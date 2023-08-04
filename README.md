@@ -4,6 +4,8 @@
 
 We are pleased to announce the initial version of **DevGPT**, a powerful tool designed to streamline your coding workflow like never before. Say goodbye to manual coding, as DevGPT takes your tickets and generates code directly in your IDE.
 
+[Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw)
+
 ![DevGPT](./devgpt-screenshot)
 
 ## Transform Tickets into Code Effortlessly
@@ -16,7 +18,7 @@ No matter which Git provider you use or which IDE you prefer, DevGPT seamlessly 
 
 ## Help Us Improve!
 
-As with any new tool, there might be a few bugs in this version. We welcome your feedback and bug reports on our Discord channel to help us make DevGPT even better.
+As with any new tool, there might be a few bugs in this version. We welcome your feedback and bug reports on our Discord channel to help us make DevGPT even better. [Our community discord is open to all](https://discord.com/invite/6GFtwzuvtw)
 
 ## Join Our Community
 
