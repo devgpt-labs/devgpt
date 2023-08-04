@@ -6,6 +6,34 @@ We are pleased to announce the initial version of **DevGPT**, a powerful tool de
 
 [Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw)
 
+# Getting Started with DevGPT
+
+Welcome to DevGPT, your code wizard for effortless issue-solving! Let's get you up and running in no time with these simple steps:
+
+## Prerequisites
+
+- **Paid Subscription:** To enjoy the full range of DevGPT features, you'll need an active paid subscription. Make sure you've subscribed to access all the magic.
+
+- **Download the Release:** Head over to our [GitHub Releases](https://github.com/your-repo/releases) page and download the latest version of DevGPT that suits your system and environment.
+
+## Installation
+
+Once you have the DevGPT release package, follow these straightforward installation steps:
+
+1. **Unpack the Package:** Extract the contents of the downloaded package to any location of your choice on your computer.
+
+## Getting Started
+
+With DevGPT installed, you're all set to start your coding journey. Here's how to dive in:
+
+1. **Launch DevGPT:** Open your terminal or command prompt, and run the DevGPT application.
+
+2. **Log In:** When prompted, log in with your registered account to access your personalized DevGPT workspace.
+
+3. **Start Issue-Solving:** Now comes the exciting part! Browse through the list of issues, pick one that sparks your interest, and let DevGPT work its magic by generating the code for you.
+
+We're thrilled to have you on board with DevGPT. Let's code together and make problem-solving a delightful experience. Happy coding!
+
 ![DevGPT](./devgpt-screenshot)
 
 ## Transform Tickets into Code Effortlessly
