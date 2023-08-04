@@ -4,6 +4,8 @@
 
 We are pleased to announce the initial version of **DevGPT**, a powerful tool designed to streamline your coding workflow like never before. Say goodbye to manual coding, as DevGPT takes your tickets and generates code directly in your IDE.
 
+![DevGPT](./devgpt-screenshot)
+
 ## Transform Tickets into Code Effortlessly
 
 With DevGPT, writing code from your tickets is a breeze. Just describe your requirements, and DevGPT will handle the rest, saving you time and effort.
