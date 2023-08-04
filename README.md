@@ -32,7 +32,7 @@ With DevGPT installed, you're all set to start your coding journey. Here's how t
 
 2. **Log In:** When prompted, log in with your registered account to access your personalized DevGPT workspace.
 
-3. **Start Issue-Solving:** Now comes the exciting part! Browse through the list of issues, pick one that sparks your interest, and let DevGPT work its magic by generating the code for you.
+3. **Start Issue-Solving:** Now comes the exciting part! Write in issues, tickets, features or bugs and solve them via DevGPT.
 
 We're thrilled to have you on board with DevGPT. Let's code together and make problem-solving a delightful experience. Happy coding!
 
