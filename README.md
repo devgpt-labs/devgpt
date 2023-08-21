@@ -14,7 +14,7 @@ Welcome to DevGPT, your code wizard for effortless issue-solving! Let's get you 
 
 - **Paid Subscription:** To enjoy the full range of DevGPT features, you'll need an active paid subscription. Make sure you've subscribed to access all the magic.
 
-- **Download the Release:** Head over to our [GitHub Releases](https://github.com/february-labs/devgpt-releases/releases/tag/release) page or click [this link](https://github.com/february-labs/devgpt-releases/releases/download/release/DevGPT-1.0.0-universal.dmg) to download the latest version of DevGPT that suits your system and environment.
+- **Download the Release:** Head over to our [GitHub Releases](https://github.com/february-labs/devgpt-releases/releases/tag/release) page to download the latest version of DevGPT that suits your system and environment.
 
 ## Installation
 
