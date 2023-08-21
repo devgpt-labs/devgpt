@@ -1,4 +1,4 @@
-# DevGPT v1.0 Release Notes
+# DevGPT Release Notes
 
 ## Introducing DevGPT
 
@@ -52,4 +52,4 @@ As with any new tool, there might be a few bugs in this version. We welcome your
 
 Connect with other developers in our Discord community, share experiences, and learn new tips and tricks to maximize DevGPT's potential.
 
-We're excited to bring you DevGPT v1.0 and look forward to supporting your coding journey. Download it now and experience the ease of code generation with DevGPT!
+We're excited to bring you DevGPT and look forward to supporting your coding journey. Download it now and experience the ease of code generation with DevGPT!
