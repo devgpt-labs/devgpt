@@ -4,8 +4,6 @@
 
 We are pleased to announce the initial version of **DevGPT**, a powerful tool designed to streamline your coding workflow like never before. Say goodbye to manual coding, as DevGPT takes your tickets and generates code directly in your IDE.
 
-[I just want the download](https://github.com/february-labs/devgpt-releases/releases/download/release/DevGPT-1.0.0-universal.dmg)
-
 [Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw)
 
 # Getting Started with DevGPT:
