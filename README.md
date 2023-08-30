@@ -22,9 +22,9 @@ Once you have the DevGPT release package, follow these straightforward installat
 
 1. **Run the correct installer for your operating system:** The installer will run and install DevGPT for you.
 
-MacOS: .dmg
-Windows: .exe
-Linux: .snap
+```MacOS: .dmg```
+```Windows: .exe```
+```Linux: .snap```
 
 If you have any questions about installation, get in touch with our team via [Discord](https://discord.com/invite/6GFtwzuvtw)!
 
