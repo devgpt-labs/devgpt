@@ -20,7 +20,13 @@ Welcome to DevGPT, your code wizard for effortless issue-solving! Let's get you 
 
 Once you have the DevGPT release package, follow these straightforward installation steps:
 
-1. **Unpack the Package:** Extract the contents of the downloaded package to any location of your choice on your computer.
+1. **Run the correct installer for your operating system:** The installer will run and install DevGPT for you.
+
+MacOS: .dmg
+Windows: .exe
+Linux: .snap
+
+If you have any questions about installation, get in touch with our team via [Discord](https://discord.com/invite/6GFtwzuvtw)!
 
 ## Getting Started
 
