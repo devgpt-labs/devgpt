@@ -26,7 +26,7 @@ Once you have the DevGPT release package, follow these straightforward installat
 
 ```Windows: .exe```
 
-```Linux: .snap```
+```Linux: .snap OR AppImage```
 
 If you have any questions about installation, get in touch with our team via [Discord](https://discord.com/invite/6GFtwzuvtw)!
 
