@@ -8,7 +8,9 @@ What does DevGPT do? Creating and editing files from existing projects to comple
 
 ## Prerequisites
 
-- **Download the Release:** Head over to our [GitHub Releases](https://github.com/february-labs/devgpt-releases/releases/tag/release) page to download the latest version of DevGPT that suits your system and environment.
+**Download the Release:** Head over to our [GitHub Releases](https://github.com/february-labs/devgpt-releases/releases/tag/release) page to download the latest version of DevGPT that suits your system and environment.
+
+We do offer a paid version of DevGPT however this isn't required to start generating code. 
 
 ## Installation
 
