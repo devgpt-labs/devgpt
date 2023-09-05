@@ -44,7 +44,7 @@ With DevGPT installed, you're all set to start your coding journey. Here's how t
 
 We're thrilled to have you on board with DevGPT. Let's code together and make problem-solving a delightful experience. Happy coding!
 
-![DevGPT](./devgpt-screenshot)
+![DevGPT](./Screenshot 2023-09-05 at 13.10.10.png)
 
 ## Transform Tickets into Code Effortlessly
 
