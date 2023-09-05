@@ -4,17 +4,9 @@
 
 What does DevGPT do? Creating and editing files from existing projects to complete a task.
 
-We are pleased to announce the initial version of **DevGPT**, a powerful tool designed to streamline your coding workflow like never before. Say goodbye to manual coding, as DevGPT takes your tickets and generates code directly in your IDE.
-
-[Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw)
-
-# Getting Started with DevGPT:
-
-Welcome to DevGPT, your code wizard for effortless issue-solving! Let's get you up and running in no time with these simple steps:
+[Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw) This is an incredibly active discord, our users and development team chat here everyday about new updates, AI, and how to best use DevGPT.
 
 ## Prerequisites
-
-- **Paid Subscription:** To enjoy the full range of DevGPT features, you'll need an active paid subscription. Make sure you've subscribed to access all the magic.
 
 - **Download the Release:** Head over to our [GitHub Releases](https://github.com/february-labs/devgpt-releases/releases/tag/release) page to download the latest version of DevGPT that suits your system and environment.
 
