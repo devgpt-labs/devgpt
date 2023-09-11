@@ -1,0 +1,176 @@
+{
+  "private": true,
+  "name": "DevGPT",
+  "description": "We're building the world's most powerful dev-agent.",
+  "version": "1.1.0",
+  "author": "February Labs",
+  "main": "app/background.js",
+  "scripts": {
+    "start": "nextron .",
+    "dev": "nextron .",
+    "build": "nextron build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:win32": "nextron build --win --ia32",
+    "build:win64": "nextron build --win --x64",
+    "build:macx": "nextron build --mac --x64",
+    "build:macarm": "nextron build --mac --arm64",
+    "build:linux": "nextron build --linux"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/february-labs/devgpt-closed-source.git"
+  },
+  "build": {
+    "asar": false,
+    "appId": "com.devgpt.app",
+    "productName": "DevGPT",
+    "electronDownload": {
+      "mirror": "https://github.com/february-labs/devgpt-releases/releases/tag/release"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "maintainer": "February Labs",
+      "icon": "resources/icon.png"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "resources/icon.icns",
+      "publisherName": "DevGPT",
+      "verifyUpdateCodeSignature": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "default",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publish": [
+        {
+          "provider": "github",
+          "owner": "february-labs",
+          "repo": "devgpt-releases",
+          "channel": "latest"
+        }
+      ],
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build-scripts/entitlements.plist",
+      "entitlementsInherit": "build-scripts/entitlements.plist",
+      "icon": "resources/icon.icns"
+    },
+    "directories": {
+      "output": "build"
+    }
+  },
+  "config": {
+    "forge": "build-scripts/forge.config.js"
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-private-methods": "^7.18.6",
+    "@chakra-ui/icons": "^2.0.19",
+    "@chakra-ui/react": "^2.7.0",
+    "@codemirror/state": "^6.2.1",
+    "@codesandbox/sandpack-react": "^2.6.9",
+    "@codesandbox/sandpack-themes": "^2.0.21",
+    "@electron-forge/cli": "^6.2.1",
+    "@electron-forge/maker-deb": "^6.2.1",
+    "@electron-forge/maker-rpm": "^6.2.1",
+    "@electron-forge/maker-squirrel": "^6.2.1",
+    "@electron-forge/maker-zip": "^6.2.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^6.2.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/open-sans": "^5.0.5",
+    "@fontsource/raleway": "^5.0.5",
+    "@octokit/rest": "^19.0.13",
+    "@rpldy/upload-drop-zone": "^1.4.1",
+    "@stripe/stripe-js": "^1.54.0",
+    "@supabase/auth-helpers-nextjs": "^0.7.3",
+    "@supabase/supabase-js": "^2.24.0",
+    "@types/node": "20.2.5",
+    "@types/react": "18.2.8",
+    "@types/react-dom": "18.2.4",
+    "@uiw/react-codemirror": "^4.21.9",
+    "@vercel/analytics": "^1.0.1",
+    "axios": "^1.4.0",
+    "buffer": "^6.0.3",
+    "codemirror": "^6.0.1",
+    "cors": "^2.8.5",
+    "css-loader": "^6.8.1",
+    "directory-tree": "^3.5.1",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "^4.4.8",
+    "electron-serve": "^1.1.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.1",
+    "eslint": "8.42.0",
+    "eslint-config-next": "13.4.4",
+    "framer-motion": "^10.12.16",
+    "howler": "^2.2.3",
+    "js-confetti": "^0.11.0",
+    "langchain": "0.0.96",
+    "micro": "^10.0.1",
+    "mixpanel-browser": "^2.47.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "next": "13.4.4",
+    "next-transpile-modules": "^10.0.1",
+    "nextron": "^8.5.0",
+    "openai-edge": "^1.2.2",
+    "react": "^18.2.0",
+    "react-codemirror-merge": "^4.21.9",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-icons": "^4.9.0",
+    "react-markdown": "^8.0.7",
+    "react-redux": "^8.1.2",
+    "react-spinners": "^0.13.8",
+    "redux": "^4.2.1",
+    "sound-play": "^1.1.0",
+    "stripe": "^12.9.0",
+    "style-loader": "^3.3.3",
+    "typescript": "5.1.3",
+    "typewriter-effect": "^2.20.1",
+    "update-electron-app": "^2.0.1",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-regenerator": "^7.22.10",
+    "@babel/plugin-transform-runtime": "^7.22.10",
+    "@electron-forge/cli": "^6.2.1",
+    "@electron-forge/maker-deb": "^6.2.1",
+    "@electron-forge/maker-rpm": "^6.2.1",
+    "@electron-forge/maker-squirrel": "^6.2.1",
+    "@electron-forge/maker-zip": "^6.2.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^6.2.1",
+    "@types/node": "^18.11.18",
+    "@types/react": "^18.0.26",
+    "electron": "^21.4.4",
+    "electron-builder": "^24.6.3",
+    "next": "13.4.4",
+    "nextron": "^8.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.9.4"
+  }
+}
