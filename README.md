@@ -1,16 +1,21 @@
-# DevGPT Release Notes
+# DevGPT: We're building the world's best open-source dev agent.
 
-## Introducing DevGPT
+## Table of Contents
 
-What does DevGPT do? Creating and editing files from existing projects to complete a task.
+1. [Introduction](#Introduction)
+2. [Introduction](#Introduction)
+3. [Features](#Features)
+4. [How It Works](#How-It-Works)
+5. [Key Outcomes](#Key-Outcomes)
+6. [FAQs](#FAQs)
+7. [Getting Started for Open-Source Contributors](#Getting-Started-for-Open-Source-Contributors)
+8. [Support](#Support)
 
-[Join our discord to ask questions, get help and give feedback](https://discord.com/invite/6GFtwzuvtw) This is an incredibly active discord, our users and development team chat here everyday about new updates, AI, and how to best use DevGPT.
+## Introduction
 
-## Prerequisites
+Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4 and other models.
 
-**Download the Release:** Head over to https://www.devgpt.com/ or our Github Releases page to download the latest version of DevGPT that suits your system and environment.
-
-We do offer a paid version of DevGPT however this isn't required to start generating code. 
+![DevGPT](Preview.png)
 
 ## Installation
 
@@ -18,42 +23,58 @@ Once you have the DevGPT release package, follow these straightforward installat
 
 1. **Run the correct installer for your operating system:** The installer will run and install DevGPT for you.
 
-```MacOS: .dmg```
+`MacOS: .dmg`
 
-```Windows: .exe```
+`Windows: .exe`
 
-```Linux: .snap OR AppImage```
+`Linux: .snap OR AppImage`
 
 If you have any questions about installation, get in touch with our team via [Discord](https://discord.com/invite/6GFtwzuvtw)!
 
-## Getting Started
+## Features
 
-With DevGPT installed, you're all set to start your coding journey. Here's how to dive in:
+- **Code Generation**: Enter a prompt and get your required code generated.
+- **One-Click Sync**: Directly sync generated code to your local code editor.
+- **Personalized Training**: Our AI model trains on your code repository to generate code that perfectly fits into your codebase.
+- **Follow-Up Prompts**: Need to modify generated code? Just enter follow-up prompts.
 
-1. **Launch DevGPT:** Open your terminal or command prompt, and run the DevGPT application.
+## How It Works
 
-2. **Log In:** When prompted, log in with your registered account to access your personalized DevGPT workspace.
+1. **Type Your Prompt**: Simply enter a prompt describing the code you need.
+2. **Wait for Generation**: Our model takes an average of 40 seconds to generate your code.
+3. **Sync to Local Editor**: With one click, sync the generated code to your local code editor.
+4. **Optional Follow-Up Prompts**: If you wish to modify the generated code, you can enter follow-up prompts.
 
-3. **Start Issue-Solving:** Now comes the exciting part! Write in issues, tickets, features or bugs and solve them via DevGPT.
+## Key Outcomes
 
-We're thrilled to have you on board with DevGPT. Let's code together and make problem-solving a delightful experience. Happy coding!
+- **Write Unit Tests**: Automatically generate unit tests for your codebase.
+- **Write Complex Functions**: No need to fret over complex algorithms; let DevGPT handle them.
+- **Create Components**: Create UI/UX components effortlessly.
+- **Debug**: Troubleshoot issues in your code easily.
 
-![DevGPT](Screenshot%202023-09-05%20at%2013.10.10.png)
+## FAQs
 
-## Transform Tickets into Code Effortlessly
+1. **Is this similar to Github Copilot?**
+   - No, we are not an autocomplete tool. We handle entire tasks, acting as your co-developer.
+2. **How much time will this save me?**
+   - Our average user saves 1.5 hours every day, allowing you to focus on more complex and fulfilling tasks.
 
-With DevGPT, writing code from your tickets is a breeze. Just describe your requirements, and DevGPT will handle the rest, saving you time and effort.
+## Getting Started for Open-Source Contributors
 
-## Compatibility with All Git Providers and IDEs
+1. Create a new project on Supabase.com
+2. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/settings/api, copy the URL (it should be like: https://{PROJECT_ID}.supabase.co) and paste into "NEXT_PUBLIC_SUPABASE_URL" in your "renderer/EXAMPLE.env". Find the anon public key below and paste into "NEXT_PUBLIC_SUPABASE_ANON_KEY" in your "renderer/EXAMPLE.env". - Please rename this file to ".env".
+3. Whilst in your new ".env" file, change the value of "NEXT_PUBLIC_OPENAI_API_KEY" to your OpenAI API key.
+4. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/sql/new and copy the SQL code from the file "supabase/SupabaseSetup.sql" into the text box and press RUN.
+5. Run NPM install // Yarn install in the root directory of the project in your terminal.
+6. Run NPM run dev // Yarn run dev in terminal.
+7. Sign up to DevGPT in your local enviroment and see your account appear in your Supabase Table; you'll need to confirm your email address via email and this may require you to restart the app after confirmation.
 
-No matter which Git provider you use or which IDE you prefer, DevGPT seamlessly integrates, making it adaptable to your existing workflow.
+## Support
 
-## Help Us Improve!
+For any queries, issues, or support needs, feel free to contact us at support@devgpt.com
 
-As with any new tool, there might be a few bugs in this version. We welcome your feedback and bug reports on our Discord channel to help us make DevGPT even better. [Our community discord is open to all](https://discord.com/invite/6GFtwzuvtw)
+---
 
-## Join Our Community
+**Happy Coding!**
 
-Connect with other developers in our Discord community, share experiences, and learn new tips and tricks to maximize DevGPT's potential.
-
-We're excited to bring you DevGPT and look forward to supporting your coding journey. Download it now and experience the ease of code generation with DevGPT!
+The DevGPT Team

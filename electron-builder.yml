@@ -1,0 +1,17 @@
+appId: com.example.nextron
+productName: DevGPT
+copyright: Copyright © 2023 February Labs
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: [{
+      "provider": "github",
+      "owner": "february-labs"
+      "repo": "devgpt-releases",
+    }],
+
