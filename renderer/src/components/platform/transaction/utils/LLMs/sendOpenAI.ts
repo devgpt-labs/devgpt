@@ -10,6 +10,20 @@ const sendGPT4Request = async ({
   const apiKey = process?.env?.NEXT_PUBLIC_OPENAI_API_KEY;
   const endpoint = "https://api.openai.com/v1/chat/completions";
 
+  let tokens;
+
+  switch (model) {
+    case "gpt-4":
+      tokens = 4000;
+      break;
+    case "gpt-4-32k":
+      tokens = 10000;
+      break;
+    default:
+      tokens = 2000;
+      break;
+  }
+
   const headers = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${apiKey}`,
@@ -31,7 +45,7 @@ const sendGPT4Request = async ({
       },
       ...(call ? [call] : []),
     ],
-    max_tokens: 2000,
+    max_tokens: tokens,
   };
 
   try {
@@ -43,6 +57,13 @@ const sendGPT4Request = async ({
 
     if (response.ok) {
       const responseData = await response.json();
+
+      if (functions) {
+        return {
+          response: responseData.choices[0].message.function_call.arguments,
+        };
+      }
+
       return { response: responseData.choices[0].message.content };
     }
 

@@ -23,28 +23,44 @@ const getLofaf = async (prompt, directory, context) => {
       const relevant = await sendToLLM({
         stream: false,
         model: "gpt-3.5-turbo-16k",
-        role: `You are a top tier developer. You should return a list of files, from the list of files provided
-				return all the files you NEED to EDIT or READ or CREATE to complete the task.
-				also select one similar file that you can use as a reference. E.g. a similar file in the same directory.
+        role: `You are a top tier developer.
+				You are going to be given a task and a list of files in the codebase.
+				You need to respond with a csv of files that will be required complete the task.
 				If you have to create a new file, give it a relevant path.
 			  `,
         content: `
-				Here are the files in the codebase so far: "${lofafChunk}" /n/n
-				Here is the task I am trying to complete: "${prompt}" /n/n
+				task: "${prompt}" /n/n
+				list of files: "${lofafChunk}" /n/n
 				
-				IMPORTANT, return ONLY an array of file names
-				Example:
-				['${directory}/src/fileOne.js', '${directory}/src/components/fileOne.test.js' , '${directory}/fileTwo.py']
+				IMPORTANT, respond with ONLY the csv of files /n/n
+				Example response: /n/n
+				${directory}/src/fileOne.js, ${directory}/src/components/fileOne.test.js, ${directory}/fileTwo.py
 				`,
+        functions: [
+          {
+            name: "send_list_of_files_to_llm",
+            description:
+              "Send a list of files that are relevant to a task to an LLM",
+            parameters: {
+              type: "object",
+              properties: {
+                comments: {
+                  type: "string",
+                  description: "Any comments you want to display to the user",
+                },
+                csvOfFiles: {
+                  type: "string",
+                  description: "A comma separated list of files directories",
+                },
+              },
+            },
+          },
+        ],
       });
 
-      let codeToParse = await makeCodeParseable(
-        String(relevant.response).replace(/(\r\n|\n|\r)/gm, "")
-      );
+      const parsedResponse = JSON.parse(relevant.response);
 
-      codeToParse = JSON.parse(`{"arr": "${codeToParse}"}`);
-
-      return codeToParse.arr;
+      return parsedResponse.csvOfFiles.split(",");
     };
 
     let processedLofaf = await chunkAndMapToLLMPromise(
@@ -71,9 +87,6 @@ const getLofaf = async (prompt, directory, context) => {
 
     //join array
     processedLofaf = processedLofaf.join(",");
-
-    //remove quotes
-    processedLofaf = processedLofaf.slice(1, -1);
 
     resolve(processedLofaf);
   });

@@ -444,51 +444,55 @@ const Environment = (transaction_id: any) => {
 
           generateQuestions(prompt, technologiesUsed, context).then(
             (questions) => {
-              //convert questions csv to array
-              let questionsArray = ["What is the purpose of this task?"];
-              if (questions.includes("\n")) {
-                questionsArray = questions.split("\n");
-              } else if (questions.includes(",")) {
-                questionsArray = questions.split(",");
-              }
-
-              let questionsAndAnswers = questionsArray.map((question) => {
-                return {
-                  question: question,
-                  answer: "",
-                  submitted: false,
-                };
-              });
-
-              //filter out empty questions or questions that are less than 10 characters
-              questionsAndAnswers = questionsAndAnswers.filter(
-                (question) => question.question.length > 10
-              );
-
-              //push each question to history
-              const questionsAndHistoryMessages = questionsAndAnswers.flatMap(
-                (question) => {
-                  return [
-                    {
-                      content: question.question,
-                      type: "output",
-                      isUser: false,
-                      source: "question",
-                      generation_round: generationRound,
-                    },
-                    {
-                      content: "",
-                      type: "input",
-                      isUser: true,
-                      submitted: false,
-                      source: "answer",
-                      generation_round: generationRound,
-                    },
-                  ];
+              try {
+                //convert questions csv to array
+                let questionsArray = ["What is the purpose of this task?"];
+                if (questions.includes("\n")) {
+                  questionsArray = questions.split("\n");
+                } else if (questions.includes(",")) {
+                  questionsArray = questions.split(",");
                 }
-              );
 
-              setHistory([...initState, ...questionsAndHistoryMessages]);
+                let questionsAndAnswers = questionsArray.map((question) => {
+                  return {
+                    question: question,
+                    answer: "",
+                    submitted: false,
+                  };
+                });
+
+                //filter out empty questions or questions that are less than 10 characters
+                questionsAndAnswers = questionsAndAnswers.filter(
+                  (question) => question.question.length > 10
+                );
+
+                //push each question to history
+                const questionsAndHistoryMessages = questionsAndAnswers.flatMap(
+                  (question) => {
+                    return [
+                      {
+                        content: question.question,
+                        type: "output",
+                        isUser: false,
+                        source: "question",
+                        generation_round: generationRound,
+                      },
+                      {
+                        content: "",
+                        type: "input",
+                        isUser: true,
+                        submitted: false,
+                        source: "answer",
+                        generation_round: generationRound,
+                      },
+                    ];
+                  }
+                );
+
+                setHistory([...initState, ...questionsAndHistoryMessages]);
+              } catch (e) {
+                handleFinalSubmit();
+              }
             }
           );
         } else {
@@ -721,10 +725,6 @@ const Environment = (transaction_id: any) => {
       router.push(`/platform/transactions/new`);
     }
   }, [transaction_id.transaction_id]);
-
-  // if (showTutorial === null) {
-  //   return;
-  // }
 
   return (
     <>
@@ -987,7 +987,7 @@ const Environment = (transaction_id: any) => {
                     }}
                     onPaste={(e: any) => {
                       // Add to the end of the setPrompt
-                      setPrompt(prompt + e.clipboardData.getData("Text"));
+                      setPrompt(e.clipboardData.getData("Text"));
                     }}
                     onKeyDown={(e: any) => {
                       // If the user does shift + enter, we dont want to submit the task
