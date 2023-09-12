@@ -49,7 +49,6 @@ import {
   generateQuestions,
   generateCode,
   generateNewGenerationCode,
-  syncCodeChangesWithLocalFileSystem,
   saveTaskInDatabase,
   generateAdvice,
   detectPromptIntent,
@@ -58,6 +57,7 @@ import calculateTimeSaved from "@/src/utils/calculateTimeSaved";
 import calculateUserRanking from "@/src/utils/calculateUserRanking";
 import playAudio from "@/src/utils/playAudio";
 import makeCodeParseable from "@/src/components/platform/transaction/utils/makeCodeParseable";
+import syncCodeChangesWithLocalFileSystem from "@/src/components/platform/transaction/utils/syncCodeChangesWithLocalFileSystem";
 
 //types
 import MessageType from "@/src/types/message";
