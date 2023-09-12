@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Box, useToast } from "@chakra-ui/react";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Box,
+  Button,
+  useToast,
+} from "@chakra-ui/react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { FiMessageSquare } from "react-icons/fi";
 import router from "next/router";
@@ -8,6 +18,7 @@ import deleteTask from "@/src/utils/deleteTask";
 import NavItem from "../../navigation/NavItem";
 import { useAuthContext } from "@/src/context";
 import getTasks from "@/src/utils/getTasks";
+import AlertConfirmation from "../../AlertConfirmation";
 
 interface TaskTabsProps {
   tasks: any;
@@ -18,6 +29,7 @@ interface TaskTabsProps {
 
 const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
   const [tasksLoaded, setTasksLoaded] = useState(false);
+  const [deletingTask, setDeletingTask] = useState(null);
 
   const { user } = useAuthContext();
   const toast = useToast();
@@ -35,6 +47,16 @@ const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
 
   return (
     <Box>
+      <AlertConfirmation
+        isOpen={deletingTask !== null}
+        onClose={() => setDeletingTask(null)}
+        onConfirm={() => {
+          deleteTask(deletingTask.transaction_id, toast, refresh, setRefresh);
+          setDeletingTask(null);
+        }}
+        title={"Delete task"}
+        bodyText={"Are you sure? This permanently deletes this task."}
+      />
       {tasks.length === 0 ? (
         <NavItem iconColor="white">
           {tasksLoaded ? "No tasks found yet" : "Loading tasks..."}
@@ -52,13 +74,19 @@ const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
                   : "gray.900"
               }
               borderRadius={0}
+              position={"relative"}
               secondIcon={
                 <Box
-                  mr={4}
+                  position="absolute"
+                  right={0}
+                  top={0}
+                  height="100%"
+                  display="flex"
+                  alignItems={"center"}
+                  pr={4}
                   onClick={(e) => {
                     e.stopPropagation();
-
-                    deleteTask(task.transaction_id, toast, refresh, setRefresh);
+                    setDeletingTask(task);
                   }}
                 >
                   <AiOutlineDelete color={"#E53E3E"} />
