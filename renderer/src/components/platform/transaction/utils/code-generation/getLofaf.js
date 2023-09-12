@@ -5,7 +5,9 @@ import makeCodeParseable from "@/src/components/platform/transaction/utils/makeC
 
 import chunkAndMapToLLMPromise from "./chunkAndMapToLLMPromise";
 
-const MAX_LOFAF_CHUNK_SIZE = 400;
+const MAX_LOFAF_CHUNK_SIZE = 1250;
+const MAX_CHUNKS = 2;
+
 const getLofaf = async (prompt, directory, context) => {
   return new Promise(async (resolve, reject) => {
     console.log("🚀 Generation Started");
@@ -20,7 +22,7 @@ const getLofaf = async (prompt, directory, context) => {
     const asyncRelevantLofaf = async (lofafChunk) => {
       const relevant = await sendToLLM({
         stream: false,
-        model: "gpt-4",
+        model: "gpt-3.5-turbo-16k",
         role: `You are a top tier developer. You should return a list of files, from the list of files provided
 				return all the files you NEED to EDIT or READ or CREATE to complete the task.
 				also select one similar file that you can use as a reference. E.g. a similar file in the same directory.
@@ -48,7 +50,8 @@ const getLofaf = async (prompt, directory, context) => {
     let processedLofaf = await chunkAndMapToLLMPromise(
       lofaf,
       MAX_LOFAF_CHUNK_SIZE,
-      asyncRelevantLofaf
+      asyncRelevantLofaf,
+      MAX_CHUNKS
     );
 
     //flatten array
