@@ -1,39 +1,17 @@
-import { supabase } from "@/src/utils/supabaseClient"
+import getAPIURL from "@/src/utils/getAPIURL";
 
 const saveTaskInDatabase = async (user_id, transactionId, prompt, history) => {
-  return new Promise(async (resolve, reject) => {
-    if (!supabase) {
-      console.log("❌ No supabase client provided");
-      reject({ result: "fail - no supabase client provided" });
-    }
-
-    if (!user_id || !prompt || !history) {
-      console.log("❌ No user_id, prompt, or history provided");
-      reject({ result: "fail - no user_id, prompt, or history provided" });
-    }
-
-    let transactionObject = {
-      user_id: user_id,
-      input: prompt,
-      history: JSON.stringify(history),
-    };
-
-    if (
-      transactionId &&
-      transactionId !== "new" &&
-      typeof transactionId === "string"
-    ) {
-      transactionObject.transaction_id = transactionId;
-    }
-
-    const { data, error } = await supabase
-      .from("new_transactions")
-      .upsert(transactionObject)
-      .select()
-      .single();
-
-    resolve(data?.transaction_id);
-  });
+  try {
+    const response = await fetch(`${getAPIURL}`, {
+      method: "POST",
+      body: JSON.stringify({ user_id, transactionId, prompt, history }),
+    });
+    const json = await response.json();
+    return json;
+  } catch (error) {
+    console.warn({ error });
+    return error;
+  }
 };
 
 export default saveTaskInDatabase;
