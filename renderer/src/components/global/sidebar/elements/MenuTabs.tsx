@@ -121,7 +121,7 @@ const MenuTabs = () => {
     {
       name: "New Task",
       icon: FiPlus,
-      command: checkOS("⌘ + T", "Ctrl + T"),
+      command: checkOS("⌘ + N", "Ctrl + N"),
       onClick: () => {
         newTaskHandler();
       },
@@ -211,10 +211,15 @@ const MenuTabs = () => {
     shell.openExternal("https://february-labs.gitbook.io/february-labs/");
   });
 
-  // Listens for Cmd+T and Ctrl+T to create a new task
-  useGlobalKeyboardShortcut("t", () => {
+  // Listens for Cmd+N and Ctrl+N to create a new task
+  useGlobalKeyboardShortcut("n", () => {
     setNewTaskCreated(true);
     router.push(`/platform/transactions/new`);
+  });
+
+  // Listens for Cmd+T and Ctrl+T to select target repo
+  useGlobalKeyboardShortcut("t", () => {
+    openRepoSettings();
   });
 
   // Listens for Cmd+B and Ctrl+B to report bugs
