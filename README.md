@@ -3,7 +3,7 @@
 ## Table of Contents
 
 1. [Introduction](#Introduction)
-2. [Introduction](#Introduction)
+2. [Installation](#Installation)
 3. [Features](#Features)
 4. [How It Works](#How-It-Works)
 5. [Key Outcomes](#Key-Outcomes)
