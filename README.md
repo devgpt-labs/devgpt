@@ -65,7 +65,7 @@ If you have any questions about installation, get in touch with our team via [Di
 1. Create a new project on Supabase.com
 1. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/settings/api, copy the URL (it should be like: https://{PROJECT_ID}.supabase.co) and paste into "NEXT_PUBLIC_SUPABASE_URL" in your "renderer/EXAMPLE.env". Find the anon public key below and paste into "NEXT_PUBLIC_SUPABASE_ANON_KEY" in your "renderer/EXAMPLE.env". - Please rename this file to ".env".
 1. Whilst in your new ".env" file, change the value of "NEXT_PUBLIC_OPENAI_API_KEY" to your OpenAI API key.
-1. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/sql/new and copy the SQL code from the file "supabase/SupabaseSetup.sql" into the text box and press RUN.
+1. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/sql/new and copy the SQL code from the file "supabase/schema.sql" into the text box and press RUN.
 1. Run NPM install // Yarn install in the root directory of the project in your terminal.
 1. Run NPM run dev // Yarn run dev in terminal.
 1. Sign up to DevGPT in your local enviroment and see your account appear in your Supabase Table; you'll need to confirm your email address via email and this may require you to restart the app after confirmation.
