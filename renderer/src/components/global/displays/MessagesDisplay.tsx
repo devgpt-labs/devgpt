@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 //components
 import ErrorMessage from "./messages/ErrorMessage";
@@ -8,6 +8,12 @@ import CodeDisplay from "./CodeDisplay";
 
 //types
 import Loading from "../Loading";
+
+const ScrollIntoView = () => {
+  const elementRef = useRef<null | HTMLDivElement>();
+  useEffect(() => elementRef.current.scrollIntoView());
+  return <div ref={elementRef} />;
+};
 
 interface MessagesDisplayProps {
   messages: any;
