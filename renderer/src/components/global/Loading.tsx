@@ -1,5 +1,4 @@
-import { Box, Flex, useToast, Text } from "@chakra-ui/react";
-import MoonLoader from "react-spinners/MoonLoader";
+import { Box, Flex, Text, Progress } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Message from "./Message";
 
@@ -9,7 +8,7 @@ const Loading = () => {
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
       setLoadingFailed(true);
-    }, 5000);
+    }, 300000);
     return () => clearTimeout(loadingTimer);
   }, []);
 
@@ -22,13 +21,9 @@ const Loading = () => {
             know in Discord.
           </Text>
         ) : (
-          <MoonLoader
-            color={"#ffffff"}
-            loading={true}
-            size={30}
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
+          <Box width={"100%"}>
+            <Progress borderRadius={"lg"} isIndeterminate hasStripe />
+          </Box>
         )}
       </Flex>
     </Message>

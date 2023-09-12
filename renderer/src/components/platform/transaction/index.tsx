@@ -985,10 +985,6 @@ const Environment = (transaction_id: any) => {
 
                       setPrompt(e.target.value);
                     }}
-                    onPaste={(e: any) => {
-                      // Add to the end of the setPrompt
-                      setPrompt(e.clipboardData.getData("Text"));
-                    }}
                     onKeyDown={(e: any) => {
                       // If the user does shift + enter, we dont want to submit the task
                       if (e.key === "Enter" && e.shiftKey) {
