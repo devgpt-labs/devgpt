@@ -1,4 +1,3 @@
-
 // Utils
 import sendToLLM from "@/src/components/platform/transaction/utils/LLMs/sendToLLM";
 
@@ -6,7 +5,7 @@ const detectPromptIntent = async (prompt) => {
   return new Promise(async (resolve, reject) => {
     const code_answer = await sendToLLM({
       stream: false,
-      model: "gpt-3.5",
+      model: "gpt-3.5-turbo",
       temperature: 0.1,
       role: `
 			It's your job to detect the intent of the prompt.

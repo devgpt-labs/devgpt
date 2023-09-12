@@ -3,17 +3,17 @@
 ## Table of Contents
 
 1. [Introduction](#Introduction)
-2. [Installation](#Installation)
-3. [Features](#Features)
-4. [How It Works](#How-It-Works)
-5. [Key Outcomes](#Key-Outcomes)
-6. [FAQs](#FAQs)
-7. [Getting Started for Open-Source Contributors](#Getting-Started-for-Open-Source-Contributors)
-8. [Support](#Support)
+1. [Installation](#Installation)
+1. [Features](#Features)
+1. [How It Works](#How-It-Works)
+1. [Key Outcomes](#Key-Outcomes)
+1. [FAQs](#FAQs)
+1. [Getting Started for Open-Source Contributors](#Getting-Started-for-Open-Source-Contributors)
+1. [Support](#Support)
 
 ## Introduction
 
-Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4 and other models.
+Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4-32k and other models.
 
 ![DevGPT](Preview.png)
 
@@ -41,9 +41,9 @@ If you have any questions about installation, get in touch with our team via [Di
 ## How It Works
 
 1. **Type Your Prompt**: Simply enter a prompt describing the code you need.
-2. **Wait for Generation**: Our model takes an average of 40 seconds to generate your code.
-3. **Sync to Local Editor**: With one click, sync the generated code to your local code editor.
-4. **Optional Follow-Up Prompts**: If you wish to modify the generated code, you can enter follow-up prompts.
+1. **Wait for Generation**: Our model takes an average of 40 seconds to generate your code.
+1. **Sync to Local Editor**: With one click, sync the generated code to your local code editor.
+1. **Optional Follow-Up Prompts**: If you wish to modify the generated code, you can enter follow-up prompts.
 
 ## Key Outcomes
 
@@ -56,18 +56,19 @@ If you have any questions about installation, get in touch with our team via [Di
 
 1. **Is this similar to Github Copilot?**
    - No, we are not an autocomplete tool. We handle entire tasks, acting as your co-developer.
-2. **How much time will this save me?**
+1. **How much time will this save me?**
    - Our average user saves 1.5 hours every day, allowing you to focus on more complex and fulfilling tasks.
 
 ## Getting Started for Open-Source Contributors
 
+1. Make sure you're using node v20.5.0, clone the project and npm install.
 1. Create a new project on Supabase.com
-2. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/settings/api, copy the URL (it should be like: https://{PROJECT_ID}.supabase.co) and paste into "NEXT_PUBLIC_SUPABASE_URL" in your "renderer/EXAMPLE.env". Find the anon public key below and paste into "NEXT_PUBLIC_SUPABASE_ANON_KEY" in your "renderer/EXAMPLE.env". - Please rename this file to ".env".
-3. Whilst in your new ".env" file, change the value of "NEXT_PUBLIC_OPENAI_API_KEY" to your OpenAI API key.
-4. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/sql/new and copy the SQL code from the file "supabase/SupabaseSetup.sql" into the text box and press RUN.
-5. Run NPM install // Yarn install in the root directory of the project in your terminal.
-6. Run NPM run dev // Yarn run dev in terminal.
-7. Sign up to DevGPT in your local enviroment and see your account appear in your Supabase Table; you'll need to confirm your email address via email and this may require you to restart the app after confirmation.
+1. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/settings/api, copy the URL (it should be like: https://{PROJECT_ID}.supabase.co) and paste into "NEXT_PUBLIC_SUPABASE_URL" in your "renderer/EXAMPLE.env". Find the anon public key below and paste into "NEXT_PUBLIC_SUPABASE_ANON_KEY" in your "renderer/EXAMPLE.env". - Please rename this file to ".env".
+1. Whilst in your new ".env" file, change the value of "NEXT_PUBLIC_OPENAI_API_KEY" to your OpenAI API key.
+1. Go to https://supabase.com/dashboard/project/{PROJECT_ID}/sql/new and copy the SQL code from the file "supabase/SupabaseSetup.sql" into the text box and press RUN.
+1. Run NPM install // Yarn install in the root directory of the project in your terminal.
+1. Run NPM run dev // Yarn run dev in terminal.
+1. Sign up to DevGPT in your local enviroment and see your account appear in your Supabase Table; you'll need to confirm your email address via email and this may require you to restart the app after confirmation.
 
 ## Support
 

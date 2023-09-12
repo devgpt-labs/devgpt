@@ -1,5 +1,6 @@
 import sendOpenAI from "./sendOpenAI";
 
+//this will later be modified to use different LLM providers, OSS uses OpenAI but we (february labs) use Azure.
 const sendToLLM = async ({
   stream,
   model,
@@ -9,23 +10,9 @@ const sendToLLM = async ({
   functions,
   temperature,
 }) => {
-  const modelParsed = { OpenAI: null };
-
-  switch (model) {
-    case "gpt-3.5":
-      modelParsed.OpenAI = "gpt-3.5-turbo";
-      break;
-    case "gpt-4":
-      modelParsed.OpenAI = "gpt-4";
-      break;
-    default:
-      modelParsed.OpenAI = "gpt-4";
-      break;
-  }
-
   const OAIResponse = await sendOpenAI({
     stream,
-    model: modelParsed.OpenAI,
+    model,
     role,
     content,
     call,

@@ -1,4 +1,3 @@
-
 // Utils
 import sendToLLM from "@/src/components/platform/transaction/utils/LLMs/sendToLLM";
 
@@ -6,7 +5,7 @@ const generateAdvice = async (prompt, answers, language, context) => {
   return new Promise(async (resolve, reject) => {
     const code_answer = await sendToLLM({
       stream: false,
-      model: "gpt-3.5",
+      model: "gpt-3.5-turbo",
       temperature: 0.4,
       role: `
 			You are a top AI developer agent, I want you to tell the developer how you would do their task, without writing any actual code.

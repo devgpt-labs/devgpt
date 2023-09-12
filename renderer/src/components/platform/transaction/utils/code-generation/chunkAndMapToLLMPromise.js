@@ -1,5 +1,10 @@
-const chunkAndMapToLLMPromise = async (array, chunkSize, asyncHandler) => {
-  const chunkedLofaf = array.reduce((resultArray, item, index) => {
+const chunkAndMapToLLMPromise = async (
+  array,
+  chunkSize,
+  asyncHandler,
+  maxChunks
+) => {
+  let chunkedLofaf = array.reduce((resultArray, item, index) => {
     const chunkIndex = Math.floor(index / chunkSize);
 
     if (!resultArray[chunkIndex]) {
@@ -10,6 +15,11 @@ const chunkAndMapToLLMPromise = async (array, chunkSize, asyncHandler) => {
 
     return resultArray;
   }, []);
+
+  // If maxChunks is defined, only process the first maxChunks chunks
+  if (maxChunks) {
+    chunkedLofaf = chunkedLofaf.slice(0, maxChunks);
+  }
 
   const mapPromiseArray = async (arr) => {
     // Map each item to a promise
