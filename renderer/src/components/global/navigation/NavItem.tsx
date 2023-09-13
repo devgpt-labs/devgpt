@@ -39,7 +39,7 @@ const NavItem = ({
         borderRadius="3"
         role="group"
         cursor="pointer"
-        bgGradient={upgradeButton ? "linear(to-r, blue.500, teal.500)" : null}
+        bgGradient={upgradeButton ? "linear(to-r, blue.500, teal.500)" : "linear(to-r, black, black)"}
         _hover={
           upgradeButton
             ? { bgGradient: "linear(to-r, blue.400, teal.400)" }
@@ -56,9 +56,8 @@ const NavItem = ({
         <Text
           fontWeight={upgradeButton ? "bold" : "medium"}
           fontSize={14}
-          // Break any text that is too long
-          overflowWrap="break-word"
-          maxW={80}
+          overflowWrap="anywhere"
+          maxW='75%'
         >
           {hoverText && isHovered ? hoverText : children}
         </Text>

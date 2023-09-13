@@ -3,14 +3,12 @@ import { supabase } from "@/src/utils/supabaseClient";
 import store from "@/redux/store";
 
 interface saveTechStackProps {
-  onSettingsClose: () => void;
   technologiesUsed: string;
   toast: any;
   user: any;
 }
 
 const saveTechStack = async ({
-  onSettingsClose,
   technologiesUsed,
   toast,
   user,

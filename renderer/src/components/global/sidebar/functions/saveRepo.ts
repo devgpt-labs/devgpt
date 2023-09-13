@@ -3,7 +3,6 @@ import { supabase } from "@/src/utils/supabaseClient";
 import store from "@/redux/store";
 
 interface saveRepoProps {
-  onSettingsClose: () => void;
   userIsPremium: boolean;
   localRepoDirectory: string;
   toast: any;
@@ -11,7 +10,6 @@ interface saveRepoProps {
 }
 
 const saveRepo = async ({
-  onSettingsClose,
   userIsPremium,
   localRepoDirectory,
   toast,
@@ -48,8 +46,6 @@ const saveRepo = async ({
         position: "top-right",
         isClosable: true,
       });
-
-      onSettingsClose();
 
       //update redux store with new localRepoDirectory and technologiesUsed
       store.dispatch({

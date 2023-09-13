@@ -9,7 +9,6 @@ import {
 import SuggestionTag from "@/src/components/global/SuggestionTag";
 
 interface TutorialProps {
-  setViewingTargetRepo: any;
   onSettingsOpen: any;
   progress: any;
   localRepoDir: any;
@@ -17,7 +16,6 @@ interface TutorialProps {
 }
 
 const Tutorial = ({
-  setViewingTargetRepo,
   onSettingsOpen,
   progress,
   localRepoDir,
@@ -68,7 +66,6 @@ const Tutorial = ({
           label="Select Project Directory (30s)"
           suggestion={`Select the folder that contains your code repository.`}
           onClick={() => {
-            setViewingTargetRepo(true);
             onSettingsOpen();
           }}
           Icon={null}
@@ -80,7 +77,6 @@ const Tutorial = ({
           label="Select Tech Stack (20s)"
           suggestion={`Choose your project's languages and frameworks.`}
           onClick={() => {
-            setViewingTargetRepo(false);
             onSettingsOpen();
           }}
           Icon={null}

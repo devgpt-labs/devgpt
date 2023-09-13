@@ -7,13 +7,25 @@ import {
   AlertDialogOverlay,
   Button,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const AlertConfirmation = ({ isOpen, onClose, onConfirm, title, bodyText }) => {
   const cancelRef = useRef();
 
+  // If the user hits delete, run the onConfirm function  
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        onConfirm();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onConfirm]);
+
   return (
     <AlertDialog
+    isCentered={true}
       isOpen={isOpen}
       leastDestructiveRef={cancelRef}
       onClose={onClose}
@@ -23,9 +35,7 @@ const AlertConfirmation = ({ isOpen, onClose, onConfirm, title, bodyText }) => {
           <AlertDialogHeader fontSize="lg" fontWeight="bold">
             {title}
           </AlertDialogHeader>
-
           <AlertDialogBody>{bodyText}</AlertDialogBody>
-
           <AlertDialogFooter>
             <Button ref={cancelRef} onClick={onClose}>
               Cancel
