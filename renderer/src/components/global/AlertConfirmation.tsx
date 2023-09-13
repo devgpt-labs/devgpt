@@ -27,10 +27,10 @@ const AlertConfirmation = ({ isOpen, onClose, onConfirm, title, bodyText }) => {
           <AlertDialogBody>{bodyText}</AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="red" onClick={onConfirm} ml={3}>
+            <Button colorScheme="red" ref={cancelRef} onClick={onConfirm} ml={3}>
               Delete
             </Button>
           </AlertDialogFooter>
