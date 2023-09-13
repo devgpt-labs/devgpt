@@ -28,7 +28,7 @@ const provideFeedbackOnTask = async (
 
     // If there's an error, show a toast
     if (error) {
-      toast({
+      toast({ 
         position: "top-right",
         title: "Oops! Something went wrong.",
         description: `Please try again later. 😢 code: 0009`,
