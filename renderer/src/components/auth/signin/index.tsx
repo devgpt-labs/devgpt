@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../../context";
-import { supabase } from "@/src/utils/supabase/supabase";
+import { supabase } from "@/src/utils/supabaseClient"
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { IoPauseCircleOutline, IoPlayCircleOutline } from "react-icons/io5";
 import Logo from "@/src/components/global/Logo";
@@ -74,8 +74,7 @@ export default function Auth() {
     if (email === "" || password === "") {
       toast({
         position: "top-right",
-
-        title: "Please enter a valid email",
+        title: "Please enter your email",
         status: "error",
         isClosable: true,
       });
