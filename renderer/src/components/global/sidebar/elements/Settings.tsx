@@ -40,7 +40,7 @@ import addRepo from "@/src/utils/addRepo";
 import { supabase } from "@/src/utils/supabase/supabase";
 
 const Settings = () => {
-  const [localRepoDirectory, setLocalRepoDirectory] = useState("");
+  const [repo, setRepo] = useState("");
   const [technologiesUsed, setTechnologiesUsed] = useState("");
   const [fileTypesToRemove, setFileTypesToRemove] = useState("");
   const [context, setContext] = useState("");
@@ -77,7 +77,7 @@ const Settings = () => {
       return;
     }
     if (user && result) {
-      setLocalRepoDirectory(result);
+      setRepo(result);
       setIsCounting(false);
       setLoading(false);
     }
@@ -88,7 +88,7 @@ const Settings = () => {
       <Flex justifyContent="flex-end" p={4}>
         {!loading && (
           <Flex pl={4}>
-            <Button mr={3} onClick={() => {}}>
+            <Button mr={3} onClick={() => { }}>
               Cancel
             </Button>
             <Button
@@ -119,9 +119,9 @@ const Settings = () => {
             pr="8rem"
             isDisabled={true}
             placeholder={checkOS("Users/me/my-repo", "C:/Users/me/my-repo")}
-            value={localRepoDirectory}
+            value={repo}
             onChange={(e) => {
-              setLocalRepoDirectory(e.target.value);
+              setRepo(e.target.value);
             }}
           />
           <InputRightElement width="8rem">
@@ -195,8 +195,8 @@ const Settings = () => {
           {!loading
             ? "Add A Repo to DevGPT"
             : loading
-            ? "Loading..."
-            : "Select a project directory."}
+              ? "Loading..."
+              : "Select a project directory."}
         </Text>
       </Box>
       {loading ? (
@@ -219,7 +219,7 @@ const Settings = () => {
                   addRepo(
                     user,
                     technologiesUsed,
-                    localRepoDirectory,
+                    repo,
                     context,
                     toast
                   );

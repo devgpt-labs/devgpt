@@ -2,11 +2,13 @@ import * as actionTypes from "./actionTypes";
 
 const initialState = {
   theme: "Normal",
-  selectedRepo: '',
-  localRepoDirectory: "",
-  technologiesUsed: "",
   isSettingsOpen: false,
-  context: "",
+  repos: [],
+  selectedRepo: {
+    localRepoDirectory: "",
+    technologiesUsed: "",
+    context: ""
+  }
 };
 
 const mainReducer = (state = initialState, action) => {
@@ -15,14 +17,34 @@ const mainReducer = (state = initialState, action) => {
       return {
         ...state,
         theme: action.payload?.theme || state.theme,
-        localRepoDirectory:
-          action.payload?.localRepoDirectory || state.localRepoDirectory,
-        technologiesUsed:
-          action.payload?.technologiesUsed || state.technologiesUsed,
         isSettingsOpen: action.payload?.isSettingsOpen || state.isSettingsOpen,
-        context: action.payload?.context || state.context,
-        selectedRepo: action.payload?.selectedRepo || state.selectedRepo,
       };
+    case actionTypes.MOUNT_REPOS:
+      return {
+        ...state,
+        repos: action.payload,
+        selectedRepo: action.payload[0]
+      }
+    case actionTypes.REMOVE_REPO:
+      return {
+        ...state,
+        repos: state.repos.filter(repo => repo.id !== action.payload)
+      }
+    case actionTypes.ADD_REPO:
+      console.log({
+        ...state,
+        repos: [...state.repos, action.payload]
+      });
+
+      return {
+        ...state,
+        repos: [...state.repos, action.payload]
+      }
+    case actionTypes.SELECT_REPO:
+      return {
+        ...state,
+        selectedRepo: action.payload
+      }
     default:
       return state;
   }

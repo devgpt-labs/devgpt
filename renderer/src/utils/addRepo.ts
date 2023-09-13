@@ -1,4 +1,5 @@
 import { supabase } from "./supabase/supabase";
+import store from "@/redux/store";
 
 const addRepo = async (
   user: any,
@@ -19,6 +20,17 @@ const addRepo = async (
   if (error) {
     console.log(error);
   } else { 
+    // dispatch add_repo action
+    store.dispatch({
+      type: "ADD_REPO",
+      payload: {
+        user_id: user?.id,
+        local_repo_dir: localRepoDirectory,
+        technologies_used: technologiesUsed,
+        context: context,
+      }
+    });
+
     toast({
       title: "Repo added.",
       description: "Repo added successfully.",

@@ -51,7 +51,7 @@ const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
         isOpen={deletingTask !== null}
         onClose={() => setDeletingTask(null)}
         onConfirm={() => {
-          deleteTask(deletingTask.transaction_id, toast, refresh, setRefresh);
+          deleteTask(deletingTask?.transaction_id, toast, refresh, setRefresh);
           setDeletingTask(null);
         }}
         title={"Delete task"}

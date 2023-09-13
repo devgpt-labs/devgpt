@@ -248,13 +248,12 @@ const SideBar = () => {
   const [isUserPremium, setIsUserPremium] = useState(false);
   const [allRepos, setAllRepos] = useState<any>(null);
   const [selectedRepo, setSelectedRepo] = useState(null);
+  const [codeUsage, setCodeUsage] = useState(0);
 
   useEffect(() => {
-    if (allRepos === null) {
-      getRepos(user).then((allRepos) => {
-        setAllRepos(allRepos);
-      });
-    }
+    getRepos(user).then((allRepos) => {
+      setAllRepos(allRepos);
+    });
   }, []);
 
   const {
@@ -339,7 +338,6 @@ const SideBar = () => {
     )
     .subscribe();
 
-  const [codeUsage, setCodeUsage] = useState(0);
 
   useEffect(() => {
     checkUsersCodeUsage(user?.id).then((codeReturn) => {
@@ -366,11 +364,11 @@ const SideBar = () => {
     );
   };
 
-  if (localRepoDir === null || technologiesUsed === null) {
+  if (store.getState().repos.length === 0) {
     return null;
   }
 
-  if (!localRepoDir || !technologiesUsed) {
+  if (store.getState().repos.length === 0) {
     return (
       <Modal
         size="lg"
@@ -529,7 +527,14 @@ const SideBar = () => {
         <Tooltip placement="right" label={lastItem}>
           <Center
             onClick={() => {
+              console.log({ repo });
+
               setSelectedRepo(repo.id);
+              store.dispatch({
+                type: 'SELECT_REPO',
+                repo: repo
+              })
+
             }}
             onContextMenu={(e) => {
               e.preventDefault();
@@ -550,7 +555,10 @@ const SideBar = () => {
           <MenuItem isDisabled={true}>{lastItem.toUpperCase()}</MenuItem>
           <MenuItem
             onClick={() => {
-              setSelectedRepo(repo.id);
+              store.dispatch({
+                type: 'SELECT_REPO',
+                repo: repo
+              })
             }}
           >
             Select
@@ -567,7 +575,7 @@ const SideBar = () => {
             Delete
           </MenuItem>
         </MenuList>
-      </Menu>
+      </Menu >
     );
   };
 
@@ -586,8 +594,6 @@ const SideBar = () => {
         {allRepos?.length > 0 &&
           allRepos?.map((repo) => (
             <Repo
-              selectedRepo={selectedRepo}
-              setSelectedRepo={setSelectedRepo}
               repo={repo}
             />
           ))}
@@ -693,10 +699,10 @@ const SideBar = () => {
                   <Heading size="md">
                     {user
                       ? user?.email
-                          .split("@")[0]
-                          .substring(0, 1)
-                          .toUpperCase() +
-                        user?.email.split("@")[0].substring(1, 8)
+                        .split("@")[0]
+                        .substring(0, 1)
+                        .toUpperCase() +
+                      user?.email.split("@")[0].substring(1, 8)
                       : ""}
                   </Heading>
                 </Flex>

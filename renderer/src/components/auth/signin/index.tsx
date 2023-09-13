@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../../context";
-import { supabase } from "@/src/utils/supabaseClient"
+import { supabase } from "@/src/utils/supabase/supabase"
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { IoPauseCircleOutline, IoPlayCircleOutline } from "react-icons/io5";
 import Logo from "@/src/components/global/Logo";
@@ -116,7 +116,8 @@ export default function Auth() {
       overflowY="hidden"
     >
       <Flex
-      flex={0.2}
+        flex={0.2}
+        px={10}
         height="85vh"
         flexDirection="column"
         alignItems="center"

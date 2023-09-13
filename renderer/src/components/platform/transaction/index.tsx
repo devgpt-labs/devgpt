@@ -80,20 +80,13 @@ const Environment = (transaction_id: any) => {
   //user settings
   const [files, setFiles] = useState([] as any); //used for auto-complete files with @
   const [showTutorial, setShowTutorial] = useState(null);
-  const [progress, setProgress] = useState(33.3);
+  const [progress, setProgress] = useState(50);
 
   //redux
-  const [technologiesUsed, setTechnologiesUsed] = useState(
-    store.getState().technologiesUsed
-  );
-  const [localRepoDir, setLocalRepoDir] = useState(
-    store.getState().localRepoDir
-  );
-  const [context, setContext] = useState(store.getState().context);
   const [theme, setTheme] = useState(null);
-
   const [tasks, setTasks] = useState([]);
-
+  const [repos, setRepos] = useState([]);
+  const [selectedRepo, setSelectedRepo]: any = useState({});
   const [showRedBox, setShowRedBox] = useState(false);
   const [redBoxProps, setRedBoxProps] = useState({
     label: "",
@@ -214,7 +207,10 @@ const Environment = (transaction_id: any) => {
     });
 
     const codeChanges = getLatestCodeChanges(history);
-    syncCodeChangesWithLocalFileSystem(codeChanges, localRepoDir);
+    syncCodeChangesWithLocalFileSystem(
+      codeChanges,
+      selectedRepo.local_repo_dir
+    );
   };
 
   const getLatestCodeChanges = (history) => {
@@ -289,10 +285,10 @@ const Environment = (transaction_id: any) => {
       prompt,
       followUpQuestionsString,
       lofaf,
-      localRepoDir,
-      technologiesUsed,
+      selectedRepo.local_repo_dir,
+      selectedRepo.technologies_used,
       existingCodeString,
-      context
+      selectedRepo.context
     ).then((code) => {
       //prepare for a new prompt
       resetState(true);
@@ -437,63 +433,69 @@ const Environment = (transaction_id: any) => {
 
           setHistory(initState);
 
-          getLofaf(prompt, localRepoDir, context).then((lofaf) => {
+          getLofaf(
+            prompt,
+            selectedRepo.localRepoDir,
+            selectedRepo.context
+          ).then((lofaf) => {
             setLofaf(lofaf);
           });
 
-          generateQuestions(prompt, technologiesUsed, context).then(
-            (questions) => {
-              try {
-                //convert questions csv to array
-                let questionsArray = ["What is the purpose of this task?"];
-                if (questions.includes("\n")) {
-                  questionsArray = questions.split("\n");
-                } else if (questions.includes(",")) {
-                  questionsArray = questions.split(",");
-                }
-
-                let questionsAndAnswers = questionsArray.map((question) => {
-                  return {
-                    question: question,
-                    answer: "",
-                    submitted: false,
-                  };
-                });
-
-                //filter out empty questions or questions that are less than 10 characters
-                questionsAndAnswers = questionsAndAnswers.filter(
-                  (question) => question.question.length > 10
-                );
-
-                //push each question to history
-                const questionsAndHistoryMessages = questionsAndAnswers.flatMap(
-                  (question) => {
-                    return [
-                      {
-                        content: question.question,
-                        type: "output",
-                        isUser: false,
-                        source: "question",
-                        generation_round: generationRound,
-                      },
-                      {
-                        content: "",
-                        type: "input",
-                        isUser: true,
-                        submitted: false,
-                        source: "answer",
-                        generation_round: generationRound,
-                      },
-                    ];
-                  }
-                );
-
-                setHistory([...initState, ...questionsAndHistoryMessages]);
-              } catch (e) {
-                handleFinalSubmit();
+          generateQuestions(
+            prompt,
+            selectedRepo.technologiesUsed,
+            selectedRepo.context
+          ).then((questions) => {
+            try {
+              //convert questions csv to array
+              let questionsArray = ["What is the purpose of this task?"];
+              if (questions.includes("\n")) {
+                questionsArray = questions.split("\n");
+              } else if (questions.includes(",")) {
+                questionsArray = questions.split(",");
               }
+
+              let questionsAndAnswers = questionsArray.map((question) => {
+                return {
+                  question: question,
+                  answer: "",
+                  submitted: false,
+                };
+              });
+
+              //filter out empty questions or questions that are less than 10 characters
+              questionsAndAnswers = questionsAndAnswers.filter(
+                (question) => question.question.length > 10
+              );
+
+              //push each question to history
+              const questionsAndHistoryMessages = questionsAndAnswers.flatMap(
+                (question) => {
+                  return [
+                    {
+                      content: question.question,
+                      type: "output",
+                      isUser: false,
+                      source: "question",
+                      generation_round: generationRound,
+                    },
+                    {
+                      content: "",
+                      type: "input",
+                      isUser: true,
+                      submitted: false,
+                      source: "answer",
+                      generation_round: generationRound,
+                    },
+                  ];
+                }
+              );
+
+              setHistory([...initState, ...questionsAndHistoryMessages]);
+            } catch (e) {
+              handleFinalSubmit();
             }
-          );
+          });
         } else {
           toast({
             title: "Code limit reached today",
@@ -555,9 +557,9 @@ const Environment = (transaction_id: any) => {
       prompt,
       followUpQuestionsString,
       lofaf,
-      localRepoDir,
-      technologiesUsed,
-      context
+      selectedRepo.localRepoDir,
+      selectedRepo.technologiesUsed,
+      selectedRepo.context
     ).then((code) => {
       //prepare for a new prompt
       saveIncomingCodeResponse(code);
@@ -606,9 +608,8 @@ const Environment = (transaction_id: any) => {
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
       setTheme(store.getState().theme);
-      setTechnologiesUsed(store.getState().technologiesUsed);
-      setLocalRepoDir(store.getState().localRepoDirectory);
-      setContext(store.getState().context);
+      setRepos(store.getState().repos);
+      setSelectedRepo(store.getState().selectedRepo);
     });
 
     return unsubscribe;
@@ -624,24 +625,13 @@ const Environment = (transaction_id: any) => {
   });
 
   useEffect(() => {
-    if (localRepoDir === undefined || technologiesUsed === undefined) {
-      return;
-    }
 
-    if (localRepoDir) {
-      setProgress(progress + 33.3);
-    }
-
-    if (technologiesUsed) {
-      setProgress(progress + 33.3);
-    }
-
-    if (localRepoDir && technologiesUsed) {
+    if (repos.length > 0) {
       setShowTutorial(false);
     } else {
       setShowTutorial(true);
     }
-  }, [technologiesUsed, localRepoDir]);
+  }, [repos]);
 
   useEffect(() => {
     if (user) {
@@ -651,35 +641,45 @@ const Environment = (transaction_id: any) => {
     }
   }, [user]);
 
-  const getUserSettings = async () => {
-    if (!user) return;
-    if (!supabase) return;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user?.id)
-      .single();
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    setTheme(data.theme);
-
-    store.dispatch({
-      type: "SETTINGS_CHANGED",
-      payload: {
-        theme: data.theme,
-        technologiesUsed: data.technologies_used,
-        localRepoDirectory: data?.local_repo_dir,
-        context: data?.context,
-      },
-    });
-  };
-
   useEffect(() => {
+    const getUserSettings = async () => {
+      if (!user) return;
+      if (!supabase) return;
+
+      const { data: themeData, error: themeError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
+
+      const { data: repoData, error: repoError } = await supabase
+        .from("repos")
+        .select("*")
+        .eq("user_id", user?.id);
+
+      console.log({ repoData });
+
+      if (themeError) {
+        console.log(themeError);
+      } else {
+        store.dispatch({
+          type: "SETTINGS_CHANGED",
+          payload: {
+            theme: themeData.theme,
+          },
+        });
+      }
+
+      if (repoError) {
+        console.log(repoError);
+      } else {
+        store.dispatch({
+          type: "MOUNT_REPOS",
+          payload: repoData,
+        });
+      }
+    };
+
     getUserSettings();
   }, []);
 
@@ -702,18 +702,23 @@ const Environment = (transaction_id: any) => {
 
   useEffect(() => {
     const setLocalFilesForAutoComplete = async () => {
-      if (!localRepoDir) {
+      if (!selectedRepo.local_repo_dir) {
         return;
       }
-      const autocompletingFiles = await getFilteredLofaf(localRepoDir);
-      //remove the localRepoDir from the file path of every file
+      const autocompletingFiles = await getFilteredLofaf(
+        selectedRepo.local_repo_dir
+      );
+      //remove the selectedRepo.local_repo_dir from the file path of every file
       autocompletingFiles.forEach((file, index) => {
-        autocompletingFiles[index] = file.replace(localRepoDir, "");
+        autocompletingFiles[index] = file.replace(
+          selectedRepo.local_repo_dir,
+          ""
+        );
       });
       setFiles(autocompletingFiles);
     };
     setLocalFilesForAutoComplete();
-  }, [localRepoDir]);
+  }, [selectedRepo.local_repo_dir]);
 
   useEffect(() => {
     if (
@@ -791,14 +796,13 @@ const Environment = (transaction_id: any) => {
                 </Tag>
               </Flex>
             </Flex>
-          
 
             {showTutorial ? (
               <Tutorial
                 onSettingsOpen={onSettingsOpen}
                 progress={progress}
-                localRepoDir={localRepoDir}
-                technologiesUsed={technologiesUsed}
+                localRepoDir={selectedRepo.localRepoDir}
+                technologiesUsed={selectedRepo.technologiesUsed}
               />
             ) : (
               <MainEducation
@@ -1022,7 +1026,7 @@ const Environment = (transaction_id: any) => {
                     p={6}
                     value={prompt}
                     placeholder={
-                      localRepoDir
+                      selectedRepo.localRepoDir
                         ? "Enter a coding task, use @ to include your local files."
                         : "You must configure your local repository in settings before you can start a task."
                     }
@@ -1034,12 +1038,12 @@ const Environment = (transaction_id: any) => {
                     label={
                       prompt.length < 6
                         ? "Unlock this by typing a task that is longer than 6 characters."
-                        : !localRepoDir ||
-                          technologiesUsed === "none" ||
-                          technologiesUsed === "" ||
-                          !technologiesUsed
-                        ? "Unlock this by configuring your local repo, tech stack, and typing a task that is longer than 6 characters."
-                        : "Complete task for me using AI"
+                        : !selectedRepo.localRepoDir ||
+                          selectedRepo.technologiesUsed === "none" ||
+                          selectedRepo.technologiesUsed === "" ||
+                          !selectedRepo.technologiesUsed
+                          ? "Unlock this by configuring your local repo, tech stack, and typing a task that is longer than 6 characters."
+                          : "Complete task for me using AI"
                     }
                     aria-label="A tooltip"
                   >
@@ -1050,10 +1054,10 @@ const Environment = (transaction_id: any) => {
                         aria-label="Send"
                         isDisabled={
                           prompt.length < 6 ||
-                          !localRepoDir ||
-                          technologiesUsed === "none" ||
-                          technologiesUsed === "" ||
-                          !technologiesUsed
+                          !selectedRepo.localRepoDir ||
+                          selectedRepo.technologiesUsed === "none" ||
+                          selectedRepo.technologiesUsed === "" ||
+                          !selectedRepo.technologiesUsed
                         }
                         onClick={() => {
                           handleInitialSubmit();
@@ -1065,8 +1069,8 @@ const Environment = (transaction_id: any) => {
                           prompt.length < 6
                             ? {}
                             : {
-                                bgGradient: "linear(to-t, blue.500, teal.500)",
-                              }
+                              bgGradient: "linear(to-t, blue.500, teal.500)",
+                            }
                         }
                         bgGradient={"linear(to-r, blue.500, teal.500)"}
                         alignSelf="flex-end"
@@ -1129,12 +1133,12 @@ const Environment = (transaction_id: any) => {
                   _hover={{ backgroundColor: "green.700" }}
                   minH="50"
                   w="full"
-                  isDisabled={!localRepoDir}
+                  isDisabled={!selectedRepo.localRepoDir}
                 >
                   Sync Latest Changes to Local
                 </Button>
                 {userIsPremium ||
-                !planIntegers?.is_follow_up_prompts_premium ? (
+                  !planIntegers?.is_follow_up_prompts_premium ? (
                   <Message isUser={true}>
                     <Flex flexDirection={"row"} flex={1}>
                       <Flex flex={1}>

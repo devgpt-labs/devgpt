@@ -12,20 +12,21 @@ import { useEffect, useRef } from "react";
 const AlertConfirmation = ({ isOpen, onClose, onConfirm, title, bodyText }) => {
   const cancelRef = useRef();
 
-  // If the user hits delete, run the onConfirm function  
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") {
-        onConfirm();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onConfirm]);
+  // This functionality is commented out for now, if you hit enter it will try to run a prompt
+  // And delete the task at the same time
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     if (e.key === "Enter") {
+  //       onConfirm();
+  //     }
+  //   };
+  //   window.addEventListener("keydown", handleKeyDown);
+  //   return () => window.removeEventListener("keydown", handleKeyDown);
+  // }, [onConfirm]);
 
   return (
     <AlertDialog
-    isCentered={true}
+      isCentered={true}
       isOpen={isOpen}
       leastDestructiveRef={cancelRef}
       onClose={onClose}

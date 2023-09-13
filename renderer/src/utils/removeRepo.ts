@@ -1,10 +1,10 @@
 import { supabase } from "./supabase/supabase";
+import store from "@/redux/store";
 
 const removeRepo = async (
   id: any,
-  toast: any
+  toast: any,
 ) => {
-
   const { error } = await supabase
     .from("repos")
     .delete()
@@ -20,6 +20,12 @@ const removeRepo = async (
       duration: 9000,
       isClosable: true,
       position: "top-right",
+    })
+
+    // Update "repos" in store
+    store.dispatch({
+      type: "REMOVE_REPO",
+      payload: id,
     })
   }
 };

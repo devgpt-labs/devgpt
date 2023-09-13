@@ -5,8 +5,19 @@ import {
   Progress,
   Grid,
   useToast,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button
+
 } from "@chakra-ui/react";
 import SuggestionTag from "@/src/components/global/SuggestionTag";
+import Settings from "./sidebar/elements/Settings";
 
 interface TutorialProps {
   onSettingsOpen: any;
@@ -21,6 +32,7 @@ const Tutorial = ({
   localRepoDir,
   technologiesUsed,
 }: TutorialProps) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast();
   return (
     <Flex flexDirection="column" alignItems="center">
@@ -63,17 +75,17 @@ const Tutorial = ({
           tutorial={true}
         />
         <SuggestionTag
-          label="Select Project Directory (30s)"
+          label="Add Your First Repo (40s)"
           suggestion={`Select the folder that contains your code repository.`}
           onClick={() => {
-            onSettingsOpen();
+            onOpen();
           }}
           Icon={null}
           complete={localRepoDir}
           theme={false}
           tutorial={true}
         />
-        <SuggestionTag
+        {/* <SuggestionTag
           label="Select Tech Stack (20s)"
           suggestion={`Choose your project's languages and frameworks.`}
           onClick={() => {
@@ -83,7 +95,15 @@ const Tutorial = ({
           complete={technologiesUsed}
           theme={false}
           tutorial={true}
-        />
+        /> */}
+        <Modal size='xl' isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton />
+            <Settings />
+          </ModalContent>
+        </Modal>
+
       </Grid>
     </Flex>
   );
