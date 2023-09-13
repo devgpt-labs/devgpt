@@ -3,8 +3,6 @@ import writeToFileSystem from "./writeToFileSystem";
 import checkOS from "@/src/utils/checkOS";
 
 const syncCodeChangesWithLocalFileSystem = async (code_changes, directory) => {
-  console.log({ code_changes, directory });
-
   code_changes.map(async (file) => {
     let { code, file_name } = file;
 

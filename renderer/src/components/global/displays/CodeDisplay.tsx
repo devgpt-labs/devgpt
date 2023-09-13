@@ -100,8 +100,6 @@ const CodeDisplay = ({ codeChanges, transaction_id }: CodeDisplayProps) => {
     file_name: string,
     code: string
   ) => {
-    console.log({ index, file_name, code });
-
     let code_changes_prepared = [
       {
         file_name: file_name,
