@@ -1,12 +1,12 @@
 import { supabase } from "./supabase/supabase";
 
-const getProfile = async (user) => {
+const getRepos = async (user) => {
 	return new Promise(async (resolve, reject) => {
 		if (supabase) {
 			const { data, error } = await supabase
-			  .from("profiles")
+			  .from("repos")
 			  .select("*")
-			  .eq("id", user?.id)
+			  .eq("user_id", user?.id)
 
 			if (!error) {
 				resolve(data);
@@ -15,4 +15,4 @@ const getProfile = async (user) => {
 	});
 };
 
-export default getProfile;
+export default getRepos;

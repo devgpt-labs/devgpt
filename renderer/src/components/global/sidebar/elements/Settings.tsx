@@ -28,7 +28,6 @@ import planIntegers from "@/src/config/planIntegers";
 import fetchLocalConfigs from "../functions/fetchLocalConfigs";
 import countFilesInDirectory from "@/src/utils/countFilesInDirectory";
 import { useAuthContext } from "@/src/context";
-import ExcludedFilesAndFolders from "./ExcludedFilesAndFolders";
 import TechStack from "@/src/components/global/sidebar/elements/TechStack";
 import checkIfPremium from "@/src/utils/checkIfPremium";
 import saveRepo from "../functions/saveRepo";
@@ -37,18 +36,10 @@ import saveContext from "../functions/saveContext";
 import getUserSubscription from "../../functions/getUserSubscription";
 import Context from "./Context";
 import UpgradeModal from "../../UpgradeModal";
+import addRepo from "@/src/utils/addRepo";
+import { supabase } from "@/src/utils/supabase/supabase";
 
-interface SettingsModalProps {
-  viewingTargetRepo?: boolean;
-  isSettingsOpen: boolean;
-  onSettingsClose: () => void;
-}
-
-const SettingsModal = ({
-  viewingTargetRepo,
-  isSettingsOpen,
-  onSettingsClose,
-}: SettingsModalProps) => {
+const Settings = () => {
   const [localRepoDirectory, setLocalRepoDirectory] = useState("");
   const [technologiesUsed, setTechnologiesUsed] = useState("");
   const [fileTypesToRemove, setFileTypesToRemove] = useState("");
@@ -79,19 +70,6 @@ const SettingsModal = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (!fetched) {
-      fetchLocalConfigs({
-        setTechnologiesUsed,
-        setContext,
-        setLocalRepoDirectory,
-        setFileTypesToRemove,
-        setFetched,
-        user,
-      });
-    }
-  }, [userIsPremium]);
-
   ipcRenderer.on("file-has-been-selected", async (event, result) => {
     if (!result) {
       setIsCounting(false);
@@ -110,7 +88,7 @@ const SettingsModal = ({
       <Flex justifyContent="flex-end" p={4}>
         {!loading && (
           <Flex pl={4}>
-            <Button mr={3} onClick={onSettingsClose}>
+            <Button mr={3} onClick={() => {}}>
               Cancel
             </Button>
             <Button
@@ -164,7 +142,7 @@ const SettingsModal = ({
             </Button>
           </InputRightElement>
         </InputGroup>
-        <Flex flexDirection="row" justifyContent="space-between">
+        {/* <Flex flexDirection="row" justifyContent="space-between">
           <Flex alignItems={"center"} justifyContent={"flex-end"} mt={3}>
             {userIsPremium ? (
               <Tag
@@ -189,7 +167,7 @@ const SettingsModal = ({
               </Tag>
             )}
           </Flex>
-        </Flex>
+        </Flex> */}
         <Box p={3} mt={3} borderRadius={3} backgroundColor="gray.600">
           <Text fontSize={14}>
             Your code remains secure. Selecting a directory does
@@ -211,124 +189,68 @@ const SettingsModal = ({
   };
 
   return (
-    <Modal
-      isCentered={true}
-      initialFocusRef={initialRef}
-      finalFocusRef={finalRef}
-      isOpen={isSettingsOpen}
-      onClose={onSettingsClose}
-      size={"xl"}
-    >
-      <ModalOverlay
-        bg="blackAlpha.700"
-        backdropFilter="blur(10px) hue-rotate(90deg)"
-      />
-      <ModalContent>
-        <Box pl={6} pt={6}>
-          <Text fontSize="xl" fontWeight={"bold"}>
-            {!viewingTargetRepo && !loading
-              ? "Project Settings"
-              : loading
-              ? "Loading..."
-              : "Select a project directory."}
-          </Text>
-        </Box>
-        {!loading && <ModalCloseButton />}
-        {loading ? (
-          <Flex flexDirection="row" p={6}>
-            <Spinner />
-          </Flex>
-        ) : (
-          <>
-            {!viewingTargetRepo && (
-              <Box px={6} pb={6}>
-                <TechStack
-                  technologiesUsed={technologiesUsed}
-                  setTechnologiesUsed={setTechnologiesUsed}
-                />
-                <Context context={context} setContext={setContext} />
-                <SaveAndCancelButtons
-                  onSave={() => {
-                    if (context.length > 3 && technologiesUsed.length > 3) {
-                      saveTechStack({
-                        onSettingsClose,
-                        technologiesUsed,
-                        toast,
-                        user,
-                      });
+    <>
+      <Box pl={6} pt={6}>
+        <Text fontSize="xl" fontWeight={"bold"}>
+          {!loading
+            ? "Add A Repo to DevGPT"
+            : loading
+            ? "Loading..."
+            : "Select a project directory."}
+        </Text>
+      </Box>
+      {loading ? (
+        <Flex flexDirection="row" p={6}>
+          <Spinner />
+        </Flex>
+      ) : (
+        <>
+          <Box p={6}>
+            <RepositoryOptions />
+            <TechStack
+              technologiesUsed={technologiesUsed}
+              setTechnologiesUsed={setTechnologiesUsed}
+            />
+            <Context context={context} setContext={setContext} />
 
-                      saveContext({
-                        context,
-                        toast,
-                        user,
-                      });
+            <SaveAndCancelButtons
+              onSave={() => {
+                if (context.length > 3 && technologiesUsed.length > 3) {
+                  addRepo(
+                    user,
+                    technologiesUsed,
+                    localRepoDirectory,
+                    context,
+                    toast
+                  );
 
-                      toast({
-                        title: "Saved!",
-                        description:
-                          "Your local environment settings have been saved.",
-                        status: "success",
-                        duration: 6000,
-                        position: "top-right",
-                        isClosable: true,
-                      });
-
-                      onSettingsClose();
-                    } else {
-                      toast({
-                        title: "You haven't completed your project settings",
-                        description:
-                          "Please write your tech stack and what you're currently working on to continue.",
-                        status: "error",
-                        duration: 6000,
-                        position: "top-right",
-                        isClosable: true,
-                      });
-                    }
-                  }}
-                />
-              </Box>
-            )}
-
-            {viewingTargetRepo && (
-              <Box px={6}>
-                <ExcludedFilesAndFolders
-                  fileTypesToRemove={fileTypesToRemove}
-                  setFileTypesToRemove={setFileTypesToRemove}
-                />
-                <RepositoryOptions />
-                <SaveAndCancelButtons
-                  onSave={() => {
-                    fs.access(localRepoDirectory, (err) => {
-                      if (err) {
-                        toast({
-                          title: "Error",
-                          position: "top-right",
-                          description: "Directory does not exist",
-                          status: "error",
-                          duration: 5000,
-                          isClosable: true,
-                        });
-                        return;
-                      } else {
-                        saveRepo({
-                          onSettingsClose,
-                          userIsPremium,
-                          localRepoDirectory,
-                          toast,
-                          user,
-                        });
-                      }
-                    });
-                  }}
-                />
-              </Box>
-            )}
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+                  // toast({
+                  //   title: "Saved!",
+                  //   description:
+                  //     "Your local environment settings have been saved.",
+                  //   status: "success",
+                  //   duration: 6000,
+                  //   position: "top-right",
+                  //   isClosable: true,
+                  // });
+                } else {
+                  toast({
+                    title: "You haven't completed your project settings",
+                    description:
+                      "Please write your tech stack and what you're currently working on to continue.",
+                    status: "error",
+                    duration: 6000,
+                    position: "top-right",
+                    isClosable: true,
+                  });
+                }
+              }}
+            />
+          </Box>
+        </>
+      )}
+    </>
   );
 };
 
-export default SettingsModal;
+export default Settings;

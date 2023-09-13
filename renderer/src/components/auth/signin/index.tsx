@@ -116,10 +116,10 @@ export default function Auth() {
       overflowY="hidden"
     >
       <Flex
+      flex={0.2}
         height="85vh"
         flexDirection="column"
         alignItems="center"
-        flex={0.3}
         mt={20}
       >
         <Logo />
@@ -262,7 +262,7 @@ export default function Auth() {
         justifyContent="flex-start"
         flexDirection="column"
         height="100vh"
-        flex={0.7}
+        flex={0.8}
         bgGradient={"linear(to-r, blue.500, teal.500)"}
       >
         <Typewriter

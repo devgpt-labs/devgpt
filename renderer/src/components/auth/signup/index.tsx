@@ -132,7 +132,7 @@ export default function Auth() {
         maxW={"lg"}
       >
         <Logo />
-        <Heading size="xl" color="white" mt={5}>
+        <Heading size="xl" color="white">
           Create an account
         </Heading>
         <Text color="white" mt={5}>
@@ -227,10 +227,11 @@ export default function Auth() {
           <Button
             bgGradient={"linear(to-r, blue.500, teal.500)"}
             mt={8}
+            mb={8}
             minW="200"
             onClick={handleSignUpWithPassword}
           >
-            Sign up & login
+            Sign Up & Login
           </Button>
         )}
       </Card>

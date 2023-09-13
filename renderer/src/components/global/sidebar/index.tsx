@@ -15,8 +15,6 @@ import {
   List,
   ListItem,
   ListIcon,
-  OrderedList,
-  UnorderedList,
   MenuDivider,
   MenuItem,
   useDisclosure,
@@ -36,15 +34,16 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
-import { shell } from "electron";
-import { MdCheckCircle, MdSettings, MdClose, MdPassword } from "react-icons/md";
+import { MdCheckCircle, MdClose, MdPassword } from "react-icons/md";
 import { BsTrophy, BsEasel } from "react-icons/bs";
-import { GoSignOut } from "react-icons/go";
-import { AiOutlineLogout, AiOutlineProfile } from "react-icons/ai";
+import { AiOutlineProfile } from "react-icons/ai";
 import { BsMoonStars } from "react-icons/bs";
 import store from "@/redux/store";
 import getTheme from "@/src/utils/getTheme";
+import { FiPlus } from "react-icons/fi";
+import Settings from "./elements/Settings";
+import getRepos from "@/src/utils/getRepos";
+import { AiOutlineFolderOpen } from "react-icons/ai";
 
 //components
 import { useAuthContext } from "@/src/context";
@@ -62,24 +61,16 @@ import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCod
 
 import ResetMyPasswordButton from "../../auth/signin/ResetMyPasswordButton";
 import getTasks from "@/src/utils/getTasks";
-import fetchLocalConfigs from "./functions/fetchLocalConfigs";
 import getUserSubscription from "../functions/getUserSubscription";
 import getProfile from "@/src/utils/getProfile";
 import getLocalRepoDir from "@/src/utils/getLocalRepoDir";
 import getTechnologiesUsed from "@/src/utils/getTechnologiesUsed";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import removeRepo from "@/src/utils/removeRepo";
 
 const Profile = () => {
   // Get the user's profile from supabase
   const { user } = useAuthContext();
-  const [userProfile, setUserProfile] = useState<any>(null);
-
-  useEffect(() => {
-    if (userProfile === null) {
-      getProfile(user).then((profile) => {
-        setUserProfile(profile);
-      });
-    }
-  }, []);
 
   return (
     <Box>
@@ -88,8 +79,6 @@ const Profile = () => {
         <strong>Email:</strong> {user.email}
       </Text>
       <ResetMyPasswordButton />
-      {/* {isUserPremium} */}
-      {/* {user.email_confirmed_at} */}
     </Box>
   );
 };
@@ -254,7 +243,20 @@ const SideBar = () => {
   const [localRepoDir, setLocalRepoDir] = useState(null);
   const [technologiesUsed, setTechnologiesUsed] = useState(null);
   const { user, signOut } = useAuthContext();
-  const borderRightColor = useColorModeValue("gray.200", "gray.700");
+  const borderRightColor = "gray.700";
+  const [selectedTab, setSelectedTab] = useState("profile");
+  const [isUserPremium, setIsUserPremium] = useState(false);
+  const [allRepos, setAllRepos] = useState<any>(null);
+  const [selectedRepo, setSelectedRepo] = useState(null);
+
+  useEffect(() => {
+    if (allRepos === null) {
+      getRepos(user).then((allRepos) => {
+        setAllRepos(allRepos);
+      });
+    }
+  }, []);
+
   const {
     isOpen: isUserSettingsOpen,
     onOpen: onUserSettingsOpen,
@@ -268,9 +270,6 @@ const SideBar = () => {
   } = useDisclosure({
     defaultIsOpen: true,
   });
-
-  const [selectedTab, setSelectedTab] = useState("profile");
-  const [isUserPremium, setIsUserPremium] = useState(false);
 
   // On click of escape, close the modal
   useEffect(() => {
@@ -348,7 +347,7 @@ const SideBar = () => {
     });
   }, [tasks]);
 
-  const UserSettingsMenuItem = ({ label, icon }: any) => {
+  const UserSettingsMenuItem = ({ label, icon, value }: any) => {
     return (
       <ListItem
         p={1}
@@ -358,7 +357,7 @@ const SideBar = () => {
         _hover={{ bg: "gray.500" }}
         cursor="pointer"
         onClick={() => {
-          setSelectedTab(label.toLowerCase());
+          setSelectedTab(value || label.toLowerCase());
         }}
       >
         <ListIcon as={icon} mr={3} />
@@ -368,7 +367,7 @@ const SideBar = () => {
   };
 
   if (localRepoDir === null || technologiesUsed === null) {
-    return null
+    return null;
   }
 
   if (!localRepoDir || !technologiesUsed) {
@@ -403,190 +402,317 @@ const SideBar = () => {
     );
   }
 
-  return (
-    <Flex
-      pt={10}
-      overflowY="scroll"
-      bg={"gray.900"}
-      borderRight="1px"
-      borderRightColor={borderRightColor}
-      h="100vh"
-      minW={80}
-      flexDirection="column"
-      justifyContent="space-between"
-    >
-      <Modal
-        onClose={onUserSettingsClose}
-        size={"full"}
-        isOpen={isUserSettingsOpen}
-      >
-        <ModalOverlay />
-        <ModalContent pt={10}>
-          <ModalHeader>
-            <Flex
-              flexDirection="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Text>User Settings</Text>
-              <Flex
-                flexDirection="column"
-                alignItems="center"
-                mr={4}
-                onClick={onUserSettingsClose}
-                _hover={{ cursor: "pointer" }}
-              >
-                <IconButton
-                  size="sm"
-                  aria-label="Search database"
-                  icon={<MdClose />}
-                  borderRadius="full"
-                />
-                <Text fontSize={12} mt={1}>
-                  ESC
-                </Text>
-              </Flex>
-            </Flex>
-          </ModalHeader>
-          <Flex flexDirection="row" ml={4}>
-            <Box flex={0.2} height="100%">
-              <List spacing={2}>
-                <UserSettingsMenuItem label="Theme" icon={BsEasel} />
-                <UserSettingsMenuItem label="Profile" icon={AiOutlineProfile} />
-                <UserSettingsMenuItem label="Achievements" icon={BsTrophy} />
-              </List>
-            </Box>
-            <Box flex={0.8} borderLeft="1px solid gray" paddingLeft={5}>
-              {selectedTab === "profile" && <Profile />}
-              {selectedTab === "theme" && <Theme user={user} />}
-              {selectedTab === "achievements" && (
-                <Achievements localRepoDir={localRepoDir} />
-              )}
-            </Box>
-          </Flex>
-        </ModalContent>
-      </Modal>
+  const OptionMenu = () => {
+    return (
+      <Menu>
+        {user && (
+          <MenuButton
+            as={Button}
+            rounded={"full"}
+            variant={"link"}
+            cursor={"pointer"}
+            minW={0}
+          >
+            <UserAvatar />
+          </MenuButton>
+        )}
+        <MenuList alignItems={"center"}>
+          <br />
+          <Center>
+            <UserAvatar />
+          </Center>
+          <br />
+          <Center>
+            <p>{user?.email}</p>
+          </Center>
+          <br />
+          <MenuDivider />
+          <MenuItem
+            icon={<EditIcon />}
+            command=""
+            onClick={() => {
+              onUserSettingsOpen();
+              setSelectedTab("profile");
+            }}
+          >
+            Edit Profile
+          </MenuItem>
+          <MenuItem
+            icon={<AiOutlineFolderOpen />}
+            command=""
+            onClick={() => {
+              onUserSettingsOpen();
+              setSelectedTab("addRepo");
+            }}
+          >
+            Add A Repo
+          </MenuItem>
+          <MenuItem
+            icon={<MdPassword />}
+            command=""
+            onClick={() => {
+              onUserSettingsOpen();
+              setSelectedTab("profile");
+            }}
+          >
+            Reset my password
+          </MenuItem>
+          <MenuItem
+            icon={<BsEasel />}
+            command=""
+            onClick={() => {
+              onUserSettingsOpen();
+              setSelectedTab("theme");
+            }}
+          >
+            Change Theme
+          </MenuItem>
+          <MenuItem
+            icon={<BsTrophy />}
+            command=""
+            onClick={() => {
+              onUserSettingsOpen();
+              setSelectedTab("achievements");
+            }}
+          >
+            My achievements
+          </MenuItem>
+          <MenuItem
+            icon={<BsMoonStars />}
+            command=""
+            onClick={() => {
+              signOut();
+            }}
+          >
+            Logout
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    );
+  };
 
-      <Box>
-        <MenuTabs />
-        <TaskTabs
-          tasks={tasks}
-          setTasks={setTasks}
-          refresh={refresh}
-          setRefresh={setRefresh}
-        />
-      </Box>
-      <Box>
-        <Flex
-          // This styling makes the profile sticky
-          // bg='gray.900'
-          // pos='fixed'
-          // bottom={0}
-          // left={0}
-          // w="80"
-          flexDirection="row"
-          justifyContent="space-between"
-          borderTop="1px"
-          borderColor="gray.700"
-          p={4}
+  const AddRepo = () => {
+    return (
+      <Tooltip placement="right" label="Add Repo">
+        <Center
+          onClick={() => {
+            onUserSettingsOpen();
+            setSelectedTab("addRepo");
+          }}
+          cursor="pointer"
+          borderRadius={10}
+          mb={2}
+          bg="gray.700"
+          height="50px"
+          width="50px"
         >
-          <Flex flexDirection="row">
-            <Menu>
-              {user && (
-                <MenuButton
-                  as={Button}
-                  rounded={"full"}
-                  variant={"link"}
-                  cursor={"pointer"}
-                  minW={0}
-                >
-                  <UserAvatar />
-                </MenuButton>
-              )}
-              <MenuList alignItems={"center"}>
-                <br />
-                <Center>
-                  <UserAvatar />
-                </Center>
-                <br />
-                <Center>
-                  <p>{user?.email}</p>
-                </Center>
-                <br />
-                <MenuDivider />
-                <MenuItem
-                  icon={<EditIcon />}
-                  command=""
-                  onClick={() => {
-                    onUserSettingsOpen();
-                    setSelectedTab("profile");
-                  }}
-                >
-                  Edit Profile
-                </MenuItem>
-                <MenuItem
-                  icon={<MdPassword />}
-                  command=""
-                  onClick={() => {
-                    onUserSettingsOpen();
-                    setSelectedTab("profile");
-                  }}
-                >
-                  Reset my password
-                </MenuItem>
-                <MenuItem
-                  icon={<BsEasel />}
-                  command=""
-                  onClick={() => {
-                    onUserSettingsOpen();
-                    setSelectedTab("theme");
-                  }}
-                >
-                  Change Theme
-                </MenuItem>
-                <MenuItem
-                  icon={<BsTrophy />}
-                  command=""
-                  onClick={() => {
-                    onUserSettingsOpen();
-                    setSelectedTab("achievements");
-                  }}
-                >
-                  My achievements
-                </MenuItem>
-                <MenuItem
-                  icon={<BsMoonStars />}
-                  command=""
-                  onClick={() => {
-                    signOut();
-                  }}
-                >
-                  Logout
-                </MenuItem>
-              </MenuList>
-            </Menu>
+          <FiPlus />
+        </Center>
+      </Tooltip>
+    );
+  };
 
-            <Flex flexDirection="column">
-              <Flex flexDirection="row" alignItems="center" mb={1}>
-                <Heading size="md">
-                  {user
-                    ? user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                      user?.email.split("@")[0].substring(1, 8)
-                    : ""}
-                </Heading>
+  const Repo = ({ repo, selectedRepo, setSelectedRepo }: any) => {
+    // Split the profile.local_repo_dir by / or \ and get the last item in the array
+    const splitPath = repo?.local_repo_dir?.split(/\/|\\/);
+    const lastItem = splitPath?.[splitPath?.length - 1];
+    const [isOpen, setIsOpen] = useState(false);
+    const toast = useToast();
+
+    return (
+      <Menu
+        isOpen={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+      >
+        <Tooltip placement="right" label={lastItem}>
+          <Center
+            onClick={() => {
+              setSelectedRepo(repo.id);
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setIsOpen(true);
+            }}
+            cursor="pointer"
+            mb={2}
+            borderRadius={selectedRepo === repo.id ? 20 : 10}
+            bg={selectedRepo === repo.id ? "gray.500" : "gray.700"}
+            height="50px"
+            width="50px"
+          >
+            <Text>{lastItem[0].toUpperCase()}</Text>
+          </Center>
+        </Tooltip>
+
+        <MenuList pos={"absolute"} top={50} left="80px">
+          <MenuItem isDisabled={true}>{lastItem.toUpperCase()}</MenuItem>
+          <MenuItem
+            onClick={() => {
+              setSelectedRepo(repo.id);
+            }}
+          >
+            Select
+          </MenuItem>
+          {/* <MenuItem>Settings</MenuItem> */}
+          <MenuItem
+            onClick={() => {
+              removeRepo(
+                repo.id,
+                toast,
+              );
+            }}
+          >
+            Delete
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    );
+  };
+
+  console.log(allRepos);
+
+  return (
+    <Flex>
+      <Flex
+        p={2}
+        mt={10}
+        flexDirection="column"
+        borderRight="1px"
+        borderRightColor={borderRightColor}
+      >
+        <AddRepo />
+        {allRepos?.length > 0 &&
+          allRepos?.map((repo) => (
+            <Repo
+              selectedRepo={selectedRepo}
+              setSelectedRepo={setSelectedRepo}
+              repo={repo}
+            />
+          ))}
+      </Flex>
+      <Flex
+        pt={10}
+        overflowY="scroll"
+        borderRight="1px"
+        borderRightColor={borderRightColor}
+        h="100vh"
+        minW={80}
+        flexDirection="column"
+        justifyContent="space-between"
+      >
+        <Modal
+          onClose={onUserSettingsClose}
+          size={"full"}
+          isOpen={isUserSettingsOpen}
+        >
+          <ModalOverlay />
+          <ModalContent pt={10}>
+            <ModalHeader>
+              <Flex
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Text>User Settings</Text>
+                <Flex
+                  flexDirection="column"
+                  alignItems="center"
+                  mr={4}
+                  onClick={onUserSettingsClose}
+                  _hover={{ cursor: "pointer" }}
+                >
+                  <IconButton
+                    size="sm"
+                    aria-label="Search database"
+                    icon={<MdClose />}
+                    borderRadius="full"
+                  />
+                  <Text fontSize={12} mt={1}>
+                    ESC
+                  </Text>
+                </Flex>
               </Flex>
-              {!isUserPremium && (
-                <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">
-                  <Tag color={"yellow.100"} size="md" mt={1} mb={1}>
-                    {`${codeUsage} / ${planIntegers?.free_lines_of_code_count} lines generated`}
-                  </Tag>
-                </Tooltip>
-              )}
-              <Text fontSize={13}>Version {packageJson?.version}</Text>
+            </ModalHeader>
+            <Flex flexDirection="row" ml={4}>
+              <Box flex={0.2} height="100%">
+                <List spacing={2}>
+                  <UserSettingsMenuItem
+                    label="Add A Repo"
+                    icon={AiOutlineFolderOpen}
+                    value="addRepo"
+                  />
+                  <UserSettingsMenuItem label="Theme" icon={BsEasel} />
+                  <UserSettingsMenuItem
+                    label="Profile"
+                    icon={AiOutlineProfile}
+                  />
+                  <UserSettingsMenuItem label="Achievements" icon={BsTrophy} />
+                </List>
+              </Box>
+              <Box flex={0.8} borderLeft="1px solid gray" paddingLeft={5}>
+                {selectedTab === "profile" && <Profile />}
+                {selectedTab === "theme" && <Theme user={user} />}
+                {selectedTab === "achievements" && (
+                  <Achievements localRepoDir={localRepoDir} />
+                )}
+                {selectedTab === "addRepo" && <Settings />}
+              </Box>
+            </Flex>
+          </ModalContent>
+        </Modal>
+
+        <Box>
+          <MenuTabs />
+          <TaskTabs
+            tasks={tasks}
+            setTasks={setTasks}
+            refresh={refresh}
+            setRefresh={setRefresh}
+          />
+        </Box>
+        <Box>
+          <Flex
+            // This styling makes the profile sticky
+            // bg='gray.900'
+            // pos='fixed'
+            // bottom={0}
+            // left={0}
+            // w="80"
+            flexDirection="row"
+            justifyContent="space-between"
+            borderTop="1px"
+            borderColor="gray.700"
+            p={4}
+          >
+            <Flex flexDirection="row">
+              <OptionMenu />
+              <Flex flexDirection="column">
+                <Flex flexDirection="row" alignItems="center" mb={1}>
+                  <Heading size="md">
+                    {user
+                      ? user?.email
+                          .split("@")[0]
+                          .substring(0, 1)
+                          .toUpperCase() +
+                        user?.email.split("@")[0].substring(1, 8)
+                      : ""}
+                  </Heading>
+                </Flex>
+                {!isUserPremium && (
+                  <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">
+                    <Tag color={"yellow.100"} size="md" mt={1} mb={1}>
+                      {`${codeUsage} / ${planIntegers?.free_lines_of_code_count} lines generated`}
+                    </Tag>
+                  </Tooltip>
+                )}
+                <Text fontSize={13}>Version {packageJson?.version}</Text>
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
-      </Box>
+        </Box>
+      </Flex>
     </Flex>
   );
 };

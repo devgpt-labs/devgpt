@@ -16,6 +16,7 @@ import router from "next/router";
 import { shell } from "electron";
 import packageJson from "../../../../package.json"
 
+
 export default function Footer() {
   const textColor = useColorModeValue("gray.700", "gray.200");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -59,7 +60,7 @@ export default function Footer() {
               }}
               fontSize="sm"
             >
-              © February
+              © DevGPT
             </Link>
             <Link
               target="_blank"
@@ -84,11 +85,9 @@ export default function Footer() {
               Support
             </Link>
           </Stack>
-          <Text>
-            Version: {packageJson.version}
-          </Text>
-        </Container>
-      </Box>
-    </Box>
+          <Text>Version: {packageJson?.version}</Text>
+        </Container >
+      </Box >
+    </Box >
   );
 }

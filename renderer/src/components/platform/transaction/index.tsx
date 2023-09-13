@@ -22,7 +22,7 @@ import { useAuthContext } from "@/src/context";
 import { supabase } from "@/src/utils/supabase/supabase";
 import store from "@/redux/store";
 import { FaDiscord } from "react-icons/fa";
-import SettingsModal from "@/src/components/global/sidebar/elements/SettingsModal";
+import Settings from "@/src/components/global/sidebar/elements/Settings";
 import { shell } from "electron";
 import { LuSend } from "react-icons/lu";
 
@@ -79,7 +79,6 @@ const Environment = (transaction_id: any) => {
 
   //user settings
   const [files, setFiles] = useState([] as any); //used for auto-complete files with @
-  const [viewingTargetRepo, setViewingTargetRepo] = useState(false);
   const [showTutorial, setShowTutorial] = useState(null);
   const [progress, setProgress] = useState(33.3);
 
@@ -792,15 +791,10 @@ const Environment = (transaction_id: any) => {
                 </Tag>
               </Flex>
             </Flex>
-            <SettingsModal
-              viewingTargetRepo={viewingTargetRepo}
-              isSettingsOpen={isSettingsOpen}
-              onSettingsClose={onSettingsClose}
-            />
+          
 
             {showTutorial ? (
               <Tutorial
-                setViewingTargetRepo={setViewingTargetRepo}
                 onSettingsOpen={onSettingsOpen}
                 progress={progress}
                 localRepoDir={localRepoDir}

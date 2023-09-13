@@ -49,7 +49,7 @@ import { IconType } from "react-icons";
 import { AiFillBug } from "react-icons/ai";
 import checkOS from "@/src/utils/checkOS";
 import NavItem from "../../navigation/NavItem";
-import SettingsModal from "@/src/components/global/sidebar/elements/SettingsModal";
+import Settings from "@/src/components/global/sidebar/elements/Settings";
 import Logo from "../../Logo";
 import { MdBiotech } from "react-icons/md";
 import { AiOutlineFolderOpen } from "react-icons/ai";
@@ -67,7 +67,6 @@ interface LinkItemProps {
 }
 
 const MenuTabs = () => {
-  const [viewingTargetRepo, setViewingTargetRepo] = useState(false);
   const [newTaskCreated, setNewTaskCreated] = useState(false);
   const [isUserPremium, setIsUserPremium] = useState(false);
   const [targetRepo, setTargetRepo] = useState(null);
@@ -80,14 +79,17 @@ const MenuTabs = () => {
   const { user } = useAuthContext();
 
   getProfile(user).then((profile: any) => {
-    setTargetRepo(profile?.local_repo_dir);
-
+    
+    // TODO: Make this pull from redux
+    // setTargetRepo(profile?.local_repo_dir);
     //check if path contains / or \ and split by that
-    const splitPath = profile?.local_repo_dir?.split(/\/|\\/);
+    // const splitPath = profile?.local_repo_dir?.split(/\/|\\/);
+
+
     //get the last item in the array
-    const lastItem = splitPath?.[splitPath?.length - 1];
+    // const lastItem = splitPath?.[splitPath?.length - 1];
     //set the last item as the targetRepoUserFriendly
-    setTargetRepoUserFriendly(lastItem);
+    // setTargetRepoUserFriendly(lastItem);
   });
 
   const setPlan = async () => {
@@ -147,35 +149,14 @@ const MenuTabs = () => {
         );
       },
     },
-
-    {
-      name: "Teck Stack",
-      icon: MdBiotech,
-      command: checkOS("⌘ + S", "Ctrl + S"),
-      onClick: () => {
-        openTechStackSettings();
-      },
-    },
-    {
-      name: targetRepoUserFriendly
-        ? `Target: ${targetRepoUserFriendly}`
-        : "Set Target Repo",
-      icon: AiOutlineFolderOpen,
-      command: checkOS("⌘ + T", "Ctrl + T"),
-      onClick: () => {
-        openRepoSettings();
-      },
-    },
   ];
 
   const openRepoSettings = () => {
     onSettingsOpen();
-    setViewingTargetRepo(true);
   };
 
   const openTechStackSettings = () => {
     onSettingsOpen();
-    setViewingTargetRepo(false);
   };
 
   // Listen for the message from the main process
@@ -269,11 +250,7 @@ const MenuTabs = () => {
           New Task
         </NavItem>
       </Collapse>
-      <SettingsModal
-        viewingTargetRepo={viewingTargetRepo}
-        isSettingsOpen={isSettingsOpen}
-        onSettingsClose={onSettingsClose}
-      />
+    
     </>
   );
 };
