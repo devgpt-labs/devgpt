@@ -31,7 +31,7 @@ import { supabase } from "@/src/utils/supabaseClient";
 import { useAuthContext } from "@/src/context";
 
 //utils
-import { syncCodeChangesWithLocalFileSystem } from "@/src/components/platform/transaction/utils/code-generation";
+import syncCodeChangesWithLocalFileSystem from "@/src/components/platform/transaction/utils/syncCodeChangesWithLocalFileSystem";
 import { AiOutlineSync } from "react-icons/ai";
 import audios from "@/src/config/audios";
 import playAudio from "@/src/utils/playAudio";

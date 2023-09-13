@@ -49,7 +49,6 @@ import {
   generateQuestions,
   generateCode,
   generateNewGenerationCode,
-  syncCodeChangesWithLocalFileSystem,
   saveTaskInDatabase,
   generateAdvice,
   detectPromptIntent,
@@ -58,6 +57,7 @@ import calculateTimeSaved from "@/src/utils/calculateTimeSaved";
 import calculateUserRanking from "@/src/utils/calculateUserRanking";
 import playAudio from "@/src/utils/playAudio";
 import makeCodeParseable from "@/src/components/platform/transaction/utils/makeCodeParseable";
+import syncCodeChangesWithLocalFileSystem from "@/src/components/platform/transaction/utils/syncCodeChangesWithLocalFileSystem";
 
 //types
 import MessageType from "@/src/types/message";
@@ -293,7 +293,8 @@ const Environment = (transaction_id: any) => {
       localRepoDir,
       technologiesUsed,
       existingCodeString,
-      context
+      context,
+      user?.id
     ).then((code) => {
       //prepare for a new prompt
       resetState(true);
@@ -341,32 +342,38 @@ const Environment = (transaction_id: any) => {
         ]);
 
         //save task in database
-        saveTaskInDatabase(user?.id, transactionId, originalPrompt, [
-          ...history,
-          {
-            content: formattedCode,
-            type: "code",
-            isUser: false,
-            source: "code",
-            generation_round: generationRound,
-          },
-          {
-            // content: `You just saved ${rankings?.timeSaved}! That's ${rankings?.totalTimeSaved} in total. That puts you in the top ${rankings?.userRanking} of users!`,
-            content: `You just saved ${rankings?.timeSaved}! That's ${rankings?.totalTimeSaved} in total!`,
-            type: "output",
-            isUser: false,
-            source: "message",
-            generation_round: generationRound,
-          },
-          {
-            content: `Shall I edit the code I generated? I'm here to help.`,
-            type: "output",
-            isUser: false,
-            source: "message",
-            generation_round: generationRound,
-            signOffMessageInGeneration: true,
-          },
-        ]).then((newTransactionId) => {
+        saveTaskInDatabase(
+          user?.id,
+          transactionId,
+          originalPrompt,
+          [
+            ...history,
+            {
+              content: formattedCode,
+              type: "code",
+              isUser: false,
+              source: "code",
+              generation_round: generationRound,
+            },
+            {
+              // content: `You just saved ${rankings?.timeSaved}! That's ${rankings?.totalTimeSaved} in total. That puts you in the top ${rankings?.userRanking} of users!`,
+              content: `You just saved ${rankings?.timeSaved}! That's ${rankings?.totalTimeSaved} in total!`,
+              type: "output",
+              isUser: false,
+              source: "message",
+              generation_round: generationRound,
+            },
+            {
+              content: `Shall I edit the code I generated? I'm here to help.`,
+              type: "output",
+              isUser: false,
+              source: "message",
+              generation_round: generationRound,
+              signOffMessageInGeneration: true,
+            },
+          ],
+          user?.id
+        ).then((newTransactionId) => {
           setTransactionId(newTransactionId);
         });
       });
@@ -387,17 +394,23 @@ const Environment = (transaction_id: any) => {
       ]);
 
       //save task in database
-      saveTaskInDatabase(user?.id, transactionId, originalPrompt, [
-        ...history,
-        {
-          content: code,
-          type: "error",
-          isUser: false,
-          source: "error",
-          signOffMessageInGeneration: true,
-          generation_round: generationRound,
-        },
-      ]).then((newTransactionId) => {
+      saveTaskInDatabase(
+        user?.id,
+        transactionId,
+        originalPrompt,
+        [
+          ...history,
+          {
+            content: code,
+            type: "error",
+            isUser: false,
+            source: "error",
+            signOffMessageInGeneration: true,
+            generation_round: generationRound,
+          },
+        ],
+        user?.id
+      ).then((newTransactionId) => {
         setTransactionId(newTransactionId);
       });
     }
@@ -408,7 +421,7 @@ const Environment = (transaction_id: any) => {
 
     setInitialPromptLoading(true);
 
-    await detectPromptIntent(prompt).then(async (intent) => {
+    await detectPromptIntent(prompt, user?.id).then(async (intent) => {
       if (intent === "false") {
         setInitialPromptLoading(false);
         //user is attempting to use us as a chat bot, educate the user
@@ -438,11 +451,11 @@ const Environment = (transaction_id: any) => {
 
           setHistory(initState);
 
-          getLofaf(prompt, localRepoDir, context).then((lofaf) => {
+          getLofaf(prompt, localRepoDir, context, user?.id).then((lofaf) => {
             setLofaf(lofaf);
           });
 
-          generateQuestions(prompt, technologiesUsed, context).then(
+          generateQuestions(prompt, technologiesUsed, context, user?.id).then(
             (questions) => {
               try {
                 //convert questions csv to array
@@ -526,7 +539,8 @@ const Environment = (transaction_id: any) => {
       prompt,
       followUpQuestionsString,
       technologiesUsed,
-      context
+      context,
+      user?.id
     ).then((advice) => {
       let trimmedAdvice = (advice = advice.trim());
 
@@ -558,7 +572,8 @@ const Environment = (transaction_id: any) => {
       lofaf,
       localRepoDir,
       technologiesUsed,
-      context
+      context,
+      user?.id
     ).then((code) => {
       //prepare for a new prompt
       saveIncomingCodeResponse(code);

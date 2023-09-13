@@ -1,6 +1,5 @@
-
 // Utils
-import writeToFileSystem from "../writeToFileSystem"
+import writeToFileSystem from "./writeToFileSystem";
 import checkOS from "@/src/utils/checkOS";
 
 const syncCodeChangesWithLocalFileSystem = async (code_changes, directory) => {

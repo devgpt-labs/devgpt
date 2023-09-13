@@ -1,48 +1,38 @@
-
-// Utils
-import sendToLLM from "@/src/components/platform/transaction/utils/LLMs/sendToLLM";
-
-//this is used for follow up prompts but we will ideally swap away from this and use generateCode for follow-up prompts as well
+import getAPIURL from "@/src/utils/getAPIURL";
 
 const generateNewGenerationCode = async (
   prompt,
-  followUpPrompt,
   answers,
-  lofaf,
-  directory,
+  context,
   language,
   existingCodeString,
-  context
+  followUpPrompt,
+  directory,
+  UID
 ) => {
-  return new Promise(async (resolve, reject) => {
-    const code_answer = await sendToLLM({
-      stream: false,
-      model: "gpt-4",
-      role: `You are a top AI developer agent aiming to generate high-quality code based on a developers's provided task, 
-			You have already generated some code, now the user has some feedback for you.
-			Their original task was: "${prompt}"
-			The developers has already provided answers to the following questions: "${answers}" /n/n
-			And they have also provided this context: "${context}" /n/n
-			Completely implement all requested features and provide code only, without any file_name or comments.
-			Use ${language} for the code generation.`,
-      content: `
-			Code we have generated so far: "${existingCodeString}" /n/n
-			Follow up request: "${followUpPrompt}" /n/n
-
-			IMPORTANT: remove "${directory}" from the file_name.
-
-			Return the code in this JSON format:
-			[
-				{
-					"file_name": "file_name",
-					"code": "code"
-				}
-			]
-			`,
+  try {
+    const response = await fetch(`${getAPIURL}/generate-new-generation-code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+        answers,
+        context,
+        language,
+        existingCodeString,
+        followUpPrompt,
+        directory,
+        UID,
+      }),
     });
-
-    resolve(code_answer.response);
-  });
+    const json = await response.json();
+    return json.data;
+  } catch (error) {
+    console.warn({ error });
+    return error;
+  }
 };
 
 export default generateNewGenerationCode;
