@@ -3,6 +3,7 @@ import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import isDev from "electron-is-dev";
 import { autoUpdater } from "electron-updater";
+import path from "path";
 const electron = require("electron");
 const { TouchBarLabel, TouchBarButton, TouchBarSpacer } = TouchBar;
 const isProd: boolean = process.env.NODE_ENV === "production";
