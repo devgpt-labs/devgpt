@@ -10,8 +10,12 @@ const generateNewGenerationCode = async (
   directory
 ) => {
   try {
-    const response = await fetch(`${getAPIURL}`, {
+    const response = await fetch(`${getAPIURL}/generate-new-generation-code`, {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         prompt,
         answers,
@@ -23,7 +27,7 @@ const generateNewGenerationCode = async (
       }),
     });
     const json = await response.json();
-    return json;
+    return json.data;
   } catch (error) {
     console.warn({ error });
     return error;

@@ -1,4 +1,5 @@
 import getAPIURL from "@/src/utils/getAPIURL";
+import readFromFileSystem from "@/src/components/platform/transaction/utils/readFromFileSystem";
 
 const generateCode = async (
   prompt,
@@ -22,8 +23,12 @@ const generateCode = async (
   );
 
   try {
-    const response = await fetch(`${getAPIURL}`, {
+    const response = await fetch(`${getAPIURL}/generate-code`, {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         prompt,
         answers,
@@ -34,7 +39,7 @@ const generateCode = async (
       }),
     });
     const json = await response.json();
-    return json;
+    return json.data;
   } catch (error) {
     console.warn({ error });
     return error;
