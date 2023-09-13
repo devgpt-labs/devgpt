@@ -1,13 +1,13 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
 const generateNewGenerationCode = async (
-  originalPrompt,
+  followUpPrompt,
   answers,
   context,
   language,
   existingCodeString,
   prompt,
-  localRepoDir,
+  directory,
   UID
 ) => {
   try {
@@ -17,13 +17,13 @@ const generateNewGenerationCode = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        originalPrompt,
+        followUpPrompt,
         answers,
         context,
         language,
         existingCodeString,
         prompt,
-        localRepoDir,
+        directory,
         UID,
       }),
     });

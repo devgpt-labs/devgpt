@@ -149,7 +149,7 @@ const MenuTabs = () => {
     },
 
     {
-      name: "Teck Stack",
+      name: "Tech Stack",
       icon: MdBiotech,
       command: checkOS("⌘ + S", "Ctrl + S"),
       onClick: () => {
