@@ -88,7 +88,7 @@ const Environment = (transaction_id: any) => {
     store.getState().technologiesUsed
   );
   const [localRepoDir, setLocalRepoDir] = useState(
-    store.getState().localRepoDir
+    store.getState().localRepoDirectory
   );
   const [context, setContext] = useState(store.getState().context);
   const [theme, setTheme] = useState(null);

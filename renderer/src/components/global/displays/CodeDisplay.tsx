@@ -100,6 +100,8 @@ const CodeDisplay = ({ codeChanges, transaction_id }: CodeDisplayProps) => {
     file_name: string,
     code: string
   ) => {
+    console.log({ index, file_name, code });
+
     let code_changes_prepared = [
       {
         file_name: file_name,
@@ -222,6 +224,7 @@ const CodeDisplay = ({ codeChanges, transaction_id }: CodeDisplayProps) => {
                 syncSingleFile={syncSingleFile}
                 copyCode={copyCode}
                 giveCodeFeedback={giveCodeFeedback}
+                localRepoDir={localRepoDir}
               />
             </SandpackProvider>
           </Box>
@@ -248,6 +251,7 @@ interface EditorProps {
   syncSingleFile?: any;
   copyCode?: any;
   giveCodeFeedback: any;
+  localRepoDir: any;
 }
 
 const Editor = ({
@@ -262,10 +266,14 @@ const Editor = ({
   syncSingleFile,
   copyCode,
   giveCodeFeedback,
+  localRepoDir,
 }: EditorProps) => {
   const { sandpack } = useSandpack();
   const [userIsDownvoting, setUserIsDownvoting] = useState(false);
   const [feedback, setFeedback] = useState("");
+
+  const FULL_RELATIVE_PATH = String(`/${file_name}`).trim();
+  const FULL_ABSOLUTE_PATH = String(`${localRepoDir}/${file_name}`).trim();
 
   // Handle updating local state with code changes
   const handleCodeChange = async (index, newCode) => {
@@ -417,7 +425,7 @@ const Editor = ({
             label="Copy"
             icon={<IoCopyOutline />}
             onClick={() => {
-              copyCode(sandpack?.files?.[file_name]?.code);
+              copyCode(sandpack?.files?.[FULL_RELATIVE_PATH]?.code);
             }}
           />
           <CodeTag
@@ -428,8 +436,8 @@ const Editor = ({
 
               syncSingleFile(
                 index,
-                file_name,
-                sandpack?.files?.[file_name]?.code
+                FULL_ABSOLUTE_PATH,
+                sandpack?.files?.[FULL_RELATIVE_PATH]?.code
               );
             }}
           />

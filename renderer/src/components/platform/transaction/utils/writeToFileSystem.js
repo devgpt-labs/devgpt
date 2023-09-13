@@ -2,6 +2,8 @@ const fs = require("fs");
 const glob = require("glob");
 
 const writeToFileSystem = async (directory, file, content) => {
+  console.log({ directory, file, content });
+
   try {
     // use readdir method to read the files of the direcoty
     const getDirectories = (callback) => {
