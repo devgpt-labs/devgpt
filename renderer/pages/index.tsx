@@ -18,12 +18,11 @@ export default function Home() {
 
   useEffect(() => {
     ipcRenderer.on("update_available", () => {
-      router.push("/upgrade");
       toast({
         title: "A new version is available!",
-        description: "Please wait while the app updates...",
+        description: "Visit DevGPT.com to download the latest update.",
         status: "success",
-        duration: 8000,
+        duration: 30000,
         isClosable: true,
         position: "top-right",
       });
