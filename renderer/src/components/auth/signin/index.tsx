@@ -99,6 +99,7 @@ export default function Auth() {
           isClosable: true,
         });
         setLoading(false);
+        return
       }
 
       if (user?.aud === "authenticated") {
