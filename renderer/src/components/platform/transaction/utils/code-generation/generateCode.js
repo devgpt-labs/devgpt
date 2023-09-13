@@ -7,7 +7,8 @@ const generateCode = async (
   lofaf,
   directory,
   language,
-  context
+  context,
+  UID
 ) => {
   let lofafArray = lofaf.includes(",") ? lofaf.split(",") : [lofaf];
 
@@ -27,12 +28,7 @@ const generateCode = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-        "Access-Control-Allow-Headers": "Set-Cookie",
       },
-      withCredentials: true,
       body: JSON.stringify({
         prompt,
         answers,
@@ -40,6 +36,7 @@ const generateCode = async (
         language,
         context,
         existing_code,
+        UID,
       }),
     });
     const json = await response.json();

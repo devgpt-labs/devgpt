@@ -7,19 +7,15 @@ const generateNewGenerationCode = async (
   language,
   existingCodeString,
   followUpPrompt,
-  directory
+  directory,
+  UID
 ) => {
   try {
     const response = await fetch(`${getAPIURL}/generate-new-generation-code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-        "Access-Control-Allow-Headers": "Set-Cookie",
       },
-      withCredentials: true,
       body: JSON.stringify({
         prompt,
         answers,
@@ -28,6 +24,7 @@ const generateNewGenerationCode = async (
         existingCodeString,
         followUpPrompt,
         directory,
+        UID,
       }),
     });
     const json = await response.json();
