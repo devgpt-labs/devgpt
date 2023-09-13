@@ -13,9 +13,13 @@ const generateNewGenerationCode = async (
     const response = await fetch(`${getAPIURL}/generate-new-generation-code`, {
       method: "POST",
       headers: {
-        Accept: "application/json",
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        "Access-Control-Allow-Headers": "Set-Cookie",
       },
+      withCredentials: true,
       body: JSON.stringify({
         prompt,
         answers,
