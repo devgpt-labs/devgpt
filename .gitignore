@@ -18,3 +18,10 @@ out/
 .yarn-lock
 app/
 /app/
+build-keys.json
+build-keys
+entitlements.plist
+/build-scripts
+build-scripts
+build-scripts/
+forge.config.js
