@@ -7,9 +7,6 @@ const getLofaf = async (prompt, directory, UID) => {
   try {
     const response = await fetch(`${getAPIURL}/get-lofaf`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ prompt, directory, lofaf, UID }),
     });
     const json = await response.json();

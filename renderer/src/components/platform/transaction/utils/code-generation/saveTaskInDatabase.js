@@ -10,9 +10,6 @@ const saveTaskInDatabase = async (
   try {
     const response = await fetch(`${getAPIURL}/save-task-in-database`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ user_id, transactionId, prompt, history, UID }),
     });
     const json = await response.json();
