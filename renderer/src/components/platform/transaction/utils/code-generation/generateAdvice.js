@@ -6,8 +6,7 @@ const generateAdvice = async (prompt, language, UID) => {
       method: "POST",
       body: JSON.stringify({ prompt, language, UID }),
     });
-    const json = await response.json();
-    return json.data;
+    return response;
   } catch (error) {
     console.warn({ error });
     return error;
