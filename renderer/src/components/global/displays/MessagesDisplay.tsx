@@ -9,13 +9,7 @@ import CodeDisplay from "./CodeDisplay";
 //types
 import Loading from "../Loading";
 
-//todo we only use one message type, so we can remove this?
-
-const ScrollIntoView = () => {
-  const elementRef = useRef<null | HTMLDivElement>();
-  useEffect(() => elementRef.current.scrollIntoView());
-  return <div ref={elementRef} />;
-};
+//todo we only use one message type?
 
 interface MessagesDisplayProps {
   messages: any;
@@ -34,6 +28,14 @@ const MessagesDisplay = ({
 
   //render a message, based on the type
   const messagesRender = messages.map((message, index) => {
+    return (
+      <OutputMessage
+        message={message}
+        key={`output${index}`}
+        type={transaction_id}
+      />
+    );
+
     if (cancelRender) {
       return <></>;
     }

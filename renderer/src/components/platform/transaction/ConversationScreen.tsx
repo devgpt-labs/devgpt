@@ -24,6 +24,16 @@ import {
 
 import { LuSend } from "react-icons/lu";
 
+//components
+import MessagesDisplay from "../../global/displays/MessagesDisplay";
+import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCodeUsage";
+import MainEducation from "@/src/components/global/MainEducation";
+import Tutorial from "@/src/components/global/Tutorial";
+import UpgradeModal from "../../global/UpgradeModal";
+import Message from "../../global/Message";
+import BlurredMessage from "../../global/BlurredMessage";
+import PromptInput from "./PromptInput";
+
 //todo clean up imports
 
 const ConversationScreen = ({
@@ -35,75 +45,36 @@ const ConversationScreen = ({
   handleSubmit,
 }: any) => {
   return (
-    <Flex
-      flexDirection="column"
-      maxH="100vh"
-      width="full"
-      overflowY="scroll"
-      w={"full"}
-      mt={10}
-      p={6}
-      justifyContent="space-between"
-    >
-      <Alert status="info">
-        <AlertIcon />
-        Get 4X longer responses with gpt-4-32k context - Upgrade now
-      </Alert>
+    <Flex flexDirection="column" maxH="100vh" width="full" overflowY="scroll">
+      <Flex
+        mt={10}
+        p={6}
+        justifyContent="space-between"
+        w={"full"}
+        flexDirection="column"
+      >
+        <Alert status="info">
+          <AlertIcon />
+          Get 4X longer responses with gpt-4-32k context - Upgrade now
+        </Alert>
 
-      <MessagesDisplay
-        messages={history}
-        transaction_id={transaction_id}
-        setHistory={setHistory}
-      />
+        <MessagesDisplay
+          messages={history}
+          transaction_id={transaction_id}
+          setHistory={setHistory}
+        />
 
-      {history.length > 0 && (
-        <>
-          <Message isUser={true}>
-            <Flex flexDirection={"row"} flex={1}>
-              <Flex flex={1}>
-                <InputGroup>
-                  <Input
-                    variant="flushed"
-                    borderBottomRadius={0}
-                    borderTopRadius={5}
-                    value={prompt}
-                    w={"95%"}
-                    maxW="90%"
-                    onChange={(e: any) => {
-                      //make sure prompt is less than max prompt length
-                      if (e.target.value.length > 150) {
-                        return;
-                      }
-
-                      setPrompt(e.target.value);
-                    }}
-                    onKeyUp={(e: any) => {
-                      if (e.key === "Enter") {
-                        handleSubmit();
-                      }
-                    }}
-                    p={2}
-                    placeholder={"Follow up prompt..."}
-                    _placeholder={{ color: "gray.400" }}
-                    fontSize="md"
-                    flexWrap="wrap"
-                  />
-                  <InputRightElement>
-                    <IconButton
-                      bgGradient={"linear(to-r, teal.500,blue.500)"}
-                      mr={8}
-                      ml={4}
-                      aria-label="Send"
-                      icon={<LuSend />}
-                      size="sm"
-                    />
-                  </InputRightElement>
-                </InputGroup>
-              </Flex>
-            </Flex>
-          </Message>
-        </>
-      )}
+        {history.length > 0 && (
+          <>
+            <PromptInput
+              prompt={prompt}
+              setPrompt={setPrompt}
+              handleSubmit={handleSubmit}
+              followUpPrompt={true}
+            />
+          </>
+        )}
+      </Flex>
     </Flex>
   );
 };

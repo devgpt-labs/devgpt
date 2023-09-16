@@ -1,5 +1,8 @@
+//todo clean up this file and the place that uses this type
+
 interface MessageType {
   content: string;
+  contentToLLM?: string; // If this isn't set, it will be the same as content
   type: "input" | "output" | "code" | "error";
   source:
     | "question"

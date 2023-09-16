@@ -24,11 +24,13 @@ import {
 import { useRouter } from "next/router";
 import { useAuthContext } from "@/src/context";
 import { supabase } from "@/src/utils/supabase/supabase";
-import store from "@/redux/store";
+
 import { FaDiscord } from "react-icons/fa";
 import SettingsModal from "@/src/components/global/sidebar/elements/SettingsModal";
 import { shell } from "electron";
 import { LuSend } from "react-icons/lu";
+
+//todo remove unused files, e.g. getLofaf
 
 //todo clean up imports
 
@@ -39,7 +41,6 @@ import audios from "@/src/config/audios";
 //components
 import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCodeUsage";
 import MainEducation from "@/src/components/global/MainEducation";
-import MessagesDisplay from "../../global/displays/MessagesDisplay";
 import Tutorial from "@/src/components/global/Tutorial";
 import UpgradeModal from "../../global/UpgradeModal";
 import Message from "../../global/Message";
@@ -69,9 +70,16 @@ import syncCodeChangesWithLocalFileSystem from "@/src/components/platform/transa
 import MessageType from "@/src/types/message";
 
 import router from "next/router";
+
+//components
 import PrePromptScreen from "./PrePromptScreen";
+import ConversationScreen from "./ConversationScreen";
 
 const Environment = (transaction_id: any) => {
+  //todo remove unused useStates
+
+  const [interactions, setInteractions] = useState(0);
+
   //history of this transaction
   const [history, setHistory] = useState<MessageType[]>([]);
   const [maxPromptLength, setMaxPromptLength] = useState(0);
@@ -85,19 +93,11 @@ const Environment = (transaction_id: any) => {
   const [initialPromptLoading, setInitialPromptLoading] = useState(false);
 
   //user settings
-  const [files, setFiles] = useState([] as any); //used for auto-complete files with @
+
   const [viewingTargetRepo, setViewingTargetRepo] = useState(false);
   const [showTutorial, setShowTutorial] = useState(null);
   const [progress, setProgress] = useState(33.3);
 
-  //redux
-  const [technologiesUsed, setTechnologiesUsed] = useState(
-    store.getState().technologiesUsed
-  );
-  const [localRepoDir, setLocalRepoDir] = useState(
-    store.getState().localRepoDirectory
-  );
-  const [context, setContext] = useState(store.getState().context);
   const [theme, setTheme] = useState(null);
 
   const [tasks, setTasks] = useState([]);
@@ -123,6 +123,7 @@ const Environment = (transaction_id: any) => {
   const toast = useToast();
 
   const resetState = () => {
+    setInteractions(0);
     setInitialPromptLoading(false);
     setHistory([]);
     setPrompt("");
@@ -177,10 +178,36 @@ const Environment = (transaction_id: any) => {
     }
   }, [transaction_id]);
 
+  const newHistory = [
+    ...history,
+    {
+      content: prompt,
+      contentToLLM: prompt, //todo add template
+      type: "output",
+      isUser: true,
+      submitted: false,
+      generation_round: generationRound,
+    },
+  ];
+
   const handleSubmit = async () => {
+    setHistory((prevState: any) => {
+      return [
+        ...prevState,
+        {
+          content: prompt,
+          contentToLLM: prompt, //todo add template
+          type: "output",
+          isUser: true,
+          submitted: false,
+          generation_round: generationRound,
+        },
+      ];
+    });
+
     setPrompt("");
 
-    const res = await generateAdvice(prompt);
+    const res = await generateAdvice(newHistory, user?.id);
 
     if (res.ok && prompt) {
       const reader = res.body.getReader();
@@ -197,11 +224,18 @@ const Environment = (transaction_id: any) => {
           setHistory((prevState: any) => {
             const newState = [...prevState];
 
-            if (prevState[prevState.length - 1]?.source === "advice") {
-              const lastMessage = newState[newState.length - 1];
+            const interactionsCompleted = Math.floor(prevState.length / 2) - 1;
+
+            const lastMessage = newState[newState.length - 1];
+
+            if (
+              lastMessage?.source === "advice" &&
+              interactionsCompleted === interactions
+            ) {
               lastMessage.content = lastMessage.content + chunk;
               return newState;
             } else {
+              setInteractions((prevState) => prevState + 1);
               return [
                 ...prevState,
                 {
@@ -224,32 +258,6 @@ const Environment = (transaction_id: any) => {
     }
   };
 
-  //bind technologiesUsed and localRepoDir with redux store
-  useEffect(() => {
-    const unsubscribe = store.subscribe(() => {
-      setTechnologiesUsed(store.getState().technologiesUsed);
-      setLocalRepoDir(store.getState().localRepoDirectory);
-      setContext(store.getState().context);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    const setLocalFilesForAutoComplete = async () => {
-      if (!localRepoDir) {
-        return;
-      }
-      const autocompletingFiles = await getFilteredLofaf(localRepoDir);
-      //remove the localRepoDir from the file path of every file
-      autocompletingFiles.forEach((file, index) => {
-        autocompletingFiles[index] = file.replace(localRepoDir, "");
-      });
-      setFiles(autocompletingFiles);
-    };
-    setLocalFilesForAutoComplete();
-  }, [localRepoDir]);
-
   return (
     <>
       {history.length === 0 ? (
@@ -259,7 +267,14 @@ const Environment = (transaction_id: any) => {
           handleSubmit={handleSubmit}
         />
       ) : (
-        
+        <ConversationScreen
+          history={history}
+          setHistory={setHistory}
+          transaction_id={transaction_id}
+          prompt={prompt}
+          setPrompt={setPrompt}
+          handleSubmit={handleSubmit}
+        />
       )}
     </>
   );

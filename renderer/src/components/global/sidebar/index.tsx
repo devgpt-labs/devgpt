@@ -81,6 +81,8 @@ const Profile = () => {
     }
   }, []);
 
+  //todo remove conditional renderes from sidebar so that it doesn't pop in after load
+
   return (
     <Box>
       <Text mb={4}>Profile</Text>
@@ -368,7 +370,7 @@ const SideBar = () => {
   };
 
   if (localRepoDir === null || technologiesUsed === null) {
-    return null
+    return null;
   }
 
   if (!localRepoDir || !technologiesUsed) {
