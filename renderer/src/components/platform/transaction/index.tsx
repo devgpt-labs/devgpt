@@ -532,34 +532,58 @@ const Environment = (transaction_id: any) => {
 
     const followUpQuestionsString = createFollowUpQuestionsString(historyCopy);
 
-    generateAdvice(
+    const res = await generateAdvice(
       prompt,
-      technologiesUsed,
-      user?.id
-    ).then((advice) => {
-      let trimmedAdvice = (advice = advice.trim());
+      followUpQuestionsString,
+      technologiesUsed
+    );
 
-      if (prompt) {
-        setHistory((prevState: any) => {
-          //this stops the advice being written after the code
-          if (prevState[prevState.length - 1]?.signOffMessageInGeneration) {
-            return [...prevState];
+    if (res.ok && prompt) {
+      const reader = res.body.getReader();
+      const processStream = async () => {
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            break;
           }
+          let chunk = new TextDecoder("utf-8").decode(value);
+          chunk = chunk.replace(/^data: /, "");
 
-          return [
-            ...prevState,
-            {
-              content: trimmedAdvice,
-              type: "output",
-              isUser: false,
-              source: "advice",
-              streamResponse: true,
-              generation_round: generationRound,
-            },
-          ];
-        });
-      }
-    });
+          setHistory((prevState: any) => {
+            //this stops the advice being written after the code
+            if (prevState[prevState.length - 1]?.signOffMessageInGeneration) {
+              return [...prevState];
+            }
+
+            const newState = [...prevState];
+
+            if (prevState[prevState.length - 1].source === "advice") {
+              const lastMessage = newState[newState.length - 1];
+              lastMessage.content = lastMessage.content + chunk;
+              return newState;
+            } else {
+              return [
+                ...prevState,
+                {
+                  content: chunk,
+                  type: "output",
+                  isUser: false,
+                  source: "advice",
+                  streamResponse: true,
+                  generation_round: generationRound,
+                },
+              ];
+            }
+          });
+        }
+      };
+      processStream().catch((err) => {
+        //error
+      });
+    } else {
+      //error
+    }
 
     generateCode(
       prompt,

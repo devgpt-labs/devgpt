@@ -4,9 +4,6 @@ const detectPromptIntent = async (prompt, UID) => {
   try {
     const response = await fetch(`${getAPIURL}/detect-prompt-intent`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ prompt, UID }),
     });
     const json = await response.json();
