@@ -25,6 +25,8 @@ import { shell } from "electron";
 import { FaDiscord } from "react-icons/fa";
 import { LuSend } from "react-icons/lu";
 
+//todo clean up imports
+
 //components
 import MainEducation from "@/src/components/global/MainEducation";
 

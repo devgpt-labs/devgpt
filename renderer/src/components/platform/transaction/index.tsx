@@ -30,6 +30,8 @@ import SettingsModal from "@/src/components/global/sidebar/elements/SettingsModa
 import { shell } from "electron";
 import { LuSend } from "react-icons/lu";
 
+//todo clean up imports
+
 //configs
 
 import audios from "@/src/config/audios";
@@ -120,33 +122,7 @@ const Environment = (transaction_id: any) => {
   const { user } = useAuthContext();
   const toast = useToast();
 
-  const createFollowUpQuestionsString = (historyCopy) => {
-    const followUpQuestions = historyCopy.filter(
-      (message) => message.source === "question" || message.source === "answer"
-    );
-
-    //convert follow up questions to string of all questions and answers
-    const followUpQuestionsString = followUpQuestions
-      .map((message) => {
-        return `${message.source}: ${message.content} \n`;
-      })
-      .join(" ");
-
-    return followUpQuestionsString;
-  };
-
-  const resetState = (followUp) => {
-    setPrompt("");
-    setInitialPromptLoading(false);
-
-    if (followUp) {
-      setGenerationRound(generationRound + 1);
-    } else if (followUp === false) {
-      setHistory([]);
-    }
-  };
-
-  const resetForBrandNewPrompt = () => {
+  const resetState = () => {
     setInitialPromptLoading(false);
     setHistory([]);
     setPrompt("");
@@ -159,8 +135,9 @@ const Environment = (transaction_id: any) => {
 
   useEffect(() => {
     if (transaction_id.transaction_id === "new") {
-      resetForBrandNewPrompt();
+      resetState();
     } else {
+      //load this transaction from supabase and load it into in-transaction state
       if (
         history.length === 0 ||
         transaction_id.transaction_id != transactionId
@@ -201,19 +178,7 @@ const Environment = (transaction_id: any) => {
   }, [transaction_id]);
 
   const handleSubmit = async () => {
-    alert("submitted");
-
-    //add generation round to generations submitted, so we don't submit it again
-    //setGenerationsSubmitted([...generationsSubmitted, generationRound]);
-
-    // const historyCopy = structuredClone(
-    //   history.filter((message) => message.generation_round === generationRound)
-    // );
-
-    //make sure all conditions for final submit are met
-    //if (historyCopy.length === 0) return;
-
-    //const followUpQuestionsString = createFollowUpQuestionsString(historyCopy);
+    setPrompt("");
 
     const res = await generateAdvice(prompt);
 
@@ -230,14 +195,9 @@ const Environment = (transaction_id: any) => {
           chunk = chunk.replace(/^data: /, "");
 
           setHistory((prevState: any) => {
-            //this stops the advice being written after the code
-            if (prevState[prevState.length - 1]?.signOffMessageInGeneration) {
-              return [...prevState];
-            }
-
             const newState = [...prevState];
 
-            if (prevState[prevState.length - 1].source === "advice") {
+            if (prevState[prevState.length - 1]?.source === "advice") {
               const lastMessage = newState[newState.length - 1];
               lastMessage.content = lastMessage.content + chunk;
               return newState;
@@ -259,108 +219,20 @@ const Environment = (transaction_id: any) => {
       };
       processStream().catch((err) => {
         //error
+        console.log({ err });
       });
-    } else {
-      //error
     }
   };
-
-  const handleRegenerateResponse = () => {
-    //remove the last message from history
-    const historyCopy = structuredClone(history);
-    //remove final two messages from history
-    historyCopy.pop();
-    historyCopy.pop();
-    setHistory(historyCopy);
-    //remove this from generations submitted
-    const generationsSubmittedCopy = structuredClone(generationsSubmitted);
-    generationsSubmittedCopy.pop();
-    setGenerationsSubmitted(generationsSubmittedCopy);
-    //set generation round back to the last generation round
-    setGenerationRound(generationRound - 1);
-    //re-run the code generation
-    handleSubmit();
-  };
-
-  useEffect(() => {
-    const historyCopy = structuredClone(
-      history.filter((message) => message.generation_round === generationRound)
-    );
-
-    //check when it's time to handleSubmit, if all follow up questions have been submitted
-    if (
-      lofaf &&
-      historyCopy.length > 1 &&
-      historyCopy.every(
-        (message) =>
-          message.submitted === true || message?.submitted === undefined
-      )
-    ) {
-      if (!generationsSubmitted.includes(generationRound)) {
-        handleSubmit();
-      }
-    }
-  }, [history, lofaf]);
 
   //bind technologiesUsed and localRepoDir with redux store
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
-      setTheme(store.getState().theme);
       setTechnologiesUsed(store.getState().technologiesUsed);
       setLocalRepoDir(store.getState().localRepoDirectory);
       setContext(store.getState().context);
     });
 
     return unsubscribe;
-  }, []);
-
-  let picture;
-
-  // Find the theme in themes that has the matching name to the theme
-  themes.forEach((themeFromConfig: any) => {
-    if (themeFromConfig.name === theme) {
-      picture = themeFromConfig.image;
-    }
-  });
-
-  useEffect(() => {
-    if (user) {
-      getAllTasks(user?.id, toast).then((tasks: any) => {
-        setTasks(tasks);
-      });
-    }
-  }, [user]);
-
-  const getUserSettings = async () => {
-    if (!user) return;
-    if (!supabase) return;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user?.id)
-      .single();
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    setTheme(data.theme);
-
-    store.dispatch({
-      type: "SETTINGS_CHANGED",
-      payload: {
-        theme: data.theme,
-        technologiesUsed: data.technologies_used,
-        localRepoDirectory: data?.local_repo_dir,
-        context: data?.context,
-      },
-    });
-  };
-
-  useEffect(() => {
-    getUserSettings();
   }, []);
 
   useEffect(() => {
@@ -378,128 +250,16 @@ const Environment = (transaction_id: any) => {
     setLocalFilesForAutoComplete();
   }, [localRepoDir]);
 
-  useEffect(() => {
-    if (
-      transaction_id.transaction_id === "new" ||
-      !transaction_id.transaction_id
-    ) {
-      setHistory([]);
-      router.push(`/platform/transactions/new`);
-    }
-  }, [transaction_id.transaction_id]);
-
   return (
     <>
-      {transaction_id.transaction_id === "new" && history.length === 0 ? (
+      {history.length === 0 ? (
         <PrePromptScreen
           prompt={prompt}
           setPrompt={setPrompt}
           handleSubmit={handleSubmit}
         />
       ) : (
-        <Flex
-          flexDirection="column"
-          maxH="100vh"
-          width="full"
-          overflowY="scroll"
-        >
-          <Flex
-            w={"full"}
-            flexDirection="column"
-            mt={10}
-            p={6}
-            justifyContent="space-between"
-          >
-            <Alert status="info">
-              <AlertIcon />
-              Get 4X longer responses with gpt-4-32k context - Upgrade now
-            </Alert>
-
-            <MessagesDisplay
-              messages={history}
-              transaction_id={transaction_id}
-              setHistory={setHistory}
-            />
-
-            {history.length > 0 && (
-              <>
-                <Message isUser={true}>
-                  <Flex flexDirection={"row"} flex={1}>
-                    <Flex flex={1}>
-                      <InputGroup>
-                        <Input
-                          variant="flushed"
-                          borderBottomRadius={0}
-                          borderTopRadius={5}
-                          value={prompt}
-                          w={"95%"}
-                          maxW="90%"
-                          onChange={(e: any) => {
-                            //make sure prompt is less than max prompt length
-                            if (e.target.value.length > 150) {
-                              return;
-                            }
-
-                            setPrompt(e.target.value);
-                          }}
-                          onKeyUp={(e: any) => {
-                            if (e.key === "Enter") {
-                              handleSubmit();
-                            }
-                          }}
-                          p={2}
-                          placeholder={"Follow up prompt..."}
-                          _placeholder={{ color: "gray.400" }}
-                          fontSize="md"
-                          flexWrap="wrap"
-                        />
-                        <InputRightElement>
-                          <Text fontSize={12}>
-                            {prompt.length}/{150}
-                          </Text>
-                          <IconButton
-                            bgGradient={"linear(to-r, teal.500,blue.500)"}
-                            mr={8}
-                            ml={4}
-                            aria-label="Send"
-                            icon={<LuSend />}
-                            size="sm"
-                          />
-                        </InputRightElement>
-                      </InputGroup>
-                    </Flex>
-
-                    <Flex justifyContent={"flex-end"}>
-                      <Flex
-                        flexDirection="row"
-                        alignItems="center"
-                        justifyContent={"center"}
-                      >
-                        {!userIsPremium && (
-                          <Tag
-                            ml={2}
-                            alignItems={"center"}
-                            justifyContent={"center"}
-                            display={"flex"}
-                            backgroundColor="teal.600"
-                            _hover={{ backgroundColor: "teal.500" }}
-                            cursor={"pointer"}
-                            onClick={() => {
-                              onUpgradeOpen();
-                            }}
-                            fontWeight={"bold"}
-                          >
-                            Upgrade
-                          </Tag>
-                        )}
-                      </Flex>
-                    </Flex>
-                  </Flex>
-                </Message>
-              </>
-            )}
-          </Flex>
-        </Flex>
+        
       )}
     </>
   );

@@ -9,6 +9,8 @@ import CodeDisplay from "./CodeDisplay";
 //types
 import Loading from "../Loading";
 
+//todo we only use one message type, so we can remove this?
+
 const ScrollIntoView = () => {
   const elementRef = useRef<null | HTMLDivElement>();
   useEffect(() => elementRef.current.scrollIntoView());
@@ -74,20 +76,6 @@ const MessagesDisplay = ({
         return <></>;
     }
   });
-
-  const loading =
-    messages[messages.length - 1]?.submitted === true ||
-    messages[messages.length - 1]?.source === "prompt" ||
-    messages[messages.length - 1]?.source === "advice";
-
-  if (loading && !viewingHistory) {
-    return (
-      <>
-        {messagesRender}
-        <Loading />
-      </>
-    );
-  }
 
   return messagesRender;
 };
