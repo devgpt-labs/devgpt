@@ -125,6 +125,12 @@ If you have any questions about installation, get in touch with our team via [Di
 1. **How do I upgrade my DevGPT plan?**
    - You can upgrade your plan directly in the app of DevGPT, which will direct you to Stripe that will handle the payment.
    - Do not upgrade your account using any other method but this.
+1. **I'm getting the error: "Microsoft Defender SmartScreen prevented an unrecognized app from starting"**
+    - This error is caused by the app being unsigned on Windows, and is still an active error. 
+    - We have a fix in progress for it. 
+    The app is already signed on Mac, but we're awaiting the process to finish for Windows to have this issue resolved. 
+    - In the meantime, you are able to pass / skip this error, but only do that if you feel comfortable doing so. 
+    This doesn't affect or change the in-app function of DevGPT in any way.
 
 ## Getting Started for Open-Source Contributors
 
