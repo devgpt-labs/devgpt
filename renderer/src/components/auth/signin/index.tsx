@@ -73,8 +73,9 @@ export default function Auth() {
     //validate inputs
     if (email === "" || password === "") {
       toast({
+        title: "Incorrect Email",
+        description: "Please check your email and try again.",
         position: "top-right",
-        title: "Please enter your email",
         status: "error",
         isClosable: true,
       });

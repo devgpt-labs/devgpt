@@ -147,18 +147,9 @@ const MenuTabs = () => {
         );
       },
     },
-
-    {
-      name: "Tech Stack",
-      icon: MdBiotech,
-      command: checkOS("⌘ + S", "Ctrl + S"),
-      onClick: () => {
-        openTechStackSettings();
-      },
-    },
     {
       name: targetRepoUserFriendly
-        ? `Target: ${targetRepoUserFriendly}`
+        ? `Repo: ${targetRepoUserFriendly}`
         : "Set Target Repo",
       icon: AiOutlineFolderOpen,
       command: checkOS("⌘ + T", "Ctrl + T"),

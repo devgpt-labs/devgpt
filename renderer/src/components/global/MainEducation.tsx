@@ -17,6 +17,7 @@ const MainEducation = ({ setPrompt, theme }: any) => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      flexWrap='wrap'
       w={"full"}
     >
       <Heading mb={6} size="lg">

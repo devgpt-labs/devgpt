@@ -129,6 +129,7 @@
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
     "framer-motion": "^10.12.16",
+    "gpt-tokenizer": "^2.1.1",
     "howler": "^2.2.3",
     "js-confetti": "^0.11.0",
     "langchain": "0.0.96",

@@ -40,15 +40,6 @@ const saveRepo = async ({
       .single();
 
     if (!error) {
-      toast({
-        title: "Saved!",
-        description: "Your local environment settings have been saved.",
-        status: "success",
-        duration: 5000,
-        position: "top-right",
-        isClosable: true,
-      });
-
       onSettingsClose();
 
       //update redux store with new localRepoDirectory and technologiesUsed
