@@ -98,9 +98,9 @@ If you have any questions about installation, get in touch with our team via [Di
    - We'll add more fixes, example prompts and issues to this list as they are coming in.
 1. **I have a new idea / want to report an issue**
    - You can do this at devgpt-releases [Github Issues](https://github.com/february-labs/devgpt-releases/issues).
-   - It doesn't have to be an "issue" for you to report it here, it can be a suggestion, idea, or any feedback at all! :)
+   - It doesn't have to be an "issue" for you to report it here, it can be a suggestion, idea, or any feedback at all!
 1. **How do I reset my password?**
-   - In the app during sign in, we have a reset password function. This will open, you enter your email, that will send you a magic link that signs you in to our site
+   - In the app during sign in, we have a reset password function. This will open, you enter your email, that will send you a magic link that signs you in to our site.
    - Here, you can reset your password and access additional support docs.
 1. **I upgraded my account but it's not reflecting in the app**
    - If you have upgraded but on the sidebar in the app you still have an 'Upgrade' button, your app is not reflecting the upgrade correctly.
