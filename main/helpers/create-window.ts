@@ -78,7 +78,7 @@ export default (
       preload: path.join(__dirname, "..", "main", "helpers", "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
-      devTools: true,
+      devTools: false,
       ...options.webPreferences,
     },
   };

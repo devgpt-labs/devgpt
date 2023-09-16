@@ -21,7 +21,7 @@ const Logo = () => {
   // get data from status table in supabase
   const getStatus = async () => {
     if (!supabase || process?.env?.NEXT_PUBLIC_DEVELOPER_MODE === "true") {
-      return
+      return;
     }
 
     const { data, error } = await supabase
@@ -29,7 +29,7 @@ const Logo = () => {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(1)
-      .single()
+      .single();
 
     if (error) {
       console.log(error);
@@ -51,11 +51,11 @@ const Logo = () => {
       alignItems="center"
       justifyContent="space-between"
     >
-      <Image src={logo.src} height={"40px"} />
-      {user && status !== 'All Operational' && !status && (
+      <Image src={logo.src} height={"40px"} objectFit={"contain"} />
+      {user && status !== "All Operational" && !status && (
         <Box width="20">
           <Tooltip label={status}>
-            <Tag colorScheme='yellow'>
+            <Tag colorScheme="yellow">
               <Text mr={1}>Status</Text> <AiOutlineInfoCircle color="yellow" />
             </Tag>
           </Tooltip>

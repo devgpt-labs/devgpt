@@ -88,7 +88,7 @@ const Environment = (transaction_id: any) => {
     store.getState().technologiesUsed
   );
   const [localRepoDir, setLocalRepoDir] = useState(
-    store.getState().localRepoDir
+    store.getState().localRepoDirectory
   );
   const [context, setContext] = useState(store.getState().context);
   const [theme, setTheme] = useState(null);
@@ -287,13 +287,12 @@ const Environment = (transaction_id: any) => {
 
     generateNewGenerationCode(
       originalPrompt,
-      prompt,
       followUpQuestionsString,
-      lofaf,
-      localRepoDir,
+      context,
       technologiesUsed,
       existingCodeString,
-      context,
+      prompt,
+      localRepoDir,
       user?.id
     ).then((code) => {
       //prepare for a new prompt
@@ -372,7 +371,6 @@ const Environment = (transaction_id: any) => {
               signOffMessageInGeneration: true,
             },
           ],
-          user?.id
         ).then((newTransactionId) => {
           setTransactionId(newTransactionId);
         });
@@ -409,7 +407,6 @@ const Environment = (transaction_id: any) => {
             generation_round: generationRound,
           },
         ],
-        user?.id
       ).then((newTransactionId) => {
         setTransactionId(newTransactionId);
       });
@@ -451,7 +448,7 @@ const Environment = (transaction_id: any) => {
 
           setHistory(initState);
 
-          getLofaf(prompt, localRepoDir, context, user?.id).then((lofaf) => {
+          getLofaf(prompt, localRepoDir, user?.id).then((lofaf) => {
             setLofaf(lofaf);
           });
 
@@ -1081,8 +1078,8 @@ const Environment = (transaction_id: any) => {
                           technologiesUsed === "none" ||
                           technologiesUsed === "" ||
                           !technologiesUsed
-                        ? "Unlock this by configuring your local repo, tech stack, and typing a task that is longer than 6 characters."
-                        : "Complete task for me using AI"
+                          ? "Unlock this by configuring your local repo, tech stack, and typing a task that is longer than 6 characters."
+                          : "Complete task for me using AI"
                     }
                     aria-label="A tooltip"
                   >
@@ -1108,8 +1105,8 @@ const Environment = (transaction_id: any) => {
                           prompt.length < 6
                             ? {}
                             : {
-                                bgGradient: "linear(to-t, blue.500, teal.500)",
-                              }
+                              bgGradient: "linear(to-t, blue.500, teal.500)",
+                            }
                         }
                         bgGradient={"linear(to-r, blue.500, teal.500)"}
                         alignSelf="flex-end"
@@ -1177,7 +1174,7 @@ const Environment = (transaction_id: any) => {
                   Sync Latest Changes to Local
                 </Button>
                 {userIsPremium ||
-                !planIntegers?.is_follow_up_prompts_premium ? (
+                  !planIntegers?.is_follow_up_prompts_premium ? (
                   <Message isUser={true}>
                     <Flex flexDirection={"row"} flex={1}>
                       <Flex flex={1}>

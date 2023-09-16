@@ -20,6 +20,9 @@
     "type": "git",
     "url": "https://github.com/february-labs/devgpt-releases.git"
   },
+  "resolutions": {
+    "electron": "^11.0.1"
+  },
   "build": {
     "asar": false,
     "appId": "com.devgpt.app",

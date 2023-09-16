@@ -27,7 +27,7 @@ Once you have the DevGPT release package, follow these straightforward installat
 
 `Windows: .exe`
 
-`Linux: .snap OR AppImage`
+`Linux: .AppImage`
 
 If you have any questions about installation, get in touch with our team via [Discord](https://discord.com/invite/6GFtwzuvtw)!
 
@@ -69,6 +69,7 @@ If you have any questions about installation, get in touch with our team via [Di
 1. Run NPM install // Yarn install in the root directory of the project in your terminal.
 1. Run NPM run dev // Yarn run dev in terminal.
 1. Sign up to DevGPT in your local enviroment and see your account appear in your Supabase Table; you'll need to confirm your email address via email and this may require you to restart the app after confirmation.
+1. Run the DevGPT-api repo (OSS on GitHub) to make prompts!
 
 ## Support
 

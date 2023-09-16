@@ -56,9 +56,8 @@ const NavItem = ({
         <Text
           fontWeight={upgradeButton ? "bold" : "medium"}
           fontSize={14}
-          // Break any text that is too long
-          overflowWrap="break-word"
-          maxW={80}
+          maxW='75%'
+          overflowWrap="anywhere"
         >
           {hoverText && isHovered ? hoverText : children}
         </Text>

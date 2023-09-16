@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../../context";
-import { supabase } from "@/src/utils/supabase/supabase";
+import { supabase } from "@/src/utils/supabaseClient"
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { IoPauseCircleOutline, IoPlayCircleOutline } from "react-icons/io5";
 import Logo from "@/src/components/global/Logo";
@@ -74,8 +74,7 @@ export default function Auth() {
     if (email === "" || password === "") {
       toast({
         position: "top-right",
-
-        title: "Please enter a valid email",
+        title: "Please enter your email",
         status: "error",
         isClosable: true,
       });
@@ -100,6 +99,7 @@ export default function Auth() {
           isClosable: true,
         });
         setLoading(false);
+        return
       }
 
       if (user?.aud === "authenticated") {
@@ -120,7 +120,8 @@ export default function Auth() {
         height="85vh"
         flexDirection="column"
         alignItems="center"
-        flex={0.3}
+        flex={0.2}
+        px={10}
         mt={20}
       >
         <Logo />
@@ -263,7 +264,7 @@ export default function Auth() {
         justifyContent="flex-start"
         flexDirection="column"
         height="100vh"
-        flex={0.7}
+        flex={0.8}
         bgGradient={"linear(to-r, blue.500, teal.500)"}
       >
         <Typewriter

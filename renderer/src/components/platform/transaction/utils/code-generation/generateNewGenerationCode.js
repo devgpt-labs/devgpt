@@ -1,12 +1,12 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
 const generateNewGenerationCode = async (
-  prompt,
+  followUpPrompt,
   answers,
   context,
   language,
   existingCodeString,
-  followUpPrompt,
+  prompt,
   directory,
   UID
 ) => {
@@ -14,12 +14,12 @@ const generateNewGenerationCode = async (
     const response = await fetch(`${getAPIURL}/generate-new-generation-code`, {
       method: "POST",
       body: JSON.stringify({
-        prompt,
+        followUpPrompt,
         answers,
         context,
         language,
         existingCodeString,
-        followUpPrompt,
+        prompt,
         directory,
         UID,
       }),
