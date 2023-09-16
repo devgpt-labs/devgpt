@@ -56,7 +56,6 @@ const SettingsModal = ({
 
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
   const [isCounting, setIsCounting] = useState(false);
 
   const initialRef = useRef(null);
@@ -80,17 +79,14 @@ const SettingsModal = ({
   }, []);
 
   useEffect(() => {
-    if (!fetched) {
-      fetchLocalConfigs({
-        setTechnologiesUsed,
-        setContext,
-        setLocalRepoDirectory,
-        setFileTypesToRemove,
-        setFetched,
-        user,
-      });
-    }
-  }, [userIsPremium]);
+    fetchLocalConfigs({
+      setTechnologiesUsed,
+      setContext,
+      setLocalRepoDirectory,
+      setFileTypesToRemove,
+      user,
+    });
+  }, []);
 
   ipcRenderer.on("file-has-been-selected", async (event, result) => {
     if (!result) {

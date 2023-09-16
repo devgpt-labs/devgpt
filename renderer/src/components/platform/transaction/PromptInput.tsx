@@ -24,6 +24,7 @@ import {
 import { shell } from "electron";
 import { FaDiscord } from "react-icons/fa";
 import { LuSend } from "react-icons/lu";
+import { connect } from "react-redux";
 
 //todo clean up imports
 
@@ -40,15 +41,10 @@ const PromptInput = ({
   setPrompt,
   handleSubmit,
   followUpPrompt,
+  technologiesUsed,
+  localRepoDir,
+  context,
 }: any) => {
-  //redux
-  const [technologiesUsed, setTechnologiesUsed] = useState(
-    store.getState().technologiesUsed
-  );
-  const [localRepoDir, setLocalRepoDir] = useState(
-    store.getState().localRepoDirectory
-  );
-  const [context, setContext] = useState(store.getState().context);
   const suggestionRef = useRef("");
   const textAreaRef = useRef(null);
   const [files, setFiles] = useState([] as any); //used for auto-complete files with @
@@ -58,6 +54,10 @@ const PromptInput = ({
     x: 0,
     y: 0,
   });
+
+  const submitToLLM = () => {
+    handleSubmit(technologiesUsed, context);
+  };
 
   useEffect(() => {
     const setLocalFilesForAutoComplete = async () => {
@@ -74,13 +74,6 @@ const PromptInput = ({
     };
     setLocalFilesForAutoComplete();
   }, [localRepoDir]);
-
-  //bind technologiesUsed and localRepoDir with redux store
-  store.subscribe(() => {
-    setTechnologiesUsed(store.getState().technologiesUsed);
-    setLocalRepoDir(store.getState().localRepoDirectory);
-    setContext(store.getState().context);
-  });
 
   return (
     <Flex
@@ -220,7 +213,7 @@ const PromptInput = ({
 
             if (!showSelectFile && e.key === "Enter") {
               e.preventDefault();
-              handleSubmit();
+              submitToLLM();
             }
 
             // If the user presses tab, we want to insert the first file name into the prompt
@@ -257,7 +250,7 @@ const PromptInput = ({
           <IconButton
             aria-label="Send"
             onClick={() => {
-              handleSubmit();
+              submitToLLM();
             }}
             bgGradient={"linear(to-r, blue.500, teal.500)"}
             alignSelf="flex-end"
@@ -269,4 +262,12 @@ const PromptInput = ({
   );
 };
 
-export default PromptInput;
+const mapStateToProps = (state) => {
+  return {
+    technologiesUsed: state.technologiesUsed,
+    localRepoDir: state.localRepoDir,
+    context: state.context,
+  };
+};
+
+export default connect(mapStateToProps)(PromptInput);

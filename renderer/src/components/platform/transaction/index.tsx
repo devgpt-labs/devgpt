@@ -190,7 +190,7 @@ const Environment = (transaction_id: any) => {
     },
   ];
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (technologiesUsed, context) => {
     setHistory((prevState: any) => {
       return [
         ...prevState,
@@ -207,7 +207,12 @@ const Environment = (transaction_id: any) => {
 
     setPrompt("");
 
-    const res = await generateAdvice(newHistory, user?.id);
+    const res = await generateAdvice(
+      newHistory,
+      technologiesUsed,
+      context,
+      user?.id
+    );
 
     if (res.ok && prompt) {
       const reader = res.body.getReader();

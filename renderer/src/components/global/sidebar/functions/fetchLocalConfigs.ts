@@ -1,48 +1,50 @@
 import { useAuthContext } from "@/src/context";
 import { supabase } from "@/src/utils/supabaseClient";
-import countFilesInDirectory from "@/src/utils/countFilesInDirectory";
+
+import store from "@/redux/store";
 
 interface ISetLocalConfigs {
-	setTechnologiesUsed: React.Dispatch<React.SetStateAction<string>>;
-	setContext: any;
-	setLocalRepoDirectory: React.Dispatch<React.SetStateAction<string>>;
-	setFileTypesToRemove: any;
-	setFetched: any;
-	user: any;
+  setTechnologiesUsed: React.Dispatch<React.SetStateAction<string>>;
+  setContext: any;
+  setLocalRepoDirectory: React.Dispatch<React.SetStateAction<string>>;
+  user: any;
 }
 
 const fetchLocalConfigs = async ({
-	setTechnologiesUsed,
-	setContext,
-	setLocalRepoDirectory,
-	setFileTypesToRemove,
-	setFetched,
-	user,
+  setTechnologiesUsed,
+  setContext,
+  setLocalRepoDirectory,
+  user,
 }: ISetLocalConfigs) => {
-	if (user && supabase) {
-		const { data, error } = await supabase
-			.from("profiles")
-			.select("*")
-			.eq("id", user?.id)
-			.single();
+  if (user && supabase) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user?.id)
+      .single();
 
-		if (data?.technologies_used) {
-			setTechnologiesUsed(data?.technologies_used);
-		}
+    if (data?.technologies_used) {
+      setTechnologiesUsed(data?.technologies_used);
+    }
 
-		if (data?.files_to_ignore) {
-			setFileTypesToRemove(data?.files_to_ignore);
-		}
+    if (data?.context) {
+      setContext(data?.context);
+    }
 
-		if (data?.context) {
-			setContext(data?.context);
-		}
+    if (data?.local_repo_dir) {
+      setLocalRepoDirectory(data?.local_repo_dir);
+    }
 
-		if (data?.local_repo_dir) {
-			setLocalRepoDirectory(data?.local_repo_dir);
-		}
-		setFetched(true);
-	}
+    //dispatch this to redux
+    store.dispatch({
+      type: "SETTINGS_CHANGED",
+      payload: {
+        localRepoDirectory: data?.local_repo_dir,
+        technologiesUsed: data?.technologies_used,
+        context: data?.context,
+      },
+    });
+  }
 };
 
 export default fetchLocalConfigs;

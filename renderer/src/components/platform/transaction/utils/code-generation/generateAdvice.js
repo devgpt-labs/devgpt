@@ -1,7 +1,13 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
-const generateAdvice = async (history, UID) => {
+const generateAdvice = async (history, technologiesUsed, context, UID) => {
   //turn history into messages array
+
+  //filter out empty csv values
+  technologiesUsed = technologiesUsed
+    .split(",")
+    .filter((tech) => tech)
+    .join(",");
 
   let messages = history.map((message) => {
     return {
@@ -10,17 +16,13 @@ const generateAdvice = async (history, UID) => {
     };
   });
 
-  console.log("1", { messages });
-
   //filter out messages with no content
   messages = messages.filter((message) => message.content);
-
-  console.log("2", { messages });
 
   try {
     const response = await fetch(`${getAPIURL}/generate-advice`, {
       method: "POST",
-      body: JSON.stringify({ messages, UID }),
+      body: JSON.stringify({ messages, technologiesUsed, context, UID }),
     });
     return response;
   } catch (error) {
