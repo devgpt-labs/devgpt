@@ -10,7 +10,7 @@ const getLofaf = async (prompt, directory, UID) => {
       body: JSON.stringify({ prompt, directory, lofaf, UID }),
     });
     const json = await response.json();
-    return json.data;
+    return "README.MD";
   } catch (error) {
     console.warn({ error });
     return error;
