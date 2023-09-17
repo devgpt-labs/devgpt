@@ -45,29 +45,38 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
                 const match = /language-(\w+)/.exec(className || "");
                 return !inline && match ? (
                   <>
-                    <SyntaxHighlighter
-                      className="syntaxhighlighter"
-                      {...props}
-                      lineProps={{ style: { paddingBottom: 8 } }}
-                      wrapLines={true}
-                      showLineNumbers={true}
-                      children={String(children).replace(/\n$/, "")}
-                      style={oneDark}
-                      language={match[1]}
-                      PreTag="div"
-                    />
                     <Flex
-                      w="full"
-                      backgroundColor={"gray.900"}
+                      maxW="full"
                       rounded={"md"}
-                      justifyContent={"flex-end"}
+                      justifyContent='space-between'
+                      bg='#282c35'
+                      flexDirection='row'
                       alignItems="center"
-                      py={1}
-                      mb={3}
+                      p={2}
+                      mb={1}
+                      mt={2}
                     >
-                      <CodeTag colorScheme="blue">Copy</CodeTag>
-                      <CodeTag colorScheme="green">Sync</CodeTag>
+                      <Text fontSize={14}>file_name_goes_here.test</Text>
+                      <Flex flexDirection='row'>
+                        <CodeTag colorScheme="blue">Copy</CodeTag>
+                        <CodeTag colorScheme="green">Sync</CodeTag>
+                      </Flex>
+
                     </Flex>
+                    <Box maxW="full">
+                      <SyntaxHighlighter
+                        className="syntaxhighlighter"
+                        {...props}
+                        lineProps={{ style: { paddingBottom: 8 } }}
+                        wrapLines={true}
+                        showLineNumbers={true}
+                        children={String(children).replace(/\n$/, "")}
+                        style={oneDark}
+                        language={match[1]}
+                        PreTag="div"
+                      />
+                    </Box>
+
                   </>
                 ) : (
                   <code {...props} className={className}>
@@ -89,7 +98,7 @@ export default OutPutMessage;
 
 const CodeTag = ({ children, onClick, colorScheme }: any) => {
   return (
-    <Tag colorScheme={colorScheme} mr={1} onClick={onClick} cursor="pointer">
+    <Tag colorScheme={colorScheme} ml={2} onClick={onClick} cursor="pointer">
       {children}
     </Tag>
   );

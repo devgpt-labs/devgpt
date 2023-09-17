@@ -56,7 +56,7 @@ import { AiOutlineFolderOpen } from "react-icons/ai";
 import getProfile from "@/src/utils/getProfile";
 import { useAuthContext } from "@/src/context";
 import checkIfPremium from "@/src/utils/checkIfPremium";
-import getUserSubscription from "../../functions/getUserSubscription";
+import getUserSubscription from "@/src/utils/getUserSubscription";
 import UpgradeModal from "@/src/components/global/UpgradeModal";
 
 interface LinkItemProps {

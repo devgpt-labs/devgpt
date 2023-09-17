@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../utils/supabase/supabase";
+import { supabase } from "@/src/utils/supabase/supabase"
 import { ipcRenderer } from "electron";
 import themes from "@/src/config/themes";
 import {
@@ -58,11 +58,11 @@ import planIntegers from "@/src/config/planIntegers";
 //utils
 import MenuTabs from "./elements/MenuTabs";
 import TaskTabs from "./elements/TaskTabs";
-import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCodeUsage";
+import checkUsersCodeUsage from "@/src/utils/checkUsersCodeUsage";
 
 import ResetMyPasswordButton from "../../auth/signin/ResetMyPasswordButton";
 import getTasks from "@/src/utils/getTasks";
-import getUserSubscription from "../functions/getUserSubscription";
+import getUserSubscription from "@/src/utils/getUserSubscription"
 import getProfile from "@/src/utils/getProfile";
 import getLocalRepoDir from "@/src/utils/getLocalRepoDir";
 import getTechnologiesUsed from "@/src/utils/getTechnologiesUsed";
@@ -451,6 +451,7 @@ const SideBar = () => {
           flexDirection="row"
           justifyContent="space-between"
           borderTop="1px"
+          borderRight="1px"
           borderColor="gray.700"
           p={4}
         >

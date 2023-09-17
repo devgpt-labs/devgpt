@@ -34,7 +34,7 @@ import checkIfPremium from "@/src/utils/checkIfPremium";
 import saveRepo from "../functions/saveRepo";
 import saveTechStack from "../functions/saveTechStack";
 import saveContext from "../functions/saveContext";
-import getUserSubscription from "../../functions/getUserSubscription";
+import getUserSubscription from "@/src/utils/getUserSubscription";
 import Context from "./Context";
 import UpgradeModal from "../../UpgradeModal";
 
@@ -83,7 +83,6 @@ const SettingsModal = ({
       setTechnologiesUsed,
       setContext,
       setLocalRepoDirectory,
-      setFileTypesToRemove,
       user,
     });
   }, []);
@@ -192,8 +191,8 @@ const SettingsModal = ({
             {!viewingTargetRepo && !loading
               ? "Project Settings"
               : loading
-              ? "Loading..."
-              : "Set up your project."}
+                ? "Loading..."
+                : "Set up your project."}
           </Text>
         </Box>
         {!loading && <ModalCloseButton />}
