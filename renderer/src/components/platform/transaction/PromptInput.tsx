@@ -49,7 +49,6 @@ const PromptInput = ({
   const [files, setFiles] = useState([] as any); //used for auto-complete files with @
   const [showSelectFile, setShowSelectFile] = useState(false);
   const [localRepoDirectory, setLocalRepoDirectory] = useState("");
-  const [isAITalking, setIsAITalking] = useState(false);
   const [selectFileProps, setSelectFileProps] = useState({
     label: "",
     x: 0,

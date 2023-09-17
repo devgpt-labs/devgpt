@@ -6,7 +6,6 @@ const initialState = {
   context: "",
   theme: "Normal",
   isSettingsOpen: false,
-  isAITalking: false,
 };
 
 const mainReducer = (state = initialState, action) => {
@@ -21,7 +20,6 @@ const mainReducer = (state = initialState, action) => {
         context: action.payload?.context || state.context,
         theme: action.payload?.theme || state.theme,
         isSettingsOpen: action.payload?.isSettingsOpen || state.isSettingsOpen,
-        isAITalking: action.payload?.isAITalking || state.isAITalking,
       };
     default:
       return state;
