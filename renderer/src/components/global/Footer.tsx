@@ -55,11 +55,11 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                shell.openExternal("https://feb.co.uk");
+                shell.openExternal("https://devgpt.com");
               }}
               fontSize="sm"
             >
-              © February
+              © DevGPT
             </Link>
             <Link
               target="_blank"

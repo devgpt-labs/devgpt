@@ -9,6 +9,7 @@ import {
   AlertTitle,
   AlertDescription,
 } from "@chakra-ui/react";
+import { app, ipcMain, dialog, TouchBar, shell } from "electron";
 
 export default function Document() {
   return (
@@ -35,7 +36,16 @@ export default function Document() {
             "-webkit-app-region": "drag",
           }}
         >
-          <Tag colorScheme='orange' fontSize={14}>You're on an old version, upgrade for the best experience.</Tag>
+          <Tag
+            // cursor={"pointer"}
+            // onClick={() => {
+            //   shell.openExternal("https://devgpt.com");
+            // }}
+            colorScheme="orange"
+            fontSize={14}
+          >
+            You're on an old version, upgrade for the best experience.
+          </Tag>
         </div>
         <Main />
         <NextScript />

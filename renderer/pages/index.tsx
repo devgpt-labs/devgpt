@@ -20,7 +20,7 @@ export default function Home() {
     ipcRenderer.on("update_available", () => {
       toast({
         title: "A new version is available!",
-        description: "Visit DevGPT.com to download the latest update.",
+        description: "Visit DevGPT.com to download the latest version.",
         status: "success",
         duration: 30000,
         isClosable: true,
