@@ -11,11 +11,11 @@ const SuggestionTag = ({
   complete,
   tutorial,
 }: {
-  label: string;
-  suggestion: string;
-  onClick: any;
-  theme: any;
-  Icon: any;
+  label?: string;
+  suggestion?: string;
+  onClick?: any;
+  theme?: any;
+  Icon?: any;
   complete?: any;
   tutorial?: any;
 }) => {

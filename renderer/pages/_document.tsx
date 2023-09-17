@@ -1,5 +1,15 @@
-import React from 'react'
+import React from "react";
 import { Html, Head, Main, NextScript } from "next/document";
+import {
+  Box,
+  Text,
+  Tag,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+} from "@chakra-ui/react";
+import { app, ipcMain, dialog, TouchBar, shell } from "electron";
 
 export default function Document() {
   return (
@@ -13,6 +23,9 @@ export default function Document() {
           id="titlebar"
           className="titlebar"
           style={{
+            alignItems: "center",
+            justifyContent: "center",
+            display: "flex",
             zIndex: 1000,
             background: "#2D3748",
             height: "38px",
@@ -22,7 +35,18 @@ export default function Document() {
             // @ts-ignore
             "-webkit-app-region": "drag",
           }}
-        />
+        >
+          <Tag
+            // cursor={"pointer"}
+            // onClick={() => {
+            //   shell.openExternal("https://devgpt.com");
+            // }}
+            colorScheme="orange"
+            fontSize={14}
+          >
+            You're on an old version, upgrade for the best experience.
+          </Tag>
+        </div>
         <Main />
         <NextScript />
       </body>

@@ -163,6 +163,7 @@ const PromptInput = ({
         )}
 
         <Textarea
+          autoFocus
           ref={textAreaRef}
           onChange={(e: any) => {
             const inputValue = e.target.value;
@@ -240,9 +241,8 @@ const PromptInput = ({
           backdropFilter="blur(10px)"
           p={6}
           value={prompt}
-          placeholder={`${
-            !followUpPrompt ? "Enter a coding task, U" : "U"
-          }se @ to include your local files.`}
+          placeholder={`${!followUpPrompt ? "Enter a coding task, U" : "U"
+            }se @ to include your local files.`}
           _placeholder={{ color: "gray.400" }}
         />
 

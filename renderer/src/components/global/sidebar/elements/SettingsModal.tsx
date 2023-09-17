@@ -20,6 +20,7 @@ import {
   Spinner,
   useToast,
   useDisclosure,
+  Divider
 } from "@chakra-ui/react";
 import { ipcRenderer, shell } from "electron";
 import fs from "fs";
@@ -28,7 +29,6 @@ import planIntegers from "@/src/config/planIntegers";
 import fetchLocalConfigs from "../functions/fetchLocalConfigs";
 import countFilesInDirectory from "@/src/utils/countFilesInDirectory";
 import { useAuthContext } from "@/src/context";
-import ExcludedFilesAndFolders from "./ExcludedFilesAndFolders";
 import TechStack from "@/src/components/global/sidebar/elements/TechStack";
 import checkIfPremium from "@/src/utils/checkIfPremium";
 import saveRepo from "../functions/saveRepo";
@@ -103,7 +103,7 @@ const SettingsModal = ({
 
   const SaveAndCancelButtons = ({ onSave }) => {
     return (
-      <Flex justifyContent="flex-end" p={4}>
+      <Flex justifyContent="flex-end" pb={4} mt={4}>
         {!loading && (
           <Flex pl={4}>
             <Button mr={3} onClick={onSettingsClose}>
@@ -225,8 +225,8 @@ const SettingsModal = ({
             {!viewingTargetRepo && !loading
               ? "Project Settings"
               : loading
-              ? "Loading..."
-              : "Select a project directory."}
+                ? "Loading..."
+                : "Setup your project."}
           </Text>
         </Box>
         {!loading && <ModalCloseButton />}
@@ -236,65 +236,20 @@ const SettingsModal = ({
           </Flex>
         ) : (
           <>
-            {!viewingTargetRepo && (
-              <Box px={6} pb={6}>
-                <TechStack
-                  technologiesUsed={technologiesUsed}
-                  setTechnologiesUsed={setTechnologiesUsed}
-                />
-                <Context context={context} setContext={setContext} />
-                <SaveAndCancelButtons
-                  onSave={() => {
-                    if (context.length > 3 && technologiesUsed.length > 3) {
-                      saveTechStack({
-                        onSettingsClose,
-                        technologiesUsed,
-                        toast,
-                        user,
-                      });
+            <Box px={6} pt={2}>
 
-                      saveContext({
-                        context,
-                        toast,
-                        user,
-                      });
+              <RepositoryOptions />
+              <Divider mt={4} />
+              <TechStack
+                technologiesUsed={technologiesUsed}
+                setTechnologiesUsed={setTechnologiesUsed}
+              />
+              <Divider mt={4} />
+              <Context context={context} setContext={setContext} />
+              <SaveAndCancelButtons
+                onSave={() => {
+                  if (context.length > 3 && technologiesUsed.length > 3) {
 
-                      toast({
-                        title: "Saved!",
-                        description:
-                          "Your local environment settings have been saved.",
-                        status: "success",
-                        duration: 6000,
-                        position: "top-right",
-                        isClosable: true,
-                      });
-
-                      onSettingsClose();
-                    } else {
-                      toast({
-                        title: "You haven't completed your project settings",
-                        description:
-                          "Please write your tech stack and what you're currently working on to continue.",
-                        status: "error",
-                        duration: 6000,
-                        position: "top-right",
-                        isClosable: true,
-                      });
-                    }
-                  }}
-                />
-              </Box>
-            )}
-
-            {viewingTargetRepo && (
-              <Box px={6}>
-                <ExcludedFilesAndFolders
-                  fileTypesToRemove={fileTypesToRemove}
-                  setFileTypesToRemove={setFileTypesToRemove}
-                />
-                <RepositoryOptions />
-                <SaveAndCancelButtons
-                  onSave={() => {
                     fs.access(localRepoDirectory, (err) => {
                       if (err) {
                         toast({
@@ -315,15 +270,50 @@ const SettingsModal = ({
                           user,
                         });
                       }
+                    })
+
+                    saveTechStack({
+                      onSettingsClose,
+                      technologiesUsed,
+                      toast,
+                      user,
                     });
-                  }}
-                />
-              </Box>
-            )}
+
+                    saveContext({
+                      context,
+                      toast,
+                      user,
+                    });
+
+                    toast({
+                      title: "Saved!",
+                      description:
+                        "Your local environment settings have been saved.",
+                      status: "success",
+                      duration: 6000,
+                      position: "top-right",
+                      isClosable: true,
+                    });
+
+                    onSettingsClose();
+                  } else {
+                    toast({
+                      title: "You haven't completed your project settings",
+                      description:
+                        "Please write your tech stack and what you're currently working on to continue.",
+                      status: "error",
+                      duration: 6000,
+                      position: "top-right",
+                      isClosable: true,
+                    });
+                  }
+                }}
+              />
+            </Box>
           </>
         )}
       </ModalContent>
-    </Modal>
+    </Modal >
   );
 };
 
