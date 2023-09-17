@@ -52,15 +52,6 @@ const Logo = () => {
       justifyContent="space-between"
     >
       <Image src={logo.src} height={"40px"} objectFit={"contain"} />
-      {/* {user && status !== "All Operational" && !status && (
-        <Box width="20">
-          <Tooltip label={status}>
-            <Tag colorScheme="yellow">
-              <Text mr={1}>Status</Text> <AiOutlineInfoCircle color="yellow" />
-            </Tag>
-          </Tooltip>
-        </Box>
-      )} */}
     </Flex>
   );
 };

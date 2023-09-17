@@ -15,13 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { CloseIcon, AddIcon, WarningIcon } from "@chakra-ui/icons";
 import { app, ipcMain, dialog, TouchBar, shell } from "electron";
-import getLatestReleaseVersion from "@/src/components/platform/transaction/utils/getLatestReleaseVersion";
-
 const Document = async () => {
-
-  // const isOnLatestVersion = await getLatestReleaseVersion();
-  // console.log(isOnLatestVersion);
-
 
   return (
     <Html lang="en">
