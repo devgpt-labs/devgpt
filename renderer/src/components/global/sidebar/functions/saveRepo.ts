@@ -1,5 +1,5 @@
 import { useAuthContext } from "@/src/context";
-import { supabase } from "@/src/utils/supabaseClient";
+import { supabase } from "@/src/utils/supabase/supabase";
 import store from "@/redux/store";
 
 interface saveRepoProps {
