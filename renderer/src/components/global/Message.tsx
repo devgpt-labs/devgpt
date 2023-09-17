@@ -12,7 +12,7 @@ const Message = (props) => {
     >
       <Flex
         borderRadius={6}
-        alignItems="center"
+        alignItems="flex-start"
         mt={4}
         p={4}
         // Set a bg gradient for the background

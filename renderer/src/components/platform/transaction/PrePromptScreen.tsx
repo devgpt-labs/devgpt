@@ -36,6 +36,9 @@ import PromptInput from "./PromptInput";
 const PrePromptScreen = ({ prompt, setPrompt, handleSubmit }: any) => {
   return (
     <Flex
+      // background={
+      //   "url(https://uploads-ssl.webflow.com/64ef4b0c41381f80160c6f5b/64ef518c1b936f9e39c63f04_stars3.png) center/cover no-repeat"
+      // }
       flexDirection="row"
       maxH="100vh"
       width="full"

@@ -24,6 +24,8 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
   const isNew = type === "new" ? true : false; //todo how is this used?
   const transitions: number = isNew ? 0.3 : 0;
 
+  //todo get sync and copy working
+
   return (
     <SlideFade
       in={true}

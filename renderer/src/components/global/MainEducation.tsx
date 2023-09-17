@@ -7,9 +7,11 @@ import {
   Input,
   Button,
   Tag,
+  Image,
 } from "@chakra-ui/react";
 import SuggestionTag from "./SuggestionTag";
 import { LuSend } from "react-icons/lu";
+import cookieMan from "@/src/assets/cookieman.png";
 
 const MainEducation = ({ setPrompt, theme }: any) => {
   return (
@@ -17,12 +19,10 @@ const MainEducation = ({ setPrompt, theme }: any) => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      flexWrap='wrap'
+      flexWrap="wrap"
       w={"full"}
     >
-      <Heading mb={6} size="lg">
-        Popular prompts
-      </Heading>
+      <Image src={cookieMan.src} height={"70px"} mb={5} objectFit={"contain"} />
       <Grid templateColumns="repeat(2,1fr)">
         <SuggestionTag
           label="Write Unit Tests"

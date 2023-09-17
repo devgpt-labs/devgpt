@@ -149,6 +149,25 @@ const Environment = (transaction_id: any) => {
       },
     ];
 
+    const res = await generateAdvice(
+      newHistory,
+      technologiesUsed,
+      context,
+      user?.id
+    );
+
+    if (res?.error) {
+      toast({
+        title: "Error",
+        description: res.error,
+        position: "top-right",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      return;
+    }
+
     setHistory((prevState: any) => {
       return [
         ...prevState,
@@ -164,13 +183,6 @@ const Environment = (transaction_id: any) => {
     });
 
     setPrompt("");
-
-    const res = await generateAdvice(
-      newHistory,
-      technologiesUsed,
-      context,
-      user?.id
-    );
 
     if (res.ok && prompt) {
       const reader = res.body.getReader();
