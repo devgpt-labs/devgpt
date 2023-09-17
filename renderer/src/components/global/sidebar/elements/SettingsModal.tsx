@@ -142,7 +142,7 @@ const SettingsModal = ({
               setLocalRepoDirectory(e.target.value);
             }}
           />
-          <InputRightElement width="8rem">
+          <InputRightElement width="7rem">
             <Button
               mr={2}
               size="sm"
@@ -156,48 +156,15 @@ const SettingsModal = ({
                 });
               }}
             >
-              Select Directory
+              Select Folder
             </Button>
           </InputRightElement>
         </InputGroup>
-        <Flex flexDirection="row" justifyContent="space-between">
-          <Flex alignItems={"center"} justifyContent={"flex-end"} mt={3}>
-            {userIsPremium ? (
-              <Tag
-                ml={2}
-                bgGradient={"linear(to-r, blue.500, teal.500)"}
-                cursor={"pointer"}
-                fontWeight={"bold"}
-              >
-                Premium
-              </Tag>
-            ) : (
-              <Tag
-                ml={2}
-                bgGradient={"linear(to-r, blue.500, teal.500)"}
-                fontWeight={"bold"}
-                cursor="pointer"
-                onClick={() => {
-                  onUpgradeOpen();
-                }}
-              >
-                Upgrade
-              </Tag>
-            )}
-          </Flex>
-        </Flex>
-        <Box p={3} mt={3} borderRadius={3} backgroundColor="gray.600">
-          <Text fontSize={14}>
-            Your code remains secure. Selecting a directory does
-            <Text fontSize={14} as="span" fontWeight={"bold"}>
-              {" "}
-              not{" "}
-            </Text>
-            grant us access to your existing code. The chosen repository is used
-            to fine-tune the AI model specifically for generating code tailored
-            to your project.
-          </Text>
-        </Box>
+        <Text fontSize={14} mr={2} mt={2} color="gray.400">
+          Your code is secure and never saved. We're open-source; view our
+          GitHub for transparency.
+        </Text>
+
         <UpgradeModal
           isUpgradeOpen={isUpgradeOpen}
           onUpgradeClose={onUpgradeClose}
@@ -220,13 +187,13 @@ const SettingsModal = ({
         backdropFilter="blur(10px) hue-rotate(90deg)"
       />
       <ModalContent>
-        <Box pl={6} pt={6}>
+        <Box pl={6} pt={6} pb={3}>
           <Text fontSize="xl" fontWeight={"bold"}>
             {!viewingTargetRepo && !loading
               ? "Project Settings"
               : loading
               ? "Loading..."
-              : "Setup your project."}
+              : "Set up your project."}
           </Text>
         </Box>
         {!loading && <ModalCloseButton />}

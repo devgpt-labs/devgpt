@@ -139,7 +139,7 @@ const TechStack = ({ technologiesUsed, setTechnologiesUsed, onSave }: any) => {
               onOpen();
             }}
           >
-            Set Defaults
+            Pick from List
           </Button>
         </InputRightElement>
       </InputGroup>
