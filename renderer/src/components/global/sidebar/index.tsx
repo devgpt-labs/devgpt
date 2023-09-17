@@ -416,7 +416,7 @@ const SideBar = () => {
           <Flex flexDirection="row" ml={4}>
             <Box flex={0.2} height="100%">
               <List spacing={2}>
-                <UserSettingsMenuItem label="Theme" icon={BsEasel} />
+                {/* <UserSettingsMenuItem label="Theme" icon={BsEasel} /> */}
                 <UserSettingsMenuItem label="Profile" icon={AiOutlineProfile} />
                 <UserSettingsMenuItem label="Achievements" icon={BsTrophy} />
               </List>
@@ -443,8 +443,8 @@ const SideBar = () => {
       </Box>
       <Box>
         <Flex
-          bg='gray.900'
-          pos='fixed'
+          bg="gray.900"
+          pos="fixed"
           bottom={0}
           left={0}
           w="80"
@@ -498,7 +498,7 @@ const SideBar = () => {
                 >
                   Reset my password
                 </MenuItem>
-                <MenuItem
+                {/* <MenuItem
                   icon={<BsEasel />}
                   command=""
                   onClick={() => {
@@ -507,7 +507,7 @@ const SideBar = () => {
                   }}
                 >
                   Change Theme
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem
                   icon={<BsTrophy />}
                   command=""
@@ -535,7 +535,7 @@ const SideBar = () => {
                 <Heading size="md">
                   {user
                     ? user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                    user?.email.split("@")[0].substring(1, 8)
+                      user?.email.split("@")[0].substring(1, 8)
                     : ""}
                 </Heading>
               </Flex>
