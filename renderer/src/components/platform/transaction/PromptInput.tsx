@@ -42,13 +42,13 @@ const PromptInput = ({
   handleSubmit,
   followUpPrompt,
   technologiesUsed,
-  localRepoDir,
   context,
 }: any) => {
   const suggestionRef = useRef("");
   const textAreaRef = useRef(null);
   const [files, setFiles] = useState([] as any); //used for auto-complete files with @
   const [showSelectFile, setShowSelectFile] = useState(false);
+  const [localRepoDirectory, setLocalRepoDirectory] = useState("");
   const [selectFileProps, setSelectFileProps] = useState({
     label: "",
     x: 0,
@@ -60,25 +60,34 @@ const PromptInput = ({
   };
 
   const setLocalFilesForAutoComplete = async () => {
-    if (!localRepoDir) {
+    if (!localRepoDirectory) {
       return;
     }
-    const autoCompletingFiles = await getFilteredLofaf(localRepoDir);
-    //remove the localRepoDir from the file path of every file
+
+    const autoCompletingFiles = await getFilteredLofaf(localRepoDirectory);
+
+    // Remove the localRepoDir from the file path of every file
     autoCompletingFiles.forEach((file, index) => {
-      autoCompletingFiles[index] = file.replace(localRepoDir, "");
+      autoCompletingFiles[index] = file.replace(localRepoDirectory, "");
     });
 
     setFiles(autoCompletingFiles);
   };
 
   useEffect(() => {
-    setLocalFilesForAutoComplete();
-  }, [localRepoDir]);
+    const unsubscribe = store.subscribe(() => {
+      setLocalRepoDirectory(store.getState().localRepoDirectory);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
-    setLocalFilesForAutoComplete();
-  }, []);
+    if (localRepoDirectory) {
+      setLocalFilesForAutoComplete();
+    }
+  }, [localRepoDirectory]);
+
 
   return (
     <Flex
@@ -234,7 +243,6 @@ const PromptInput = ({
               setPrompt(promptWithoutLastAt + `@${suggestionRef.current} `);
             }
           }}
-          autoFocus
           resize="none"
           fontSize="md"
           height={160}
@@ -246,9 +254,8 @@ const PromptInput = ({
           backdropFilter="blur(10px)"
           p={6}
           value={prompt}
-          placeholder={`${
-            !followUpPrompt ? "Enter a coding task, U" : "U"
-          }se @ to include your local files.`}
+          placeholder={`${!followUpPrompt ? "Enter a coding task, U" : "U"
+            }se @ to include your local files.`}
           _placeholder={{ color: "gray.400" }}
         />
 
@@ -271,7 +278,7 @@ const PromptInput = ({
 const mapStateToProps = (state) => {
   return {
     technologiesUsed: state.technologiesUsed,
-    localRepoDir: state.localRepoDir,
+    localRepoDirectory: state.localRepoDirectory,
     context: state.context,
   };
 };

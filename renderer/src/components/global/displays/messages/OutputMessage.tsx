@@ -44,6 +44,7 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
                 return !inline && match ? (
                   <>
                     <SyntaxHighlighter
+                      className="syntaxhighlighter"
                       {...props}
                       lineProps={{ style: { paddingBottom: 8 } }}
                       wrapLines={true}

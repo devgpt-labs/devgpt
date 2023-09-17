@@ -441,3 +441,7 @@ input:hover::file-selector-button {
   display: block;
   white-space: pre-wrap;
 }
+
+.syntaxhighlighter {
+  max-width: 60vw
+}

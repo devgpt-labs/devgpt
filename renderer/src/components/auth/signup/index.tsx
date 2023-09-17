@@ -31,7 +31,7 @@ import {
 import { shell } from "electron";
 import router from "next/router";
 import Logo from "../../global/Logo";
-import { supabase } from "@/src/utils/supabaseClient";
+import { supabase } from "@/src/utils/supabase/supabase";
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { useAuthContext } from "@/src/context";
 

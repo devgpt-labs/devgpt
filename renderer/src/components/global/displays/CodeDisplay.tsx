@@ -27,7 +27,7 @@ import {
   SandpackCodeEditor,
   useSandpack,
 } from "@codesandbox/sandpack-react";
-import { supabase } from "@/src/utils/supabaseClient";
+import { supabase } from "@/src/utils/supabase/supabase";
 import { useAuthContext } from "@/src/context";
 
 //utils
@@ -127,7 +127,6 @@ const CodeDisplay = ({ code, path, transaction_id }: CodeDisplayProps) => {
                 }}
               />
             </Flex>
-
             <CodeTag
               label="Copy"
               icon={<IoCopyOutline />}
@@ -161,8 +160,8 @@ const CodeDisplay = ({ code, path, transaction_id }: CodeDisplayProps) => {
             }}
             readOnly={false}
             showLineNumbers={true}
-            // showTabs={true}
             wrapContent={true}
+          // showTabs={true}
           />
         </SandpackLayout>
       </Flex>

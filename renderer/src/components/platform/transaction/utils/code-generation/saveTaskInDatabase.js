@@ -1,4 +1,4 @@
-import { supabase } from "@/src/utils/supabaseClient";
+import { supabase } from "@/src/utils/supabase/supabase";
 
 const saveTaskInDatabase = async (user_id, transactionId, prompt, history) => {
   return new Promise(async (resolve, reject) => {

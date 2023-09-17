@@ -443,12 +443,11 @@ const SideBar = () => {
       </Box>
       <Box>
         <Flex
-          // This styling makes the profile sticky
-          // bg='gray.900'
-          // pos='fixed'
-          // bottom={0}
-          // left={0}
-          // w="80"
+          bg='gray.900'
+          pos='fixed'
+          bottom={0}
+          left={0}
+          w="80"
           flexDirection="row"
           justifyContent="space-between"
           borderTop="1px"
@@ -536,7 +535,7 @@ const SideBar = () => {
                 <Heading size="md">
                   {user
                     ? user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                      user?.email.split("@")[0].substring(1, 8)
+                    user?.email.split("@")[0].substring(1, 8)
                     : ""}
                 </Heading>
               </Flex>
