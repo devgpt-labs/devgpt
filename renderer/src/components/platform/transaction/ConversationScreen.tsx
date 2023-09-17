@@ -53,6 +53,7 @@ const ConversationScreen = ({
         w={"full"}
         flexDirection="column"
       >
+        {/* todo do not show to premium users, or replace the message with a thank you for supporting us */}
         <Alert status="info">
           <AlertIcon />
           Get 4X longer responses with gpt-4-32k - $16.99/month
