@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../utils/supabase/supabase";
+import { supabase } from "@/src/utils/supabase/supabase"
 import { ipcRenderer } from "electron";
 import themes from "@/src/config/themes";
 import {
