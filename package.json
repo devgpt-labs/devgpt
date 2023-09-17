@@ -148,6 +148,7 @@
     "react-markdown": "^8.0.7",
     "react-redux": "^8.1.2",
     "react-spinners": "^0.13.8",
+    "react-syntax-highlighter": "^15.5.0",
     "redux": "^4.2.1",
     "sound-play": "^1.1.0",
     "stripe": "^12.9.0",

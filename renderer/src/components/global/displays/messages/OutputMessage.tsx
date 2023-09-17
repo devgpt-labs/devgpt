@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import Typewriter from "typewriter-effect";
-import { Flex, Text, SlideFade } from "@chakra-ui/react";
+import { Flex, Text, SlideFade, Tag, Box } from "@chakra-ui/react";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 //components
 import Message from "../../Message";
+import CodeDisplay from "../CodeDisplay";
 
 //types
 import MessageType from "@/src/types/message";
@@ -15,8 +19,9 @@ interface OutPutMessageProps {
 }
 
 const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
-  const trimmedContent = message.content.trim();
-  const isNew = type === "new" ? true : false;
+  let content = message?.content?.trim();
+
+  const isNew = type === "new" ? true : false; //todo how is this used?
   const transitions: number = isNew ? 0.3 : 0;
 
   return (
@@ -32,10 +37,44 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
     >
       <Message isUser={message.isUser}>
         <Flex flexDirection="column">
-          <Text fontSize={16} whiteSpace={"pre-wrap"}>
-            {trimmedContent ||
-              "An error occurred, please try again later or let us know in Discord."}
-          </Text>
+          <ReactMarkdown
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || "");
+                return !inline && match ? (
+                  <>
+                    <SyntaxHighlighter
+                      {...props}
+                      lineProps={{ style: { paddingBottom: 8 } }}
+                      wrapLines={true}
+                      showLineNumbers={true}
+                      children={String(children).replace(/\n$/, "")}
+                      style={oneDark}
+                      language={match[1]}
+                      PreTag="div"
+                    />
+                    <Flex
+                      w="full"
+                      backgroundColor={"gray.900"}
+                      rounded={"md"}
+                      justifyContent={"flex-end"}
+                      alignItems="center"
+                      py={1}
+                    >
+                      <CodeTag colorScheme="blue">Copy</CodeTag>
+                      <CodeTag colorScheme="green">Sync</CodeTag>
+                    </Flex>
+                  </>
+                ) : (
+                  <code {...props} className={className}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+          >
+            {content}
+          </ReactMarkdown>
         </Flex>
       </Message>
     </SlideFade>
@@ -43,3 +82,11 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
 };
 
 export default OutPutMessage;
+
+const CodeTag = ({ children, onClick, colorScheme }: any) => {
+  return (
+    <Tag colorScheme={colorScheme} mr={1} onClick={onClick} cursor="pointer">
+      {children}
+    </Tag>
+  );
+};
