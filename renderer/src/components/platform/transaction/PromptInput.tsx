@@ -59,21 +59,26 @@ const PromptInput = ({
     handleSubmit(technologiesUsed, context);
   };
 
-  useEffect(() => {
-    const setLocalFilesForAutoComplete = async () => {
-      if (!localRepoDir) {
-        return;
-      }
-      const autoCompletingFiles = await getFilteredLofaf(localRepoDir);
-      //remove the localRepoDir from the file path of every file
-      autoCompletingFiles.forEach((file, index) => {
-        autoCompletingFiles[index] = file.replace(localRepoDir, "");
-      });
+  const setLocalFilesForAutoComplete = async () => {
+    if (!localRepoDir) {
+      return;
+    }
+    const autoCompletingFiles = await getFilteredLofaf(localRepoDir);
+    //remove the localRepoDir from the file path of every file
+    autoCompletingFiles.forEach((file, index) => {
+      autoCompletingFiles[index] = file.replace(localRepoDir, "");
+    });
 
-      setFiles(autoCompletingFiles);
-    };
+    setFiles(autoCompletingFiles);
+  };
+
+  useEffect(() => {
     setLocalFilesForAutoComplete();
   }, [localRepoDir]);
+
+  useEffect(() => {
+    setLocalFilesForAutoComplete();
+  }, []);
 
   return (
     <Flex
@@ -241,8 +246,9 @@ const PromptInput = ({
           backdropFilter="blur(10px)"
           p={6}
           value={prompt}
-          placeholder={`${!followUpPrompt ? "Enter a coding task, U" : "U"
-            }se @ to include your local files.`}
+          placeholder={`${
+            !followUpPrompt ? "Enter a coding task, U" : "U"
+          }se @ to include your local files.`}
           _placeholder={{ color: "gray.400" }}
         />
 

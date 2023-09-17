@@ -55,7 +55,7 @@ const ConversationScreen = ({
       >
         <Alert status="info">
           <AlertIcon />
-          Get 4X longer responses with gpt-4-32k context - Upgrade now
+          Get 4X longer responses with gpt-4-32k - $16.99/month
         </Alert>
 
         <MessagesDisplay

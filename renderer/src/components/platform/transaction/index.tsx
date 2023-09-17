@@ -47,6 +47,7 @@ import Message from "../../global/Message";
 import BlurredMessage from "../../global/BlurredMessage";
 
 //utils
+import setReduxStoreData from "@/src/utils/setReduxStoreData";
 import getUserSubscription from "../../global/functions/getUserSubscription";
 import getAllTasks from "@/src/utils/getAllTasks";
 import getFilteredLofaf from "@/src/utils/getFilteredLofaf";
@@ -93,7 +94,6 @@ const Environment = (transaction_id: any) => {
   const [initialPromptLoading, setInitialPromptLoading] = useState(false);
 
   //user settings
-
   const [viewingTargetRepo, setViewingTargetRepo] = useState(false);
   const [showTutorial, setShowTutorial] = useState(null);
   const [progress, setProgress] = useState(33.3);
@@ -133,6 +133,14 @@ const Environment = (transaction_id: any) => {
     setGenerationRound(0);
     setGenerationsSubmitted([]);
   };
+
+  useEffect(() => {
+    setReduxStoreData(user);
+  }, []);
+
+  useEffect(() => {
+    setReduxStoreData(user);
+  }, [user]);
 
   useEffect(() => {
     if (transaction_id.transaction_id === "new") {

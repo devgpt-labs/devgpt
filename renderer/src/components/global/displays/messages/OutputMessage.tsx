@@ -60,6 +60,7 @@ const OutPutMessage = ({ message, type }: OutPutMessageProps) => {
                       justifyContent={"flex-end"}
                       alignItems="center"
                       py={1}
+                      mb={3}
                     >
                       <CodeTag colorScheme="blue">Copy</CodeTag>
                       <CodeTag colorScheme="green">Sync</CodeTag>

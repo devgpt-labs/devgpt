@@ -20,7 +20,7 @@ import {
   Spinner,
   useToast,
   useDisclosure,
-  Divider
+  Divider,
 } from "@chakra-ui/react";
 import { ipcRenderer, shell } from "electron";
 import fs from "fs";
@@ -225,8 +225,8 @@ const SettingsModal = ({
             {!viewingTargetRepo && !loading
               ? "Project Settings"
               : loading
-                ? "Loading..."
-                : "Setup your project."}
+              ? "Loading..."
+              : "Setup your project."}
           </Text>
         </Box>
         {!loading && <ModalCloseButton />}
@@ -237,7 +237,6 @@ const SettingsModal = ({
         ) : (
           <>
             <Box px={6} pt={2}>
-
               <RepositoryOptions />
               <Divider mt={4} />
               <TechStack
@@ -249,7 +248,6 @@ const SettingsModal = ({
               <SaveAndCancelButtons
                 onSave={() => {
                   if (context.length > 3 && technologiesUsed.length > 3) {
-
                     fs.access(localRepoDirectory, (err) => {
                       if (err) {
                         toast({
@@ -270,7 +268,7 @@ const SettingsModal = ({
                           user,
                         });
                       }
-                    })
+                    });
 
                     saveTechStack({
                       onSettingsClose,
@@ -313,7 +311,7 @@ const SettingsModal = ({
           </>
         )}
       </ModalContent>
-    </Modal >
+    </Modal>
   );
 };
 
