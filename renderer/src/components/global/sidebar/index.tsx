@@ -368,42 +368,6 @@ const SideBar = () => {
     );
   };
 
-  if (localRepoDir === null || technologiesUsed === null) {
-    return null;
-  }
-
-  if (!localRepoDir || !technologiesUsed) {
-    return (
-      <Modal
-        size="lg"
-        isCentered={true}
-        isOpen={isWelcomeOpen}
-        onClose={onWelcomeClose}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Welcome to DevGPT!</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>
-              Get ready to start developing the easy way. Save time, write less
-              boilerplate, and focus on what really matters. Your AI
-              co-developer is just a prompt away!
-              <br />
-              <br />
-              We're about to get started with the set up, this only takes a few
-              minutes.
-            </Text>
-          </ModalBody>
-
-          <ModalFooter justifyContent="center">
-            <Button onClick={onWelcomeClose}>Let's go!</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  }
-
   return (
     <Flex
       pt={10}

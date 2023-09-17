@@ -1,6 +1,11 @@
 const fs = require("fs");
 const glob = require("glob");
 const readFromFileSystem = async (directory, file) => {
+  //expects directory e.g. /home/username/project
+  //expects file e.g. /src/index.js
+
+  file = `${directory}${file}`;
+
   if (!file || !directory) {
     return null;
   }
@@ -45,6 +50,7 @@ const readFromFileSystem = async (directory, file) => {
 
     return file_contents;
   } catch (error) {
+    console.log("error:", error);
     return null;
   }
 };

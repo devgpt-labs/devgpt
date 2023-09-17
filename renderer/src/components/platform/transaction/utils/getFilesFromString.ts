@@ -1,42 +1,44 @@
 const getFilesFromString = (stringWithFiles: string) => {
-	// Usage
-	// getFilesFromString(
-	//   "hello world, how @/src/myfiles.js are you dooooing today!! :) ) )! )!) @files/myfiles.com @files famsdf 1 2 3 "
-	// )
+  // Usage
+  // getFilesFromString(
+  //   "hello world, how @/src/myfiles.js are you dooooing today!! :) ) )! )!) @files/myfiles.com @files famsdf 1 2 3 "
+  // )
 
-	const filePaths: string[] = [];
+  //todo move all of these utils to /utils
 
-	let start: number = 0;
-	let end: number = 0;
+  const filePaths: string[] = [];
 
-	while (start < stringWithFiles.length) {
-		// Find the first occurrence of '@' starting from the current position
-		start = stringWithFiles.indexOf("@", start);
+  let start: number = 0;
+  let end: number = 0;
 
-		// If '@' is not found, break out of the loop
-		if (start === -1) {
-			break;
-		}
+  while (start < stringWithFiles.length) {
+    // Find the first occurrence of '@' starting from the current position
+    start = stringWithFiles.indexOf("@", start);
 
-		// Find the next space starting from the position after '@'
-		end = stringWithFiles.indexOf(" ", start);
+    // If '@' is not found, break out of the loop
+    if (start === -1) {
+      break;
+    }
 
-		// If space is not found, use the end of the string
-		if (end === -1) {
-			end = stringWithFiles.length;
-		}
+    // Find the next space starting from the position after '@'
+    end = stringWithFiles.indexOf(" ", start);
 
-		// Extract the file path between '@' and space
-		const filePath: string = stringWithFiles.substring(start + 1, end);
+    // If space is not found, use the end of the string
+    if (end === -1) {
+      end = stringWithFiles.length;
+    }
 
-		// Add the file path to the list
-		filePaths.push(filePath);
+    // Extract the file path between '@' and space
+    const filePath: string = stringWithFiles.substring(start + 1, end);
 
-		// Update the start position to search for the next '@'
-		start = end + 1;
-	}
+    // Add the file path to the list
+    filePaths.push(filePath);
 
-	return filePaths;
+    // Update the start position to search for the next '@'
+    start = end + 1;
+  }
+
+  return filePaths;
 };
 
 export default getFilesFromString;

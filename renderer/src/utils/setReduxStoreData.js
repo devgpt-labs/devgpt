@@ -9,8 +9,6 @@ const setUserData = async (user) => {
       .eq("id", user?.id)
       .single();
 
-    console.log({ data });
-
     //dispatch this to redux
     store.dispatch({
       type: "SETTINGS_CHANGED",
