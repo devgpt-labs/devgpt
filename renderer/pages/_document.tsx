@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Html, Head, Main, NextScript } from "next/document";
 import {
   Box,
-  Text,
+  Flex,
   Tag,
   Alert,
   AlertIcon,
+  Text,
   AlertTitle,
   AlertDescription,
+  Fade,
+  useDisclosure,
+  Button,
 } from "@chakra-ui/react";
+import { CloseIcon, AddIcon, WarningIcon } from "@chakra-ui/icons";
 import { app, ipcMain, dialog, TouchBar, shell } from "electron";
+import getLatestReleaseVersion from "@/src/components/platform/transaction/utils/getLatestReleaseVersion";
 
-export default function Document() {
+const Document = async () => {
+
+  // const isOnLatestVersion = await getLatestReleaseVersion();
+  // console.log(isOnLatestVersion);
+
+
   return (
     <Html lang="en">
       <Head>
@@ -23,33 +34,27 @@ export default function Document() {
           id="titlebar"
           className="titlebar"
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            display: "flex",
-            zIndex: 1000,
-            background: "#2D3748",
-            height: "38px",
-            width: "100%",
-            position: "fixed",
-            top: 0,
             // @ts-ignore
             "-webkit-app-region": "drag",
           }}
+        />
+        <Flex
+          alignItems='center'
+          position="absolute"
+          justifyContent='flex-end'
+          top={0}
+          bg="#ED8936"
+          width="100%"
+          p={4}
         >
-          <Tag
-            // cursor={"pointer"}
-            // onClick={() => {
-            //   shell.openExternal("https://devgpt.com");
-            // }}
-            colorScheme="orange"
-            fontSize={14}
-          >
-            You're on an old version, upgrade for the best experience.
-          </Tag>
-        </div>
+          <Text>You're on an old version, upgrade for the best experience.</Text>
+          <WarningIcon mx={4} />
+        </Flex>
         <Main />
         <NextScript />
       </body>
     </Html>
   );
-}
+};
+
+export default Document;

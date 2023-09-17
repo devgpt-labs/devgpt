@@ -46,13 +46,13 @@ const Logo = () => {
   return (
     <Flex
       flexDirection="row"
-      mt={8}
+      mt={4}
       mb={4}
       alignItems="center"
       justifyContent="space-between"
     >
       <Image src={logo.src} height={"40px"} objectFit={"contain"} />
-      {user && status !== "All Operational" && !status && (
+      {/* {user && status !== "All Operational" && !status && (
         <Box width="20">
           <Tooltip label={status}>
             <Tag colorScheme="yellow">
@@ -60,7 +60,7 @@ const Logo = () => {
             </Tag>
           </Tooltip>
         </Box>
-      )}
+      )} */}
     </Flex>
   );
 };
