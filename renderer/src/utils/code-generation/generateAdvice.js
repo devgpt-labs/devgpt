@@ -2,7 +2,7 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
 //utils
-import getTokenLength from "@/src/components/platform/transaction/utils/getTokenLength";
+import getTokenLength from "@/src/utils/getTokenLength";
 
 const generateAdvice = async (history, technologiesUsed, context, UID) => {
   //filter out empty csv values
@@ -45,7 +45,7 @@ const generateAdvice = async (history, technologiesUsed, context, UID) => {
   //todo test what happens if API fails to respond, make sure it doesn't crash the app
 
   try {
-    const response = await fetch(`${getAPIURL}/generate-advice`, {
+    const response = await fetch(`${getAPIURL}/generate-advice-azure`, {
       method: "POST",
       body: JSON.stringify({ messages, technologiesUsed, context, UID }),
     });
