@@ -14,7 +14,10 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { CloseIcon, AddIcon, WarningIcon } from "@chakra-ui/icons";
-import { app, ipcMain, dialog, TouchBar, shell } from "electron";
+import { autoUpdater, ipcRenderer } from "electron";
+import store from "@/redux/store";
+import getIsUserOnLatestRelease from "@/src/utils/getIsUserOnLatestRelease";
+import packageJson from "../../package.json";
 
 const Document = () => {
   return (
@@ -31,17 +34,22 @@ const Document = () => {
             // @ts-ignore
             "-webkit-app-region": "drag",
           }}
-          alignItems='center'
+          alignItems="center"
           position="absolute"
-          justifyContent='flex-end'
+          justifyContent="flex-end"
           top={0}
           // gray or warning orange
-          bgColor={true ? '#2D3748' : "#ED8936"}
+          bgColor={false ? "#ED8936" : "#2D3748"}
           width="100%"
           p={4}
+          height={30}
         >
-          {/* <Text>{`You're on an old version, upgrade for the best experience.`}</Text> */}
-          <WarningIcon mx={4} />
+          {false && (
+            <>
+              <Text>{`You're on an old version, upgrade for the best experience.`}</Text>
+              <WarningIcon mx={4} />
+            </>
+          )}
         </Flex>
         <Main />
         <NextScript />

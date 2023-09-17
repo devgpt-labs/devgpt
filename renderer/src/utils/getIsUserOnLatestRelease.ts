@@ -1,6 +1,6 @@
 //TODO make compare and return true/false from packagejson
 
-const getLatestReleaseVersion = async (): Promise<string> => {
+const getIsUserOnLatestRelease = async (): Promise<string> => {
 	const response = await fetch(
 		"https://api.github.com/repos/february-Labs/devgpt-releases/releases/latest"
 	);
@@ -8,4 +8,4 @@ const getLatestReleaseVersion = async (): Promise<string> => {
 	return data.tag_name;
 };
 
-export default getLatestReleaseVersion;
+export default getIsUserOnLatestRelease;

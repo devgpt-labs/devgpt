@@ -57,7 +57,8 @@ const SuggestionTag = ({
       </Flex>
       <Flex>
         {Icon ? (
-          Icon
+          <></>
+          // <Icon size={20} />
         ) : complete ? (
           <AiOutlineCheckCircle size={20} color="green.400" />
         ) : (

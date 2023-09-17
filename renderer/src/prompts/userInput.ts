@@ -1,6 +1,6 @@
 //utils
-import readFromFileSystem from "../components/platform/transaction/utils/readFromFileSystem";
-import getFilesFromString from "../components/platform/transaction/utils/getFilesFromString";
+import readFromFileSystem from "@/src/utils/readFromFileSystem";
+import getFilesFromString from "../utils/getFilesFromString";
 
 import store from "@/redux/store";
 

@@ -1,84 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  useToast,
-  Flex,
-  useDisclosure,
-  Box,
-  Tag,
-  Text,
-  Heading,
-  Button,
-  Kbd,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Tooltip,
-  Textarea,
-  IconButton,
-  Spinner,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-} from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { useToast, useDisclosure } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useAuthContext } from "@/src/context";
 import { supabase } from "@/src/utils/supabase/supabase";
 
-import { FaDiscord } from "react-icons/fa";
-import SettingsModal from "@/src/components/global/sidebar/elements/SettingsModal";
-import { shell } from "electron";
-import { LuSend } from "react-icons/lu";
+import store from "@/redux/store";
 
-//todo remove unused files, e.g. getLofaf
-
-//todo clean up imports
+// TODO remove unused files, e.g. getLofaf
 
 //configs
 
-import audios from "@/src/config/audios";
-
 //components
-import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCodeUsage";
-import MainEducation from "@/src/components/global/MainEducation";
-import Tutorial from "@/src/components/global/Tutorial";
-import UpgradeModal from "../../global/UpgradeModal";
-import Message from "../../global/Message";
-import BlurredMessage from "../../global/BlurredMessage";
 
 //utils
 import setReduxStoreData from "@/src/utils/setReduxStoreData";
 import userInput from "@/src/prompts/userInput";
-import getUserSubscription from "../../global/functions/getUserSubscription";
-import getAllTasks from "@/src/utils/getAllTasks";
-import getFilteredLofaf from "@/src/utils/getFilteredLofaf";
-import themes from "@/src/config/themes";
-import {
-  getLofaf,
-  generateQuestions,
-  generateCode,
-  generateNewGenerationCode,
-  saveTaskInDatabase,
-  generateAdvice,
-  detectPromptIntent,
-} from "@/src/components/platform/transaction/utils/code-generation";
-import calculateTimeSaved from "@/src/utils/calculateTimeSaved";
-import calculateUserRanking from "@/src/utils/calculateUserRanking";
-import playAudio from "@/src/utils/playAudio";
-import makeCodeParseable from "@/src/components/platform/transaction/utils/makeCodeParseable";
-import syncCodeChangesWithLocalFileSystem from "@/src/components/platform/transaction/utils/syncCodeChangesWithLocalFileSystem";
+import { generateAdvice } from "@/src/utils/code-generation";
 
 //types
 import MessageType from "@/src/types/message";
-
-import router from "next/router";
 
 //components
 import PrePromptScreen from "./PrePromptScreen";
 import ConversationScreen from "./ConversationScreen";
 
 const Environment = (transaction_id: any) => {
-  //todo remove unused useStates
+  // TODO remove unused useStates
 
   const [interactions, setInteractions] = useState(0);
 
@@ -246,6 +193,7 @@ const Environment = (transaction_id: any) => {
           if (done) {
             break;
           }
+
           let chunk = new TextDecoder("utf-8").decode(value);
           chunk = chunk.replace(/^data: /, "");
 
@@ -279,6 +227,7 @@ const Environment = (transaction_id: any) => {
           });
         }
       };
+
       processStream().catch((err) => {
         //error
         console.log({ err });

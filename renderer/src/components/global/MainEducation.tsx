@@ -31,23 +31,36 @@ const MainEducation = ({ setPrompt, theme }: any) => {
           Icon={LuSend}
         />
         <SuggestionTag
-          label="Fix a Bug"
+          label="Fix A Bug"
           suggestion="in my main app file"
           theme={theme}
           Icon={LuSend}
         />
         <SuggestionTag
-          label="Create a List Component"
+          label="Create a Table Component"
           suggestion="in the src folder"
           theme={theme}
           Icon={LuSend}
         />
         <SuggestionTag
-          label="Refactor the Code"
+          label="Refactor The Code"
           suggestion="in my forgot password function"
           theme={theme}
           Icon={LuSend}
         />
+        <SuggestionTag
+          label="Write A Utility Function"
+          suggestion="to sum up all the numbers in an array"
+          theme={theme}
+          Icon={LuSend}
+        />
+        <SuggestionTag
+          label="Edit The Text"
+          suggestion="in my login file"
+          theme={theme}
+          Icon={LuSend}
+        />
+
       </Grid>
     </Flex>
   );

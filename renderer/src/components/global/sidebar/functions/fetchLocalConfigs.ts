@@ -1,5 +1,6 @@
 import { useAuthContext } from "@/src/context";
 import { supabase } from "@/src/utils/supabase/supabase";
+import getLatestReleaseVersion from "@/src/utils/getIsUserOnLatestRelease";
 
 import store from "@/redux/store";
 
@@ -34,6 +35,7 @@ const fetchLocalConfigs = async ({
     if (data?.local_repo_dir) {
       setLocalRepoDirectory(data?.local_repo_dir);
     }
+
 
     //dispatch this to redux
     store.dispatch({

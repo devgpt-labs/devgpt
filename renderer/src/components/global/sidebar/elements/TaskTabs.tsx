@@ -46,7 +46,7 @@ const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
   }, [refresh, user]);
 
   return (
-    <Box>
+    <Box mb={10}>
       <AlertConfirmation
         isOpen={deletingTask !== null}
         onClose={() => setDeletingTask(null)}

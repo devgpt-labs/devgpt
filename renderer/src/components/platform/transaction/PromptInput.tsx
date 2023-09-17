@@ -88,7 +88,6 @@ const PromptInput = ({
     }
   }, [localRepoDirectory]);
 
-
   return (
     <Flex
       width="100%"
@@ -225,7 +224,7 @@ const PromptInput = ({
               return;
             }
 
-            if (!showSelectFile && e.key === "Enter") {
+            if (e.key === "Enter") {
               e.preventDefault();
               submitToLLM();
             }

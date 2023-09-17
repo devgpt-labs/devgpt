@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../../context";
-import { supabase } from "../../../utils/supabase/supabase";
+import { supabase } from "@/src/utils/supabase/supabase"
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { IoPauseCircleOutline, IoPlayCircleOutline } from "react-icons/io5";
 import Logo from "@/src/components/global/Logo";

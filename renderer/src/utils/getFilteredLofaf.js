@@ -1,5 +1,5 @@
 //utils
-import getFileSystem from "../components/platform/transaction/utils/getFileSystem";
+import getFileSystem from "@/src/utils/getFileSystem";
 import getFilesToIgnore from "@/src/config/getFilesToIgnore";
 
 const getFilteredLofaf = async (full_directory) => {
