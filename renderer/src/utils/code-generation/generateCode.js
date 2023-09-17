@@ -1,5 +1,5 @@
 import getAPIURL from "@/src/utils/getAPIURL";
-import readFromFileSystem from "@/src/components/platform/transaction/utils/readFromFileSystem";
+import readFromFileSystem from "@/src/utils/readFromFileSystem";
 
 const generateCode = async (
   prompt,

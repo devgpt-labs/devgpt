@@ -26,7 +26,7 @@ import { LuSend } from "react-icons/lu";
 
 //components
 import MessagesDisplay from "../../global/displays/MessagesDisplay";
-import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCodeUsage";
+import checkUsersCodeUsage from "@/src/utils/checkUsersCodeUsage";
 import MainEducation from "@/src/components/global/MainEducation";
 import Tutorial from "@/src/components/global/Tutorial";
 import UpgradeModal from "../../global/UpgradeModal";

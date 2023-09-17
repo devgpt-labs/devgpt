@@ -2,7 +2,7 @@ import React from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { useContext, useState, useEffect, createContext } from "react";
 import { supabase } from "../utils/supabase/supabase";
-import { decideUserHomeScreen } from "../utils/decideUserHomeScreen";
+import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
 import { ipcRenderer } from "electron";
 import router from "next/router";
 
@@ -16,7 +16,7 @@ const AuthContext = createContext<{
 }>({
   session: null,
   user: null,
-  signOut: () => {},
+  signOut: () => { },
   loading: true,
   activeSubscription: false,
 });
