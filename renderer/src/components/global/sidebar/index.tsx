@@ -62,7 +62,6 @@ import checkUsersCodeUsage from "@/src/components/global/functions/checkUsersCod
 
 import ResetMyPasswordButton from "../../auth/signin/ResetMyPasswordButton";
 import getTasks from "@/src/utils/getTasks";
-import fetchLocalConfigs from "./functions/fetchLocalConfigs";
 import getUserSubscription from "../functions/getUserSubscription";
 import getProfile from "@/src/utils/getProfile";
 import getLocalRepoDir from "@/src/utils/getLocalRepoDir";

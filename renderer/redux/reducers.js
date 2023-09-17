@@ -1,11 +1,11 @@
 import * as actionTypes from "./actionTypes";
 
 const initialState = {
-  theme: "Normal",
   localRepoDirectory: "",
   technologiesUsed: "",
-  isSettingsOpen: false,
   context: "",
+  theme: "Normal",
+  isSettingsOpen: false,
 };
 
 const mainReducer = (state = initialState, action) => {
@@ -13,13 +13,13 @@ const mainReducer = (state = initialState, action) => {
     case actionTypes.SETTINGS_CHANGED:
       return {
         ...state,
-        theme: action.payload?.theme || state.theme,
         localRepoDirectory:
           action.payload?.localRepoDirectory || state.localRepoDirectory,
         technologiesUsed:
           action.payload?.technologiesUsed || state.technologiesUsed,
-        isSettingsOpen: action.payload?.isSettingsOpen || state.isSettingsOpen,
         context: action.payload?.context || state.context,
+        theme: action.payload?.theme || state.theme,
+        isSettingsOpen: action.payload?.isSettingsOpen || state.isSettingsOpen,
       };
     default:
       return state;
