@@ -2,7 +2,7 @@
   "private": true,
   "name": "DevGPT",
   "description": "We're building the world's most powerful dev-agent.",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "author": "February Labs",
   "main": "app/background.js",
   "scripts": {
