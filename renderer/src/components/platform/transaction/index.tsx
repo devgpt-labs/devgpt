@@ -6,6 +6,8 @@ import { supabase } from "@/src/utils/supabase/supabase";
 
 import store from "@/redux/store";
 
+// TODO remove unused files, e.g. getLofaf
+
 //configs
 
 //components
@@ -23,7 +25,7 @@ import PrePromptScreen from "./PrePromptScreen";
 import ConversationScreen from "./ConversationScreen";
 
 const Environment = (transaction_id: any) => {
-  //todo remove unused useStates
+  // TODO remove unused useStates
 
   const [interactions, setInteractions] = useState(0);
 
