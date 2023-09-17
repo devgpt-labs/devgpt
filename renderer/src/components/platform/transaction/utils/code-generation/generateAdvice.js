@@ -42,6 +42,8 @@ const generateAdvice = async (history, technologiesUsed, context, UID) => {
     };
   }
 
+  //todo test what happens if API fails to respond, make sure it doesn't crash the app
+
   try {
     const response = await fetch(`${getAPIURL}/generate-advice`, {
       method: "POST",

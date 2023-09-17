@@ -34,10 +34,10 @@ const theme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        //bg: "black",
+        bg: "black",
         // bg: "gray.800",
         //bg: "blue.900",
-        bg: "#111111",
+        //bg: "#111111",
       },
     }),
   },
