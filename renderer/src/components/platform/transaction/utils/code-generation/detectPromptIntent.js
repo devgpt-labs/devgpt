@@ -1,5 +1,7 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
+//todo delete all of these unused routes
+
 const detectPromptIntent = async (prompt, UID) => {
   try {
     const response = await fetch(`${getAPIURL}/detect-prompt-intent`, {

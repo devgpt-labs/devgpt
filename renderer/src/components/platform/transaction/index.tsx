@@ -48,6 +48,7 @@ import BlurredMessage from "../../global/BlurredMessage";
 
 //utils
 import setReduxStoreData from "@/src/utils/setReduxStoreData";
+import userInput from "@/src/prompts/userInput";
 import getUserSubscription from "../../global/functions/getUserSubscription";
 import getAllTasks from "@/src/utils/getAllTasks";
 import getFilteredLofaf from "@/src/utils/getFilteredLofaf";
@@ -186,25 +187,27 @@ const Environment = (transaction_id: any) => {
     }
   }, [transaction_id]);
 
-  const newHistory = [
-    ...history,
-    {
-      content: prompt,
-      contentToLLM: prompt, //todo add template
-      type: "output",
-      isUser: true,
-      submitted: false,
-      generation_round: generationRound,
-    },
-  ];
-
   const handleSubmit = async (technologiesUsed, context) => {
+    const filledTemplatePrompt = await userInput(prompt);
+
+    const newHistory = [
+      ...history,
+      {
+        content: prompt,
+        contentToLLM: filledTemplatePrompt, //todo add template
+        type: "output",
+        isUser: true,
+        submitted: false,
+        generation_round: generationRound,
+      },
+    ];
+
     setHistory((prevState: any) => {
       return [
         ...prevState,
         {
           content: prompt,
-          contentToLLM: prompt, //todo add template
+          contentToLLM: filledTemplatePrompt, //todo add template
           type: "output",
           isUser: true,
           submitted: false,
