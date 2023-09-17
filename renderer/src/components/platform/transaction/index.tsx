@@ -216,8 +216,6 @@ const Environment = (transaction_id: any) => {
         }
       };
 
-      // Once process stream has finished, console.log (winner)
-
       processStream().catch((err) => {
         //error
         console.log({ err });
