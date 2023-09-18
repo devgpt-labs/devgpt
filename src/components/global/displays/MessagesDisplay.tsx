@@ -66,11 +66,12 @@ const MessagesDisplay = ({
         );
       case "code":
         return (
-          <CodeDisplay
-            codeChanges={message.content}
-            transaction_id={transaction_id}
-            key={`code${index}`}
-          />
+          <></>
+          // <CodeDisplay
+          //   codeChanges={message.content}
+          //   transaction_id={transaction_id}
+          //   key={`code${index}`}
+          // />
         );
       case "error":
         return <ErrorMessage message={message} key={`error${index}`} />;

@@ -82,6 +82,8 @@ const Profile = () => {
 
   //todo remove conditional renderes from sidebar so that it doesn't pop in after load
 
+  if (!user) return;
+
   return (
     <Box>
       <Text mb={4}>Profile</Text>
@@ -123,7 +125,7 @@ const Theme = ({ user }) => {
 
   useEffect(() => {
     if (user) {
-      getTheme(user).then((theme) => {
+      getTheme(user).then((theme: any) => {
         setTheme(theme);
       });
     }
@@ -200,17 +202,19 @@ const Achievements = (localRepoDir) => {
   const [tasks, setTasks] = useState(null);
   const [premium, setPremium] = useState(null);
 
-  getLocalRepoDir(user).then((localRepoDir) => {
-    setLocalRepo(localRepoDir);
-  });
+  if (user) {
+    getLocalRepoDir(user).then((localRepoDir) => {
+      setLocalRepo(localRepoDir);
+    });
 
-  getTasks(user?.id, toast).then((tasks) => {
-    setTasks(tasks);
-  });
+    getTasks(user?.id, toast).then((tasks: any) => {
+      setTasks(tasks);
+    });
 
-  checkIfPremium(user).then((premium) => {
-    setPremium(premium);
-  });
+    checkIfPremium(user).then((premium: any) => {
+      setPremium(premium);
+    });
+  }
 
   return (
     <Box mr={6}>
@@ -288,8 +292,9 @@ const SideBar = () => {
   }, []);
 
   const setPlan = async () => {
+    if (!user) return;
     const premium = await getUserSubscription(user.id);
-    if (premium.activeSubscription) {
+    if (premium?.activeSubscription) {
       setIsUserPremium(true);
     } else {
       setIsUserPremium(false);
@@ -340,7 +345,8 @@ const SideBar = () => {
   const [codeUsage, setCodeUsage] = useState(0);
 
   useEffect(() => {
-    checkUsersCodeUsage(user?.id).then((codeReturn) => {
+    if (!user?.id) return;
+    checkUsersCodeUsage(user?.id).then((codeReturn: any) => {
       setCodeUsage(codeReturn?.lines);
     });
   }, [tasks]);
@@ -477,7 +483,7 @@ const SideBar = () => {
                   cursor={"pointer"}
                   minW={0}
                 >
-                  {user?.identities[0].identity_data.avatar_url ? (
+                  {user?.identities?.[0]?.identity_data?.avatar_url ? (
                     <Image
                       src={user?.identities[0].identity_data.avatar_url}
                       borderRadius={100}
@@ -556,10 +562,13 @@ const SideBar = () => {
             <Flex flexDirection="column">
               <Flex flexDirection="row" alignItems="center">
                 <Heading size="md" mr={2}>
-                  {user?.app_metadata?.provider === "github"
-                    ? user?.identities[0].identity_data.full_name
-                    : user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                    user?.email.split("@")[0].substring(1, 8)}
+                  {user && user?.app_metadata?.provider === "github"
+                    ? user?.identities?.[0]?.identity_data?.full_name
+                    : user?.email
+                      ?.split("@")?.[0]
+                      ?.substring(0, 1)
+                      ?.toUpperCase() +
+                    user?.email?.split("@")?.[0]?.substring(1, 8)}
                 </Heading>
                 {!isUserPremium && (
                   <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">

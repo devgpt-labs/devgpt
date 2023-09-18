@@ -76,8 +76,9 @@ const SettingsModal = ({
   const toast = useToast();
 
   const setPlan = async () => {
-    const premium = await getUserSubscription(user.id);
-    if (premium.activeSubscription) {
+    if (!user) return;
+    const premium = await getUserSubscription(user?.id);
+    if (premium?.activeSubscription) {
       setUserIsPremium(true);
     } else {
       setUserIsPremium(false);
