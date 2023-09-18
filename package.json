@@ -76,6 +76,7 @@
     "forge": "build-scripts/forge.config.js"
   },
   "dependencies": {
+    "@azure/openai": "^1.0.0-beta.5",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@chakra-ui/icons": "^2.0.19",
@@ -97,6 +98,7 @@
     "@types/react-dom": "18.2.4",
     "@uiw/react-codemirror": "^4.21.9",
     "@vercel/analytics": "^1.0.1",
+    "ai": "^2.2.12",
     "axios": "^1.4.0",
     "buffer": "^6.0.3",
     "codemirror": "^6.0.1",
@@ -117,6 +119,7 @@
     "next": "13.4.4",
     "next-transpile-modules": "^10.0.1",
     "nextron": "^8.5.0",
+    "openai": "^4.7.1",
     "openai-edge": "^1.2.2",
     "react": "^18.2.0",
     "react-codemirror-merge": "^4.21.9",

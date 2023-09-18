@@ -24,7 +24,7 @@ const generateCode = async (
   );
 
   try {
-    const response = await fetch(`${getAPIURL}/generate-code`, {
+    const response = await fetch(`api/generate-code`, {
       method: "POST",
       body: JSON.stringify({
         prompt,
