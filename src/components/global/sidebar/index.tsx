@@ -69,7 +69,7 @@ import getTechnologiesUsed from "@/src/utils/getTechnologiesUsed";
 
 const Profile = () => {
   // Get the user's profile from supabase
-  const { user, session } = useAuthContext();
+  const { user: any, session: any } = useAuthContext();
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -199,7 +199,7 @@ const Achievements = (localRepoDir) => {
   const toast = useToast();
 
   const [localRepo, setLocalRepo] = useState(null);
-  const [tasks, setTasks] = useState(null);
+  const [tasks, setTasks] = useState<any>(null);
   const [premium, setPremium] = useState(null);
 
   if (user) {
@@ -386,6 +386,10 @@ const SideBar = () => {
 
   // console.log(user);
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <Flex
       pt={6}
@@ -562,13 +566,9 @@ const SideBar = () => {
             <Flex flexDirection="column">
               <Flex flexDirection="row" alignItems="center">
                 <Heading size="md" mr={2}>
-                  {user && user?.app_metadata?.provider === "github"
+                  {user?.app_metadata?.provider === "github"
                     ? user?.identities?.[0]?.identity_data?.full_name
-                    : user?.email
-                      ?.split("@")?.[0]
-                      ?.substring(0, 1)
-                      ?.toUpperCase() +
-                    user?.email?.split("@")?.[0]?.substring(1, 8)}
+                    : user?.email}
                 </Heading>
                 {!isUserPremium && (
                   <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">
