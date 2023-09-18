@@ -10,7 +10,7 @@ import {
 import { useRef } from "react";
 
 const AlertConfirmation = ({ isOpen, onClose, onConfirm, title, bodyText }) => {
-  const cancelRef = useRef();
+  const cancelRef = useRef(null);
 
   return (
     <AlertDialog
