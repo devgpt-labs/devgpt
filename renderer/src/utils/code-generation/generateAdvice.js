@@ -2,7 +2,7 @@
 import getAPIURL from "@/src/utils/getAPIURL";
 
 //utils
-import getTokenLength from "@/src/components/platform/transaction/utils/getTokenLength";
+import getTokenLength from "@/src/utils/getTokenLength";
 
 const generateAdvice = async (history, technologiesUsed, context, UID) => {
   //filter out empty csv values

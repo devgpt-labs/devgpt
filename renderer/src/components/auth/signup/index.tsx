@@ -114,6 +114,12 @@ export default function Auth() {
     }
   };
 
+  const signInWithGithub = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+    })
+  };
+
   return (
     <Flex
       justifyContent={"center"}
@@ -135,6 +141,13 @@ export default function Auth() {
         <Heading size="xl" color="white" mt={5}>
           Create an account
         </Heading>
+        <Button
+
+          onClick={() => {
+            signInWithGithub()
+          }}
+        >Sign in with GitHub</Button>
+
         <Text color="white" mt={5}>
           Already have an account?{" "}
           <Link

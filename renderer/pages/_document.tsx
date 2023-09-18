@@ -27,30 +27,6 @@ const Document = () => {
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </Head>
       <body>
-        <Flex
-          id="titlebar"
-          className="titlebar"
-          style={{
-            // @ts-ignore
-            "-webkit-app-region": "drag",
-          }}
-          alignItems="center"
-          position="absolute"
-          justifyContent="flex-end"
-          top={0}
-          // gray or warning orange
-          bgColor={false ? "#ED8936" : "#2D3748"}
-          width="100%"
-          p={4}
-          height={30}
-        >
-          {false && (
-            <>
-              <Text>{`You're on an old version, upgrade for the best experience.`}</Text>
-              <WarningIcon mx={4} />
-            </>
-          )}
-        </Flex>
         <Main />
         <NextScript />
       </body>

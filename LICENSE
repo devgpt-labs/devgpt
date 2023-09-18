@@ -1,39 +1,31 @@
-DEVGPT Software Distribution License
+DEVGPT.COM Software Distribution License
 
-Copyright © 2023, DEVGPT Corporation
+Copyright © 2023, DEVGPT.COM
 
 This license ("License") grants rights in specified software code (the "Code") under the following terms and conditions:
 
-1. Distribution Prohibition: You are expressly prohibited from distributing the Code under the DEVGPT Business Source License (BSL) or any modified versions of the BSL. The BSL includes terms and conditions that apply to the Code and all modified Code before a specified date (the "Change Date"). You may not distribute the Code under the BSL or any similar license.
+Distribution Prohibition: You are expressly prohibited from distributing the Code under the DEVGPT.COM Business Source License (BSL) or any modified versions of the BSL for commercial use. The BSL includes terms and conditions that apply to the Code and all modified Code before a specified date (16 September 2023).
 
-2. Limited Rights: You have the non-exclusive, worldwide rights under this License to copy, modify, display, use, and redistribute the Code solely for your internal purposes or personal use, subject to the following conditions listed 2.1 to 2.9:
+Limited Rights: You have non-exclusive, worldwide rights under this License to copy, modify, display, use, and redistribute the Code solely for your internal purposes or personal use, subject to the following conditions listed 2.1 to 2.5:
 
-   2.1. **Non-Commercial Use**: This technology is intended for non-commercial use only. Users are prohibited from using it to generate revenue directly or indirectly.
+2.1. Non-Commercial Use: This technology is intended exclusively for non-commercial use. Users are prohibited from using it to generate revenue directly or indirectly.
 
-   2.2. **Internal Use Only**: Users may use the technology solely for internal development, testing, or educational purposes. It cannot be used to develop commercial products or services.
+2.2. Internal Use Only: Users may employ the technology solely for internal development, testing, or educational purposes. It cannot be used to develop commercial products or services.
 
-   2.3. **No Redistribution**: Users are not allowed to redistribute the technology or any modified versions of it to third parties. It is for personal use within the organization only.
+2.3. No Hosting as a Service: Users cannot offer the technology as a cloud-based service or host it for others. It should only be used locally.
 
-   2.4. **No Reverse Engineering**: Users are prohibited from reverse-engineering, decompiling, or disassembling the technology to extract its source code or algorithms.
+2.4. Data Privacy Compliance: Users are responsible for ensuring that any data or content processed through the technology complies with applicable privacy laws and regulations. Data privacy violations are strictly prohibited.
 
-   2.5. **No Derivative Works**: Users may not create derivative works based on the technology or modify it in any way.
+2.5. No Competitive Use: Users may not employ the technology in a manner that competes with the products or services offered by DEVGPT.COM.
 
-   2.6. **No Hosting as a Service**: Users cannot offer the technology as a cloud-based service or host it for others. It should only be used locally.
+2.6. No Warranty: This technology is provided "as is" without any warranty, and DEVGPT.COM is not liable for any damages or issues arising from its use.
 
-   2.7. **Data Privacy Compliance**: Users are responsible for ensuring that any data or content processed through the technology complies with privacy laws and regulations. Data privacy violations are strictly prohibited.
+Copyright Notice: When copying or distributing the Code, you must conspicuously and appropriately publish on each copy an appropriate copyright notice; keep intact all notices stating that this License applies to the Code; retain all notices of the absence of any warranty, and provide all recipients with a copy of this License along with the Code.
 
-   2.8. **No Competitive Use**: Users may not use the technology in a way that competes with the products or services offered by DEVGPT Corporation.
+Termination: Any attempt to distribute the Code under the BSL or any similar license will automatically terminate your rights under this License.
 
-   2.9. **No Warranty**: This technology is provided "as is" without any warranty, and DEVGPT Corporation is not liable for any damages or issues arising from its use.
+No Warranties: TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE CODE OR ANY SERVICES OR WORK PRODUCT PROVIDED UNDER OR IN CONNECTION WITH THIS LICENSE ARE PROVIDED ON AN "AS IS" BASIS. YOU EXPRESSLY WAIVE ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING (WITHOUT LIMITATION) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, SYSTEM INTEGRATION, AND ACCURACY OF INFORMATIONAL CONTENT.
 
-3. Copyright Notice: When copying or distributing the Code, you must conspicuously and appropriately publish on each copy an appropriate copyright notice; keep intact all notices stating that this License applies to the Code; keep intact all notices of the absence of any warranty; and give all recipients a copy of this License along with the Code.
+This License is effective as of 16 September 2023 and supersedes any previous licenses or agreements relating to the Code. DEVGPT.COM reserves all rights not expressly granted herein.
 
-4. Commercial Use: If your desired use of the Code does not meet all of the above requirements, or if you wish to use the Code for commercial purposes, you MUST purchase a separate, commercial license for the Code from DEVGPT Corporation.
-
-5. Termination: Any attempt to distribute the Code under the BSL or any similar license will automatically terminate your rights under this License.
-
-6. No Warranties: TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE CODE OR ANY SERVICES OR WORK PRODUCT PROVIDED UNDER OR IN CONNECTION WITH THIS LICENSE ARE PROVIDED ON AN "AS IS" BASIS. YOU EXPRESSLY WAIVE ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING (WITHOUT LIMITATION) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, SYSTEM INTEGRATION, AND ACCURACY OF INFORMATIONAL CONTENT.
-
-This License is effective as of 16 September 2023 and supersedes any previous licenses or agreements relating to the Code. DEVGPT Corporation reserves all rights not expressly granted herein.
-
-For any questions or inquiries regarding licensing or distribution, please contact DEVGPT.
+For any questions or inquiries regarding licensing or distribution, please contact DEVGPT.COM.

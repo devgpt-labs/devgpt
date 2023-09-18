@@ -368,6 +368,8 @@ const SideBar = () => {
     );
   };
 
+  // TODO: test
+  // console.log(supabase.auth.session());
   return (
     <Flex
       pt={10}
@@ -536,7 +538,7 @@ const SideBar = () => {
                 <Heading size="md">
                   {user
                     ? user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                      user?.email.split("@")[0].substring(1, 8)
+                    user?.email.split("@")[0].substring(1, 8)
                     : ""}
                 </Heading>
               </Flex>
