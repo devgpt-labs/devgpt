@@ -58,6 +58,8 @@ import { useAuthContext } from "@/src/context";
 import checkIfPremium from "@/src/utils/checkIfPremium";
 import getUserSubscription from "@/src/utils/getUserSubscription";
 import UpgradeModal from "@/src/components/global/UpgradeModal";
+import handleSignInWithGitHub from "@/src/utils/github/handleSignInWithGithub";
+import { BsDiscord, BsPlus, BsGithub } from "react-icons/bs";
 
 interface LinkItemProps {
   name: string;
@@ -77,7 +79,7 @@ const MenuTabs = () => {
     router.push(`/platform/transactions/new`);
   };
 
-  const { user } = useAuthContext();
+  const { user, session } = useAuthContext();
 
   getProfile(user).then((profile: any) => {
     setTargetRepo(profile?.local_repo_dir);
@@ -117,15 +119,10 @@ const MenuTabs = () => {
     onClose: onUpgradeClose,
   } = useDisclosure();
 
+
+  const connectedGithub = user?.app_metadata?.providers.includes("github");
+
   const LinkItems: any = [
-    {
-      name: "New Task",
-      icon: FiPlus,
-      command: checkOS("⌘ + N", "Ctrl + N"),
-      onClick: () => {
-        newTaskHandler();
-      },
-    },
     !isUserPremium && {
       name: "Upgrade",
       upgradeButton: true,
@@ -135,6 +132,33 @@ const MenuTabs = () => {
         onUpgradeOpen();
       },
     },
+    connectedGithub && {
+      name: "New Task",
+      icon: BsPlus,
+      command: checkOS("⌘ + N", "Ctrl + N"),
+      onClick: () => {
+        newTaskHandler();
+      },
+    },
+    connectedGithub && {
+      name: targetRepoUserFriendly
+        ? `Repo: ${targetRepoUserFriendly}`
+        : "Set Target Repo",
+      icon: AiOutlineFolderOpen,
+      command: checkOS("⌘ + T", "Ctrl + T"),
+      onClick: () => {
+        openRepoSettings();
+      },
+    },
+    !connectedGithub && {
+      name: "Connect GitHub",
+      icon: BsGithub,
+      command: checkOS("⌘ + G", "Ctrl + G"),
+      onClick: () => {
+        handleSignInWithGitHub();
+      },
+    },
+
     {
       name: "Report a bug",
       icon: AiFillBug,
@@ -145,16 +169,6 @@ const MenuTabs = () => {
         console.log(
           "https://github.com/february-labs/devgpt-releases/issues/new"
         );
-      },
-    },
-    {
-      name: targetRepoUserFriendly
-        ? `Repo: ${targetRepoUserFriendly}`
-        : "Set Target Repo",
-      icon: AiOutlineFolderOpen,
-      command: checkOS("⌘ + T", "Ctrl + T"),
-      onClick: () => {
-        openRepoSettings();
       },
     },
   ];
@@ -220,19 +234,19 @@ const MenuTabs = () => {
         onUpgradeClose={onUpgradeClose}
       />
       {LinkItems.map((link) => {
-        if (!link.name) return null;
+        if (!link?.name) return null;
         return (
           <NavItem
             upgradeButton={link.upgradeButton}
-            key={link.name}
-            icon={link.icon}
+            key={link?.name}
+            icon={link?.icon}
             onClick={() => {
               {
                 link?.onClick && link?.onClick();
               }
             }}
           >
-            {link.name}
+            {link?.name}
             <Kbd ml={2}>{link?.command}</Kbd>
           </NavItem>
         );

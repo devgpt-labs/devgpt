@@ -11,27 +11,19 @@ import {
   Link,
   Text,
   useToast,
-  Image,
   Spinner,
   InputGroup,
   InputRightElement,
-  Tag,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  useDisclosure,
-  Heading,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../../context";
 import { supabase } from "@/src/utils/supabase/supabase"
 import { decideUserHomeScreen } from "@/src/utils/decideUserHomeScreen";
-import { IoPauseCircleOutline, IoPlayCircleOutline } from "react-icons/io5";
 import Logo from "@/src/components/global/Logo";
-import audios from "@/src/config/audios";
 import ResetMyPasswordButton from "./ResetMyPasswordButton";
 import Typewriter from "typewriter-effect";
+import handleSignInWithGitHub from "@/src/utils/github/handleSignInWithGithub";
+import { AiFillGithub } from 'react-icons/ai'
 
 export default function Auth() {
   const toast = useToast();
@@ -108,6 +100,8 @@ export default function Auth() {
       }
     }
   };
+
+
 
   return (
     <Flex
@@ -231,25 +225,34 @@ export default function Auth() {
                       </InputGroup>
                       <ResetMyPasswordButton />
                     </FormControl>
-                    <Stack spacing={10}>
-                      <Stack
-                        direction={{ base: "column", sm: "column" }}
-                        alignItems={"start"}
-                        justifyContent={"space-between"}
-                      >
-                        <Checkbox>Stay signed in</Checkbox>
-                      </Stack>
-                      <Button
-                        bg={"blue.400"}
-                        color={"white"}
-                        _hover={{
-                          bg: "blue.500",
-                        }}
-                        onClick={handleSignIn}
-                      >
-                        Sign in
-                      </Button>
+                    <Stack
+                      direction={{ base: "column", sm: "column" }}
+                      alignItems={"start"}
+                    >
+                      <Checkbox>Stay signed in</Checkbox>
                     </Stack>
+                    <Button
+                      bg={"blue.400"}
+                      color={"white"}
+                      _hover={{
+                        bg: "blue.500",
+                      }}
+                      onClick={handleSignIn}
+                    >
+                      Sign in
+                    </Button>
+                    <Button
+                      bg='gray.900'
+                      mt={8}
+                      minW="200"
+                      onClick={handleSignInWithGitHub}
+                    >
+                      <AiFillGithub />
+                      <Text ml={2}>
+                        Sign In With GitHub
+
+                      </Text>
+                    </Button>
                   </Stack>
                 )}
               </>

@@ -21,6 +21,14 @@ import {
   useToast,
   useDisclosure,
   Divider,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuItemOption,
+  MenuGroup,
+  MenuOptionGroup,
+  MenuDivider,
 } from "@chakra-ui/react";
 
 // import fs from "fs";
@@ -28,6 +36,7 @@ import checkOS from "@/src/utils/checkOS";
 import planIntegers from "@/src/config/planIntegers";
 import fetchLocalConfigs from "../functions/fetchLocalConfigs";
 import countFilesInDirectory from "@/src/utils/countFilesInDirectory";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useAuthContext } from "@/src/context";
 import TechStack from "@/src/components/global/sidebar/elements/TechStack";
 import checkIfPremium from "@/src/utils/checkIfPremium";
@@ -37,6 +46,9 @@ import saveContext from "../functions/saveContext";
 import getUserSubscription from "@/src/utils/getUserSubscription";
 import Context from "./Context";
 import UpgradeModal from "../../UpgradeModal";
+import getCode from "@/src/utils/github/getCode";
+import getUserRepositories from "@/src/utils/github/getUserRepositories";
+import exchangeAccessToken from "@/src/utils/github/exchangeAccessToken";
 
 interface SettingsModalProps {
   viewingTargetRepo?: boolean;
@@ -60,7 +72,7 @@ const SettingsModal = ({
 
   const initialRef = useRef(null);
   const finalRef = useRef(null);
-  const { user } = useAuthContext();
+  const { user, session } = useAuthContext();
   const toast = useToast();
 
   const setPlan = async () => {
@@ -159,6 +171,64 @@ const SettingsModal = ({
     );
   };
 
+  // console.log(session);
+
+  const fetchGithubInformation = async () => {
+    // const repos = await getUserRepositories(session?.access_token);
+    const owner = user?.identities?.[0]?.identity_data?.user_name;
+    const token = session?.provider_token;
+    const path = "";
+    const repo = "";
+
+    console.log({
+      owner,
+      token,
+      path,
+      repo
+    });
+
+    exchangeAccessToken(session?.access_token)
+      .then((result) => {
+        console.log({ result });
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+
+
+    // getUserRepositories(session?.provider_token)
+    //   .then((data) => {
+    //     if (data) {
+    //       console.log("File Names:");
+    //       console.log(data);
+    //     } else {
+    //       console.error("Error: Data not found or API request failed.");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error(`Error: ${error.message}`);
+    //   });
+
+    // getCode(owner, repo, path, token)
+    //   .then((data) => {
+    //     if (data) {
+    //       console.log("File Names:");
+    //       console.log(data);
+    //     } else {
+    //       console.error("Error: Data not found or API request failed.");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error(`Error: ${error.message}`);
+    //   });
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchGithubInformation();
+    }
+  }, [session]);
+
   return (
     <Modal
       isCentered={true}
@@ -178,8 +248,8 @@ const SettingsModal = ({
             {!viewingTargetRepo && !loading
               ? "Project Settings"
               : loading
-              ? "Loading..."
-              : "Set up your project."}
+                ? "Loading..."
+                : "Set up your project."}
           </Text>
         </Box>
         {!loading && <ModalCloseButton />}
@@ -190,7 +260,20 @@ const SettingsModal = ({
         ) : (
           <>
             <Box px={6} pt={2}>
-              <RepositoryOptions />
+              {/* <RepositoryOptions /> */}
+              <Text>Pick from a list of github</Text>
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                  Actions
+                </MenuButton>
+                <MenuList>
+                  <MenuItem>Download</MenuItem>
+                  <MenuItem>Create a Copy</MenuItem>
+                  <MenuItem>Mark as Draft</MenuItem>
+                  <MenuItem>Delete</MenuItem>
+                  <MenuItem>Attend a Workshop</MenuItem>
+                </MenuList>
+              </Menu>
               <Divider mt={4} />
               <TechStack
                 technologiesUsed={technologiesUsed}

@@ -16,7 +16,7 @@ const AuthContext = createContext<{
 }>({
   session: null,
   user: null,
-  signOut: () => {},
+  signOut: () => { },
   loading: true,
   activeSubscription: false,
 });
@@ -69,7 +69,6 @@ export const AuthProvider = ({ children }: any) => {
         supabase.auth.signOut();
         setUser(null);
         setSession(null);
-
         router.push("/login");
       }
       setLoading(false);

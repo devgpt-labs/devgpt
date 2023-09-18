@@ -37,7 +37,7 @@ import {
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
-
+import getUserRepositories from "@/src/utils/github/getUserRepositories";
 import { MdCheckCircle, MdSettings, MdClose, MdPassword } from "react-icons/md";
 import { BsTrophy, BsEasel } from "react-icons/bs";
 import { GoSignOut } from "react-icons/go";
@@ -69,7 +69,7 @@ import getTechnologiesUsed from "@/src/utils/getTechnologiesUsed";
 
 const Profile = () => {
   // Get the user's profile from supabase
-  const { user } = useAuthContext();
+  const { user, session } = useAuthContext();
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -254,7 +254,7 @@ const SideBar = () => {
   const [refresh, setRefresh] = useState(false);
   const [localRepoDir, setLocalRepoDir] = useState(null);
   const [technologiesUsed, setTechnologiesUsed] = useState(null);
-  const { user, signOut } = useAuthContext();
+  const { user, signOut, session } = useAuthContext();
   const borderRightColor = useColorModeValue("gray.200", "gray.700");
   const {
     isOpen: isUserSettingsOpen,
@@ -364,9 +364,25 @@ const SideBar = () => {
     );
   };
 
+  console.log(session);
+
+  // getUserRepositories(session?.provider_token)
+  //   .then((user_repositories) => {
+  //     if (user_repositories) {
+  //       user_repositories.forEach((repo) => {
+  //         console.log(repo.name);
+  //       });
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     console.error(`Error: ${error.message}`);
+  //   });
+
+  // console.log(user);
+
   return (
     <Flex
-      pt={10}
+      pt={6}
       overflowY="scroll"
       bg={"gray.900"}
       borderRight="1px"
@@ -461,7 +477,17 @@ const SideBar = () => {
                   cursor={"pointer"}
                   minW={0}
                 >
-                  <UserAvatar />
+                  {user?.identities[0].identity_data.avatar_url ? (
+                    <Image
+                      src={user?.identities[0].identity_data.avatar_url}
+                      borderRadius={100}
+                      mr={2}
+                      height="40px"
+                      width="40px"
+                    />
+                  ) : (
+                    <UserAvatar />
+                  )}
                 </MenuButton>
               )}
               <MenuList alignItems={"center"}>
@@ -528,21 +554,21 @@ const SideBar = () => {
             </Menu>
 
             <Flex flexDirection="column">
-              <Flex flexDirection="row" alignItems="center" mb={1}>
-                <Heading size="md">
-                  {user
-                    ? user?.email.split("@")[0].substring(0, 1).toUpperCase() +
-                      user?.email.split("@")[0].substring(1, 8)
-                    : ""}
+              <Flex flexDirection="row" alignItems="center">
+                <Heading size="md" mr={2}>
+                  {user?.app_metadata?.provider === "github"
+                    ? user?.identities[0].identity_data.full_name
+                    : user?.email.split("@")[0].substring(0, 1).toUpperCase() +
+                    user?.email.split("@")[0].substring(1, 8)}
                 </Heading>
+                {!isUserPremium && (
+                  <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">
+                    <Tag color={"yellow.100"} size="md" mt={1} mb={1}>
+                      {`${codeUsage} / ${planIntegers?.free_lines_of_code_count} lines`}
+                    </Tag>
+                  </Tooltip>
+                )}
               </Flex>
-              {!isUserPremium && (
-                <Tooltip label="Limit resets daily. Upgrade for unlimited code gen.">
-                  <Tag color={"yellow.100"} size="md" mt={1} mb={1}>
-                    {`${codeUsage} / ${planIntegers?.free_lines_of_code_count} lines generated`}
-                  </Tag>
-                </Tooltip>
-              )}
               <Text fontSize={13}>Version {packageJson?.version}</Text>
             </Flex>
           </Flex>

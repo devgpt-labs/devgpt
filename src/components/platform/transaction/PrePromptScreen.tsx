@@ -46,7 +46,6 @@ const PrePromptScreen = ({ prompt, setPrompt, handleSubmit }: any) => {
       bgRepeat="no-repeat"
     >
       <Flex
-        mt={10}
         p={6}
         justifyContent="space-between"
         alignItems="center"

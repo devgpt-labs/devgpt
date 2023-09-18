@@ -248,14 +248,14 @@ const PromptInput = ({
           flexWrap="wrap"
           justifyContent="space-between"
           color="white"
-          border="1px solid rgba(150, 150, 180)"
+          border="1px solid"
+          borderColor="gray.700"
           borderRadius="0.5rem"
           backdropFilter="blur(10px)"
           p={6}
           value={prompt}
-          placeholder={`${
-            !followUpPrompt ? "Enter a coding task, U" : "U"
-          }se @ to include your local files.`}
+          placeholder={`${!followUpPrompt ? "Enter a coding task, U" : "U"
+            }se @ to include your local files.`}
           _placeholder={{ color: "gray.400" }}
         />
 

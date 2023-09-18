@@ -43,11 +43,11 @@ export default function Auth() {
   const toast = useToast();
   const { user } = useAuthContext();
 
-  useEffect(() => {
-    if (user) {
-      decideUserHomeScreen(user);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (user) {
+  //     decideUserHomeScreen(user);
+  //   }
+  // }, []);
 
   const handleSignUpWithPassword = async () => {
     setLoading(true);
@@ -233,6 +233,7 @@ export default function Auth() {
             Sign up & login
           </Button>
         )}
+
       </Card>
     </Flex>
   );

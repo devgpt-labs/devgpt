@@ -46,7 +46,6 @@ const Logo = () => {
   return (
     <Flex
       flexDirection="row"
-      mt={4}
       mb={4}
       alignItems="center"
       justifyContent="space-between"
