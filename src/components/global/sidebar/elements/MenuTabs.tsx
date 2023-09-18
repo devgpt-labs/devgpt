@@ -93,6 +93,7 @@ const MenuTabs = () => {
   });
 
   const setPlan = async () => {
+    if (!user) return;
     const premium: any = await getUserSubscription(user.id);
     if (premium.activeSubscription) {
       setIsUserPremium(true);
