@@ -1,0 +1,21 @@
+//utils
+import getFileSystem from "@/src/utils/getFileSystem";
+import getFilesToIgnore from "@/src/config/getFilesToIgnore";
+
+const getFilteredLofaf = async (full_directory) => {
+  const excludedFilesArray = getFilesToIgnore;
+
+  let filteredLofaf = await getFileSystem(full_directory);
+
+  if (filteredLofaf) {
+    console.log({ filteredLofaf });
+
+    filteredLofaf = filteredLofaf?.filter((file) => {
+      return !excludedFilesArray.includes(file.file_name);
+    });
+  }
+
+  return filteredLofaf;
+};
+
+export default getFilteredLofaf;

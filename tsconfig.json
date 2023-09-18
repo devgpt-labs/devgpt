@@ -1,6 +1,18 @@
 {
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
-    "target": "es5",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
     "lib": [
       "dom",
       "dom.iterable",
@@ -17,15 +29,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "paths": {
-      "@/*": ["./renderer/*"]
-    }
-  },
-  "exclude": [
-    "node_modules",
-    "renderer/next.config.js",
-    "app",
-    "dist"
-  ]
+    "jsx": "preserve"
+  }
 }
