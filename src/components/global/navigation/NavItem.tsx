@@ -39,7 +39,7 @@ const NavItem = ({
         borderRadius="3"
         role="group"
         cursor="pointer"
-        bgGradient={upgradeButton ? "linear(to-r, blue.500, teal.500)" : null}
+        bgGradient={upgradeButton ? "linear(to-r, blue.500, teal.500)" : ''}
         _hover={
           upgradeButton
             ? { bgGradient: "linear(to-r, blue.400, teal.400)" }
