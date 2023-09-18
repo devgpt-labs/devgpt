@@ -29,7 +29,7 @@ interface TaskTabsProps {
 
 const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
   const [tasksLoaded, setTasksLoaded] = useState(false);
-  const [deletingTask, setDeletingTask] = useState(null);
+  const [deletingTask, setDeletingTask] = useState<any>(null);
 
   const { user } = useAuthContext();
   const toast = useToast();
@@ -51,7 +51,7 @@ const TaskTabs = ({ tasks, setTasks, refresh, setRefresh }: TaskTabsProps) => {
         isOpen={deletingTask !== null}
         onClose={() => setDeletingTask(null)}
         onConfirm={() => {
-          deleteTask(deletingTask.transaction_id, toast, refresh, setRefresh);
+          deleteTask(deletingTask?.transaction_id, toast, refresh, setRefresh);
           setDeletingTask(null);
         }}
         title={"Delete task"}
