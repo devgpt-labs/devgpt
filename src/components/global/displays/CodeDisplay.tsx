@@ -115,7 +115,7 @@ const CodeDisplay = ({ code, path, transaction_id }: CodeDisplayProps) => {
                 label="Upvote"
                 icon={<IoThumbsUpOutline />}
                 onClick={() => {
-                  giveCodeFeedback("upvote");
+                  // giveCodeFeedback("upvote");
                 }}
               />
               <CodeTag
@@ -123,7 +123,7 @@ const CodeDisplay = ({ code, path, transaction_id }: CodeDisplayProps) => {
                 icon={<IoThumbsDownOutline />}
                 onClick={() => {
                   setUserIsDownvoting(true);
-                  giveCodeFeedback("downvote");
+                  // giveCodeFeedback("downvote");
                 }}
               />
             </Flex>
