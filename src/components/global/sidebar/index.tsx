@@ -69,7 +69,7 @@ import getTechnologiesUsed from "@/src/utils/getTechnologiesUsed";
 
 const Profile = () => {
   // Get the user's profile from supabase
-  const { user: any, session: any } = useAuthContext();
+  const { user, session } = useAuthContext();
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
