@@ -23,8 +23,9 @@ import {
 } from "@chakra-ui/react";
 
 import { FaDiscord } from "react-icons/fa";
+import { supabase } from "@/src/utils/supabase/supabase";
 import { LuSend } from "react-icons/lu";
-
+import Router, { useRouter } from "next/router";
 //todo clean up imports
 
 //components
@@ -34,6 +35,8 @@ import store from "@/redux/store";
 import PromptInput from "./PromptInput";
 
 const PrePromptScreen = ({ prompt, setPrompt, handleSubmit }: any) => {
+
+  const router = useRouter();
   return (
     <Flex
       // background={
@@ -71,6 +74,7 @@ const PrePromptScreen = ({ prompt, setPrompt, handleSubmit }: any) => {
               as={"a"}
               target={"_blank"}
               onClick={async () => {
+                if (!supabase) return
                 await supabase.auth.signOut();
                 router.push("/login");
               }}
