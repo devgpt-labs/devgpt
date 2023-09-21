@@ -88,11 +88,11 @@ const Chat = () => {
       >
         <Header />
         <Box className="text-slate-50 max-h-[50vh] overflow-y-auto">
+          {prompt && (<Text>{prompt}</Text>)}
           {isLoading && !response && <Loader />}
           {response && <Response content={String(response)} />}
         </Box>
         <ConversationStyleToggle visible={isFinished} />
-
         <PromptInput
           prompt={prompt}
           setPrompt={setPrompt}

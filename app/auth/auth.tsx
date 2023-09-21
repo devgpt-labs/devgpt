@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { Header } from "./AuthHeader";
-import handleSignInWithGitHub from "@/utils/github/signInWithGithub";
+import signInWithGithub from "@/utils/github/signInWithGithub";
 import { useSessionContext } from "@/context/useSessionContext";
 import {
   Box,
@@ -35,7 +35,7 @@ const Auth = () => {
           justifyContent="space-between"
           width="100%"
           onClick={() => {
-            handleSignInWithGitHub()
+            signInWithGithub()
               .then(() => {
                 setLoading(true);
               })

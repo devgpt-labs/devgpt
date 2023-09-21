@@ -23,20 +23,20 @@ const Repos = () => {
                         onChange={(e: any) => methods.setBranch(e?.value)}
                         border="0.5px solid gray"
                     />
-                    {/* <Text>Tech Stack</Text>
+                    <Text>Tech Stack</Text>
                     <Input
                         // value={tech}
                         placeholder="What tech stack are you using? E.g. React, Next.js, Chakra UI"
                         onChange={(e: any) => methods.setTechStack(e?.value)}
                         border="0.5px solid gray"
-                    /> */}
-                    {/* <Text>Context</Text>
+                    />
+                    <Text>Context</Text>
                     <Input
                         // value={context}
                         placeholder="What are you trying to do? E.g. Create a new Next.js booking app"
                         onChange={(e: any) => methods.setContext(e?.value)}
                         border="0.5px solid gray"
-                    /> */}
+                    />
                 </VStack>
 
             </Box>
