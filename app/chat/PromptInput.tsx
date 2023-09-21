@@ -157,10 +157,10 @@ export const PromptInput: FC<Props> = (props) => {
                   mb={1}
                   autoFocus
                   key={file}
-                  cursor="pointer"
-                  onClick={() =>
-                    handleKeyDown({ key: "Tab", preventDefault: () => { } })
-                  }
+                // cursor="pointer"
+                // onClick={() =>
+                //   handleKeyDown({ key: "Tab", preventDefault: () => { } })
+                // }
                 >
                   {file}
                 </Tag>
