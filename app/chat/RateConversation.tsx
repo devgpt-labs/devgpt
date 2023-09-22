@@ -1,6 +1,6 @@
 "use client";
 import React, { FC, useState } from "react";
-import { Text, Center, Box, useToast, Button } from "@chakra-ui/react";
+import { Text, Center, Box, useToast, Fade } from "@chakra-ui/react";
 
 export const ConversationStyleToggle = ({ visible }: any) => {
   const toast = useToast();
@@ -39,13 +39,28 @@ interface ToggleItemProps {
 }
 
 const ToggleItem: FC<ToggleItemProps> = (props) => {
+  const [showCheckmark, setShowCheckmark] = useState(false);
+
+  const handleItemClick = () => {
+    if (props.onClick) props.onClick();
+    setShowCheckmark(true);
+    setTimeout(() => {
+      setShowCheckmark(false);
+    }, 2000);
+  };
+
   return (
     <li
-      onClick={props.onClick}
+      onClick={handleItemClick}
       className={`border gap-2 border-transparent py-2 hover:bg-slate-800 cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
     >
       <Box>
-        <Text>{props.children}</Text>
+        <Fade in={!showCheckmark}>
+          <Text>{props.children}</Text>
+        </Fade>
+        <Fade in={showCheckmark}>
+          <Text color="green.500">☑️</Text>
+        </Fade>
       </Box>
     </li>
   );
