@@ -15,6 +15,7 @@ import Loader from "@/app/components/Loader";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
+import { supabase } from "@/utils/supabase";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
@@ -23,8 +24,9 @@ const Chat = () => {
   const [prompt, setPrompt] = useState<string>("");
   const { user, session, messages, methods, repo } = useSessionContext();
 
-  //todo move this to ssession context
+  // todo move this to session context
   if (!user) return null;
+  if (!session?.provider_token) supabase?.auth.signOut()
 
   const submitHandler = async (prompt: string) => {
     setIsLoading(true);
