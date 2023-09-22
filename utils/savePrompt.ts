@@ -6,10 +6,6 @@ export async function savePrompt(
   prompt: string,
   response: string
 ) {
-  console.log({ email, prompt, response });
-
-  return;
-
   if (!supabase) {
     throw new Error("Supabase not initialized");
   }

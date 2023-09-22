@@ -1,7 +1,7 @@
 import React from "react";
 import { useSessionContext } from "@/context/useSessionContext";
 import Auth from "./auth";
-import Chat from "./chat";
+import Chat from "./chat/Chat";
 import RepoDrawer from "./repos/RepoDrawer";
 import { useDisclosure, Tag, Text, Flex } from "@chakra-ui/react";
 
@@ -25,8 +25,8 @@ const Home = () => {
       <Flex
         height="95vh"
         flexDirection="column"
-        alignItems='center'
-        justifyContent='center'
+        alignItems="center"
+        justifyContent="center"
       >
         {user ? <Chat /> : <Auth />}
 

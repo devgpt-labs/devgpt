@@ -26,7 +26,6 @@ const Chat = () => {
   // useMemo to create a version of the prompt that will stay between submissions
   const memoizedPrompt = useMemo(() => prompt, [prompt]);
 
-
   //todo move this to session context
   if (!user) return null;
 
@@ -64,15 +63,14 @@ const Chat = () => {
 
     while (true) {
       const { value, done: doneReading } = await reader.read();
-      if (doneReading) {
-        setIsFinished(true);
-        console.log({ response });
-        savePrompt(String(user.email), prompt, String(response));
-        break;
-      }
-
       const chunkValue = decoder.decode(value);
       completeResponse += chunkValue;
+      if (doneReading) {
+        setIsFinished(true);
+        console.log({ completeResponse });
+        savePrompt(String(user.email), prompt.trim(), String(completeResponse));
+        break;
+      }
 
       setResponse(completeResponse);
     }
@@ -97,7 +95,7 @@ const Chat = () => {
       >
         <Header />
         <Box className="text-slate-50 max-h-[50vh] overflow-y-auto">
-          {prompt && (<Text>{memoizedPrompt}</Text>)}
+          {prompt && <Text>{memoizedPrompt}</Text>}
           {isLoading && !response && <Loader />}
           {response && <Response content={String(response)} />}
         </Box>
