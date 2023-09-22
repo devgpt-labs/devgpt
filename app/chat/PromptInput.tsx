@@ -56,44 +56,29 @@ export const PromptInput: FC<Props> = (props) => {
   });
 
   // If the user clicks tab, we want to autocomplete the file name
-  const handleKeyDown = (e: any) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
+  const handleKeyDown = (file: any) => {
+    // Append currentSuggestion to prompt
+    const promptArray = props.prompt.split(" ");
 
-      // Append currentSuggestion to prompt
-      const promptArray = props.prompt.split(" ");
+    console.log(promptArray);
 
-      console.log(promptArray);
+    const lastWord = promptArray[promptArray.length - 1];
+    const newPrompt = props.prompt.replace(lastWord, `~${file}`);
 
-      const lastWord = promptArray[promptArray.length - 1];
-      const newPrompt = props.prompt.replace(lastWord, `~${selectedFile[0]}`);
-
-      props.setPrompt(newPrompt);
-      // Refocus on input
-      const input = document.getElementById("message");
-      input?.focus();
-    }
+    props.setPrompt(newPrompt);
+    // Refocus on input
+    const input = document.getElementById("message");
+    input?.focus();
   };
 
   useEffect(() => {
     setAllFiles([]);
 
-    const githubIdentity: any = user?.identities?.find(
-      (identity) => identity?.provider === "github"
-    );
-
-    console.log(githubIdentity);
-
     if (!repo.owner || !repo.repo || !session?.provider_token) {
       return;
     }
 
-    const branchDefault = branch || "main";
-
-    console.log(branch);
-
-
-    getLofaf(repo.owner, repo.repo, branchDefault, session?.provider_token)
+    getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
       .then((files: any) => {
         if (!files) return;
 
@@ -157,10 +142,8 @@ export const PromptInput: FC<Props> = (props) => {
                   mb={1}
                   autoFocus
                   key={file}
-                // cursor="pointer"
-                // onClick={() =>
-                //   handleKeyDown({ key: "Tab", preventDefault: () => { } })
-                // }
+                  cursor="pointer"
+                  onClick={() => handleKeyDown(file)}
                 >
                   {file}
                 </Tag>
@@ -174,7 +157,22 @@ export const PromptInput: FC<Props> = (props) => {
         onSubmit={onSubmit}
       >
         <Input
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e: any) => {
+
+            // If key equals tab, autocomplete
+            if (e.key === "Tab") {
+              e.preventDefault();
+              handleKeyDown(selectedFile[0]);
+              return;
+            }
+
+            // If key equals enter, submit
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSubmit(e);
+              return;
+            }
+          }}
           onChange={(e) => {
             props.setPrompt(e.target.value);
           }}

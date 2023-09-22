@@ -12,6 +12,8 @@ import {
   Button,
   Flex,
   useDisclosure,
+  Skeleton,
+  Stack,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
 import getRepos from "@/utils/github/getRepos";
@@ -25,6 +27,7 @@ const RepoDrawer = () => {
   });
   const { repo, methods, session, user, repoWindowOpen } = useSessionContext();
   const [repos, setRepos] = useState<any[]>([]);
+  const [filter, setFilter] = useState<string>("");
   const btnRef = useRef<any>();
 
   useEffect(() => {
@@ -33,7 +36,8 @@ const RepoDrawer = () => {
   }, [repoWindowOpen]);
 
   useEffect(() => {
-    if (!session?.provider_token) return;
+    if (!session) return;
+
     getRepos(session?.provider_token)
       .then((allRepos) => {
         setRepos(allRepos);
@@ -46,8 +50,6 @@ const RepoDrawer = () => {
   if (!user) {
     return null;
   }
-
-
 
   return (
     <>
@@ -63,46 +65,67 @@ const RepoDrawer = () => {
           <DrawerHeader>Select a repo</DrawerHeader>
           <DrawerBody>
             {repos?.length > 0 ? (
-              repos?.map((repoOption, index) => {
-                return (
-                  <Flex
-                    key={repoOption.name + repoOption.owner.login}
-                    my={2}
-                    flexDirection="row"
-                    justifyContent={"space-between"}
-                    alignItems={"center"}
-                  >
-                    <Flex flexDirection="column">
-                      <Text fontSize={16}>
-                        {repoOption.name.substring(0, 16)}
-                        {repoOption.name.length > 16 && "..."}
-                      </Text>
+              <>
+                <Input
+                  value={filter}
+                  onChange={(e) => {
+                    setFilter(e.target.value);
+                  }}
+                />
+                {repos
+                  .filter((repoOption) => {
+                    return repoOption.name
+                      .toLowerCase()
+                      .includes(filter.toLowerCase());
+                  })
+                  ?.map((repoOption, index) => {
+                    return (
+                      <Flex
+                        key={repoOption.name + repoOption.owner.login}
+                        my={2}
+                        flexDirection="row"
+                        justifyContent={"space-between"}
+                        alignItems={"center"}
+                      >
+                        <Flex flexDirection="column">
+                          <Text fontSize={16}>
+                            {repoOption.name.substring(0, 16)}
+                            {repoOption.name.length > 16 && "..."}
+                          </Text>
 
-                      <Text fontSize={12} color="gray">
-                        {repoOption.owner.login}
-                      </Text>
-                    </Flex>
+                          <Text fontSize={12} color="gray">
+                            {repoOption.owner.login}
+                          </Text>
+                        </Flex>
 
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        onClose();
-                        methods.setRepo({
-                          owner: repoOption.owner.login,
-                          repo: repoOption.name,
-                        });
-                      }}
-                    >
-                      {repo.repo === repoOption.name &&
-                        repo.owner === repoOption.owner.login
-                        ? "Selected"
-                        : "Select"}
-                    </Button>
-                  </Flex>
-                );
-              })
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            onClose();
+                            methods.setRepo({
+                              owner: repoOption.owner.login,
+                              repo: repoOption.name,
+                            });
+                          }}
+                        >
+                          {repo.repo === repoOption.name &&
+                            repo.owner === repoOption.owner.login
+                            ? "Selected"
+                            : "Select"}
+                        </Button>
+                      </Flex>
+                    );
+                  })}
+              </>
             ) : (
-              <Loader />
+              <Stack mt={4} spacing={2}>
+                <Skeleton height="40px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+              </Stack>
             )}
           </DrawerBody>
           <DrawerFooter />

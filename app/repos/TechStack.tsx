@@ -22,7 +22,7 @@ const TechStack = () => {
         if (selectedValues.length >= 6) return;
 
         if (
-            (event.key === "Enter" || event.key === "Tab") &&
+            (event.key === "Enter" || event.key === "Tab" || event.key === ' ' || event.key === ',') &&
             inputValue.trim() !== ""
         ) {
             setSelectedValues([...selectedValues, inputValue.trim()]);

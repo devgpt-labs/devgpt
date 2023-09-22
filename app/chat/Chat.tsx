@@ -5,7 +5,7 @@ import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Tag, Flex, Text, Spinner, SlideFade } from "@chakra-ui/react";
-import Profile from "../repos";
+import Profile from "@/app/repos/Profile"
 //prompts
 import userPrompt from "@/app/prompts/user";
 
@@ -19,10 +19,6 @@ const Chat = () => {
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
   const { user, session, messages, methods, repo } = useSessionContext();
-
-  // useMemo to create a version of the prompt that will stay between submissions
-  const memoizedPrompt = useMemo(() => prompt, [prompt]);
-
 
   //todo move this to session context
   if (!user) return null;
@@ -54,6 +50,7 @@ const Chat = () => {
         "Content-Type": "application/json",
       },
     });
+
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
 
@@ -67,6 +64,7 @@ const Chat = () => {
       }
 
       const chunkValue = decoder.decode(value);
+
       completeResponse += chunkValue;
 
       setResponse(completeResponse);
@@ -77,7 +75,6 @@ const Chat = () => {
 
   return (
     <Flex
-      mt={10}
       direction="column"
       maxW="full"
       flex={{ md: "initial", base: 1 }}
@@ -92,9 +89,13 @@ const Chat = () => {
       >
         <Header />
         <Box className="text-slate-50 max-h-[50vh] overflow-y-auto">
-          {prompt && (<Text>{memoizedPrompt}</Text>)}
           {isLoading && !response && <Loader />}
-          {response && <Response content={String(response)} />}
+          {response && <>
+            <Box width='100%' mt={4}>
+              {/* {lastPrompt} */}
+            </Box>
+            <Response content={String(response)} />
+          </>}
         </Box>
         <ConversationStyleToggle visible={isFinished} />
         <PromptInput
@@ -107,6 +108,7 @@ const Chat = () => {
       <Profile />
     </Flex>
   );
-};
+}
+
 
 export default Chat;

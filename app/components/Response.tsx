@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Tag, Box } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";
@@ -13,6 +13,12 @@ interface ResponseProps {
 }
 
 const Response = ({ content }: ResponseProps) => {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    setCopied(false)
+  }, [content])
+
   return (
     <Flex flex={1} my={4} flexDirection={"column"}>
       <ReactMarkdown
@@ -23,26 +29,28 @@ const Response = ({ content }: ResponseProps) => {
               <>
                 <Box maxW="full" pb={10}>
                   <SyntaxHighlighter
-                    fontSize={14}
-                    className="syntaxhighlighter"
                     {...props}
                     lineProps={{ style: { paddingBottom: 8, fontSize: 14 } }}
+                    fontSize={14}
                     wrapLines={true}
                     showLineNumbers={true}
                     // eslint-disable-next-line react/no-children-prop
                     children={String(children).replace(/\n$/, "")}
-                    style={oneDark}
+                    style={vscDarkPlus}
                     language={match[1]}
+                    className="syntaxhighlighter"
                     PreTag="div"
                   />
                   <Tag
+                    size='lg'
                     cursor={"pointer"}
                     colorScheme="whatsapp"
                     onClick={() => {
                       copyToClipboard(String(children));
+                      setCopied(true)
                     }}
                   >
-                    Copy
+                    {copied ? "Copied!" : "Copy"}
                   </Tag>
                 </Box>
               </>

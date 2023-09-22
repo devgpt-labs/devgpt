@@ -23,7 +23,7 @@ const defaultContext: any = {
   lofaf: [],
   techStack: [],
   context: "",
-  branch: "main",
+  branch: "",
   messages: [{ role: null, content: null }],
   methods: {
     setRepoWindowOpen: () => { },
@@ -69,7 +69,7 @@ export const SessionProvider = ({ children }: any) => {
   const [lofaf, setLofaf] = useState<string[]>([]);
   const [techStack, setTechStack] = useState<string[]>([]);
   const [context, setContext] = useState<string>("");
-  const [branch, setBranch] = useState<string>("main");
+  const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "system",
