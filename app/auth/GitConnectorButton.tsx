@@ -13,6 +13,7 @@ const GitConnectorButton = ({
   return (
     <Tooltip placement="right" label={tooltip}>
       <Button
+        isDisabled={tooltip ? true : false}
         bg={color}
         justifyContent="space-between"
         width="100%"

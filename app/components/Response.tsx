@@ -20,14 +20,15 @@ const Response = ({ content }: ResponseProps) => {
   }, [content])
 
   return (
-    <Flex flex={1} my={4} flexDirection={"column"}>
+    <Flex flex={1} my={1} flexDirection={"column"} whiteSpace='pre-wrap'>
       <ReactMarkdown
+
         components={{
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
-                <Box maxW="full" pb={10}>
+                <Box maxW="full" pb={2}>
                   <SyntaxHighlighter
                     {...props}
                     lineProps={{ style: { paddingBottom: 8, fontSize: 14 } }}

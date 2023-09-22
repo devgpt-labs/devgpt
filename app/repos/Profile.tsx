@@ -184,7 +184,7 @@ const Profile = () => {
                         }
                       />
                     </Tooltip>
-                    {/* <Tooltip
+                    <Tooltip
                       label={colorMode === "light" ? "Dark" : "Light"}
                       placement="top"
                     >
@@ -195,7 +195,7 @@ const Profile = () => {
                           colorMode === "light" ? <MoonIcon /> : <SunIcon />
                         }
                       />
-                    </Tooltip> */}
+                    </Tooltip>
                   </>
                 )}
                 <Tooltip label="Join Discord" placement="top">
@@ -226,15 +226,17 @@ const Profile = () => {
             )}
           </SlideFade>
           <Flex gap={2} ml={2}>
-            <Tooltip label="Upgrade" placement="top">
-              <IconButton
-                bgGradient="linear(to-tr, teal.500, blue.500)"
-                onClick={onUpgradeOpen}
-                _hover={{ color: "blue.500", bg: "white" }}
-                aria-label="Upgrade"
-                icon={<StarIcon />}
-              />
-            </Tooltip>
+            {!isPro && (
+              <Tooltip label="Upgrade" placement="top">
+                <IconButton
+                  bgGradient="linear(to-tr, teal.500, blue.500)"
+                  onClick={onUpgradeOpen}
+                  _hover={{ color: "blue.500", bg: "white" }}
+                  aria-label="Upgrade"
+                  icon={<StarIcon />}
+                />
+              </Tooltip>
+            )}
             <Tooltip label="Select Repo" placement="top">
               <IconButton
                 onClick={() => {

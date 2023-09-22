@@ -78,7 +78,7 @@ export const SessionProvider = ({ children }: any) => {
 
   useEffect(() => {
     //set default messages
-    addContextMessages(messages, String(lofaf)).then((newMessages: any) => {
+    addContextMessages(messages, String(lofaf), String(user?.email)).then((newMessages: any) => {
       setMessages(newMessages);
     });
   }, [lofaf]);

@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { Flex } from "@chakra-ui/react";
 import { Inter } from "next/font/google";

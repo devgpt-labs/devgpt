@@ -37,6 +37,7 @@ export const PromptInput: FC<Props> = (props) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (props.prompt.length === 0 || props.isLoading) return null;
+
     props.onSubmit(props.prompt);
   };
 

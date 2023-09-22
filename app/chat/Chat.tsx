@@ -6,6 +6,7 @@ import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Tag, Flex, Text, Spinner, SlideFade } from "@chakra-ui/react";
 import Profile from "@/app/repos/Profile"
+
 //prompts
 import userPrompt from "@/app/prompts/user";
 
@@ -14,19 +15,20 @@ import Response from "@/app/components/Response";
 import Loader from "@/app/components/Loader";
 
 //utils
-import { savePrompt } from "@/utils/savePrompt";
 import { supabase } from "@/utils/supabase";
+import { savePrompt } from "@/utils/savePrompt";
+import getTokensFromString from "@/utils/getTokensFromString"
+import getTokenLimit from "@/utils/getTokenLimit";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
-  const { user, session, messages, methods, repo } = useSessionContext();
+  const { user, session, messages, methods, repo }: any = useSessionContext();
 
   // todo move this to session context
   if (!user) return null;
-  if (!session?.provider_token) supabase?.auth.signOut()
 
   const submitHandler = async (prompt: string) => {
     setIsLoading(true);
@@ -40,6 +42,15 @@ const Chat = () => {
       repo.repo,
       String(session?.provider_token)
     );
+
+    const tokensInString = await getTokensFromString(prompt);
+    const tokenLimit = await getTokenLimit(user.email);
+
+    if (tokensInString > tokenLimit) {
+      alert('Your prompt is too long try to include more information')
+      setIsLoading(false);
+      return null
+    }
 
     const newMessages: Array<any> = [
       ...messages,

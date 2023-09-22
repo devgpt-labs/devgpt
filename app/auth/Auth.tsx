@@ -36,8 +36,6 @@ const Auth = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { user, session } = useSessionContext();
 
-  if (!supabase) return <Text>Loading...</Text>;
-
   return (
     <Box className="w-[500px] rounded-lg overflow-hidden text-slate-400 p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30">
       <Header />

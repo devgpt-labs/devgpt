@@ -2,7 +2,10 @@ import { Message } from "@/app/types/chat";
 //prompts
 import { system } from "@/app/prompts/system";
 import sendLLM from "./sendLLM";
-const addContextMessages = async (messages: Message[], lofaf: string) => {
+import getTokenLimit from "./getTokenLimit";
+import getTokensFromString from "./getTokensFromString";
+
+const addContextMessages = async (messages: Message[], lofaf: string, emailAddress: string) => {
   let newMessages: any = messages;
 
   if (!lofaf) {
@@ -16,7 +19,7 @@ const addContextMessages = async (messages: Message[], lofaf: string) => {
     });
 
     // add context messages
-    newMessages = addContext(newMessages, lofaf);
+    newMessages = addContext(newMessages, lofaf, emailAddress);
 
     return newMessages;
   } catch (error) {
@@ -57,7 +60,7 @@ const addContext = async (messages: Message[], lofaf: string) => {
     );
 
     usefulFilePrompts.forEach((prompt: any) => {
-      addMessage(messages, prompt.userPrompt, prompt.fileContent);
+      addMessage(messages, prompt.userPrompt, prompt.fileContent, emailAddress);
     });
 
     return messages;
@@ -129,10 +132,11 @@ const getUsefulFilePrompts = async (files: string[]) => {
 const addMessage = (
   messages: Message[],
   userMessage: string,
-  assistantMessage: string
+  assistantMessage: string,
+  emailAddress: string
 ) => {
   //todo this shouldn't be a hardcoded cap, it should come from your plan (8k or 32k)
-  if (countTokensInString(userMessage) > 31500) {
+  if (getTokensFromString(userMessage) > getTokenLimit(emailAddress)) {
     return messages;
   }
 
