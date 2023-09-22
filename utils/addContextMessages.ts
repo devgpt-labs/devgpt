@@ -4,6 +4,7 @@ import { system } from "@/app/prompts/system";
 import sendLLM from "./sendLLM";
 import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
+import getCode from "./github/getCode";
 
 const addContextMessages = async (messages: Message[], lofaf: string, emailAddress: string) => {
   let newMessages: any = messages;
@@ -19,7 +20,15 @@ const addContextMessages = async (messages: Message[], lofaf: string, emailAddre
     });
 
     // add context messages
-    newMessages = addContext(newMessages, lofaf, emailAddress);
+    newMessages = addContext(
+      newMessages,
+      lofaf,
+      owner,
+      repo,
+      path,
+      access_token,
+      emailAddress
+    );
 
     return newMessages;
   } catch (error) {
@@ -46,16 +55,26 @@ interface UsefulFilePrompt {
   userPrompt: string;
 }
 
-const addContext = async (messages: Message[], lofaf: string) => {
+const addContext = async (
+  messages: Message[],
+  lofaf: string,
+  owner: string,
+  repo: string,
+  path: string,
+  access_token: string
+) => {
   try {
-    const usefulFiles: any = await getUsefulFiles(lofaf);
-    return;
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
-    const usefulFileContents: any = await getUsefulFileContents(
-      usefulFiles
+    const usefulFileContents: UsefulFileContent[] = await getUsefulFileContents(
+      usefulFiles,
+      owner,
+      repo,
+      path,
+      access_token
     );
     
-    const usefulFilePrompts: any = await getUsefulFilePrompts(
+    const usefulFilePrompts: UsefulFilePrompt[] = await getUsefulFilePrompts(
       usefulFileContents
     );
 
@@ -71,45 +90,51 @@ const addContext = async (messages: Message[], lofaf: string) => {
 
 const getUsefulFiles = async (lofaf: string) => {
   //send lofaf to the LLM and get back an array of useful files.
-  const usefulFiles: UsefulFile[] = [];
 
-  //todo move this to prompts folder
-  const string = await sendLLM(
-    `
+  try {
+    //todo move this to prompts folder
+    const response = await sendLLM(
+      `
+		You are an expert software developer.
 		I have this list of files in my project: "${lofaf}".
-		Return a list of the files that would be useful to understand the project.
-		E.g. "README.md", "package.json" (or equivalent), as well as an example of a front-end and back-end file.
+		Return an array of files that you would need to understand how this project is coded.
+		E.g. "README.md", "package.json" (or equivalent), "MyFrontEndComponent.tsx", "my-back-end-route.ts" as well as an example of a front-end and back-end file.
 		Try to return 3-4 files.
 	`,
-    [
-      {
-        name: "process_useful_files_array",
-        description: "Processes an array of useful files.",
-        parameters: {
-          type: "array",
-          description: "The array of useful files.",
-          items: {
-            type: "string",
+      [
+        {
+          name: "process_useful_files_array",
+          description: "Processes an array of useful files.",
+          parameters: {
+            type: "array",
+            description: "The array of useful files.",
+            items: {
+              type: "string",
+            },
           },
         },
-      },
-    ]
-  );
-
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(usefulFiles);
-    } catch (error) {
-      console.warn(error);
-      resolve(false);
-    }
-  });
+      ]
+    );
+    console.log({ response });
+    return response;
+  } catch (error) {
+    console.warn(error);
+    return [];
+  }
 };
 
-const getUsefulFileContents = async (files: string[]) => {
+const getUsefulFileContents = async (
+  files: string[],
+  owner: string,
+  repo: string,
+  path: string,
+  access_token: string
+) => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(["README.md", "package.json"]);
+      files.map(async (file) => {
+        getCode(owner, repo, path, access_token);
+      });
     } catch (error) {
       console.warn(error);
       resolve(false);
@@ -129,14 +154,16 @@ const getUsefulFilePrompts = async (files: string[]) => {
   });
 };
 
-const addMessage = (
+const addMessage = async (
   messages: Message[],
   userMessage: string,
   assistantMessage: string,
   emailAddress: string
 ) => {
+
+  const tokenLimit = await getTokenLimit(emailAddress);
   //todo this shouldn't be a hardcoded cap, it should come from your plan (8k or 32k)
-  if (getTokensFromString(userMessage) > getTokenLimit(emailAddress)) {
+  if (getTokensFromString(userMessage) > tokenLimit) {
     return messages;
   }
 

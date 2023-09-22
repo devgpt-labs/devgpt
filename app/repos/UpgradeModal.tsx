@@ -55,7 +55,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   <Tr>
                     <Td>Daily Prompts </Td>
                     <Td>10</Td>
-                    <Td>150</Td>
+                    <Td>Unlimited</Td>
                   </Tr>
                   <Tr>
                     <Td>Model </Td>

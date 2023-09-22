@@ -1,7 +1,7 @@
 const sendLLM = async (prompt: string, functions: any) => {
   const response: Response = await fetch("/api/llms-no-stream", {
     method: "POST",
-    body: JSON.stringify({ prompt: prompt, functions }),
+    body: JSON.stringify({ prompt: prompt, functions: functions }),
     headers: {
       "Content-Type": "application/json",
     },
