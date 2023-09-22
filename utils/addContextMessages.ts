@@ -69,7 +69,7 @@ const getUsefulFiles = async (lofaf: string) => {
   const usefulFiles: UsefulFile[] = [];
 
   //todo move this to prompts folder
-  const string = await sendLLM(
+  const response = await sendLLM(
     `
 		I have this list of files in my project: "${lofaf}".
 		Return a list of the files that would be useful to understand the project.
@@ -91,7 +91,7 @@ const getUsefulFiles = async (lofaf: string) => {
     ]
   );
 
-  console.log({ string });
+  console.log({ response });
 
   return new Promise((resolve, reject) => {
     try {

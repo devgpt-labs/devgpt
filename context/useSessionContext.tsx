@@ -27,14 +27,14 @@ const defaultContext: any = {
   branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => { },
-    signOut: () => { },
-    setRepo: () => { },
-    setLofaf: () => { },
-    setTechStack: () => { },
-    setContext: () => { },
-    setBranch: () => { },
-    setMessages: () => { },
+    setRepoWindowOpen: () => {},
+    signOut: () => {},
+    setRepo: () => {},
+    setLofaf: () => {},
+    setTechStack: () => {},
+    setContext: () => {},
+    setBranch: () => {},
+    setMessages: () => {},
   },
 };
 
