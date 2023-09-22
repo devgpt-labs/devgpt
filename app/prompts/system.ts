@@ -13,6 +13,6 @@ export const system = (context?: string, technologiesUsed?: string) => {
     `The developer is using this tech stack: "${technologiesUsed}"`
   }
 	If you have any questions, please ask them, otherwise please provide the code to the developer in markdown code blocks.
-	Important: return the entire file not just the code snippet.
+	Important: return the entire file not just the code snippet. Do not replace provided code with placeholder comments. 
 	`;
 };
