@@ -13,6 +13,9 @@ import userPrompt from "@/app/prompts/user";
 import Response from "@/app/components/Response";
 import Loader from "@/app/components/Loader";
 
+//utils
+import { savePrompt } from "@/utils/savePrompt";
+
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,7 +23,7 @@ const Chat = () => {
   const [prompt, setPrompt] = useState<string>("");
   const { user, session, messages, methods, repo } = useSessionContext();
 
-  //todo move this to session context
+  //todo move this to ssession context
   if (!user) return null;
 
   const submitHandler = async (prompt: string) => {
@@ -58,14 +61,14 @@ const Chat = () => {
 
     while (true) {
       const { value, done: doneReading } = await reader.read();
-      if (doneReading) {
-        setIsFinished(true);
-        break;
-      }
-
       const chunkValue = decoder.decode(value);
 
       completeResponse += chunkValue;
+      if (doneReading) {
+        setIsFinished(true);
+        savePrompt(String(user.email), prompt.trim(), String(completeResponse));
+        break;
+      }
 
       setResponse(completeResponse);
     }
@@ -90,13 +93,15 @@ const Chat = () => {
         <Header />
         <Box className="text-slate-50 max-h-[50vh] overflow-y-auto">
           {isLoading && !response && <Loader />}
-          {response && <>
-            <Box width='100%' mt={4}>
-              {/* {lastPrompt} */}
-            </Box>
-            <Response content={String(response)} />
-          </>}
-        </Box>
+          {
+            response && <>
+              <Box width='100%' mt={4}>
+                {/* {lastPrompt} */}
+              </Box>
+              <Response content={String(response)} />
+            </>
+          }
+        </Box >
         <ConversationStyleToggle visible={isFinished} />
         <PromptInput
           prompt={prompt}
@@ -104,9 +109,9 @@ const Chat = () => {
           isLoading={isLoading}
           onSubmit={(prompt: any) => submitHandler(prompt)}
         />
-      </Box>
+      </Box >
       <Profile />
-    </Flex>
+    </Flex >
   );
 }
 

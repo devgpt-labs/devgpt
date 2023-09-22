@@ -23,11 +23,8 @@ const Home = () => {
         width="100vw"
         flexDirection="row"
       >
-        <Text mr={3}>DevGPT is now accessible via the web!</Text>
-        <Text mr={3}>🎉 </Text>
-        <Text>Improved desktop app dropping soon</Text>
-        {/* <Text>Read more about why we thought this was important</Text> */}
-      </Tag>
+        <Text>DevGPT is now accessible via the web! 🎉 Improved desktop app dropping soon.</Text>
+      </Tag >
       <Flex
         height="95vh"
         flexDirection="column"
@@ -36,8 +33,8 @@ const Home = () => {
       >
         {user && session ? <Chat /> : <Auth />}
         <RepoDrawer />
-      </Flex>
-    </Flex>
+      </Flex >
+    </Flex >
   );
 };
 

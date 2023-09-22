@@ -34,12 +34,12 @@ Welcome to **DevGPT**, the AI-driven development tool designed to transform the 
 - **Create Components**: Create UI/UX components effortlessly.
 - **Debug**: Troubleshoot issues in your code easily.
 
-## Next focuses (For OSS contributors)
+## Bounty board (For OSS contributors)
 
-1. Updating documentation
-1. Add more git connetors (BitBucket and GitLab)
-1. Add context and tech stack
-1. Ensure that azure is providing gpt-4-32k
+| Task                                                                                                      | Reward |
+| --------------------------------------------------------------------------------------------------------- | ------ |
+| Updating documentation                                                                                    | $150   |
+| Add compatibility for Open-AI (repo currently only supports Azure, .env change only, no frontend changes) | $500   |
 
 ## FAQs
 
