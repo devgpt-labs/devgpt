@@ -13,6 +13,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
 import { system } from "@/app/prompts/system";
+import addContextMessages from "@/utils/addContextMessages";
 
 const defaultContext: any = {
   repoWindowOpen: null,
@@ -26,14 +27,14 @@ const defaultContext: any = {
   branch: "main",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => { },
-    signOut: () => { },
-    setRepo: () => { },
-    setLofaf: () => { },
-    setTechStack: () => { },
-    setContext: () => { },
-    setBranch: () => { },
-    setMessages: () => { },
+    setRepoWindowOpen: () => {},
+    signOut: () => {},
+    setRepo: () => {},
+    setLofaf: () => {},
+    setTechStack: () => {},
+    setContext: () => {},
+    setBranch: () => {},
+    setMessages: () => {},
   },
 };
 
@@ -70,14 +71,18 @@ export const SessionProvider = ({ children }: any) => {
   const [techStack, setTechStack] = useState<string[]>([]);
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("main");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "system",
-      content: system(context), // set the personality of the AI
-    },
-  ]);
+
+  const [messages, setMessages] = useState<Message[]>([]);
 
   //load data from supabase
+
+  useEffect(() => {
+    //set default messages
+    addContextMessages(messages, String(lofaf)).then((newMessages: any) => {
+      setMessages(newMessages);
+    });
+  }, [lofaf]);
+
   useEffect(() => {
     //set user and session
     if (supabase) {
