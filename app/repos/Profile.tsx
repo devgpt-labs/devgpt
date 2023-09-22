@@ -100,7 +100,6 @@ const Profile = () => {
 
   console.log({ promptCount });
 
-
   useEffect(() => {
     getPromptCount();
   }, []);
@@ -117,7 +116,11 @@ const Profile = () => {
       rounded="lg"
       className="overflow-hidden text-slate-400 p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
     >
-      <UpgradeModal isUpgradeOpen={isUpgradeOpen} onUpgradeOpen={onUpgradeOpen} onUpgradeClose={onUpgradeClose} />
+      <UpgradeModal
+        isUpgradeOpen={isUpgradeOpen}
+        onUpgradeOpen={onUpgradeOpen}
+        onUpgradeClose={onUpgradeClose}
+      />
       <Flex
         flexDirection="row"
         alignItems="center"
@@ -144,9 +147,13 @@ const Profile = () => {
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
               <Text>{githubIdentity.name}</Text>
-              {isPro && (
+              {isPro ? (
                 <Tag ml={2} colorScheme="teal">
                   Pro
+                </Tag>
+              ) : (
+                <Tag ml={2} colorScheme="teal">
+                  Free
                 </Tag>
               )}
             </Flex>
@@ -159,7 +166,6 @@ const Profile = () => {
               <Flex gap={2}>
                 {!isPro && (
                   <>
-
                     <Tooltip
                       label={`${10 - promptCount}/10 Prompts Remaining Today`}
                       placement="top"
