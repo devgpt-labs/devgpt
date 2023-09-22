@@ -91,11 +91,8 @@ const getUsefulFiles = async (lofaf: string) => {
     ]
   );
 
-  console.log({ string });
-
   return new Promise((resolve, reject) => {
     try {
-      console.log({ usefulFiles });
       resolve(usefulFiles);
     } catch (error) {
       console.warn(error);

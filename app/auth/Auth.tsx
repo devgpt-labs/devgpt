@@ -36,11 +36,6 @@ const Auth = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { user, session } = useSessionContext();
 
-  console.log({ user });
-  console.log({ session });
-
-
-
   if (!supabase) return <Text>Loading...</Text>;
 
   return (

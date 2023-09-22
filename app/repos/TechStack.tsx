@@ -39,7 +39,6 @@ const TechStack = () => {
                     creatable
                     openOnFocus
                     multiple
-                    onChange={(vals) => console.log(vals)}
                 >
                     <AutoCompleteInput
                         pt={4}

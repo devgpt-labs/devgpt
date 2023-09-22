@@ -18,7 +18,6 @@ const userInput = async (
       let content = code.content;
 
       if (!content) {
-        console.log("no content.");
         return;
       }
 

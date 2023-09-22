@@ -60,8 +60,6 @@ export const PromptInput: FC<Props> = (props) => {
     // Append currentSuggestion to prompt
     const promptArray = props.prompt.split(" ");
 
-    console.log(promptArray);
-
     const lastWord = promptArray[promptArray.length - 1];
     const newPrompt = props.prompt.replace(lastWord, `~${file}`);
 

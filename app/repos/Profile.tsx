@@ -98,8 +98,6 @@ const Profile = () => {
     setPromptCount(data?.length);
   };
 
-  console.log({ promptCount });
-
   useEffect(() => {
     getPromptCount();
   }, []);

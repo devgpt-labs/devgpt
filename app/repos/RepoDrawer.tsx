@@ -43,7 +43,7 @@ const RepoDrawer = () => {
         setRepos(allRepos);
       })
       .catch((err) => {
-        console.log({ err });
+        console.log('error getting repos:', { err });
       });
   }, [user]);
 
