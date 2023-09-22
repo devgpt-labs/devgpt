@@ -1,7 +1,7 @@
 import React from "react";
 import { useSessionContext } from "@/context/useSessionContext";
-import Auth from "./auth/auth";
-import Chat from "./chat/chat";
+import Auth from "./auth";
+import Chat from "./chat";
 import RepoDrawer from "./repos/RepoDrawer";
 import { useDisclosure, Tag, Text, Flex } from "@chakra-ui/react";
 

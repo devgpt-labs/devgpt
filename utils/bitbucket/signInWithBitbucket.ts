@@ -5,16 +5,15 @@ const signInWithBitbucket = async () => {
 		console.error(
 			"Supabase is not configured correctly. Please check the .env file."
 		);
-		return null
+		return null;
 	}
 
 	await supabase.auth.signInWithOAuth({
-		provider: 'bitbucket',
+		provider: "bitbucket",
 		options: {
-		  scopes: 'repo'
-		}
-	})
+			scopes: "read_user",
+		},
+	});
 };
 
 export default signInWithBitbucket;
-

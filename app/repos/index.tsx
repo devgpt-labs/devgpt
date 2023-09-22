@@ -136,6 +136,16 @@ const Profile = () => {
               </Link>
             </Tooltip>
           )}
+          <Tooltip
+            label='New Task'
+            placement="top"
+          >
+            <IconButton
+              onClick={() => methods.setMessages([])}
+              aria-label="New Task"
+              icon={<PlusSquareIcon />}
+            />
+          </Tooltip>
           <Tooltip label="Select Repo" placement="top">
             <IconButton
               onClick={() => {
@@ -153,16 +163,6 @@ const Profile = () => {
               onClick={onToggle}
               aria-label="Open Settings"
               icon={<IoMdSettings size={18} />}
-            />
-          </Tooltip>
-          <Tooltip
-            label='New Task'
-            placement="top"
-          >
-            <IconButton
-              onClick={() => methods.setMessages([])}
-              aria-label="New Task"
-              icon={<PlusSquareIcon />}
             />
           </Tooltip>
         </Flex>

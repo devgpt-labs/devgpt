@@ -11,7 +11,7 @@ const signInWithGitlab = async () => {
 	await supabase.auth.signInWithOAuth({
 		provider: 'gitlab',
 		options: {
-		  scopes: 'repo'
+		  scopes: 'read_user'
 		}
 	})
 };
