@@ -26,14 +26,14 @@ const defaultContext: any = {
   branch: "main",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => {},
-    signOut: () => {},
-    setRepo: () => {},
-    setLofaf: () => {},
-    setTechStack: () => {},
-    setContext: () => {},
-    setBranch: () => {},
-    setMessages: () => {},
+    setRepoWindowOpen: () => { },
+    signOut: () => { },
+    setRepo: () => { },
+    setLofaf: () => { },
+    setTechStack: () => { },
+    setContext: () => { },
+    setBranch: () => { },
+    setMessages: () => { },
   },
 };
 
@@ -73,7 +73,7 @@ export const SessionProvider = ({ children }: any) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "system",
-      content: system(context, techStack.join("")), // set the personality of the AI
+      content: system(context), // set the personality of the AI
     },
   ]);
 

@@ -33,6 +33,7 @@ const RepoDrawer = () => {
   }, [repoWindowOpen]);
 
   useEffect(() => {
+    if (!session?.provider_token) return;
     getRepos(session?.provider_token)
       .then((allRepos) => {
         setRepos(allRepos);
@@ -45,6 +46,8 @@ const RepoDrawer = () => {
   if (!user) {
     return null;
   }
+
+
 
   return (
     <>
@@ -91,7 +94,7 @@ const RepoDrawer = () => {
                       }}
                     >
                       {repo.repo === repoOption.name &&
-                      repo.owner === repoOption.owner.login
+                        repo.owner === repoOption.owner.login
                         ? "Selected"
                         : "Select"}
                     </Button>

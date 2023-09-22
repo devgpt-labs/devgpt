@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Tag, Flex, Text, Spinner, SlideFade } from "@chakra-ui/react";
-import Profile from "../repos/profile";
+import Profile from "../repos";
 //prompts
 import userPrompt from "@/app/prompts/user";
 
@@ -22,6 +22,10 @@ const Chat = () => {
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
   const { user, session, messages, methods, repo } = useSessionContext();
+
+  // useMemo to create a version of the prompt that will stay between submissions
+  const memoizedPrompt = useMemo(() => prompt, [prompt]);
+
 
   //todo move this to session context
   if (!user) return null;
@@ -93,11 +97,11 @@ const Chat = () => {
       >
         <Header />
         <Box className="text-slate-50 max-h-[50vh] overflow-y-auto">
+          {prompt && (<Text>{memoizedPrompt}</Text>)}
           {isLoading && !response && <Loader />}
           {response && <Response content={String(response)} />}
         </Box>
         <ConversationStyleToggle visible={isFinished} />
-
         <PromptInput
           prompt={prompt}
           setPrompt={setPrompt}

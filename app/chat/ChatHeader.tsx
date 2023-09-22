@@ -17,15 +17,6 @@ export const Header = () => {
     >
       <Logo />
       <Text>{repo.repo}</Text>
-      <Image
-        pos="absolute"
-        top={5}
-        left={5}
-        src={astro.src}
-        width="25px"
-        height="25px"
-        alt="Astro"
-      />
     </Flex>
   );
 };

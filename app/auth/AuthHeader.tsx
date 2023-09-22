@@ -1,5 +1,5 @@
 import { supabase } from "@/utils/supabase";
-import { Box, Flex, Image } from "@chakra-ui/react";
+import { Box, Flex, Image, Tag, Text } from "@chakra-ui/react";
 import AstroHead from "@/images/astro_profile.png";
 
 //components
@@ -15,7 +15,13 @@ export const Header = () => {
       alignItems="center"
     >
       <Logo />
-      <Image src={AstroHead.src} objectFit='contain' width='25px' height='25px' alt="DevGPT Astro" />
+      <Image
+        src={AstroHead.src}
+        objectFit="contain"
+        width="25px"
+        height="25px"
+        alt="DevGPT Astro"
+      />
     </Flex>
   );
 };
