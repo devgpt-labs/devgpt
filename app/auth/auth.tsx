@@ -58,7 +58,7 @@ const Auth = () => {
         <AuthOption
           label="Star Project On GitHub"
           Icon={BiSolidStar}
-          url="https://github.com/february-labs/devgpt-releases"
+          url="https://github.com/devgpt-labs/devgpt-releases/"
         />
         <AuthOption
           label="Join Discord Community"
