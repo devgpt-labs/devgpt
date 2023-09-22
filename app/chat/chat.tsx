@@ -13,6 +13,9 @@ import userPrompt from "@/app/prompts/user";
 import Response from "@/app/components/Response";
 import Loader from "@/app/components/Loader";
 
+//utils
+import { savePrompt } from "@/utils/savePrompt";
+
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,6 +62,8 @@ const Chat = () => {
       const { value, done: doneReading } = await reader.read();
       if (doneReading) {
         setIsFinished(true);
+        console.log({ response });
+        savePrompt(String(user.email), prompt, String(response));
         break;
       }
 
