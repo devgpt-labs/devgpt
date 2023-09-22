@@ -6,7 +6,6 @@ import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 import copyToClipboard from "@/utils/copyToClipboard";
 
-
 interface ResponseProps {
   content: string;
 }
@@ -20,8 +19,10 @@ const Response = ({ content }: ResponseProps) => {
 
     setTimeout(() => {
       setCopied(false);
-    }, 2000); 
+    }, 2000);
   };
+
+  const tagCursorStyle = copied ? "not-allowed" : "pointer";
 
   return (
     <Flex flex={1} my={4} flexDirection={"column"}>
@@ -46,10 +47,12 @@ const Response = ({ content }: ResponseProps) => {
                     PreTag="div"
                   />
                   <Tag
-                    cursor={"pointer"}
+                    cursor={tagCursorStyle}
                     colorScheme="whatsapp"
                     onClick={() => {
-                      handleCopyClick(String(children));
+                      if (!copied) {
+                        handleCopyClick(String(children));
+                      }
                     }}
                   >
                     {copied ? "Copied to Clipboard" : "Copy"}
