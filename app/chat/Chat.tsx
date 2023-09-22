@@ -67,7 +67,6 @@ const Chat = () => {
       completeResponse += chunkValue;
       if (doneReading) {
         setIsFinished(true);
-        console.log({ completeResponse });
         savePrompt(String(user.email), prompt.trim(), String(completeResponse));
         break;
       }

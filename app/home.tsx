@@ -3,7 +3,7 @@ import { useSessionContext } from "@/context/useSessionContext";
 import Auth from "./auth";
 import Chat from "./chat/Chat";
 import RepoDrawer from "./repos/RepoDrawer";
-import { useDisclosure, Tag, Text, Flex } from "@chakra-ui/react";
+import { Tag, Text, Flex } from "@chakra-ui/react";
 
 const Home = () => {
   const { user } = useSessionContext();
@@ -17,10 +17,10 @@ const Home = () => {
         width="100vw"
         flexDirection="row"
       >
-        <Text mr={3}>We are now a web based AI dev-agent. </Text>
-        <Text mr={3}>🎉 </Text>
-        <Text>GitLab and BitBucket connectors coming soon.</Text>
-        {/* <Text>Read more about why we thought this was important</Text> */}
+        <Text>
+          We are now a web based AI dev-agent. 🎉 GitLab and BitBucket
+          connectors coming soon.
+        </Text>
       </Tag>
       <Flex
         height="95vh"
@@ -29,7 +29,6 @@ const Home = () => {
         justifyContent="center"
       >
         {user ? <Chat /> : <Auth />}
-
         <RepoDrawer />
       </Flex>
     </>

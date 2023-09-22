@@ -47,8 +47,6 @@ const RepoDrawer = () => {
     return null;
   }
 
-
-
   return (
     <>
       <Drawer
@@ -94,7 +92,7 @@ const RepoDrawer = () => {
                       }}
                     >
                       {repo.repo === repoOption.name &&
-                        repo.owner === repoOption.owner.login
+                      repo.owner === repoOption.owner.login
                         ? "Selected"
                         : "Select"}
                     </Button>

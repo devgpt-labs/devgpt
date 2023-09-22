@@ -63,8 +63,6 @@ export const PromptInput: FC<Props> = (props) => {
       // Append currentSuggestion to prompt
       const promptArray = props.prompt.split(" ");
 
-      console.log(promptArray);
-
       const lastWord = promptArray[promptArray.length - 1];
       const newPrompt = props.prompt.replace(lastWord, `~${selectedFile[0]}`);
 
@@ -82,16 +80,11 @@ export const PromptInput: FC<Props> = (props) => {
       (identity) => identity?.provider === "github"
     );
 
-    console.log(githubIdentity);
-
     if (!repo.owner || !repo.repo || !session?.provider_token) {
       return;
     }
 
     const branchDefault = branch || "main";
-
-    console.log(branch);
-
 
     getLofaf(repo.owner, repo.repo, branchDefault, session?.provider_token)
       .then((files: any) => {
@@ -157,10 +150,10 @@ export const PromptInput: FC<Props> = (props) => {
                   mb={1}
                   autoFocus
                   key={file}
-                // cursor="pointer"
-                // onClick={() =>
-                //   handleKeyDown({ key: "Tab", preventDefault: () => { } })
-                // }
+                  // cursor="pointer"
+                  // onClick={() =>
+                  //   handleKeyDown({ key: "Tab", preventDefault: () => { } })
+                  // }
                 >
                   {file}
                 </Tag>
