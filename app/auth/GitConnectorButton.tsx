@@ -8,25 +8,29 @@ const GitConnectorButton = ({
   loading,
   handle,
   Icon,
+  tooltip,
 }: any) => {
   return (
-    <Button
-      bg={color}
-      justifyContent="space-between"
-      width="100%"
-      onClick={() => {
-        handle()
-          .then(() => {
-            setLoading(true);
-          })
-          .catch(() => {
-            setLoading(false);
-          });
-      }}
-    >
-      {`${provider}`}
-      <Icon />
-    </Button>
+    <Tooltip label={tooltip}>
+      <Button
+        bg={color}
+        justifyContent="space-between"
+        width="100%"
+        onClick={() => {
+          handle()
+            .then(() => {
+              setLoading(true);
+            })
+            .catch(() => {
+              setLoading(false);
+            });
+        }}
+      >
+        {`${provider}`}
+        <Icon />
+      </Button>
+    </Tooltip>
+
   );
 };
 

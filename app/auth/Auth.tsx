@@ -26,7 +26,7 @@ import { AiFillGitlab } from "react-icons/ai";
 import { FaBitbucket } from "react-icons/fa";
 import { GrCircleInformation } from "react-icons/gr";
 import WhatIsDevGPT from "./WhatIsDevGPT";
-import getTokensFromString from "@/utils/getTokensFromString"
+import getTokensFromString from "@/utils/getTokensFromString";
 import AuthOption from "./AuthOption";
 
 //assets
@@ -58,19 +58,21 @@ const Auth = () => {
         />
         <GitConnectorButton
           color="#FC6D27"
-          provider="Coming Soon"
+          provider="Sign In With GitLab"
           setLoading={setLoading}
           loading={loading}
           handle={signInWithGitlab}
           Icon={AiFillGitlab}
+          tooltip="Coming soon!"
         />
         <GitConnectorButton
           color="#0c61db"
-          provider="Coming Soon"
+          provider="Sign In With BitBucket"
           setLoading={setLoading}
           loading={loading}
           handle={signInWithBitbucket}
           Icon={FaBitbucket}
+          tooltip="Coming soon!"
         />
         <Heading size="xs" mt="2">
           New here?
