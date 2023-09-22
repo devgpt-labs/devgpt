@@ -71,9 +71,10 @@ const getUsefulFiles = async (lofaf: string) => {
   //todo move this to prompts folder
   const response = await sendLLM(
     `
+		You are an expert software developer.
 		I have this list of files in my project: "${lofaf}".
-		Return a list of the files that would be useful to understand the project.
-		E.g. "README.md", "package.json" (or equivalent), as well as an example of a front-end and back-end file.
+		Return an array of files that you would need to understand how this project is coded.
+		E.g. "README.md", "package.json" (or equivalent), "MyFrontEndComponent.tsx", "my-back-end-route.ts" as well as an example of a front-end and back-end file.
 		Try to return 3-4 files.
 	`,
     [
