@@ -31,7 +31,7 @@ const GitConnectorButton = () => {
         </Text>
         <FaUserAstronaut color="white" />
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered={true}>
+      <Modal size='sm' isOpen={isOpen} onClose={onClose} isCentered={true}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>What is DevGPT?</ModalHeader>
@@ -40,7 +40,7 @@ const GitConnectorButton = () => {
             <Flex flexDirection="column">
               <Text mb={4} fontSize={14}>
                 DevGPT is a performant AI dev agent that helps you develop. Our
-                core focuses for this agent are to improve:
+                core focuses for this agent are:
               </Text>
               <UnorderedList mb={4} fontSize={14}>
                 <ListItem>Component Creation</ListItem>
@@ -49,13 +49,16 @@ const GitConnectorButton = () => {
                 <ListItem>Refactoring Code</ListItem>
                 <ListItem>Writing Unit Tests</ListItem>
               </UnorderedList>
-              <Text mb={4} fontSize={14}>
-                DevGPT is updated weekly, with our sole purpose of creating a
-                useful tool for developers and product owners.
-              </Text>
+              <Link href="https://discord.com/invite/6GFtwzuvtw" cursor='pointer'>
+                <Text mb={4} fontSize={14}>
+                  DevGPT is updated weekly, with our sole purpose of creating a
+                  useful tool for developers and product owners. We have an active
+                  discord community for all.
+                </Text>
+              </Link>
+
             </Flex>
           </ModalBody>
-          <ModalFooter />
         </ModalContent>
       </Modal>
     </>

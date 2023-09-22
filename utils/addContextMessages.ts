@@ -45,16 +45,18 @@ interface UsefulFilePrompt {
 
 const addContext = async (messages: Message[], lofaf: string) => {
   try {
-    const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
+    const usefulFiles: any = await getUsefulFiles(lofaf);
     return;
-    const usefulFileContents: UsefulFileContent[] = await getUsefulFileContents(
+
+    const usefulFileContents: any = await getUsefulFileContents(
       usefulFiles
     );
-    const usefulFilePrompts: UsefulFilePrompt[] = await getUsefulFilePrompts(
+    
+    const usefulFilePrompts: any = await getUsefulFilePrompts(
       usefulFileContents
     );
 
-    usefulFilePrompts.forEach((prompt) => {
+    usefulFilePrompts.forEach((prompt: any) => {
       addMessage(messages, prompt.userPrompt, prompt.fileContent);
     });
 

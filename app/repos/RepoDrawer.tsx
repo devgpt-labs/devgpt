@@ -67,6 +67,7 @@ const RepoDrawer = () => {
             {repos?.length > 0 ? (
               <>
                 <Input
+                  placeholder='Search repos'
                   value={filter}
                   onChange={(e) => {
                     setFilter(e.target.value);
