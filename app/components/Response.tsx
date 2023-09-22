@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { Flex, Tag, Box } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
-//utils
 import copyToClipboard from "@/utils/copyToClipboard";
 
-//props types for response
+
 interface ResponseProps {
   content: string;
 }
 
 const Response = ({ content }: ResponseProps) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = (text: string) => {
+    copyToClipboard(text);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000); 
+  };
+
   return (
     <Flex flex={1} my={4} flexDirection={"column"}>
       <ReactMarkdown
@@ -39,10 +49,10 @@ const Response = ({ content }: ResponseProps) => {
                     cursor={"pointer"}
                     colorScheme="whatsapp"
                     onClick={() => {
-                      copyToClipboard(String(children));
+                      handleCopyClick(String(children));
                     }}
                   >
-                    Copy
+                    {copied ? "Copied to Clipboard" : "Copy"}
                   </Tag>
                 </Box>
               </>
