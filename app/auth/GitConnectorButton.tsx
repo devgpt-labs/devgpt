@@ -11,26 +11,27 @@ const GitConnectorButton = ({
   tooltip,
 }: any) => {
   return (
-    <Tooltip label={tooltip}>
+    <Tooltip placement="right" label={tooltip}>
       <Button
         bg={color}
         justifyContent="space-between"
         width="100%"
         onClick={() => {
-          handle()
-            .then(() => {
-              setLoading(true);
-            })
-            .catch(() => {
-              setLoading(false);
-            });
+          tooltip
+            ? null
+            : handle()
+              .then(() => {
+                setLoading(true);
+              })
+              .catch(() => {
+                setLoading(false);
+              });
         }}
       >
         {`${provider}`}
         <Icon />
       </Button>
     </Tooltip>
-
   );
 };
 

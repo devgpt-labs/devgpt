@@ -91,12 +91,15 @@ const Profile = () => {
     const { data, error } = await supabase
       .from("prompts")
       .select("id")
-      .eq("user_id", user?.id)
+      .eq("email_address", user?.email)
       .gte("created_at", new Date().toISOString().slice(0, 10));
     if (error) throw error;
 
     setPromptCount(data?.length);
   };
+
+  console.log({ promptCount });
+
 
   useEffect(() => {
     getPromptCount();
@@ -156,17 +159,9 @@ const Profile = () => {
               <Flex gap={2}>
                 {!isPro && (
                   <>
-                    <Tooltip label="Upgrade" placement="top">
-                      <IconButton
-                        bgGradient="linear(to-tr, teal.500, blue.500)"
-                        onClick={onUpgradeOpen}
-                        _hover={{ color: "blue.500", bg: "white" }}
-                        aria-label="Upgrade"
-                        icon={<StarIcon />}
-                      />
-                    </Tooltip>
+
                     <Tooltip
-                      label="10/10 Prompts Remaining Today"
+                      label={`${10 - promptCount}/10 Prompts Remaining Today`}
                       placement="top"
                     >
                       <IconButton
@@ -177,6 +172,8 @@ const Profile = () => {
                             <GiBattery0 />
                           ) : promptCount > 5 ? (
                             <GiBattery50 />
+                          ) : promptCount > 0 ? (
+                            <GiBattery75 />
                           ) : (
                             <GiBattery100 />
                           )
@@ -225,6 +222,15 @@ const Profile = () => {
             )}
           </SlideFade>
           <Flex gap={2} ml={2}>
+            <Tooltip label="Upgrade" placement="top">
+              <IconButton
+                bgGradient="linear(to-tr, teal.500, blue.500)"
+                onClick={onUpgradeOpen}
+                _hover={{ color: "blue.500", bg: "white" }}
+                aria-label="Upgrade"
+                icon={<StarIcon />}
+              />
+            </Tooltip>
             <Tooltip label="Select Repo" placement="top">
               <IconButton
                 onClick={() => {

@@ -34,13 +34,12 @@ import astro from "@/images/astro.png";
 
 const Auth = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useSessionContext();
+  const { user, session } = useSessionContext();
 
-  console.log(
-    getTokensFromString(
-      "hello this is my s tringnrgn adf !!!!!!!!!! o fiskoasfkoask "
-    )
-  );
+  console.log({ user });
+  console.log({ session });
+
+
 
   if (!supabase) return <Text>Loading...</Text>;
 

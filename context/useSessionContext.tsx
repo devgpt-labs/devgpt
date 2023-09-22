@@ -41,7 +41,7 @@ const defaultContext: any = {
 const SessionContext = createContext<{
   repoWindowOpen: boolean;
   session: Session | null | undefined;
-  user: User | null | undefined;
+  user: User | null;
   isPro: boolean;
   repo: Repo;
   lofaf: string[];
