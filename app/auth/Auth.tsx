@@ -85,7 +85,7 @@ const Auth = () => {
           w="full"
         >
           <Tooltip label="Hi, I'm Astro!">
-            <Image maxH="80px" src={astro.src} />
+            <Image maxH="80px" src={astro.src} alt="Astro Logo" />
           </Tooltip>
         </Flex>
       </VStack>

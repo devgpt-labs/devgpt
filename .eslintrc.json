@@ -1,6 +1,6 @@
 {
-  "extends": ["next/core-web-vitals"],
-  "plugins": ["import", "unused-imports"],
+  "extends": ["next/core-web-vitals", "plugin:jsx-a11y/recommended"],
+  "plugins": ["import", "unused-imports", "jsx-a11y"],
   "rules": {
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
