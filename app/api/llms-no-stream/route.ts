@@ -1,6 +1,6 @@
-//utils
+// utils
 import stringifyJsonClean from "@/utils/stringifyJsonClean";
-//types
+// types
 import { Message } from "@/app/types/chat";
 
 export interface Payload {
@@ -17,6 +17,20 @@ export async function POST(request: Request) {
       content: String(payload.prompt),
     },
   ];
+
+  if (process.env.NODE_ENV === 'development') {
+    // Return mock response
+    const mockResponse = {
+      messages: [
+        {
+          role: "bot",
+          content: `Mock response for: ${payload.prompt}`
+        }
+      ],
+      // Add any other necessary mock fields
+    };
+    return new Response(JSON.stringify(mockResponse));
+  }
 
   const APIURL: any = process.env.NEXT_PUBLIC_CHAT_COMPLETION_URL;
   const APIKEY: any = process.env.NEXT_PUBLIC_AZURE_OPEN_AI_KEY;

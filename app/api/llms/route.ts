@@ -11,6 +11,22 @@ export async function POST(request: Request) {
   // This is the main API entry point.
   const payload = (await request.json()) as Payload;
 
+  if (process.env.NODE_ENV === 'development') {
+    // Return mock response
+    const lastMessage = payload.messages[payload.messages.length - 1].content;
+    const mockResponse = {
+      messages: [
+        ...payload.messages, // returning the sent messages
+        {
+          role: "bot",
+          content: `Mock response for: ${lastMessage}`
+        }
+      ],
+      // Add any other necessary mock fields
+    };
+    return new Response(JSON.stringify(mockResponse));
+  }
+
   interface AzureConfig {
     basePath: string;
     apiKey: string;
