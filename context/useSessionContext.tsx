@@ -27,14 +27,14 @@ const defaultContext: any = {
   branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => { },
-    signOut: () => { },
-    setRepo: () => { },
-    setLofaf: () => { },
-    setTechStack: () => { },
-    setContext: () => { },
-    setBranch: () => { },
-    setMessages: () => { },
+    setRepoWindowOpen: () => {},
+    signOut: () => {},
+    setRepo: () => {},
+    setLofaf: () => {},
+    setTechStack: () => {},
+    setContext: () => {},
+    setBranch: () => {},
+    setMessages: () => {},
   },
 };
 
@@ -92,8 +92,9 @@ export const SessionProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
+    setMessages([]); //reset messages
     setupContextMessages();
-  }, [lofaf, repo, session, user]);
+  }, [lofaf, repo, session, user, repo?.repo]);
 
   useEffect(() => {
     //set user and session
