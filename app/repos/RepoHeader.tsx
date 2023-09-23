@@ -7,7 +7,7 @@ export const Header = () => {
     <Box
       justifyContent="space-between"
       borderBottom="1px"
-      borderColor="slate.800"
+      borderColor="#2D3748"
       pb={3}
       alignItems="center"
     >
@@ -16,10 +16,10 @@ export const Header = () => {
       </Box>
       <Image
         src={astro.src}
+        alt='Astro says hi!'
         objectFit="contain"
         width="25px"
         height="25px"
-        alt="Astro"
       />
     </Box>
   );
