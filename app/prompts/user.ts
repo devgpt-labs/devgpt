@@ -10,8 +10,6 @@ const userInput = async (
 ) => {
   let filePaths = getFilesFromString(prompt);
 
-  console.log({ prompt, owner, repo, access_token });
-
   const existing_code = await Promise.all(
     filePaths.map(async (file) => {
       const code = await getCode(owner, repo, file, access_token);
@@ -20,7 +18,6 @@ const userInput = async (
       let content = code.content;
 
       if (!content) {
-        console.log("no content.");
         return;
       }
 
