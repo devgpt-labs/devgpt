@@ -1,4 +1,4 @@
-//write the user's email address, prompt and response to a supabase table called prompts
+// Write the user's email address, prompt, and response to a Supabase table called prompts
 import { supabase } from "@/utils/supabase";
 
 export async function savePrompt(
@@ -6,14 +6,21 @@ export async function savePrompt(
   prompt: string,
   response: string
 ) {
-  if (!supabase) {
-    throw new Error("Supabase not initialized");
-  }
-
+ 
   if (!email || !prompt || !response) {
     throw new Error("Missing required fields");
   }
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log("In development mode. Not saving to Supabase.");
+    console.log({ email, prompt, response });
+    // Mock a response
+    return { email_address: email, prompt: prompt, output: response };
+  }
+
+  if (!supabase) {
+    throw new Error("Supabase not initialized");
+  }
   const { data, error } = await supabase
     .from("prompts")
     .insert([{ email_address: email, prompt: prompt, output: response }])
