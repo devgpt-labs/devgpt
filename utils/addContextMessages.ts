@@ -207,7 +207,6 @@ const addMessage = async (
   emailAddress: string
 ) => {
   const tokenLimit = await getTokenLimit(emailAddress);
-  //todo this shouldn't be a hardcoded cap, it should come from your plan (8k or 32k)
   if (getTokensFromString(userMessage) > tokenLimit) {
     return messages;
   }
