@@ -6,8 +6,11 @@ const IGNORED_FILES = [
 	".gif", // Image formats
 	".pdf", // PDF files
 	".docx", // Microsoft Word documents
+	".doc", // Microsoft Word documents
 	".xlsx", // Microsoft Excel spreadsheets
+	".xls", // Microsoft Excel spreadsheets
 	".pptx", // Microsoft PowerPoint presentations
+	".ppt", // Microsoft PowerPoint presentations
 	".zip", // Zip archives
 	".tar", // Tar archives
 	".gz", // Gzip compressed files
@@ -20,6 +23,8 @@ const IGNORED_FILES = [
 	".jar", // Java Archive files
 	".pdb", // Program Database files (debug info)
 	".swp", // Vim swap files
+	".gitignore", 
+	".lock" //lock files should be ommited
 ];
 
 export default IGNORED_FILES;

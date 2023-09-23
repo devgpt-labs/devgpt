@@ -13,5 +13,6 @@ const IGNORED_FOLDERS = [
 	"target", // Java/Maven target folder
 	"bin", // Binary folder
 	"obj", // Object folder (C#/.NET)
+	"vendor" // PhP Eqv of node_modules
 ];
 export default IGNORED_FOLDERS;
