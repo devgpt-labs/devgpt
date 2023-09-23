@@ -1,5 +1,5 @@
 "use client";
-import { Text, Button, Link } from "@chakra-ui/react";
+import { Text, Button, Link, Tooltip } from "@chakra-ui/react";
 
 const AuthOption = ({ label, Icon, url }: any) => {
   return (

@@ -1,7 +1,9 @@
+//types
 import { AzureConfig } from "../../types/azure";
-import { Streamer } from "./streamer";
-
 import { Message } from "@/app/types/chat";
+//utils
+import { Streamer } from "./streamer";
+import stringifyJsonClean from "@/utils/stringifyJsonClean";
 
 export class AzureOpenAI {
   private configuration: AzureConfig;
@@ -12,7 +14,7 @@ export class AzureOpenAI {
 
   public async createChat(messages: Message[]) {
     const APIURL: any = process.env.NEXT_PUBLIC_CHAT_COMPLETION_URL;
-    const body = this.stringifyJsonClean(messages);
+    const body = stringifyJsonClean(messages);
 
     const response = await fetch(APIURL, {
       headers: {
@@ -80,14 +82,5 @@ export class AzureOpenAI {
     };
 
     return new ReadableStream(source);
-  }
-
-  private stringifyJsonClean(obj: any): string {
-    return JSON.stringify(obj, (key, value) => {
-      if (value === null || value === undefined) {
-        return undefined;
-      }
-      return value;
-    });
   }
 }
