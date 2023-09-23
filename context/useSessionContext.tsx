@@ -13,7 +13,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
 import { system } from "@/app/prompts/system";
-import addContextMessages from "@/utils/addContextMessages";
+import createContextMessages from "@/utils/addContextMessages";
 
 const defaultContext: any = {
   repoWindowOpen: null,
@@ -75,12 +75,25 @@ export const SessionProvider = ({ children }: any) => {
 
   //load data from supabase
 
-  useEffect(() => {
+  const setupContextMessages = () => {
     //set default messages
-    // addContextMessages(messages, String(lofaf), String(user?.email)).then((newMessages: any) => {
-    //   setMessages(newMessages);
-    // });
-  }, [lofaf]);
+    if (messages.length === 0) {
+      createContextMessages(
+        [],
+        String(lofaf),
+        String(repo?.owner),
+        String(repo?.repo),
+        String(session?.provider_token),
+        String(user?.email)
+      ).then((newMessages: any) => {
+        setMessages(newMessages);
+      });
+    }
+  };
+
+  useEffect(() => {
+    setupContextMessages();
+  }, [lofaf, repo, session, user]);
 
   useEffect(() => {
     //set user and session

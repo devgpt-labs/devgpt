@@ -90,6 +90,7 @@ export const PromptInput: FC<Props> = (props) => {
           return file.path;
         });
 
+        methods.setLofaf(repoFiles);
         setAllFiles(repoFiles);
       })
       .catch((err) => {
@@ -192,9 +193,6 @@ export const PromptInput: FC<Props> = (props) => {
             placeholder="Enter your coding task, use @ to select a file from your repo."
           />
         </Tooltip>
-
-
-
         <Button
           bgGradient="linear(to-tr, teal.500, blue.500)"
           disabled={props.isLoading}
