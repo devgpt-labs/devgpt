@@ -70,11 +70,11 @@ const Auth = () => {
           New here?
         </Heading>
         <WhatIsDevGPT />
-        {/* <AuthOption
+        <AuthOption
           label="Read Our Docs"
           Icon={BiSolidBookBookmark}
           url="https://docs.devgpt.com"
-        /> */}
+        />
         <AuthOption
           label="Star Project On GitHub"
           Icon={BiSolidStar}
