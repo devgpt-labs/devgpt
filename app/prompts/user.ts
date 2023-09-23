@@ -31,12 +31,12 @@ const userInput = async (
   );
 
   prompt = `
-		${prompt}
+		${prompt}, please use the code in our conversation so far as a guide.
 
 		${
       existing_code.length > 0
         ? `
-			Here are the files you are going to edit:
+			Here is the file you are going to edit:
 			"${existing_code}"`
         : ""
     }
