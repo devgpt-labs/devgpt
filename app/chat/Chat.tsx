@@ -100,8 +100,6 @@ const Chat = () => {
       const { value, done: doneReading } = await reader.read();
       const chunkValue = decoder.decode(value);
 
-      console.log(chunkValue);
-
       completeResponse += chunkValue;
       if (doneReading) {
         setIsFinished(true);
@@ -145,8 +143,6 @@ const Chat = () => {
           isLoading={isLoading}
           onSubmit={(prompt: any) => submitHandler(prompt)}
         />
-
-
         <Text mt={2} fontSize={14}>
           {failMessage}
         </Text>

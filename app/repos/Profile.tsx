@@ -135,7 +135,7 @@ const Profile = () => {
               <Text>{githubIdentity.name}</Text>
               {isPro ? (
                 <Tag ml={2} colorScheme="teal">
-                  <Text mr={2}>Pro</Text>
+                  <Text mr={1}>Pro</Text>
                   <AiFillStar />
                 </Tag>
               ) : (
