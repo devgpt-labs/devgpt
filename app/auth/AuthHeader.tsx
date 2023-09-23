@@ -10,7 +10,7 @@ export const Header = () => {
     <Flex
       justifyContent="space-between"
       borderBottom="1px"
-      borderColor="slate.600"
+      borderColor="#2D3748"
       pb={3}
       alignItems="center"
     >

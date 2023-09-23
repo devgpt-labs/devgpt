@@ -10,8 +10,6 @@ const userInput = async (
 ) => {
   let filePaths = getFilesFromString(prompt);
 
-  console.log({ prompt, owner, repo, access_token });
-
   const existing_code = await Promise.all(
     filePaths.map(async (file) => {
       const code = await getCode(owner, repo, file, access_token);
@@ -20,7 +18,6 @@ const userInput = async (
       let content = code.content;
 
       if (!content) {
-        console.log("no content.");
         return;
       }
 
@@ -34,12 +31,12 @@ const userInput = async (
   );
 
   prompt = `
-		${prompt}
+		${prompt}, please use the code in our conversation so far as a guide.
 
 		${
       existing_code.length > 0
         ? `
-			Here are the files you are going to edit:
+			Here is the file you are going to edit:
 			"${existing_code}"`
         : ""
     }

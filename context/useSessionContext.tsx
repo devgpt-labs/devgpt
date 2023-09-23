@@ -13,6 +13,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
 import { system } from "@/app/prompts/system";
+import createContextMessages from "@/utils/addContextMessages";
 
 const defaultContext: any = {
   repoWindowOpen: null,
@@ -23,17 +24,17 @@ const defaultContext: any = {
   lofaf: [],
   techStack: [],
   context: "",
-  branch: "main",
+  branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => {},
-    signOut: () => {},
-    setRepo: () => {},
-    setLofaf: () => {},
-    setTechStack: () => {},
-    setContext: () => {},
-    setBranch: () => {},
-    setMessages: () => {},
+    setRepoWindowOpen: () => { },
+    signOut: () => { },
+    setRepo: () => { },
+    setLofaf: () => { },
+    setTechStack: () => { },
+    setContext: () => { },
+    setBranch: () => { },
+    setMessages: () => { },
   },
 };
 
@@ -69,15 +70,31 @@ export const SessionProvider = ({ children }: any) => {
   const [lofaf, setLofaf] = useState<string[]>([]);
   const [techStack, setTechStack] = useState<string[]>([]);
   const [context, setContext] = useState<string>("");
-  const [branch, setBranch] = useState<string>("main");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "system",
-      content: system(context, techStack.join("")), // set the personality of the AI
-    },
-  ]);
+  const [branch, setBranch] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
 
   //load data from supabase
+
+  const setupContextMessages = () => {
+    //set default messages
+    if (messages.length === 0) {
+      createContextMessages(
+        [],
+        String(lofaf),
+        String(repo?.owner),
+        String(repo?.repo),
+        String(session?.provider_token),
+        String(user?.email)
+      ).then((newMessages: any) => {
+        setMessages(newMessages);
+      });
+    }
+  };
+
+  useEffect(() => {
+    setupContextMessages();
+  }, [lofaf, repo, session, user]);
+
   useEffect(() => {
     //set user and session
     if (supabase) {

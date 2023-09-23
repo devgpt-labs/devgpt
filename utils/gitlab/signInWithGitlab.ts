@@ -1,6 +1,6 @@
 import { supabase } from "@/utils/supabase";
 
-const signInWithGithub = async () => {
+const signInWithGitlab = async () => {
 	if (!supabase) {
 		console.error(
 			"Supabase is not configured correctly. Please check the .env file."
@@ -9,11 +9,12 @@ const signInWithGithub = async () => {
 	}
 
 	await supabase.auth.signInWithOAuth({
-		provider: 'github',
+		provider: 'gitlab',
 		options: {
-		  scopes: 'repo'
+		  scopes: 'read_user'
 		}
-	  })
+	})
 };
 
-export default signInWithGithub;
+export default signInWithGitlab;
+

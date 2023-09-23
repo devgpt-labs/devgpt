@@ -11,6 +11,7 @@ import {
   Text,
   Flex,
   useToast,
+  Tooltip,
   Kbd,
 } from "@chakra-ui/react";
 import { FC, FormEvent } from "react";
@@ -19,7 +20,10 @@ import { useSessionContext } from "@/context/useSessionContext";
 import { LuSend } from "react-icons/lu";
 import { BsHourglassSplit } from "react-icons/bs";
 
+
+
 interface Props {
+  promptCount: number;
   prompt: string;
   setPrompt: (prompt: string) => void;
   onSubmit: (prompt: string) => void;
@@ -30,13 +34,14 @@ export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [currentSuggestion, setCurrentSuggestion] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
-  const { repo, session, methods, repoWindowOpen, branch, user } =
+  const { repo, session, methods, repoWindowOpen, branch, user, messages } =
     useSessionContext();
   const toast = useToast();
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (props.prompt.length === 0 || props.isLoading) return null;
+
     props.onSubmit(props.prompt);
   };
 
@@ -56,51 +61,36 @@ export const PromptInput: FC<Props> = (props) => {
   });
 
   // If the user clicks tab, we want to autocomplete the file name
-  const handleKeyDown = (e: any) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
+  const handleKeyDown = (file: any) => {
+    // Append currentSuggestion to prompt
+    const promptArray = props.prompt.split(" ");
 
-      // Append currentSuggestion to prompt
-      const promptArray = props.prompt.split(" ");
+    const lastWord = promptArray[promptArray.length - 1];
+    const newPrompt = props.prompt.replace(lastWord, `~${file}`);
 
-      console.log(promptArray);
-
-      const lastWord = promptArray[promptArray.length - 1];
-      const newPrompt = props.prompt.replace(lastWord, `~${selectedFile[0]}`);
-
-      props.setPrompt(newPrompt);
-      // Refocus on input
-      const input = document.getElementById("message");
-      input?.focus();
-    }
+    props.setPrompt(newPrompt);
+    // Refocus on input
+    const input = document.getElementById("message");
+    input?.focus();
   };
 
   useEffect(() => {
     setAllFiles([]);
 
-    const githubIdentity: any = user?.identities?.find(
-      (identity) => identity?.provider === "github"
-    );
-
-    console.log(githubIdentity);
-
     if (!repo.owner || !repo.repo || !session?.provider_token) {
       return;
     }
 
-    const branchDefault = branch || "main";
-
-    console.log(branch);
-
-
-    getLofaf(repo.owner, repo.repo, branchDefault, session?.provider_token)
+    getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
       .then((files: any) => {
         if (!files) return;
 
+        // Move this to global session
         const repoFiles = files?.tree?.map((file: any) => {
           return file.path;
         });
 
+        methods.setLofaf(repoFiles);
         setAllFiles(repoFiles);
       })
       .catch((err) => {
@@ -134,8 +124,8 @@ export const PromptInput: FC<Props> = (props) => {
     );
   }
 
-  if (allFiles?.length === 0 && repo.repo !== "") {
-    return <Text mt={3}>Loading via GitHub...</Text>;
+  if (messages.length === 0 && repo.repo !== "") {
+    return <Text mt={3}>Training a model with context from your codebase...</Text>;
   }
 
   return (
@@ -157,10 +147,8 @@ export const PromptInput: FC<Props> = (props) => {
                   mb={1}
                   autoFocus
                   key={file}
-                // cursor="pointer"
-                // onClick={() =>
-                //   handleKeyDown({ key: "Tab", preventDefault: () => { } })
-                // }
+                  cursor="pointer"
+                  onClick={() => handleKeyDown(file)}
                 >
                   {file}
                 </Tag>
@@ -173,22 +161,38 @@ export const PromptInput: FC<Props> = (props) => {
         className="-mx-5 px-5 mt-5 flex gap-2 items-center"
         onSubmit={onSubmit}
       >
-        <Input
-          onKeyDown={handleKeyDown}
-          onChange={(e) => {
-            props.setPrompt(e.target.value);
-          }}
-          autoFocus
-          value={props.prompt}
-          type="text"
-          id="message"
-          autoComplete="off"
-          name="message"
-          required
-          className=" bg-transparent rounded-md p-4 flex-1 max-h-56 text-slate-50 focus:ring-0 focus:outline-none"
-          placeholder="Enter your coding task, use @ to select a file from your repo."
-        />
+        <Tooltip placement='top' isOpen label={props.promptCount === 0 && 'Write your task for DevGPT here!'}>
+          <Input
+            onKeyDown={(e: any) => {
 
+              // If key equals tab, autocomplete
+              if (e.key === "Tab") {
+                e.preventDefault();
+                handleKeyDown(selectedFile[0]);
+                return;
+              }
+
+              // If key equals enter, submit
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                onSubmit(e);
+                return;
+              }
+            }}
+            onChange={(e) => {
+              props.setPrompt(e.target.value);
+            }}
+            autoFocus
+            value={props.prompt}
+            type="text"
+            id="message"
+            autoComplete="off"
+            name="message"
+            required
+            className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
+            placeholder="Enter your coding task, use @ to select a file from your repo."
+          />
+        </Tooltip>
         <Button
           bgGradient="linear(to-tr, teal.500, blue.500)"
           disabled={props.isLoading}
