@@ -173,20 +173,21 @@ const Profile = () => {
                         }
                       />
                     </Tooltip>
-                    <Tooltip
-                      label={colorMode === "light" ? "Dark" : "Light"}
-                      placement="top"
-                    >
-                      <IconButton
-                        onClick={toggleColorMode}
-                        aria-label="Turn the lights on"
-                        icon={
-                          colorMode === "light" ? <MoonIcon /> : <SunIcon />
-                        }
-                      />
-                    </Tooltip>
+
                   </>
                 )}
+                <Tooltip
+                  label={colorMode === "light" ? "Dark" : "Light"}
+                  placement="top"
+                >
+                  <IconButton
+                    onClick={toggleColorMode}
+                    aria-label="Turn the lights on"
+                    icon={
+                      colorMode === "light" ? <MoonIcon /> : <SunIcon />
+                    }
+                  />
+                </Tooltip>
                 <Tooltip label="Join Discord" placement="top">
                   <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
                     <IconButton
