@@ -1,8 +1,8 @@
-import React from "react";
-import { Flex, Tag, Box } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Tag, Box, useColorMode } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { vscDarkPlus, oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";
@@ -13,36 +13,48 @@ interface ResponseProps {
 }
 
 const Response = ({ content }: ResponseProps) => {
+  const [copied, setCopied] = useState(false)
+  const { colorMode } = useColorMode();
+
+  useEffect(() => {
+    setCopied(false)
+  }, [content])
+
+  const theme = colorMode === 'light' ? oneLight : vscDarkPlus
+
   return (
-    <Flex flex={1} my={4} flexDirection={"column"}>
+    <Flex flex={1} my={1} flexDirection={"column"} whiteSpace='pre-wrap'>
       <ReactMarkdown
+
         components={{
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
-                <Box maxW="full" pb={10}>
+                <Box maxW="full" pb={2}>
                   <SyntaxHighlighter
-                    fontSize={14}
-                    className="syntaxhighlighter"
                     {...props}
                     lineProps={{ style: { paddingBottom: 8, fontSize: 14 } }}
+                    fontSize={14}
                     wrapLines={true}
                     showLineNumbers={true}
                     // eslint-disable-next-line react/no-children-prop
                     children={String(children).replace(/\n$/, "")}
-                    style={oneDark}
+                    style={theme}
                     language={match[1]}
+                    className="syntaxhighlighter"
                     PreTag="div"
                   />
                   <Tag
+                    size='lg'
                     cursor={"pointer"}
                     colorScheme="whatsapp"
                     onClick={() => {
                       copyToClipboard(String(children));
+                      setCopied(true)
                     }}
                   >
-                    Copy
+                    {copied ? "Copied!" : "Copy"}
                   </Tag>
                 </Box>
               </>

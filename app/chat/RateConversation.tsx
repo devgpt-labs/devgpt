@@ -1,6 +1,6 @@
 "use client";
 import React, { FC, useState } from "react";
-import { Text, Center, Box, useToast, Fade } from "@chakra-ui/react";
+import { Text, Center, Box, useToast, Button, ListItem, List, Fade } from "@chakra-ui/react";
 
 export const ConversationStyleToggle = ({ visible }: any) => {
   const toast = useToast();
@@ -21,13 +21,13 @@ export const ConversationStyleToggle = ({ visible }: any) => {
   return (
     <Center>
       <Box mt={4} minW="60" className="bg-slate-900 rounded-full p-1">
-        <ul className="flex justify-between gap-1 text-sm items-stretch">
+        <List className="flex justify-between gap-1 text-sm items-stretch">
           <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
           <ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👀</ToggleItem>
           <ToggleItem onClick={onClickHandler}>🚀</ToggleItem>
-        </ul>
+        </List>
       </Box>
     </Center>
   );
@@ -50,9 +50,12 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
   };
 
   return (
-    <li
+    <ListItem
       onClick={handleItemClick}
       className={`border gap-2 border-transparent py-2 hover:bg-slate-800 cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
+      gap={2}
+      py={2}
+      px={4}
     >
       <Box>
         <Fade in={!showCheckmark}>
@@ -62,6 +65,6 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
           <Text color="green.500">☑️</Text>
         </Fade>
       </Box>
-    </li>
+    </ListItem>
   );
 };
