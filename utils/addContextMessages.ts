@@ -27,7 +27,7 @@ const createContextMessages = async (
     });
 
     // add context messages
-    newMessages = addContext(
+    newMessages = await addContext(
       newMessages,
       lofaf,
       owner,
@@ -133,8 +133,6 @@ const getUsefulFiles = async (lofaf: string) => {
 
     const usefulFilesArray = useful_files_csv.split(",").splice(0, 5);
 
-    console.log({ usefulFilesArray });
-
     return usefulFilesArray;
   } catch (error) {
     console.warn(error);
@@ -151,7 +149,7 @@ const getUsefulFileContents = async (
   try {
     // Map each item to a promise
     const promises = files.map(async (file: any) => {
-      let code = await getCode(owner, repo, file, access_token);
+      let code = await getCode(owner, repo, file.trim(), access_token);
       code = code.content;
       code = Buffer.from(code, "base64").toString("ascii");
 
@@ -161,7 +159,6 @@ const getUsefulFileContents = async (
     // Wait for all promises to resolve
     const filesWithContent = await Promise.all(promises);
 
-    console.log({ filesWithContent });
     return filesWithContent;
   } catch (error) {
     console.warn(error);
@@ -170,13 +167,21 @@ const getUsefulFileContents = async (
 };
 
 const getUsefulFilePrompts = async (files: any) => {
-  //what prompts would the user enter to generate this file?
-
   try {
     const promises = files.map(async (file: any) => {
-      let prompt = "";
+      //todo move to prompts folder
+      const response = await sendLLM(
+        `
+					I am going to provide you with the contents of a software developer's file.
+					Can you respond with the prompts that the developer would have entered to generate this file?
 
-      //here
+					E.g. "Generate a readme for my project", "Make a component that the user can use to rate a conversation"
+					
+					File: "${file.fileContent}"
+				`
+      );
+
+      const prompt = response?.choices?.[0]?.message?.content;
 
       return {
         fileName: file.fileName,
@@ -188,7 +193,6 @@ const getUsefulFilePrompts = async (files: any) => {
     // Wait for all promises to resolve
     const filesWithPrompts = await Promise.all(promises);
 
-    console.log({ filesWithPrompts });
     return filesWithPrompts;
   } catch (error) {
     console.warn(error);
@@ -220,139 +224,3 @@ const addMessage = async (
 
   return messages;
 };
-
-// newMessages.push({
-// 	role: "assistant",
-// 	content: "Generate a readme for my project",
-// });
-
-// newMessages.push({
-// 	role: "assistant",
-// 	content: `# DevGPT: We're building the world's best open-source dev agent.
-
-// 				## Table of Contents
-
-// 				1. [Introduction](#Introduction)
-// 				1. [Installation](#Installation)
-// 				1. [Features](#Features)
-// 				1. [How It Works](#How-It-Works)
-// 				1. [Key Outcomes](#Key-Outcomes)
-// 				1. [FAQs](#FAQs)
-// 				1. [Getting Started for Open-Source Contributors](#Getting-Started-for-Open-Source-Contributors)
-// 				1. [Support](#Support)
-
-// 				## Introduction
-
-// 				Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4-32k and other models.
-
-// 				## Features
-
-// 				- **Code Generation**: Enter a prompt and get your required code generated.
-// 				- **Personalized Training**: Our AI model trains on your code repository to generate code that perfectly fits into your codebase.
-// 				- **Follow-Up Prompts**: Need to modify generated code? Just enter follow-up prompts.
-
-// 				## How It Works
-
-// 				1. **Type Your Prompt**: Simply enter a prompt describing the code you need.
-// 				1. **Wait for Generation**: Our model takes an average of 40 seconds to generate your code.
-// 				1. **Optional Follow-Up Prompts**: If you wish to modify the generated code, you can enter follow-up prompts.
-
-// 				## Key Outcomes
-
-// 				- **Write Unit Tests**: Automatically generate unit tests for your codebase.
-// 				- **Write Complex Functions**: No need to fret over complex algorithms; let DevGPT handle them.
-// 				- **Create Components**: Create UI/UX components effortlessly.
-// 				- **Debug**: Troubleshoot issues in your code easily.
-
-// 				## Bounty board (For OSS contributors)
-
-// 				| Task                                                                                                      | Reward |
-// 				| --------------------------------------------------------------------------------------------------------- | ------ |
-// 				| Updating documentation                                                                                    | $150   |
-// 				| Add compatibility for Open-AI (repo currently only supports Azure, .env change only, no frontend changes) | $500   |
-
-// 				## FAQs
-
-// 				1. **Is this similar to Github Copilot?**
-// 					 - No, we are not an autocomplete tool. We handle entire tasks, acting as your co-developer.
-// 				1. **How much time will this save me?**
-// 					 - Our average user saves 1.5 hours every day, allowing you to focus on more complex and fulfilling tasks.
-
-// 				## Support
-
-// 				For any queries, issues, or support needs, feel free to contact us at support@devgpt.com
-
-// 				---
-
-// 				**Happy Coding!**
-
-// 				The DevGPT Team
-// 				`,
-// });
-
-// newMessages.push({
-// 	role: "user",
-// 	content: "Make a component that the user can use to rate a conversation",
-// });
-
-// newMessages.push({
-// 	role: "assistant",
-// 	content: `
-
-// 		Sure! Here you go...
-
-// 		\`\`\`tsx
-// 		"use client";
-// 			import React, { FC, useState } from "react";
-// 			import { Text, Center, Box, useToast, Button } from "@chakra-ui/react";
-
-// 			export const ConversationStyleToggle = ({ visible }: any) => {
-// 				const toast = useToast();
-
-// 				const onClickHandler = () => {
-// 					toast({
-// 						title: "Thank you!",
-// 						description: "Thank you for your feedback.",
-// 						status: "success",
-// 						duration: 4000,
-// 						isClosable: true,
-// 						position: "top-right",
-// 					});
-// 				};
-
-// 				if (visible === false) return null;
-
-// 				return (
-// 					<Center>
-// 						<Box mt={4} minW="60" className="bg-slate-900 rounded-full p-1">
-// 							<ul className="flex justify-between gap-1 text-sm items-stretch">
-// 								<ToggleItem onClick={onClickHandler}>👎</ToggleItem>
-// 								<ToggleItem onClick={onClickHandler}>👍</ToggleItem>
-// 								<ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
-// 								<ToggleItem onClick={onClickHandler}>👀</ToggleItem>
-// 								<ToggleItem onClick={onClickHandler}>🚀</ToggleItem>
-// 							</ul>
-// 						</Box>
-// 					</Center>
-// 				);
-// 			};
-
-// 			interface ToggleItemProps {
-// 				children?: React.ReactNode;
-// 				onClick?: () => void;
-// 			}
-
-// 			const ToggleItem: FC<ToggleItemProps> = (props) => {
-// 				return (
-// 					<li
-// 						onClick={props.onClick}
-// 						className={\`border gap-2 border-transparent py-2 hover:bg-slate-800 cursor-pointer grow justify-center flex rounded-full flex-1 items-center\`}
-// 					>
-// 						<Box>
-// 							<Text>{props.children}</Text>
-// 						</Box>
-// 					</li>
-// 				);
-// 			};\`\`\`
-// 			`,
-// });

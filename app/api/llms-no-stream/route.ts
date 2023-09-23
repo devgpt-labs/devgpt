@@ -20,9 +20,10 @@ export async function POST(request: Request) {
 
   const APIURL: any = process.env.NEXT_PUBLIC_CHAT_COMPLETION_URL;
   const APIKEY: any = process.env.NEXT_PUBLIC_AZURE_OPEN_AI_KEY;
+
   const body = stringifyJsonClean({
     messages,
-    functions: payload.functions,
+    functions: payload.functions || null,
     stream: false,
   });
 
@@ -46,7 +47,6 @@ export async function POST(request: Request) {
     completeResponse += chunkValue;
     if (doneReading && completeResponse) {
       completeResponse = JSON.parse(completeResponse);
-      console.log({ completeResponse });
       return new Response(JSON.stringify(completeResponse));
     }
   }

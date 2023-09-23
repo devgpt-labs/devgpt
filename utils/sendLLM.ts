@@ -1,4 +1,4 @@
-const sendLLM = async (prompt: string, functions: any) => {
+const sendLLM = async (prompt: string, functions?: any) => {
   const response: Response = await fetch("/api/llms-no-stream", {
     method: "POST",
     body: JSON.stringify({ prompt: prompt, functions: functions }),
