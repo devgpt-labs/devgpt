@@ -115,14 +115,11 @@ const Chat = () => {
 
 
   return (
-    <Flex direction="column" maxW="full" flex={{ md: "initial", base: 1 }}>
+    <Flex direction="column" maxW="full">
       <Box
-        w="4xl"
-        maxW="full"
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-        flex={{ md: "initial", base: 1 }}
-        justifyContent={{ md: "flex-start", base: "space-between" }}
+        justifyContent="flex-start"
       >
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">
