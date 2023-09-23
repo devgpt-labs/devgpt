@@ -192,33 +192,31 @@ const Profile = () => {
             {isSettingsOpen && (
               <Flex gap={2}>
                 {!isPro && (
-                  <>
-                    <Tooltip
-                      label={`${10 - promptCount
-                        }/10 Free Prompts Remaining Today`}
-                      placement="top"
-                    >
-                      <IconButton
-                        _hover={{
-                          transform: "translateY(-4px)",
-                          transition: "all 0.2s ease-in-out",
-                        }}
-                        onClick={onUpgradeOpen}
-                        aria-label="Upgrade"
-                        icon={
-                          promptCount === 10 ? (
-                            <GiBattery0 />
-                          ) : promptCount > 4 ? (
-                            <GiBattery50 />
-                          ) : promptCount > 0 ? (
-                            <GiBattery75 />
-                          ) : (
-                            <GiBattery100 />
-                          )
-                        }
-                      />
-                    </Tooltip>
-                  </>
+                  <Tooltip
+                    label={`${10 - promptCount
+                      }/10 Free Prompts Remaining Today`}
+                    placement="top"
+                  >
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      onClick={onUpgradeOpen}
+                      aria-label="Upgrade"
+                      icon={
+                        promptCount === 10 ? (
+                          <GiBattery0 />
+                        ) : promptCount > 4 ? (
+                          <GiBattery50 />
+                        ) : promptCount > 0 ? (
+                          <GiBattery75 />
+                        ) : (
+                          <GiBattery100 />
+                        )
+                      }
+                    />
+                  </Tooltip>
                 )}
                 <ProfileOptionIconButton
                   comparison={colorMode === "light"}
