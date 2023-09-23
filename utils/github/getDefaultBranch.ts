@@ -18,7 +18,7 @@ const getDefaultBranch = async (owner: any, repo: any, token: any) => {
 
 		return data.default_branch;
 	} catch (error) {
-		console.log(`Fsailed to get the default branch: ${error}`);
+		console.log(`Failed to get the default branch: ${error}`);
 	}
 };
 
