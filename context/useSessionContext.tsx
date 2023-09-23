@@ -13,7 +13,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
 import { system } from "@/app/prompts/system";
-import addContextMessages from "@/utils/addContextMessages";
+import createContextMessages from "@/utils/addContextMessages";
 
 const defaultContext: any = {
   repoWindowOpen: null,
@@ -79,9 +79,8 @@ export const SessionProvider = ({ children }: any) => {
   const setupContextMessages = () => {
     //set default messages
     if (messages.length === 0) {
-      console.log("here6");
-      addContextMessages(
-        messages,
+      createContextMessages(
+        [],
         String(lofaf),
         String(repo?.owner),
         String(repo?.repo),
@@ -95,7 +94,7 @@ export const SessionProvider = ({ children }: any) => {
 
   useEffect(() => {
     setupContextMessages();
-  }, [lofaf]);
+  }, [lofaf, repo, session, user]);
 
   useEffect(() => {
     //set user and session

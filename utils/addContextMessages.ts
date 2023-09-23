@@ -6,7 +6,7 @@ import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
 import getCode from "./github/getCode";
 
-const addContextMessages = async (
+const createContextMessages = async (
   messages: Message[],
   lofaf: string,
   owner: string,
@@ -16,22 +16,15 @@ const addContextMessages = async (
 ) => {
   let newMessages: any = messages;
 
-  console.log("here7");
-
-  console.log({ messages, lofaf, emailAddress });
-
   if (!lofaf) {
     return newMessages;
   }
-  console.log("here8");
 
   try {
     newMessages.push({
       role: "system",
       content: system(), //add system message
     });
-
-    console.log("here3");
 
     // add context messages
     newMessages = addContext(
@@ -50,7 +43,7 @@ const addContextMessages = async (
   }
 };
 
-export default addContextMessages;
+export default createContextMessages;
 
 //todo move these interfaces
 interface UsefulFile {
@@ -76,9 +69,7 @@ const addContext = async (
   access_token: string,
   emailAddress: string
 ) => {
-  console.log("here2");
   try {
-    console.log("here9");
     const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
     const usefulFileContents: any = await getUsefulFileContents(
@@ -105,34 +96,46 @@ const addContext = async (
 const getUsefulFiles = async (lofaf: string) => {
   //send lofaf to the LLM and get back an array of useful files.
 
-  console.log("here");
-
   try {
     //todo move this to prompts folder
     const response = await sendLLM(
       `
-		You are an expert software developer.
-		I have this list of files in my project: "${lofaf}".
-		Return an array of files that you would need to understand how this project is coded.
-		E.g. "README.md", "package.json" (or equivalent), "MyFrontEndComponent.tsx", "my-back-end-route.ts" as well as an example of a front-end and back-end file.
-		Try to return 3-4 files.
+		You are about to help a software developer with their job.
+		This is the files in their project: "${lofaf}".
+		Return an example of a front-end and back-end file that you can use to understand the developer's coding style.
+		E.g. "MyFrontEndComponent.tsx", "my-back-end-route.ts", "README.md" 
+		Pick 5 files max.
 	`,
       [
         {
           name: "process_useful_files_array",
           description: "Processes an array of useful files.",
           parameters: {
-            type: "array",
-            description: "The array of useful files.",
-            items: {
-              type: "string",
+            type: "object",
+            properties: {
+              useful_files_csv: {
+                type: "string",
+                description: "A comma separated list of useful files",
+              },
+              optional_comments: {
+                type: "string",
+                description: "Any optional comments about this list",
+              },
             },
           },
         },
       ]
     );
-    console.log({ response });
-    return response;
+
+    const { useful_files_csv } = JSON.parse(
+      response?.choices?.[0]?.message?.function_call?.arguments
+    );
+
+    const usefulFilesArray = useful_files_csv.split(",").splice(0, 5);
+
+    console.log({ usefulFilesArray });
+
+    return usefulFilesArray;
   } catch (error) {
     console.warn(error);
     return [];
@@ -143,31 +146,54 @@ const getUsefulFileContents = async (
   files: any,
   owner: string,
   repo: string,
-  path: string,
   access_token: string
 ) => {
-  return new Promise((resolve, reject) => {
-    try {
-      files.map(async (file) => {
-        getCode(owner, repo, path, access_token);
-      });
-    } catch (error) {
-      console.warn(error);
-      resolve(false);
-    }
-  });
+  try {
+    // Map each item to a promise
+    const promises = files.map(async (file: any) => {
+      let code = await getCode(owner, repo, file, access_token);
+      code = code.content;
+      code = Buffer.from(code, "base64").toString("ascii");
+
+      return { fileName: file, fileContent: code };
+    });
+
+    // Wait for all promises to resolve
+    const filesWithContent = await Promise.all(promises);
+
+    console.log({ filesWithContent });
+    return filesWithContent;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
 };
 
-const getUsefulFilePrompts = async (files: string[]) => {
+const getUsefulFilePrompts = async (files: any) => {
   //what prompts would the user enter to generate this file?
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(["README.md", "package.json"]);
-    } catch (error) {
-      console.warn(error);
-      resolve(false);
-    }
-  });
+
+  try {
+    const promises = files.map(async (file: any) => {
+      let prompt = "";
+
+      //here
+
+      return {
+        fileName: file.fileName,
+        fileContent: file.fileContent,
+        userPrompt: prompt,
+      };
+    });
+
+    // Wait for all promises to resolve
+    const filesWithPrompts = await Promise.all(promises);
+
+    console.log({ filesWithPrompts });
+    return filesWithPrompts;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
 };
 
 const addMessage = async (
