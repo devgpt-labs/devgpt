@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress:run": "npx cypress run",
+    "cypress:open": "npx cypress open"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -16,11 +18,13 @@
     "@supabase/auth-ui-react": "^0.4.5",
     "@supabase/auth-ui-shared": "^0.1.7",
     "@supabase/supabase-js": "^2.33.2",
+    "@testing-library/cypress": "^10.0.1",
     "@types/node": "18.16.3",
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.1",
     "@vercel/analytics": "^1.0.2",
     "autoprefixer": "10.4.14",
+    "cypress": "^13.2.0",
     "dotenv": "^16.3.1",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.2",
