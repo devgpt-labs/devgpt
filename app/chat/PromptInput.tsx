@@ -85,6 +85,7 @@ export const PromptInput: FC<Props> = (props) => {
           return file.path;
         });
 
+        methods.setLofaf(repoFiles);
         setAllFiles(repoFiles);
       })
       .catch((err) => {
@@ -157,7 +158,6 @@ export const PromptInput: FC<Props> = (props) => {
       >
         <Input
           onKeyDown={(e: any) => {
-
             // If key equals tab, autocomplete
             if (e.key === "Tab") {
               e.preventDefault();

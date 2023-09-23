@@ -6,12 +6,24 @@ import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
 import getCode from "./github/getCode";
 
-const addContextMessages = async (messages: Message[], lofaf: string, emailAddress: string) => {
+const addContextMessages = async (
+  messages: Message[],
+  lofaf: string,
+  owner: string,
+  repo: string,
+  access_token: string,
+  emailAddress: string
+) => {
   let newMessages: any = messages;
+
+  console.log("here7");
+
+  console.log({ messages, lofaf, emailAddress });
 
   if (!lofaf) {
     return newMessages;
   }
+  console.log("here8");
 
   try {
     newMessages.push({
@@ -19,13 +31,14 @@ const addContextMessages = async (messages: Message[], lofaf: string, emailAddre
       content: system(), //add system message
     });
 
+    console.log("here3");
+
     // add context messages
     newMessages = addContext(
       newMessages,
       lofaf,
       owner,
       repo,
-      path,
       access_token,
       emailAddress
     );
@@ -60,21 +73,22 @@ const addContext = async (
   lofaf: string,
   owner: string,
   repo: string,
-  path: string,
-  access_token: string
+  access_token: string,
+  emailAddress: string
 ) => {
+  console.log("here2");
   try {
+    console.log("here9");
     const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
-    const usefulFileContents: UsefulFileContent[] = await getUsefulFileContents(
+    const usefulFileContents: any = await getUsefulFileContents(
       usefulFiles,
       owner,
       repo,
-      path,
       access_token
     );
-    
-    const usefulFilePrompts: UsefulFilePrompt[] = await getUsefulFilePrompts(
+
+    const usefulFilePrompts: any = await getUsefulFilePrompts(
       usefulFileContents
     );
 
@@ -90,6 +104,8 @@ const addContext = async (
 
 const getUsefulFiles = async (lofaf: string) => {
   //send lofaf to the LLM and get back an array of useful files.
+
+  console.log("here");
 
   try {
     //todo move this to prompts folder
@@ -124,7 +140,7 @@ const getUsefulFiles = async (lofaf: string) => {
 };
 
 const getUsefulFileContents = async (
-  files: string[],
+  files: any,
   owner: string,
   repo: string,
   path: string,
@@ -160,7 +176,6 @@ const addMessage = async (
   assistantMessage: string,
   emailAddress: string
 ) => {
-
   const tokenLimit = await getTokenLimit(emailAddress);
   //todo this shouldn't be a hardcoded cap, it should come from your plan (8k or 32k)
   if (getTokensFromString(userMessage) > tokenLimit) {

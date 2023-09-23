@@ -76,11 +76,25 @@ export const SessionProvider = ({ children }: any) => {
 
   //load data from supabase
 
-  useEffect(() => {
+  const setupContextMessages = () => {
     //set default messages
-    addContextMessages(messages, String(lofaf), String(user?.email)).then((newMessages: any) => {
-      setMessages(newMessages);
-    });
+    if (messages.length === 0) {
+      console.log("here6");
+      addContextMessages(
+        messages,
+        String(lofaf),
+        String(repo?.owner),
+        String(repo?.repo),
+        String(session?.provider_token),
+        String(user?.email)
+      ).then((newMessages: any) => {
+        setMessages(newMessages);
+      });
+    }
+  };
+
+  useEffect(() => {
+    setupContextMessages();
   }, [lofaf]);
 
   useEffect(() => {
