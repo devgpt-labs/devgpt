@@ -30,14 +30,28 @@ const RepoDrawer = () => {
   const [filter, setFilter] = useState<string>("");
   const btnRef = useRef<any>();
 
-  useEffect(() => {
-    if (repoWindowOpen === null) return;
-    onOpen();
-  }, [repoWindowOpen]);
+  const mockRepos = () => {
+    return [
+      {
+        name: 'SampleRepo1',
+        owner: { login: 'johnDoe' },
+      },
+      {
+        name: 'SampleRepo2',
+        owner: { login: 'johnDoe' },
+      },
+    ];
+  };
+  
 
-  useEffect(() => {
+  const fetchRepos = () => {
+    if (process.env.NODE_ENV === 'development') {
+      setRepos(mockRepos());
+      return;
+    }
+  
     if (!session) return;
-
+  
     getRepos(session?.provider_token)
       .then((allRepos) => {
         setRepos(allRepos);
@@ -45,6 +59,16 @@ const RepoDrawer = () => {
       .catch((err) => {
         console.log('error getting repos:', { err });
       });
+  };
+  
+
+  useEffect(() => {
+    if (repoWindowOpen === null) return;
+    onOpen();
+  }, [repoWindowOpen]);
+
+  useEffect(() => {
+    fetchRepos();
   }, [user]);
 
   if (!user) {
@@ -62,7 +86,14 @@ const RepoDrawer = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Select a repo</DrawerHeader>
+          <DrawerHeader>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text>Select a repo</Text>
+              <Button size="sm" onClick={fetchRepos}>
+                Refresh
+              </Button>
+            </Flex>
+          </DrawerHeader>
           <DrawerBody>
             {repos?.length > 0 ? (
               <>
