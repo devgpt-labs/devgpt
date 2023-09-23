@@ -1,20 +1,11 @@
 "use client";
-import { useState } from "react";
-import { Header } from "./RepoHeader";
-import { supabase } from "@/utils/supabase";
 import {
     Box,
-    Divider,
     Input,
     VStack,
     Text,
-    InputGroup,
-    InputLeftElement,
-    Tag,
-    Button,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
-import TechStack from "./TechStack";
 
 const Repos = () => {
     const { user, methods, context, branch, repo } = useSessionContext();

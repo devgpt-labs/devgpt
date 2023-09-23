@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSessionContext } from "@/context/useSessionContext";
 import Auth from "./auth/Auth";
 import Chat from "./chat/Chat";

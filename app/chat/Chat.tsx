@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useState, useContext, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import {
   Box,
-  Tooltip,
   Flex,
   Text,
   SkeletonText,
@@ -18,10 +17,8 @@ import userPrompt from "@/app/prompts/user";
 
 //components
 import Response from "@/app/components/Response";
-import Loader from "@/app/components/Loader";
 
 //utils
-import { supabase } from "@/utils/supabase";
 import { savePrompt } from "@/utils/savePrompt";
 import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";

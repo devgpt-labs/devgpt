@@ -12,7 +12,6 @@ import { Message } from "@/app/types/chat";
 import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
-import { system } from "@/app/prompts/system";
 import createContextMessages from "@/utils/addContextMessages";
 
 const defaultContext: any = {
