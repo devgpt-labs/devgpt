@@ -11,6 +11,7 @@ import {
   Text,
   Flex,
   useToast,
+  Tooltip,
   Kbd,
 } from "@chakra-ui/react";
 import { FC, FormEvent } from "react";
@@ -19,7 +20,10 @@ import { useSessionContext } from "@/context/useSessionContext";
 import { LuSend } from "react-icons/lu";
 import { BsHourglassSplit } from "react-icons/bs";
 
+
+
 interface Props {
+  promptCount: number;
   prompt: string;
   setPrompt: (prompt: string) => void;
   onSubmit: (prompt: string) => void;
@@ -81,6 +85,7 @@ export const PromptInput: FC<Props> = (props) => {
       .then((files: any) => {
         if (!files) return;
 
+        // Move this to global session
         const repoFiles = files?.tree?.map((file: any) => {
           return file.path;
         });
@@ -119,7 +124,7 @@ export const PromptInput: FC<Props> = (props) => {
   }
 
   if (allFiles?.length === 0 && repo.repo !== "") {
-    return <Text mt={3}>Loading via GitHub...</Text>;
+    return <Text mt={3}>Training a model with context from your codebase...</Text>;
   }
 
   return (
@@ -155,36 +160,40 @@ export const PromptInput: FC<Props> = (props) => {
         className="-mx-5 px-5 mt-5 flex gap-2 items-center"
         onSubmit={onSubmit}
       >
-        <Input
-          onKeyDown={(e: any) => {
+        <Tooltip placement='top' isOpen label={props.promptCount === 0 && 'Write your task for DevGPT here!'}>
+          <Input
+            onKeyDown={(e: any) => {
 
-            // If key equals tab, autocomplete
-            if (e.key === "Tab") {
-              e.preventDefault();
-              handleKeyDown(selectedFile[0]);
-              return;
-            }
+              // If key equals tab, autocomplete
+              if (e.key === "Tab") {
+                e.preventDefault();
+                handleKeyDown(selectedFile[0]);
+                return;
+              }
 
-            // If key equals enter, submit
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              onSubmit(e);
-              return;
-            }
-          }}
-          onChange={(e) => {
-            props.setPrompt(e.target.value);
-          }}
-          autoFocus
-          value={props.prompt}
-          type="text"
-          id="message"
-          autoComplete="off"
-          name="message"
-          required
-          className=" bg-transparent rounded-md p-4 flex-1 max-h-56 text-slate-50 focus:ring-0 focus:outline-none"
-          placeholder="Enter your coding task, use @ to select a file from your repo."
-        />
+              // If key equals enter, submit
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                onSubmit(e);
+                return;
+              }
+            }}
+            onChange={(e) => {
+              props.setPrompt(e.target.value);
+            }}
+            autoFocus
+            value={props.prompt}
+            type="text"
+            id="message"
+            autoComplete="off"
+            name="message"
+            required
+            className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
+            placeholder="Enter your coding task, use @ to select a file from your repo."
+          />
+        </Tooltip>
+
+
 
         <Button
           bgGradient="linear(to-tr, teal.500, blue.500)"

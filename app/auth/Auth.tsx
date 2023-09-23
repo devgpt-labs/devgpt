@@ -37,7 +37,7 @@ const Auth = () => {
   const { user, session } = useSessionContext();
 
   return (
-    <Box className="w-[500px] rounded-lg overflow-hidden text-slate-400 p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30">
+    <Box className="w-[500px] rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30">
       <Header />
       <VStack spacing={2} mt={3} width="100%" alignItems="flex-start">
         <GitConnectorButton
@@ -70,11 +70,11 @@ const Auth = () => {
           New here?
         </Heading>
         <WhatIsDevGPT />
-        <AuthOption
+        {/* <AuthOption
           label="Read Our Docs"
           Icon={BiSolidBookBookmark}
           url="https://docs.devgpt.com"
-        />
+        /> */}
         <AuthOption
           label="Star Project On GitHub"
           Icon={BiSolidStar}

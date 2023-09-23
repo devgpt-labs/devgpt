@@ -16,10 +16,10 @@ export const Header = () => {
       </Box>
       <Image
         src={astro.src}
+        alt='Astro says hi!'
         objectFit="contain"
         width="25px"
         height="25px"
-        alt="Astro"
       />
     </Box>
   );

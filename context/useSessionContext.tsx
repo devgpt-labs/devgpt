@@ -27,14 +27,14 @@ const defaultContext: any = {
   branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => {},
-    signOut: () => {},
-    setRepo: () => {},
-    setLofaf: () => {},
-    setTechStack: () => {},
-    setContext: () => {},
-    setBranch: () => {},
-    setMessages: () => {},
+    setRepoWindowOpen: () => { },
+    signOut: () => { },
+    setRepo: () => { },
+    setLofaf: () => { },
+    setTechStack: () => { },
+    setContext: () => { },
+    setBranch: () => { },
+    setMessages: () => { },
   },
 };
 
@@ -71,16 +71,15 @@ export const SessionProvider = ({ children }: any) => {
   const [techStack, setTechStack] = useState<string[]>([]);
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("");
-
   const [messages, setMessages] = useState<Message[]>([]);
 
   //load data from supabase
 
   useEffect(() => {
     //set default messages
-    addContextMessages(messages, String(lofaf), String(user?.email)).then((newMessages: any) => {
-      setMessages(newMessages);
-    });
+    // addContextMessages(messages, String(lofaf), String(user?.email)).then((newMessages: any) => {
+    //   setMessages(newMessages);
+    // });
   }, [lofaf]);
 
   useEffect(() => {

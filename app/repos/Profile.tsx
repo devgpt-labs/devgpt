@@ -44,6 +44,8 @@ import { AiFillFolderOpen } from "react-icons/ai";
 import { BsDiscord, BsFillMoonStarsFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { PiSignOutBold } from "react-icons/pi";
+import { AiFillStar } from "react-icons/ai";
+import getPromptCount from "@/utils/getPromptCount";
 import { BiSolidBookBookmark } from "react-icons/bi";
 import {
   GiBattery100,
@@ -84,22 +86,8 @@ const Profile = () => {
     (identity) => identity?.provider === "github"
   )?.identity_data;
 
-  // Get the number of prompts this user has ran today from supabase 'prompts' table
-  const getPromptCount = async () => {
-    if (!supabase) return;
-
-    const { data, error } = await supabase
-      .from("prompts")
-      .select("id")
-      .eq("email_address", user?.email)
-      .gte("created_at", new Date().toISOString().slice(0, 10));
-    if (error) throw error;
-
-    setPromptCount(data?.length);
-  };
-
   useEffect(() => {
-    getPromptCount();
+    getPromptCount(user, setPromptCount);
   }, []);
 
   if (!user) return null;
@@ -112,7 +100,7 @@ const Profile = () => {
       w="4xl"
       maxW="full"
       rounded="lg"
-      className="overflow-hidden text-slate-400 p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+      className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
     >
       <UpgradeModal
         isUpgradeOpen={isUpgradeOpen}
@@ -147,7 +135,8 @@ const Profile = () => {
               <Text>{githubIdentity.name}</Text>
               {isPro ? (
                 <Tag ml={2} colorScheme="teal">
-                  Pro
+                  <Text mr={2}>Pro</Text>
+                  <AiFillStar />
                 </Tag>
               ) : (
                 <Tag ml={2} colorScheme="teal">
@@ -165,7 +154,7 @@ const Profile = () => {
                 {!isPro && (
                   <>
                     <Tooltip
-                      label={`${10 - promptCount}/10 Prompts Remaining Today`}
+                      label={`${10 - promptCount}/10 Free Prompts Remaining Today`}
                       placement="top"
                     >
                       <IconButton
@@ -174,7 +163,7 @@ const Profile = () => {
                         icon={
                           promptCount === 10 ? (
                             <GiBattery0 />
-                          ) : promptCount > 5 ? (
+                          ) : promptCount > 4 ? (
                             <GiBattery50 />
                           ) : promptCount > 0 ? (
                             <GiBattery75 />
@@ -228,13 +217,15 @@ const Profile = () => {
           <Flex gap={2} ml={2}>
             {!isPro && (
               <Tooltip label="Upgrade" placement="top">
-                <IconButton
-                  bgGradient="linear(to-tr, teal.500, blue.500)"
-                  onClick={onUpgradeOpen}
-                  _hover={{ color: "blue.500", bg: "white" }}
-                  aria-label="Upgrade"
-                  icon={<StarIcon />}
-                />
+                <>
+                  <IconButton
+                    bgGradient="linear(to-tr, teal.500, blue.500)"
+                    onClick={onUpgradeOpen}
+                    _hover={{ color: "blue.500", bg: "white" }}
+                    aria-label="Upgrade"
+                    icon={<StarIcon />}
+                  />
+                </>
               </Tooltip>
             )}
             <Tooltip label="Select Repo" placement="top">

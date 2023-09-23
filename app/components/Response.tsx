@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Tag, Box } from "@chakra-ui/react";
+import { Flex, Tag, Box, useColorMode } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { vscDarkPlus, oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";
@@ -14,10 +14,13 @@ interface ResponseProps {
 
 const Response = ({ content }: ResponseProps) => {
   const [copied, setCopied] = useState(false)
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     setCopied(false)
   }, [content])
+
+  const theme = colorMode === 'light' ? oneLight : vscDarkPlus
 
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace='pre-wrap'>
@@ -37,7 +40,7 @@ const Response = ({ content }: ResponseProps) => {
                     showLineNumbers={true}
                     // eslint-disable-next-line react/no-children-prop
                     children={String(children).replace(/\n$/, "")}
-                    style={vscDarkPlus}
+                    style={theme}
                     language={match[1]}
                     className="syntaxhighlighter"
                     PreTag="div"

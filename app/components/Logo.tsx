@@ -11,6 +11,7 @@ const Logo = () => {
       src={colorMode === "dark" ? devgpt.src : devgptdark.src}
       maxH="25px"
       bgClip="text"
+      alt='Astro says hi!'
     />
   );
 };
