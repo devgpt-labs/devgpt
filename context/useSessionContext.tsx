@@ -1,22 +1,14 @@
 "use client";
-import React from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { useContext, useState, useEffect, createContext } from "react";
 import { supabase } from "@/utils/supabase";
-
-//types
 import { Repo } from "@/app/types/prompts";
 import { Message } from "@/app/types/chat";
-
-//utils
+import createContextMessages from "@/utils/addContextMessages";
 import { checkIfPro } from "@/utils/checkIfPro";
 
-//prompts
-import { system } from "@/app/prompts/system";
-import createContextMessages from "@/utils/addContextMessages";
-
 const defaultContext: any = {
-  repoWindowOpen: null,
+  repoWindowOpen: false,
   session: null,
   user: null,
   isPro: false,
@@ -38,34 +30,42 @@ const defaultContext: any = {
   },
 };
 
-const SessionContext = createContext<{
-  repoWindowOpen: boolean;
-  session: Session | null | undefined;
-  user: User | null | undefined;
-  isPro: boolean;
-  repo: Repo;
-  lofaf: string[];
-  techStack: string[];
-  context: string;
-  branch: string;
-  messages: Message[];
-  methods: {
-    setRepoWindowOpen: (repoWindowOpen: boolean) => void;
-    signOut: () => void;
-    setRepo: (repo: Repo) => void;
-    setLofaf: (lofaf: string[]) => void;
-    setTechStack: (techStack: string[]) => void;
-    setContext: (context: string) => void;
-    setBranch: (branch: string) => void;
-    setMessages: (messages: Message[]) => void;
-  };
-}>(defaultContext);
+const SessionContext = createContext(defaultContext);
 
-export const SessionProvider = ({ children }: any) => {
+const MOCK_DATA = {
+  repoWindowOpen: false,
+  session: {
+    user: {
+      id: "mockUserId",
+      email: "mockEmail@example.com",
+    },
+  },
+  user: {
+    id: "mockUserId",
+    email: "mockEmail@example.com",
+  },
+  isPro: true,
+  repo: {
+    owner: "mockOwner",
+    repo: "mockRepoName",
+  },
+  lofaf: ["mockLofaf1", "mockLofaf2"],
+  techStack: ["mockTech1", "mockTech2"],
+  context: "mockContext",
+  branch: "mockBranch",
+  messages: [
+    {
+      role: "mockRole",
+      content: "mockContent",
+    },
+  ],
+};
+
+export const SessionProvider: React.FC = ({ children }) => {
   const [repoWindowOpen, setRepoWindowOpen] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>();
+  const [user, setUser] = useState<User | null>(null);
   const [isPro, setIsPro] = useState<boolean>(false);
-  const [session, setSession] = useState<Session | null>();
+  const [session, setSession] = useState<Session | null>(null);
   const [repo, setRepo] = useState<Repo>({ owner: "", repo: "" });
   const [lofaf, setLofaf] = useState<string[]>([]);
   const [techStack, setTechStack] = useState<string[]>([]);
@@ -73,42 +73,25 @@ export const SessionProvider = ({ children }: any) => {
   const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
 
-  //load data from supabase
-
-  const setupContextMessages = () => {
-    //set default messages
-    if (messages.length === 0) {
-      createContextMessages(
-        [],
-        String(lofaf),
-        String(repo?.owner),
-        String(repo?.repo),
-        String(session?.provider_token),
-        String(user?.email)
-      ).then((newMessages: any) => {
-        setMessages(newMessages);
-      });
-    }
-  };
-
   useEffect(() => {
-    setMessages([]); //reset messages
-    setupContextMessages();
-  }, [lofaf, repo, session, user, repo?.repo]);
-
-  useEffect(() => {
-    //set user and session
-    if (supabase) {
+    if (process.env.NODE_ENV === 'development') {
+      setUser(MOCK_DATA.user);
+      setSession(MOCK_DATA.session);
+      setRepo(MOCK_DATA.repo);
+      setLofaf(MOCK_DATA.lofaf);
+      setTechStack(MOCK_DATA.techStack);
+      setContext(MOCK_DATA.context);
+      setBranch(MOCK_DATA.branch);
+      setMessages(MOCK_DATA.messages);
+    } else {
       const setData = async () => {
-        if (supabase) {
-          const {
-            data: { session },
-            error,
-          } = await supabase.auth.getSession();
-          if (error) throw error;
-          setSession(session);
-          setUser(session?.user);
-        }
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) throw error;
+        setSession(session);
+        setUser(session?.user);
       };
 
       const { data: listener } = supabase.auth.onAuthStateChange(
@@ -127,15 +110,32 @@ export const SessionProvider = ({ children }: any) => {
   }, []);
 
   useEffect(() => {
-    const loadPaymentStatus = async () => {
-      //check if user is pro
-      const githubIdentity: any = user?.identities?.find(
-        (identity) => identity?.provider === "github"
-      )?.identity_data;
-      const pro = await checkIfPro(githubIdentity?.email);
-      setIsPro(pro);
-    };
-    loadPaymentStatus();
+    setMessages([]);
+    if (process.env.NODE_ENV !== 'development') {
+      if (messages.length === 0) {
+        createContextMessages(
+          [],
+          String(lofaf),
+          String(repo?.owner),
+          String(repo?.repo),
+          String(session?.provider_token),
+          String(user?.email)
+        ).then(setMessages);
+      }
+    }
+  }, [repo, user, session]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') {
+      const loadPaymentStatus = async () => {
+        const githubIdentity: any = user?.identities?.find(
+          (identity) => identity?.provider === "github"
+        )?.identity_data;
+        const pro = await checkIfPro(githubIdentity?.email);
+        setIsPro(pro);
+      };
+      loadPaymentStatus();
+    }
   }, [user]);
 
   const value = {
@@ -152,7 +152,7 @@ export const SessionProvider = ({ children }: any) => {
     methods: {
       setRepoWindowOpen,
       signOut: () => {
-        if (supabase) {
+        if (process.env.NODE_ENV !== 'development' && supabase) {
           supabase.auth.signOut();
           setUser(null);
           setSession(null);
