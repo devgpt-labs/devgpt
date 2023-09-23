@@ -28,6 +28,7 @@ const RepoDrawer = () => {
   const { repo, methods, session, user, repoWindowOpen } = useSessionContext();
   const [repos, setRepos] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>("");
+  const [loading, setLoading] = useState(false); // For the refresh debounce
   const btnRef = useRef<any>();
 
   const mockRepos = () => {
@@ -42,7 +43,6 @@ const RepoDrawer = () => {
       },
     ];
   };
-  
 
   const fetchRepos = () => {
     if (process.env.NODE_ENV === 'development') {
@@ -60,7 +60,24 @@ const RepoDrawer = () => {
         console.log('error getting repos:', { err });
       });
   };
-  
+
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchRepos();
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (repoWindowOpen === null) return;
@@ -89,7 +106,7 @@ const RepoDrawer = () => {
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
               <Text>Select a repo</Text>
-              <Button size="sm" onClick={fetchRepos}>
+              <Button size="sm" onClick={handleRefresh} isLoading={loading} disabled={loading}>
                 Refresh
               </Button>
             </Flex>
