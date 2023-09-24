@@ -5,14 +5,7 @@ import signInWithGithub from "@/utils/github/signInWithGithub";
 import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 import signInWithGitlab from "@/utils/gitlab/signInWithGitlab";
 import { useSessionContext } from "@/context/useSessionContext";
-import {
-  Box,
-  Heading,
-  VStack,
-  Image,
-  Flex,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Heading, VStack, Image, Flex, Tooltip } from "@chakra-ui/react";
 import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
 import { BsDiscord, BsGithub } from "react-icons/bs";
 import GitConnectorButton from "./GitConnectorButton";
@@ -26,13 +19,12 @@ import astro from "@/images/astro.png";
 
 const Auth = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { user, session } = useSessionContext();
 
   return (
     <Box
       className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
       maxW="500px" // Set maximum width for larger screens
-      mx="auto"    // Center the box horizontally
+      mx="auto" // Center the box horizontally
     >
       <Header />
       <VStack spacing={2} mt={3} width="100%" alignItems="center">
