@@ -72,6 +72,8 @@ export const SessionProvider = ({ children }: any) => {
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [lastUsedTrainingSettings, setLastUsedTrainingSettings] =
+    useState<any>(null);
 
   //load data from supabase
 
@@ -86,14 +88,28 @@ export const SessionProvider = ({ children }: any) => {
         String(session?.provider_token),
         String(user?.email)
       ).then((newMessages: any) => {
+        setLastUsedTrainingSettings({
+          repo: repo?.repo,
+          owner: repo?.owner,
+          lofaf: lofaf,
+        });
         setMessages(newMessages);
       });
     }
   };
 
   useEffect(() => {
-    setMessages([]); //reset messages
-    setupContextMessages();
+    console.log({ lastUsedTrainingSettings });
+
+    if (
+      lastUsedTrainingSettings?.repo !== repo?.repo ||
+      lastUsedTrainingSettings?.owner !== repo?.owner ||
+      lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+    ) {
+      console.log("TRAINING AGAIN");
+      setMessages([]); //reset messages
+      setupContextMessages();
+    }
   }, [lofaf, repo, session, user, repo?.repo]);
 
   useEffect(() => {

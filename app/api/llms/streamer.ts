@@ -1,5 +1,3 @@
-import escapeJSONStrings from "@/utils/escapeJSONStrings";
-
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
@@ -31,11 +29,16 @@ export class Streamer {
 
         if (match) {
           let content = match[1];
-          content = escapeJSONStrings(content);
           // add additional handling for edge cases (like lone backslashes)
           if (content.endsWith("\\")) {
             content += "\\"; // escape the lone backslash
           }
+
+          //add additional edge case for double quotes
+          if (content.endsWith('"')) {
+            content += '\\"'; // escape the double quote
+          }
+
           try {
             content = JSON.parse(
               `"${content.replace(/\\u([a-fA-F0-9]{4})/g, "\\\\u$1")}"`
