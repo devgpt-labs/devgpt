@@ -4,13 +4,7 @@ import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
-import {
-  Box,
-  Tooltip,
-  Flex,
-  Text,
-  SkeletonText,
-} from "@chakra-ui/react";
+import { Box, Tooltip, Flex, Text, SkeletonText } from "@chakra-ui/react";
 import Profile from "@/app/repos/Profile";
 
 //prompts
@@ -37,8 +31,8 @@ const Chat = () => {
   const { user, session, messages, methods, repo }: any = useSessionContext();
 
   useEffect(() => {
-    getPromptCount(user, setPromptCount)
-  }, [])
+    getPromptCount(user, setPromptCount);
+  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -112,7 +106,6 @@ const Chat = () => {
 
     setIsLoading(false);
   };
-
 
   return (
     <Flex direction="column" maxW="full" flex={{ md: "initial", base: 1 }}>

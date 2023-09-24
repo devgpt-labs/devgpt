@@ -1,3 +1,5 @@
+import { unescape } from "querystring";
+
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
@@ -22,26 +24,41 @@ export class Streamer {
       this.onData(content);
       return content;
     } catch (e) {
-      this.onError(e);
-      return "";
+      try {
+        //force the data out of the failed JSON with a regex
+        const regex = /"content":"(.*?)"/;
+        const match = data.match(regex);
+
+        if (match) {
+          let content = match[1];
+          content = unescape(content);
+          this.onData(content);
+          return content;
+        }
+        return "";
+      } catch (e) {
+        this.onError(e);
+        return "";
+      }
     }
   }
 
-  public parseSSE(input: string) {
+  public parseStream(input: string) {
     let runningLength = input;
     let position = 0;
     let data = "";
     while (position < runningLength.length) {
       const lineEnd = runningLength.indexOf("\n", position);
       if (lineEnd === -1) {
-        break;
+        break; // no more lines
       }
 
-      const line = runningLength.slice(position, lineEnd).trim();
+      const line = runningLength.slice(position, lineEnd);
       position = lineEnd + 1;
 
+      //extract data: here and add it to data variable?
       if (line.startsWith("data:")) {
-        const eventData = line.slice(5).trim();
+        const eventData = line.slice(5);
 
         if (eventData === "[DONE]") {
           this.onComplete();
@@ -49,9 +66,12 @@ export class Streamer {
         } else {
           data += eventData;
         }
-      } else if (line === "") {
+      } else {
         if (data) {
           this.processEvent(data);
+          data = "";
+        } else {
+          this.processEvent(line);
           data = "";
         }
       }
