@@ -37,9 +37,13 @@ const Auth = () => {
   const { user, session } = useSessionContext();
 
   return (
-    <Box className="w-[500px] rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30">
+    <Box
+      className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+      maxW="500px" // Set maximum width for larger screens
+      mx="auto"    // Center the box horizontally
+    >
       <Header />
-      <VStack spacing={2} mt={3} width="100%" alignItems="flex-start">
+      <VStack spacing={2} mt={3} width="100%" alignItems="center">
         <GitConnectorButton
           color="black"
           provider="Sign In With Github"
