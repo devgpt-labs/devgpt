@@ -4,13 +4,7 @@ import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
-import {
-  Box,
-  Tooltip,
-  Flex,
-  Text,
-  SkeletonText,
-} from "@chakra-ui/react";
+import { Box, Tooltip, Flex, Text, SkeletonText } from "@chakra-ui/react";
 import Profile from "@/app/repos/Profile";
 
 //prompts
@@ -26,6 +20,7 @@ import { savePrompt } from "@/utils/savePrompt";
 import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
+import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
@@ -37,8 +32,8 @@ const Chat = () => {
   const { user, session, messages, methods, repo }: any = useSessionContext();
 
   useEffect(() => {
-    getPromptCount(user, setPromptCount)
-  }, [])
+    getPromptCount(user, setPromptCount);
+  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -59,8 +54,9 @@ const Chat = () => {
 
     const tokensInString = await getTokensFromString(prompt);
     const tokenLimit = await getTokenLimit(user.email);
+    const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 10) {
+    if (promptCount > 10 && !isPro) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
@@ -112,7 +108,6 @@ const Chat = () => {
 
     setIsLoading(false);
   };
-
 
   return (
     <Flex direction="column" maxW="full" flex={{ md: "initial", base: 1 }}>

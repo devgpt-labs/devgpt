@@ -1,9 +1,10 @@
 "use client";
 import React, { FC, useState } from "react";
-import { Text, Center, Box, useToast, Button, ListItem, List, Fade } from "@chakra-ui/react";
+import { Text, Center, Box, useToast, Button, ListItem, List, Fade, useColorMode } from "@chakra-ui/react";
 
 export const ConversationStyleToggle = ({ visible }: any) => {
   const toast = useToast();
+  const { colorMode } = useColorMode();
 
   const onClickHandler = () => {
     toast({
@@ -20,7 +21,7 @@ export const ConversationStyleToggle = ({ visible }: any) => {
 
   return (
     <Center>
-      <Box mt={4} minW="60" className="bg-slate-900 rounded-full p-1">
+      <Box mt={4} minW="60" className="rounded-full p-1" bg={colorMode === 'light' ? 'white' : 'gray.800'}>
         <List className="flex justify-between gap-1 text-sm items-stretch">
           <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
@@ -40,7 +41,8 @@ interface ToggleItemProps {
 
 const ToggleItem: FC<ToggleItemProps> = (props) => {
   const [showCheckmark, setShowCheckmark] = useState(false);
-
+  const { colorMode } = useColorMode();
+  
   const handleItemClick = () => {
     if (props.onClick) props.onClick();
     setShowCheckmark(true);
@@ -48,6 +50,7 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
       setShowCheckmark(false);
     }, 2000);
   };
+  
 
   return (
     <ListItem
@@ -56,6 +59,10 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
       gap={2}
       py={2}
       px={4}
+      _hover={{
+        bg: colorMode === 'light' ? 'gray.100' : 'black'
+      }}
+      className={`border border-transparent cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
     >
       <Box>
         <Fade in={!showCheckmark}>

@@ -15,7 +15,7 @@ const App = async () => {
         <Flex
           flex={{ md: "initial", base: 1 }}
           direction="column"
-          alignItems={"center"}
+          alignItems="center"
           justifyContent={{ md: "center", base: "flex-start" }}
           className={`min-h-screen flex bg-slate-950 overflow-hidden ${inter.className}`}
         >

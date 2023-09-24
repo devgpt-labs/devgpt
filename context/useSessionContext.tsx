@@ -27,14 +27,14 @@ const defaultContext: any = {
   branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => { },
-    signOut: () => { },
-    setRepo: () => { },
-    setLofaf: () => { },
-    setTechStack: () => { },
-    setContext: () => { },
-    setBranch: () => { },
-    setMessages: () => { },
+    setRepoWindowOpen: () => {},
+    signOut: () => {},
+    setRepo: () => {},
+    setLofaf: () => {},
+    setTechStack: () => {},
+    setContext: () => {},
+    setBranch: () => {},
+    setMessages: () => {},
   },
 };
 
@@ -72,6 +72,8 @@ export const SessionProvider = ({ children }: any) => {
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [lastUsedTrainingSettings, setLastUsedTrainingSettings] =
+    useState<any>(null);
 
   //load data from supabase
 
@@ -86,14 +88,26 @@ export const SessionProvider = ({ children }: any) => {
         String(session?.provider_token),
         String(user?.email)
       ).then((newMessages: any) => {
+        setLastUsedTrainingSettings({
+          repo: repo?.repo,
+          owner: repo?.owner,
+          lofaf: lofaf,
+        });
         setMessages(newMessages);
       });
     }
   };
 
   useEffect(() => {
-    setupContextMessages();
-  }, [lofaf, repo, session, user]);
+    if (
+      lastUsedTrainingSettings?.repo !== repo?.repo ||
+      lastUsedTrainingSettings?.owner !== repo?.owner ||
+      lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+    ) {
+      setMessages([]); //reset messages
+      setupContextMessages();
+    }
+  }, [lofaf, repo, session, user, repo?.repo]);
 
   useEffect(() => {
     //set user and session

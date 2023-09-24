@@ -13,14 +13,13 @@ import {
   useToast,
   Tooltip,
   Kbd,
+  Spinner,
 } from "@chakra-ui/react";
 import { FC, FormEvent } from "react";
 import getLofaf from "@/utils/github/getLofaf";
 import { useSessionContext } from "@/context/useSessionContext";
 import { LuSend } from "react-icons/lu";
 import { BsHourglassSplit } from "react-icons/bs";
-
-
 
 interface Props {
   promptCount: number;
@@ -32,7 +31,6 @@ interface Props {
 
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
-  const [currentSuggestion, setCurrentSuggestion] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
   const { repo, session, methods, repoWindowOpen, branch, user, messages } =
     useSessionContext();
@@ -125,7 +123,12 @@ export const PromptInput: FC<Props> = (props) => {
   }
 
   if (messages.length === 0 && repo.repo !== "") {
-    return <Text mt={3}>Training a model with context from your codebase...</Text>;
+    return (
+      <Flex flexDirection="row" alignItems="center" mt={5}>
+        <Spinner />
+        <Text ml={4}>Training a model with context from your codebase...</Text>
+      </Flex>
+    );
   }
 
   return (
@@ -161,10 +164,13 @@ export const PromptInput: FC<Props> = (props) => {
         className="-mx-5 px-5 mt-5 flex gap-2 items-center"
         onSubmit={onSubmit}
       >
-        <Tooltip placement='top' isOpen label={props.promptCount === 0 && 'Write your task for DevGPT here!'}>
+        <Tooltip
+          placement="top"
+          isOpen
+          label={props.promptCount === 0 && "Write your task for DevGPT here!"}
+        >
           <Input
             onKeyDown={(e: any) => {
-
               // If key equals tab, autocomplete
               if (e.key === "Tab") {
                 e.preventDefault();
@@ -190,7 +196,7 @@ export const PromptInput: FC<Props> = (props) => {
             name="message"
             required
             className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
-            placeholder="Enter your coding task, use @ to select a file from your repo."
+            placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
           />
         </Tooltip>
         <Button
@@ -201,7 +207,11 @@ export const PromptInput: FC<Props> = (props) => {
           _hover={{ bg: "slate.600" }}
           cursor="pointer"
         >
-          {props.isLoading ? <BsHourglassSplit /> : <LuSend />}
+          {props.isLoading ? (
+            <BsHourglassSplit color="white" />
+          ) : (
+            <LuSend color="white" />
+          )}
         </Button>
       </form>
     </Flex>
