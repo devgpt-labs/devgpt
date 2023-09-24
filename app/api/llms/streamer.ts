@@ -1,3 +1,5 @@
+import escapeJSONStrings from "@/utils/escapeJSONStrings";
+
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
@@ -29,9 +31,22 @@ export class Streamer {
 
         if (match) {
           let content = match[1];
-          content = JSON.parse(`"${content}"`);
-          this.onData(content);
-          return content;
+          content = escapeJSONStrings(content);
+          // add additional handling for edge cases (like lone backslashes)
+          if (content.endsWith("\\")) {
+            content += "\\"; // escape the lone backslash
+          }
+          try {
+            content = JSON.parse(
+              `"${content.replace(/\\u([a-fA-F0-9]{4})/g, "\\\\u$1")}"`
+            ); //decode unicode
+            this.onData(content);
+            return content;
+          } catch (e) {
+            console.log({ content });
+            console.log({ e });
+            return "";
+          }
         }
         return "";
       } catch (e) {
