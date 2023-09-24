@@ -1,5 +1,6 @@
 // Write the user's email address, prompt, and response to a Supabase table called prompts
 import { supabase } from "@/utils/supabase";
+import { mockManager } from "@/app/configs/mockManager";
 
 export async function savePrompt(
   email: string,
@@ -11,7 +12,7 @@ export async function savePrompt(
     throw new Error("Missing required fields");
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (mockManager.isMockIntegrationsEnabled()) {
     console.log("In development mode. Not saving to Supabase.");
     console.log({ email, prompt, response });
     // Mock a response
