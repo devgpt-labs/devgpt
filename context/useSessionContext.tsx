@@ -99,14 +99,11 @@ export const SessionProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
-    console.log({ lastUsedTrainingSettings });
-
     if (
       lastUsedTrainingSettings?.repo !== repo?.repo ||
       lastUsedTrainingSettings?.owner !== repo?.owner ||
       lastUsedTrainingSettings?.lofaf.length !== lofaf.length
     ) {
-      console.log("TRAINING AGAIN");
       setMessages([]); //reset messages
       setupContextMessages();
     }
