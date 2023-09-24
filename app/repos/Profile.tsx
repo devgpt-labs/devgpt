@@ -68,6 +68,7 @@ import { FaBug } from "react-icons/fa";
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const { user, methods, repoWindowOpen, isPro, repo } = useSessionContext();
+  const [identity, setIdentity] = useState(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const {
     isOpen: isSettingsOpen,
@@ -75,23 +76,26 @@ const Profile = () => {
     onClose: onSettingsClose,
     onToggle: onSettingsToggle,
   } = useDisclosure({ defaultIsOpen: false });
-
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const githubIdentity: any = user?.identities?.find(
-    (identity) => identity?.provider === "github"
-  )?.identity_data;
+
+  useEffect(() => {
+    var identity = user?.identities?.find(
+      (identity: { provider: string; }) =>
+        ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
+    )?.identity_data;
+    setIdentity(identity);
+    console.log(identity)
+    console.log(user)
+  }, [user]);
 
   useEffect(() => {
     getPromptCount(user, setPromptCount);
   }, []);
-
-  if (!user) return null;
-  if (!user?.identities) return null;
 
   return (
     <Flex
@@ -114,14 +118,13 @@ const Profile = () => {
         width="100%"
       >
         <Flex flexDirection="row">
-          {githubIdentity.avatar_url && (
-            <Tooltip label="via Github">
+          {identity?.avatar_url && (
+            <Tooltip label={`via ${identity.provider}`}>
               <Image
                 alt="Avatar"
-                src={githubIdentity.avatar_url}
+                src={identity?.avatar_url}
                 style={{
                   borderRadius: 10,
-
                   objectFit: "cover",
                 }}
                 maxHeight={40}
@@ -132,7 +135,7 @@ const Profile = () => {
           )}
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
-              <Text>{githubIdentity.name}</Text>
+              <Text>{identity?.name}</Text>
               {isPro ? (
                 <Tag ml={2} colorScheme="teal">
                   <Text mr={1}>Pro</Text>
@@ -144,7 +147,7 @@ const Profile = () => {
                 </Tag>
               )}
             </Flex>
-            <Text>{githubIdentity.email}</Text>
+            <Text>{identity?.email}</Text>
           </Box>
         </Flex>
         <Flex flexDirection="row">
@@ -173,7 +176,6 @@ const Profile = () => {
                         }
                       />
                     </Tooltip>
-
                   </>
                 )}
                 <Tooltip
