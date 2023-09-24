@@ -4,7 +4,6 @@ import { Header } from "./AuthHeader";
 import signInWithGithub from "@/utils/github/signInWithGithub";
 import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 import signInWithGitlab from "@/utils/gitlab/signInWithGitlab";
-import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Heading, VStack, Image, Flex, Tooltip } from "@chakra-ui/react";
 import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
 import { BsDiscord, BsGithub } from "react-icons/bs";

@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
@@ -21,5 +20,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// className={`text-white bg-slate-900 ${inter.className}`}
