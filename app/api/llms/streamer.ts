@@ -1,3 +1,29 @@
+const recoverContent = (str: string) => {
+  // Regular expression to match the JSON-like substring
+  const regex = /{"content":"([\\"]|[^"])*?"}/;
+
+  // Use the match method to find the first occurrence
+  const match = str.match(regex);
+
+  // If a match is found, manually escape known control characters and then parse it
+  if (match) {
+    const escapedMatch = match[0]
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "\\r")
+      .replace(/\t/g, "\\t");
+    try {
+      let content = JSON.parse(escapedMatch);
+      return content.content;
+    } catch {
+      console.error("Error parsing JSON-like string: ", escapedMatch);
+      return "";
+    }
+  } else {
+    console.error("No match found for JSON-like string: ", str);
+    return "";
+  }
+};
+
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
@@ -22,26 +48,32 @@ export class Streamer {
       this.onData(content);
       return content;
     } catch (e) {
-      this.onError(e);
-      return "";
+      try {
+        const content = recoverContent(data);
+        this.onData(content);
+        return content;
+      } catch (e) {
+        this.onError(e);
+        return "";
+      }
     }
   }
 
-  public parseSSE(input: string) {
+  public parseStream(input: string) {
     let runningLength = input;
     let position = 0;
     let data = "";
     while (position < runningLength.length) {
       const lineEnd = runningLength.indexOf("\n", position);
       if (lineEnd === -1) {
-        break;
+        break; // no more lines
       }
 
-      const line = runningLength.slice(position, lineEnd).trim();
+      const line = runningLength.slice(position, lineEnd);
       position = lineEnd + 1;
 
       if (line.startsWith("data:")) {
-        const eventData = line.slice(5).trim();
+        const eventData = line.slice(5);
 
         if (eventData === "[DONE]") {
           this.onComplete();
@@ -49,9 +81,12 @@ export class Streamer {
         } else {
           data += eventData;
         }
-      } else if (line === "") {
+      } else {
         if (data) {
           this.processEvent(data);
+          data = "";
+        } else {
+          this.processEvent(line);
           data = "";
         }
       }

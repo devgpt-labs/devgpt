@@ -54,7 +54,8 @@ export class AzureOpenAI {
       if (done) break;
 
       const chunkedValue = decoder.decode(value);
-      streamer.parseSSE(chunkedValue);
+
+      streamer.parseStream(chunkedValue);
     }
   }
 

@@ -1,28 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ConversationStyleToggle } from "./RateConversation";
-import { Header } from "./ChatHeader";
-import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
-import {
-  Box,
-  Flex,
-  Text,
-  SkeletonText,
-} from "@chakra-ui/react";
-import Profile from "@/app/repos/Profile";
+import { Box, Tooltip, Flex, Text, SkeletonText } from "@chakra-ui/react";
 
 //prompts
 import userPrompt from "@/app/prompts/user";
 
 //components
 import Response from "@/app/components/Response";
+import Profile from "@/app/repos/Profile";
+import { PromptInput } from "./PromptInput";
+import { ConversationStyleToggle } from "./RateConversation";
+import { Header } from "./ChatHeader";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
 import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
+import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
@@ -34,8 +30,8 @@ const Chat = () => {
   const { user, session, messages, methods, repo }: any = useSessionContext();
 
   useEffect(() => {
-    getPromptCount(user, setPromptCount)
-  }, [])
+    getPromptCount(user, setPromptCount);
+  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -56,8 +52,9 @@ const Chat = () => {
 
     const tokensInString = await getTokensFromString(prompt);
     const tokenLimit = await getTokenLimit(user.email);
+    const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 10) {
+    if (promptCount > 75 && !isPro) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
@@ -110,16 +107,12 @@ const Chat = () => {
     setIsLoading(false);
   };
 
-
   return (
-    <Flex direction="column" maxW="full" flex={{ md: "initial", base: 1 }}>
+    <Flex direction="column" maxW="full">
       <Box
-        w="4xl"
-        maxW="full"
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-        flex={{ md: "initial", base: 1 }}
-        justifyContent={{ md: "flex-start", base: "space-between" }}
+        justifyContent="flex-start"
       >
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">

@@ -22,6 +22,7 @@ const Home = () => {
       {!closed && (
         <Tag
           p={2}
+          py={3}
           colorScheme="blue"
           alignItems='center'
           justifyContent="center"
