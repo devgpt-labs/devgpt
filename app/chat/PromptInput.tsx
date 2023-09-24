@@ -34,6 +34,7 @@ export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [currentSuggestion, setCurrentSuggestion] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const { repo, session, methods, repoWindowOpen, branch, user, messages } =
     useSessionContext();
   const toast = useToast();
@@ -41,7 +42,7 @@ export const PromptInput: FC<Props> = (props) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (props.prompt.length === 0 || props.isLoading) return null;
-
+    setHasSentAMessage(true);
     props.onSubmit(props.prompt);
   };
 
@@ -124,9 +125,9 @@ export const PromptInput: FC<Props> = (props) => {
     );
   }
 
-  if (messages.length === 0 && repo.repo !== "") {
+  if (!hasSentAMessage && repo.repo !== "") {
     return <Text mt={3}>Training a model with context from your codebase...</Text>;
-  }
+  } 
 
   return (
     <Flex flexDirection="column">
@@ -161,7 +162,7 @@ export const PromptInput: FC<Props> = (props) => {
         className="-mx-5 px-5 mt-5 flex gap-2 items-center"
         onSubmit={onSubmit}
       >
-        <Tooltip placement='top' isOpen label={props.promptCount === 0 && 'Write your task for DevGPT here!'}>
+        <Tooltip placement='top' isOpen label={!hasSentAMessage && 'Write your task for DevGPT here!'}>
           <Input
             onKeyDown={(e: any) => {
 
