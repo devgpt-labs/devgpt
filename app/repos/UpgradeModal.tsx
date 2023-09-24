@@ -39,7 +39,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
               <Text mb={6} fontSize={16}>
                 This is our early bird price, it will be available for a limited
                 time only. This will also include these benefits in our desktop
-                app.
+                app when it is released.
               </Text>
             </Stack>
             <TableContainer>
@@ -58,13 +58,18 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                     <Td>Unlimited</Td>
                   </Tr>
                   <Tr>
-                    <Td>Model </Td>
+                    <Td>AI Model </Td>
                     <Td>GPT-4-8K</Td>
                     <Td>GPT-4-32K</Td>
                   </Tr>
                   <Tr>
-                    <Td>Discord Support</Td>
-                    <Td>✓</Td>
+                    <Td>Model Training</Td>
+                    <Td>5 rounds</Td>
+                    <Td>15 rounds</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Priority Support</Td>
+                    <Td>×</Td>
                     <Td>✓</Td>
                   </Tr>
                 </Tbody>
@@ -83,13 +88,14 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
               >
                 <Button
                   size="lg"
+                  color={'white'}
                   bgGradient={"linear(to-r, blue.500, teal.500)"}
                   _hover={{
                     bgGradient: "linear(to-r, blue.400, teal.400)",
                   }}
                   mb={2}
                 >
-                  <Text as="s" mr={2} fontSize={15}>
+                  <Text as="s" mr={2} fontSize={14}>
                     {" "}
                     $25.99
                   </Text>{" "}

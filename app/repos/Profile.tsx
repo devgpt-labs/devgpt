@@ -54,7 +54,6 @@ import {
   GiBattery25,
   GiBattery0,
 } from "react-icons/gi";
-
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -64,6 +63,43 @@ import {
   PlusSquareIcon,
 } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
+
+interface ProfileOptionIconButtonProps {
+  tooltip?: any;
+  comparison?: any;
+  onClick?: any;
+  ariaLabel?: any;
+  label?: any;
+  otherLabel?: any;
+  Icon?: any;
+  OtherIcon?: any;
+}
+
+// TODO: Convert all of the buttons on this menu to use this component
+const ProfileOptionIconButton = ({
+  tooltip,
+  comparison,
+  onClick,
+  ariaLabel,
+  label,
+  otherLabel,
+  Icon,
+  OtherIcon,
+}: ProfileOptionIconButtonProps) => {
+  return (
+    <Tooltip label={tooltip ? tooltip : comparison ? label : otherLabel} placement="top">
+      <IconButton
+        _hover={{
+          transform: "translateY(-4px)",
+          transition: "all 0.2s ease-in-out",
+        }}
+        onClick={onClick}
+        aria-label={ariaLabel}
+        icon={comparison ? <Icon /> : <OtherIcon />}
+      />
+    </Tooltip>
+  );
+};
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
@@ -115,13 +151,17 @@ const Profile = () => {
       >
         <Flex flexDirection="row">
           {githubIdentity.avatar_url && (
-            <Tooltip label="via Github">
+            <Tooltip label="Looking golden! via Github">
               <Image
+                _hover={{
+                  boxShadow: "0px 0px 10px 0px gold",
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
                 alt="Avatar"
                 src={githubIdentity.avatar_url}
                 style={{
                   borderRadius: 10,
-
                   objectFit: "cover",
                 }}
                 maxHeight={40}
@@ -152,45 +192,48 @@ const Profile = () => {
             {isSettingsOpen && (
               <Flex gap={2}>
                 {!isPro && (
-                  <>
-                    <Tooltip
-                      label={`${10 - promptCount}/10 Free Prompts Remaining Today`}
-                      placement="top"
-                    >
-                      <IconButton
-                        onClick={onUpgradeOpen}
-                        aria-label="Upgrade"
-                        icon={
-                          promptCount === 10 ? (
-                            <GiBattery0 />
-                          ) : promptCount > 4 ? (
-                            <GiBattery50 />
-                          ) : promptCount > 0 ? (
-                            <GiBattery75 />
-                          ) : (
-                            <GiBattery100 />
-                          )
-                        }
-                      />
-                    </Tooltip>
-
-                  </>
+                  <Tooltip
+                    label={`${10 - promptCount
+                      }/10 Free Prompts Remaining Today`}
+                    placement="top"
+                  >
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      onClick={onUpgradeOpen}
+                      aria-label="Upgrade"
+                      icon={
+                        promptCount === 10 ? (
+                          <GiBattery0 />
+                        ) : promptCount > 4 ? (
+                          <GiBattery50 />
+                        ) : promptCount > 0 ? (
+                          <GiBattery75 />
+                        ) : (
+                          <GiBattery100 />
+                        )
+                      }
+                    />
+                  </Tooltip>
                 )}
-                <Tooltip
-                  label={colorMode === "light" ? "Dark" : "Light"}
-                  placement="top"
-                >
-                  <IconButton
-                    onClick={toggleColorMode}
-                    aria-label="Turn the lights on"
-                    icon={
-                      colorMode === "light" ? <MoonIcon /> : <SunIcon />
-                    }
-                  />
-                </Tooltip>
+                <ProfileOptionIconButton
+                  comparison={colorMode === "light"}
+                  onClick={toggleColorMode}
+                  ariaLabel="Turn the lights on"
+                  label="Dark"
+                  otherLabel="Light"
+                  Icon={MoonIcon}
+                  OtherIcon={SunIcon}
+                />
                 <Tooltip label="Join Discord" placement="top">
                   <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
                     <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
                       aria-label="Join Discord"
                       icon={<BsDiscord />}
                     />
@@ -201,12 +244,23 @@ const Profile = () => {
                     isExternal
                     href="https://github.com/february-labs/devgpt-releases/issues"
                   >
-                    <IconButton aria-label="Report An Issue" icon={<FaBug />} />
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Report An Issue"
+                      icon={<FaBug />}
+                    />
                   </Link>
                 </Tooltip>
                 <Tooltip label="Read The Docs" placement="top">
                   <Link isExternal href="https://docs.devgpt.com">
                     <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
                       aria-label="Read The Docs"
                       icon={<BiSolidBookBookmark />}
                     />
@@ -218,28 +272,37 @@ const Profile = () => {
           <Flex gap={2} ml={2}>
             {!isPro && (
               <Tooltip label="Upgrade" placement="top">
-                <>
-                  <IconButton
-                    bgGradient="linear(to-tr, teal.500, blue.500)"
-                    onClick={onUpgradeOpen}
-                    _hover={{ color: "blue.500", bg: "white" }}
-                    aria-label="Upgrade"
-                    icon={<StarIcon />}
-                  />
-                </>
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                    color: "blue.500",
+                  }}
+                  bgGradient="linear(to-tr, teal.500, blue.500)"
+                  onClick={onUpgradeOpen}
+                  aria-label="Upgrade"
+                  icon={<StarIcon color="white" />}
+                />
               </Tooltip>
             )}
-            <Tooltip label="Select Repo" placement="top">
-              <IconButton
-                onClick={() => {
-                  methods.setRepoWindowOpen(!repoWindowOpen);
-                }}
-                aria-label="Open Repo Drawer"
-                icon={<AiFillFolderOpen size={18} />}
-              />
-            </Tooltip>
+            <ProfileOptionIconButton
+              tooltip={repoWindowOpen ? "Close Repo Drawer" : "Open Repo Drawer"}
+              comparison={repoWindowOpen}
+              onClick={() => {
+                methods.setRepoWindowOpen(!repoWindowOpen);
+              }}
+              ariaLabel="Open Repo Drawer"
+              label="Close"
+              otherLabel="Open"
+              Icon={AiFillFolderOpen}
+              OtherIcon={AiFillFolderOpen}
+            />
             <Tooltip label="Signout" placement="top">
               <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
                 onClick={() => supabase?.auth.signOut()}
                 aria-label="Signout"
                 icon={<PiSignOutBold size={14} />}
@@ -250,6 +313,10 @@ const Profile = () => {
               placement="top"
             >
               <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
                 onClick={onSettingsToggle}
                 aria-label="Open Settings"
                 icon={<IoMdSettings size={18} />}

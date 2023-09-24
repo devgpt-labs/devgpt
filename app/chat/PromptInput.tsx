@@ -13,6 +13,7 @@ import {
   useToast,
   Tooltip,
   Kbd,
+  Spinner,
 } from "@chakra-ui/react";
 import { FC, FormEvent } from "react";
 import getLofaf from "@/utils/github/getLofaf";
@@ -30,7 +31,6 @@ interface Props {
 
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
-  const [currentSuggestion, setCurrentSuggestion] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
   const { repo, session, methods, repoWindowOpen, branch, user, messages } =
     useSessionContext();
@@ -124,7 +124,10 @@ export const PromptInput: FC<Props> = (props) => {
 
   if (messages.length === 0 && repo.repo !== "") {
     return (
-      <Text mt={3}>Training a model with context from your codebase...</Text>
+      <Flex flexDirection="row" alignItems="center" mt={5}>
+        <Spinner />
+        <Text ml={4}>Training a model with context from your codebase...</Text>
+      </Flex>
     );
   }
 
@@ -204,7 +207,11 @@ export const PromptInput: FC<Props> = (props) => {
           _hover={{ bg: "slate.600" }}
           cursor="pointer"
         >
-          {props.isLoading ? <BsHourglassSplit /> : <LuSend />}
+          {props.isLoading ? (
+            <BsHourglassSplit color="white" />
+          ) : (
+            <LuSend color="white" />
+          )}
         </Button>
       </form>
     </Flex>

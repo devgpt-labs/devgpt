@@ -20,6 +20,7 @@ import { savePrompt } from "@/utils/savePrompt";
 import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
+import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
@@ -53,8 +54,9 @@ const Chat = () => {
 
     const tokensInString = await getTokensFromString(prompt);
     const tokenLimit = await getTokenLimit(user.email);
+    const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 10) {
+    if (promptCount > 10 && !isPro) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
