@@ -196,7 +196,7 @@ export const PromptInput: FC<Props> = (props) => {
             name="message"
             required
             className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
-            placeholder="Enter your coding task, use @ to select a file from your repo."
+            placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
           />
         </Tooltip>
         <Button
