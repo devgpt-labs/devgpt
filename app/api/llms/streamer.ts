@@ -31,7 +31,7 @@ export class Streamer {
 
         if (match) {
           let content = match[1];
-          content = unescape(content);
+          content = JSON.parse(`"${content}"`);
           this.onData(content);
           return content;
         }
