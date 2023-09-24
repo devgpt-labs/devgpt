@@ -48,6 +48,19 @@ interface ProfileOptionIconButtonProps {
   OtherIcon?: any;
 }
 
+interface ProviderIdentity {
+  provider: string;
+  identity_data: Identity;
+}
+
+interface Identity {
+  provider: 'github' | 'gitlab' | 'bitbucket' | 'mock';
+  avatar_url?: string;
+  name?: string;
+  email?: string;
+  bio?: string; 
+}
+
 // TODO: Convert all of the buttons on this menu to use this component
 const ProfileOptionIconButton = ({
   tooltip,
@@ -77,7 +90,7 @@ const ProfileOptionIconButton = ({
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const { user, methods, repoWindowOpen, isPro, repo } = useSessionContext();
-  const [identity, setIdentity] = useState(null);
+  const [identity, setIdentity] = useState<Identity | null>(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const {
     isOpen: isSettingsOpen,
