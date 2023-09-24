@@ -1,12 +1,9 @@
-import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
+import { Flex, FormControl, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
     AutoComplete,
     AutoCompleteInput,
-    AutoCompleteItem,
-    AutoCompleteList,
     AutoCompleteTag,
-    AutoCompleteCreatable,
 } from "@choc-ui/chakra-autocomplete";
 
 const TechStack = () => {

@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/utils/supabase";
 import { Header } from "./AuthHeader";
 import signInWithGithub from "@/utils/github/signInWithGithub";
 import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
@@ -9,24 +8,17 @@ import { useSessionContext } from "@/context/useSessionContext";
 import {
   Box,
   Heading,
-  Button,
-  Stack,
   VStack,
-  Link,
   Image,
-  Text,
   Flex,
-  Center,
   Tooltip,
 } from "@chakra-ui/react";
 import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
-import { BsDiscord, BsFillJournalBookmarkFill, BsGithub } from "react-icons/bs";
+import { BsDiscord, BsGithub } from "react-icons/bs";
 import GitConnectorButton from "./GitConnectorButton";
 import { AiFillGitlab } from "react-icons/ai";
 import { FaBitbucket } from "react-icons/fa";
-import { GrCircleInformation } from "react-icons/gr";
 import WhatIsDevGPT from "./WhatIsDevGPT";
-import getTokensFromString from "@/utils/getTokensFromString";
 import AuthOption from "./AuthOption";
 
 //assets
@@ -97,7 +89,7 @@ const Auth = () => {
           w="full"
         >
           <Tooltip label="Hi, I'm Astro!">
-            <Image maxH="80px" src={astro.src} />
+            <Image maxH="80px" src={astro.src} alt="Astro Logo" />
           </Tooltip>
         </Flex>
       </VStack>

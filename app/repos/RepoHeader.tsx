@@ -1,4 +1,3 @@
-import { supabase } from "@/utils/supabase";
 import { Box, Image, Text } from "@chakra-ui/react";
 import astro from "@/images/astro_profile.png";
 

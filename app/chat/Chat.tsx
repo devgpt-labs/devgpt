@@ -1,21 +1,19 @@
 "use client";
-import { useEffect, useState, useContext, useMemo } from "react";
-import { ConversationStyleToggle } from "./RateConversation";
-import { Header } from "./ChatHeader";
-import { PromptInput } from "./PromptInput";
+import { useEffect, useState } from "react";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Tooltip, Flex, Text, SkeletonText } from "@chakra-ui/react";
-import Profile from "@/app/repos/Profile";
 
 //prompts
 import userPrompt from "@/app/prompts/user";
 
 //components
 import Response from "@/app/components/Response";
-import Loader from "@/app/components/Loader";
+import Profile from "@/app/repos/Profile";
+import { PromptInput } from "./PromptInput";
+import { ConversationStyleToggle } from "./RateConversation";
+import { Header } from "./ChatHeader";
 
 //utils
-import { supabase } from "@/utils/supabase";
 import { savePrompt } from "@/utils/savePrompt";
 import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";

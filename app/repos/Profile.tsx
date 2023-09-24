@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Modal, ModalContent, Tag } from "@chakra-ui/react";
+import { Tag } from "@chakra-ui/react";
 import { supabase } from "@/utils/supabase";
 import { useSessionContext } from "@/context/useSessionContext";
 import Repos from "./Settings";
@@ -11,37 +11,14 @@ import {
   Image,
   Text,
   useColorMode,
-  Button,
   SlideFade,
   Tooltip,
   Link,
-  ModalOverlay,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useToast,
   useDisclosure,
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Heading,
-  Stack,
-  Card,
-  CardBody,
-  CardFooter,
-  useColorModeValue,
-  TableProps,
 } from "@chakra-ui/react";
 import UpgradeModal from "./UpgradeModal";
 import { AiFillFolderOpen } from "react-icons/ai";
-import { BsDiscord, BsFillMoonStarsFill } from "react-icons/bs";
+import { BsDiscord } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { PiSignOutBold } from "react-icons/pi";
 import { AiFillStar } from "react-icons/ai";
@@ -51,16 +28,12 @@ import {
   GiBattery100,
   GiBattery75,
   GiBattery50,
-  GiBattery25,
   GiBattery0,
 } from "react-icons/gi";
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
   MoonIcon,
   SunIcon,
   StarIcon,
-  PlusSquareIcon,
 } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
 

@@ -1,5 +1,4 @@
-import { supabase } from "@/utils/supabase";
-import { Box, Flex, Image, Tag, Text } from "@chakra-ui/react";
+import { Flex, Image } from "@chakra-ui/react";
 import AstroHead from "@/images/astro_profile.png";
 
 //components

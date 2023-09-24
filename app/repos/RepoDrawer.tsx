@@ -19,7 +19,6 @@ import { useSessionContext } from "@/context/useSessionContext";
 import getRepos from "@/utils/github/getRepos";
 
 //components
-import Loader from "@/app/components/Loader";
 
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
