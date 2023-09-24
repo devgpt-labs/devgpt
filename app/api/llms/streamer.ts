@@ -1,5 +1,3 @@
-import { unescape } from "querystring";
-
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
