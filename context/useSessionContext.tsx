@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 import React, { createContext, useEffect, useContext, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
@@ -43,7 +43,9 @@ const MOCK_DATA = {
   user: {
     id: "mockUserId",
     email: "mockEmail@example.com",
-    identities: [{id: "mock", provider: "mock", identity_data: { name: "Mock User", email: "mockEmail@example.com"} }]
+    identities: [
+      { id: "mock", provider: "mock", identity_data: { name: "Mock User", email: "mockEmail@example.com" } },
+    ],
   },
   isPro: true,
   repo: {
@@ -73,19 +75,44 @@ export const SessionProvider: React.FC = ({ children }) => {
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [lastUsedTrainingSettings, setLastUsedTrainingSettings] = useState<any>(null);
+
+  // Load data from supabase
+  const setupContextMessages = () => {
+    // Set default messages
+    if (messages.length === 0) {
+      createContextMessages(
+        [],
+        String(lofaf),
+        String(repo?.owner),
+        String(repo?.repo),
+        String(session?.provider_token),
+        String(user?.email)
+      ).then((newMessages: any) => {
+        setLastUsedTrainingSettings({
+          repo: repo?.repo,
+          owner: repo?.owner,
+          lofaf: lofaf,
+        });
+        setMessages(newMessages);
+      });
+    }
+  };
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      setUser(MOCK_DATA.user);
-      setSession(MOCK_DATA.session);
-      setRepo(MOCK_DATA.repo);
-      setLofaf(MOCK_DATA.lofaf);
-      setIsPro(MOCK_DATA.isPro);
-      setTechStack(MOCK_DATA.techStack);
-      setContext(MOCK_DATA.context);
-      setBranch(MOCK_DATA.branch);
-      setMessages(MOCK_DATA.messages);
-    } else {
+    if (
+      lastUsedTrainingSettings?.repo !== repo?.repo ||
+      lastUsedTrainingSettings?.owner !== repo?.owner ||
+      lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+    ) {
+      setMessages([]); // Reset messages
+      setupContextMessages();
+    }
+  }, [lofaf, repo, session, user, repo?.repo]);
+
+  useEffect(() => {
+    // Set user and session
+    if (supabase) {
       const setData = async () => {
         const {
           data: { session },
@@ -96,12 +123,10 @@ export const SessionProvider: React.FC = ({ children }) => {
         setUser(session?.user);
       };
 
-      const { data: listener } = supabase.auth.onAuthStateChange(
-        (_event, session) => {
-          setSession(session);
-          setUser(session?.user);
-        }
-      );
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+        setUser(session?.user);
+      });
 
       setData();
 
