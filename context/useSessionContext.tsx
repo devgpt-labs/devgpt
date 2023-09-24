@@ -95,7 +95,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
           if (error) throw error;
           setSession(session);
           // @ts-ignore
-          setUser(session.user);
+          setUser(session?.user);
         };
 
         const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
