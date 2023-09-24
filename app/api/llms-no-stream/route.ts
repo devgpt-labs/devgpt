@@ -2,6 +2,7 @@
 import stringifyJsonClean from "@/utils/stringifyJsonClean";
 // types
 import { Message } from "@/app/types/chat";
+import { mockManager } from "@/app/configs/mockManager";
 
 export interface Payload {
   prompt: string;
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     },
   ];
 
-  if (process.env.NODE_ENV === 'development') {
+  if (mockManager.isMockIntegrationsEnabled()) {
     // Return mock response
     const mockResponse = {
       messages: [
@@ -27,7 +28,6 @@ export async function POST(request: Request) {
           content: `Mock response for: ${payload.prompt}`
         }
       ],
-      // Add any other necessary mock fields
     };
     return new Response(JSON.stringify(mockResponse));
   }

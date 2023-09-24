@@ -1,5 +1,7 @@
 import { AzureOpenAI } from "./prepareChatCompletion";
 
+import { mockManager } from "@/app/configs/mockManager";
+
 import { Message } from "@/app/types/chat";
 
 export interface Payload {
@@ -10,7 +12,7 @@ export async function POST(request: Request) {
   // This is the main API entry point.
   const payload = (await request.json()) as Payload;
 
-  if (process.env.NODE_ENV === 'development') {
+  if (mockManager.isMockIntegrationsEnabled()) {
     // Return mock response
     const lastMessage = payload.messages[payload.messages.length - 1].content;
     const mockResponse = {
@@ -21,7 +23,6 @@ export async function POST(request: Request) {
           content: `Mock response for: ${lastMessage}`
         }
       ],
-      // Add any other necessary mock fields
     };
     return new Response(JSON.stringify(mockResponse));
   }
