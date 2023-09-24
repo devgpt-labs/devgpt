@@ -54,7 +54,6 @@ export class Streamer {
       const line = runningLength.slice(position, lineEnd);
       position = lineEnd + 1;
 
-      //extract data: here and add it to data variable?
       if (line.startsWith("data:")) {
         const eventData = line.slice(5);
 
