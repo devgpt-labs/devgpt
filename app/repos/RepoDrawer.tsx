@@ -17,9 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
 import getRepos from "@/utils/github/getRepos";
-
-//components
-import Loader from "@/app/components/Loader";
+import { mockManager } from "@/app/configs/mockManager"; 
 
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
@@ -31,22 +29,11 @@ const RepoDrawer = () => {
   const [loading, setLoading] = useState(false); // For the refresh debounce
   const btnRef = useRef<any>();
 
-  const mockRepos = () => {
-    return [
-      {
-        name: 'SampleRepo1',
-        owner: { login: 'johnDoe' },
-      },
-      {
-        name: 'SampleRepo2',
-        owner: { login: 'johnDoe' },
-      },
-    ];
-  };
+
 
   const fetchRepos = () => {
-    if (process.env.NODE_ENV === 'development') {
-      setRepos(mockRepos());
+    if (mockManager.isMockIntegrationsEnabled()) {
+      setRepos(mockManager.mockRepos());
       return;
     }
   

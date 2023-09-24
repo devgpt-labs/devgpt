@@ -1,4 +1,3 @@
- "use client";
 import React, { createContext, useEffect, useContext, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
@@ -6,6 +5,7 @@ import { Repo } from "@/app/types/prompts";
 import { Message } from "@/app/types/chat";
 import createContextMessages from "@/utils/addContextMessages";
 import { checkIfPro } from "@/utils/checkIfPro";
+import { mockManager } from "@/app/configs/mockManager";
 
 const defaultContext: any = {
   repoWindowOpen: false,
@@ -31,38 +31,6 @@ const defaultContext: any = {
 };
 
 const SessionContext = createContext(defaultContext);
-
-const MOCK_DATA = {
-  repoWindowOpen: false,
-  session: {
-    user: {
-      id: "mockUserId",
-      email: "mockEmail@example.com",
-    },
-  },
-  user: {
-    id: "mockUserId",
-    email: "mockEmail@example.com",
-    identities: [
-      { id: "mock", provider: "mock", identity_data: { name: "Mock User", email: "mockEmail@example.com" } },
-    ],
-  },
-  isPro: true,
-  repo: {
-    owner: "",
-    repo: "",
-  },
-  lofaf: ["mockLofaf1", "mockLofaf2"],
-  techStack: ["mockTech1", "mockTech2"],
-  context: "mockContext",
-  branch: "mockBranch",
-  messages: [
-    {
-      role: "mockRole",
-      content: "mockContent",
-    },
-  ],
-};
 
 export const SessionProvider: React.FC = ({ children }) => {
   const [repoWindowOpen, setRepoWindowOpen] = useState<boolean>(false);
@@ -138,7 +106,7 @@ export const SessionProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     setMessages([]);
-    if (process.env.NODE_ENV !== 'development') {
+    if (!mockManager.isMockIntegrationsEnabled()) {
       if (messages.length === 0) {
         createContextMessages(
           [],
@@ -153,7 +121,7 @@ export const SessionProvider: React.FC = ({ children }) => {
   }, [repo, user, session]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
+    if (!mockManager.isMockIntegrationsEnabled()) {
       const loadPaymentStatus = async () => {
         const githubIdentity: any = user?.identities?.find(
           (identity) => identity?.provider === "github"
@@ -175,11 +143,11 @@ export const SessionProvider: React.FC = ({ children }) => {
     techStack,
     context,
     branch,
-    messages,
+    messages: mockManager.mockData().messages, // Get mock messages from mockManager
     methods: {
       setRepoWindowOpen,
       signOut: () => {
-        if (process.env.NODE_ENV !== 'development' && supabase) {
+        if (supabase) {
           supabase.auth.signOut();
           setUser(null);
           setSession(null);

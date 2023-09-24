@@ -125,8 +125,6 @@ const Profile = () => {
         ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
     )?.identity_data;
     setIdentity(identity);
-    console.log(identity)
-    console.log(user)
   }, [user]);
 
   useEffect(() => {
