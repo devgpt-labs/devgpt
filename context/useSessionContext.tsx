@@ -43,11 +43,12 @@ const MOCK_DATA = {
   user: {
     id: "mockUserId",
     email: "mockEmail@example.com",
+    identities: [{id: "mock", provider: "mock", identity_data: { name: "Mock User", email: "mockEmail@example.com"} }]
   },
   isPro: true,
   repo: {
-    owner: "mockOwner",
-    repo: "mockRepoName",
+    owner: "",
+    repo: "",
   },
   lofaf: ["mockLofaf1", "mockLofaf2"],
   techStack: ["mockTech1", "mockTech2"],
@@ -79,6 +80,7 @@ export const SessionProvider: React.FC = ({ children }) => {
       setSession(MOCK_DATA.session);
       setRepo(MOCK_DATA.repo);
       setLofaf(MOCK_DATA.lofaf);
+      setIsPro(MOCK_DATA.isPro);
       setTechStack(MOCK_DATA.techStack);
       setContext(MOCK_DATA.context);
       setBranch(MOCK_DATA.branch);
