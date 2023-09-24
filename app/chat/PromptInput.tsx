@@ -34,7 +34,7 @@ export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [currentSuggestion, setCurrentSuggestion] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const { repo, session, methods, repoWindowOpen, branch, user, messages } =
     useSessionContext();
   const toast = useToast();
@@ -125,7 +125,7 @@ export const PromptInput: FC<Props> = (props) => {
     );
   }
 
-  if (!hasSentAMessage && repo.repo !== "") {
+  if ((messages.length === 0 && repo.repo !== "") && process.env.NODE_ENV !== 'development') {
     return <Text mt={3}>Training a model with context from your codebase...</Text>;
   } 
 
