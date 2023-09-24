@@ -1,3 +1,29 @@
+const recoverContent = (str: string) => {
+  // Regular expression to match the JSON-like substring
+  const regex = /{"content":"([\\"]|[^"])*?"}/;
+
+  // Use the match method to find the first occurrence
+  const match = str.match(regex);
+
+  // If a match is found, manually escape known control characters and then parse it
+  if (match) {
+    const escapedMatch = match[0]
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "\\r")
+      .replace(/\t/g, "\\t");
+    try {
+      let content = JSON.parse(escapedMatch);
+      return content.content;
+    } catch {
+      console.error("Error parsing JSON-like string: ", escapedMatch);
+      return "";
+    }
+  } else {
+    console.error("No match found for JSON-like string: ", str);
+    return "";
+  }
+};
+
 export type StreamEvents = {
   onError: (error: unknown) => void;
   onComplete: () => void;
@@ -23,35 +49,9 @@ export class Streamer {
       return content;
     } catch (e) {
       try {
-        //force the data out of the failed JSON with a regex
-        const regex = /"content":"(.*?)"/;
-        const match = data.match(regex);
-
-        if (match) {
-          let content = match[1];
-          // add additional handling for edge cases (like lone backslashes)
-          if (content.endsWith("\\")) {
-            content += "\\"; // escape the lone backslash
-          }
-
-          //add additional edge case for double quotes
-          if (content.endsWith('"')) {
-            content += '\\"'; // escape the double quote
-          }
-
-          try {
-            content = JSON.parse(
-              `"${content.replace(/\\u([a-fA-F0-9]{4})/g, "\\\\u$1")}"`
-            ); //decode unicode
-            this.onData(content);
-            return content;
-          } catch (e) {
-            console.log({ content });
-            console.log({ e });
-            return "";
-          }
-        }
-        return "";
+        const content = recoverContent(data);
+        this.onData(content);
+        return content;
       } catch (e) {
         this.onError(e);
         return "";

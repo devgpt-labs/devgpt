@@ -56,7 +56,7 @@ const Chat = () => {
     const tokenLimit = await getTokenLimit(user.email);
     const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 10 && !isPro) {
+    if (promptCount > 75 && !isPro) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
