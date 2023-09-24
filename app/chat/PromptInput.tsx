@@ -101,7 +101,7 @@ export const PromptInput: FC<Props> = (props) => {
         methods.setRepo({ owner: "", repo: "" });
         console.error({ err });
       });
-  }, [repo.owner, repo.repo, branch, methods]);
+  }, [repo.owner, repo.repo, branch, methods, session?.provider_token, toast]);
 
   if (repo.repo === "") {
     return (
