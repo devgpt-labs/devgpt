@@ -1,5 +1,4 @@
 import { AzureOpenAI } from "./prepareChatCompletion";
-import { AzureConfig } from "../../types/azure";
 
 import { Message } from "@/app/types/chat";
 

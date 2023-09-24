@@ -7,6 +7,10 @@ import createContextMessages from "@/utils/addContextMessages";
 import { checkIfPro } from "@/utils/checkIfPro";
 import { mockManager } from "@/app/configs/mockManager";
 
+interface SessionProviderProps {
+  children: React.ReactNode;
+}
+
 const defaultContext: any = {
   repoWindowOpen: false,
   session: null,
@@ -31,8 +35,10 @@ const defaultContext: any = {
 };
 
 const SessionContext = createContext(defaultContext);
+const isMockEnabled = mockManager.isMockIntegrationsEnabled();
 
-export const SessionProvider: React.FC = ({ children }) => {
+
+export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [repoWindowOpen, setRepoWindowOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [isPro, setIsPro] = useState<boolean>(false);
@@ -45,9 +51,7 @@ export const SessionProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [lastUsedTrainingSettings, setLastUsedTrainingSettings] = useState<any>(null);
 
-  // Load data from supabase
   const setupContextMessages = () => {
-    // Set default messages
     if (messages.length === 0) {
       createContextMessages(
         [],
@@ -68,57 +72,55 @@ export const SessionProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    if (
-      lastUsedTrainingSettings?.repo !== repo?.repo ||
-      lastUsedTrainingSettings?.owner !== repo?.owner ||
-      lastUsedTrainingSettings?.lofaf.length !== lofaf.length
-    ) {
-      setMessages([]); // Reset messages
-      setupContextMessages();
-    }
-  }, [lofaf, repo, session, user, repo?.repo]);
+    if (isMockEnabled) {
+      setUser(mockManager.mockData().user);
+      setSession(mockManager.mockData().session);
+      setIsPro(mockManager.mockData().isPro);
+      setRepo(mockManager.mockData().repo);
+      setLofaf(mockManager.mockData().lofaf);
+      setTechStack(mockManager.mockData().techStack);
+      setContext(mockManager.mockData().context);
+      setBranch(mockManager.mockData().branch);
+      setMessages(mockManager.mockData().messages);
+    } else {
+      if (supabase) {
+        const setData = async () => {
+          const {
+            data: { session },
+            error,
+          } = await supabase.auth.getSession();
+          if (error) throw error;
+          setSession(session);
+          setUser(session?.user);
+        };
 
-  useEffect(() => {
-    // Set user and session
-    if (supabase) {
-      const setData = async () => {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) throw error;
-        setSession(session);
-        setUser(session?.user);
-      };
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+          setSession(session);
+          setUser(session?.user);
+        });
 
-      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        setUser(session?.user);
-      });
+        setData();
 
-      setData();
-
-      return () => {
-        listener?.subscription.unsubscribe();
-      };
-    }
-  }, []);
-
-  useEffect(() => {
-    setMessages([]);
-    if (!mockManager.isMockIntegrationsEnabled()) {
-      if (messages.length === 0) {
-        createContextMessages(
-          [],
-          String(lofaf),
-          String(repo?.owner),
-          String(repo?.repo),
-          String(session?.provider_token),
-          String(user?.email)
-        ).then(setMessages);
+        return () => {
+          listener?.subscription.unsubscribe();
+        };
       }
     }
-  }, [repo, user, session]);
+  }, [isMockEnabled]);
+
+  useEffect(() => {
+    if (!mockManager.isMockIntegrationsEnabled()) {
+      if (
+        messages.length === 0 ||
+        lastUsedTrainingSettings?.repo !== repo?.repo ||
+        lastUsedTrainingSettings?.owner !== repo?.owner ||
+        lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+      ) {
+        setMessages([]);
+        setupContextMessages();
+      }
+    }
+  }, [lofaf, session, user, repo]);
 
   useEffect(() => {
     if (!mockManager.isMockIntegrationsEnabled()) {
@@ -143,7 +145,7 @@ export const SessionProvider: React.FC = ({ children }) => {
     techStack,
     context,
     branch,
-    messages: mockManager.mockData().messages, // Get mock messages from mockManager
+    messages, 
     methods: {
       setRepoWindowOpen,
       signOut: () => {

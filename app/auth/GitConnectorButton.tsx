@@ -1,5 +1,5 @@
 "use client";
-import { Text, Button, Link, Tooltip, useColorMode } from "@chakra-ui/react";
+import { Button, Tooltip, useColorMode } from "@chakra-ui/react";
 
 
 const GitConnectorButton = ({

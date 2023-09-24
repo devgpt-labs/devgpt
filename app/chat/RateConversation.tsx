@@ -1,6 +1,6 @@
 "use client";
-import React, { FC, useState } from "react";
-import { Text, Center, Box, useToast, Button, ListItem, List, useColorMode } from "@chakra-ui/react";
+import React, { FC } from "react";
+import { Text, Center, Box, useToast, ListItem, List, useColorMode } from "@chakra-ui/react";
 
 export const ConversationStyleToggle = ({ visible }: any) => {
   const toast = useToast();

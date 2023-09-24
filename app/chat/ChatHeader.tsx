@@ -1,6 +1,5 @@
-import { Box, Text, Flex, Image } from "@chakra-ui/react";
+import { Text, Flex } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
-import astro from "@/images/astro_profile.png";
 
 //components
 import Logo from "@/app/components/Logo";

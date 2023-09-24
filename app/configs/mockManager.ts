@@ -1,15 +1,9 @@
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 
 class MockConfigurationManager {
   private config: { [key: string]: string };
 
   constructor() {
-    const envPath = path.resolve(__dirname, '..', '.env'); // Adjust the path as needed
-    dotenv.config({ path: envPath });
-
     this.config = {
-      NODE_ENV: 'development',
       MOCK_INTEGRATIONS: 'false',
     };
   }
@@ -60,12 +54,7 @@ class MockConfigurationManager {
       techStack: ["mockTech1", "mockTech2"],
       context: "mockContext",
       branch: "mockBranch",
-      messages: [
-        {
-          role: "mockRole",
-          content: "mockContent",
-        },
-      ],
+      messages: [],
     };
   }
 }
