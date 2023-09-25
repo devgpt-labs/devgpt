@@ -42,7 +42,7 @@ Welcome to **DevGPT**, the AI-driven development tool designed to transform the 
 | While page is loading it should show a spinner instead of the broken top-bar                                         |
 | Shouldn’t need to re-train models on previously selected repos - save the conversation to local memory, e.g. cookies |
 | Add option to re-train a model manually (calls setupContextMessages)                                                 |
-| Bitbucket and GitLan other integrations                                                                              |
+| Bitbucket and GitLab integrations                                                                                    |
 | Performance increase for local development (high load time and CPU  when running locally?)                           |
 
 ## FAQs
