@@ -16,9 +16,15 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
-import getRepos from "@/utils/github/getRepos";
+import { getPaginatedRepos } from "@/utils/github/getRepos";
 
 //components
+type PageInfo = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+};
 
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
@@ -26,6 +32,8 @@ const RepoDrawer = () => {
   });
   const { repo, methods, session, user, repoWindowOpen } = useSessionContext();
   const [repos, setRepos] = useState<any[]>([]);
+  const [reposCount, setReposCount] = useState<number>(0);
+  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
   const btnRef = useRef<any>();
 
@@ -37,15 +45,46 @@ const RepoDrawer = () => {
   useEffect(() => {
     if (!session) return;
     if (repos.length > 0) return;
+    if (!session?.provider_token) return;
 
-    getRepos(session?.provider_token)
-      .then((allRepos) => {
-        setRepos(allRepos);
+    getPaginatedRepos(session?.provider_token)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setReposCount(allRepos.totalCount);
+          setPageInfo(allRepos.pageInfo);
+        }
+      })
+      .catch((err: any) => {
+        console.log("Failed to get repos:", { err });
+      });
+  }, [repos.length, session, user]);
+
+  const onPreviousPage = async () =>
+    session?.provider_token &&
+    getPaginatedRepos(session?.provider_token, pageInfo?.endCursor)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setPageInfo(allRepos.pageInfo);
+        }
       })
       .catch((err) => {
         console.log("Failed to get repos:", { err });
       });
-  }, [user, session]);
+
+  const onNextPage = async () =>
+    session?.provider_token &&
+    getPaginatedRepos(session?.provider_token, null, pageInfo?.endCursor)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setPageInfo(allRepos.pageInfo);
+        }
+      })
+      .catch((err: any) => {
+        console.log("Failed to get repos:", { err });
+      });
 
   if (!user) {
     return null;
@@ -62,11 +101,14 @@ const RepoDrawer = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Select a repo</DrawerHeader>
+          <DrawerHeader>
+            Select a repo{reposCount ? ` (${reposCount})` : ""}
+          </DrawerHeader>
           <DrawerBody>
             {repos?.length > 0 ? (
               <>
                 <Input
+                  className="mb-2"
                   placeholder="Search repos"
                   value={filter}
                   onChange={(e) => {
@@ -129,7 +171,22 @@ const RepoDrawer = () => {
               </Stack>
             )}
           </DrawerBody>
-          <DrawerFooter />
+          {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
+            <DrawerFooter className="gap-2">
+              <>
+                {pageInfo.hasPreviousPage && (
+                  <Button size="sm" variant="outline" onClick={onPreviousPage}>
+                    Previous
+                  </Button>
+                )}
+                {pageInfo.hasNextPage && (
+                  <Button size="sm" variant="outline" onClick={onNextPage}>
+                    Next
+                  </Button>
+                )}
+              </>
+            </DrawerFooter>
+          )}
         </DrawerContent>
       </Drawer>
     </>
