@@ -88,7 +88,7 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, repoWindowOpen, isPro, repo } = useSessionContext();
+  const { user, repoWindowOpen, isPro, repo, methods } = useSessionContext();
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const {

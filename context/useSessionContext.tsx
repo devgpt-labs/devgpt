@@ -92,8 +92,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       return;
     }
 
-    if (!supabase) return;
-
     if (
       lastUsedTrainingSettings?.repo !== repo?.repo ||
       lastUsedTrainingSettings?.owner !== repo?.owner ||
@@ -105,10 +103,19 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   }, [lofaf, repo, session, user, repo.repo]);
 
   useEffect(() => {
-    //set user and session
-    if (supabase) {
-      const setData = async () => {
-        if (supabase) {
+    if (isMockEnabled) {
+      setUser(mockManager.mockData().user as unknown as User);
+      setSession(mockManager.mockData().session as unknown as Session);
+      setIsPro(mockManager.mockData().isPro);
+      setRepo(mockManager.mockData().repo);
+      setLofaf(mockManager.mockData().lofaf);
+      setTechStack(mockManager.mockData().techStack);
+      setContext(mockManager.mockData().context);
+      setBranch(mockManager.mockData().branch);
+      setMessages(mockManager.mockData().messages);
+    } else {
+      if (supabase) {
+        const setData = async () => {
           const {
             data: { session },
             error,
@@ -118,7 +125,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           setSession(session);
           // @ts-ignore
           setUser(session?.user);
-        }
+        };
 
         const { data: listener } = supabase.auth.onAuthStateChange(
           (_event, session) => {
@@ -133,7 +140,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         return () => {
           listener?.subscription.unsubscribe();
         };
-      };
+      }
     }
   }, [isMockEnabled]);
 

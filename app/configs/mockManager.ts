@@ -3,7 +3,7 @@ class MockConfigurationManager {
 
   constructor() {
     this.config = {
-      MOCK_INTEGRATIONS: "true",
+      MOCK_INTEGRATIONS: "false",
     };
   }
 
