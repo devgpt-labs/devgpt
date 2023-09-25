@@ -218,13 +218,7 @@ const addMessage = async (
 
   messages.push({
     role: "assistant",
-    content: String(`
-		I'd love to help! Here's what I came up with:
-		
-		\`\`\`
-		${assistantMessage}
-		\`\`\`
-		`),
+    content: String(assistantMessage),
   });
 
   return messages;

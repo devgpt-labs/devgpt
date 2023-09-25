@@ -141,12 +141,14 @@ export const PromptInput: FC<Props> = (props) => {
   if (
     messages.length === 0 &&
     repo.repo !== "" &&
-    process.env.NODE_ENV !== "development"
+    process.env.NEXT_PUBLIC_DEV_MODE !== "true"
   ) {
     return (
       <Flex flexDirection="row" alignItems="center" mt={5}>
         <Spinner />
-        <Text ml={4}>Training a model with context from your codebase...</Text>
+        <Text ml={4}>
+          Training your model with context from your codebase...
+        </Text>
       </Flex>
     );
   }

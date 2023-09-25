@@ -273,14 +273,12 @@ const Profile = () => {
               </Tooltip>
             )}
             <ProfileOptionIconButton
-              tooltip={
-                repoWindowOpen ? "Close Repo Drawer" : "Open Repo Drawer"
-              }
+              tooltip={"Change Repo"}
               comparison={repoWindowOpen}
               onClick={() => {
                 methods.setRepoWindowOpen(!repoWindowOpen);
               }}
-              ariaLabel="Open Repo Drawer"
+              ariaLabel="Change Repo"
               label="Close"
               otherLabel="Open"
               Icon={AiFillFolderOpen}
