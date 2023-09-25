@@ -207,6 +207,9 @@ const RepoDrawer = () => {
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
+                <Text p={3} size="sm">
+                  Taking too long to load? Try logging out and logging back in.
+                </Text>
               </Stack>
             )}
           </DrawerBody>
