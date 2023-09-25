@@ -30,8 +30,9 @@ const Chat = () => {
   const { user, session, messages, methods, repo }: any = useSessionContext();
 
   useEffect(() => {
-    getPromptCount(user, setPromptCount);
-  }, [user]);
+    if (promptCount != 0) return;
+    getPromptCount(user?.email, setPromptCount);
+  }, [user.email]);
 
   // todo move this to session context
   if (!user) return null;

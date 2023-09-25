@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { SessionProvider } from "@/context/useSessionContext";
 import { ChakraProvider } from "@chakra-ui/provider";
 import theme from "@/app/configs/theme";
-import Home from "./home";
+import Home from "@/app/home";
 const inter = Inter({ subsets: ["latin"] });
 
 const App = async () => {

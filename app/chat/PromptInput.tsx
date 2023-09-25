@@ -30,6 +30,7 @@ interface Props {
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [failMessage, setFailMessage] = useState<string>("");
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
   const { repo, session, methods, repoWindowOpen, branch, messages } =
     useSessionContext();
@@ -38,7 +39,7 @@ export const PromptInput: FC<Props> = (props) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (props.prompt.length === 0 || props.isLoading) return null;
-
+    setHasSentAMessage(true);
     props.onSubmit(props.prompt);
   };
 
@@ -137,11 +138,17 @@ export const PromptInput: FC<Props> = (props) => {
     );
   }
 
-  if (messages.length === 0 && repo.repo !== "") {
+  if (
+    messages.length === 0 &&
+    repo.repo !== "" &&
+    process.env.NEXT_PUBLIC_DEV_MODE !== "true"
+  ) {
     return (
       <Flex flexDirection="row" alignItems="center" mt={5}>
         <Spinner />
-        <Text ml={4}>Training a model with context from your codebase...</Text>
+        <Text ml={4}>
+          Training your model with context from your codebase...
+        </Text>
       </Flex>
     );
   }
@@ -181,7 +188,7 @@ export const PromptInput: FC<Props> = (props) => {
         <Tooltip
           placement="top"
           isOpen
-          label={props.promptCount === 0 && "Write your task for DevGPT here!"}
+          label={!hasSentAMessage && "Write your task for DevGPT here!"}
         >
           <Input
             onKeyDown={(e: any) => {

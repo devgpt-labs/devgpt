@@ -44,6 +44,14 @@ interface ProfileOptionIconButtonProps {
   OtherIcon?: any;
 }
 
+interface Identity {
+  provider: "github" | "gitlab" | "bitbucket" | "mock";
+  avatar_url?: string;
+  name?: string;
+  email?: string;
+  bio?: string;
+}
+
 // TODO: Convert all of the buttons on this menu to use this component
 const ProfileOptionIconButton = ({
   tooltip,
@@ -75,28 +83,29 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, methods, repoWindowOpen, isPro } = useSessionContext();
+  const { user, repoWindowOpen, isPro, methods } = useSessionContext();
+  const [identity, setIdentity] = useState<Identity | null>(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
     defaultIsOpen: false,
   });
-
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const githubIdentity: any = user?.identities?.find(
-    (identity) => identity?.provider === "github"
-  )?.identity_data;
-
   useEffect(() => {
-    getPromptCount(user, setPromptCount);
+    var identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
+    )?.identity_data;
+    setIdentity(identity);
   }, [user]);
 
-  if (!user) return null;
-  if (!user?.identities) return null;
+  useEffect(() => {
+    if (promptCount != 0) return;
+    getPromptCount(user?.email, setPromptCount);
+  }, [user.email, promptCount]);
 
   return (
     <Flex
@@ -119,8 +128,8 @@ const Profile = () => {
         width="100%"
       >
         <Flex flexDirection="row">
-          {githubIdentity.avatar_url && (
-            <Tooltip label="Looking golden! via Github">
+          {identity?.avatar_url && (
+            <Tooltip label={`via ${identity.provider}`}>
               <Image
                 _hover={{
                   boxShadow: "0px 0px 10px 0px gold",
@@ -128,7 +137,7 @@ const Profile = () => {
                   transition: "all 0.2s ease-in-out",
                 }}
                 alt="Avatar"
-                src={githubIdentity.avatar_url}
+                src={identity?.avatar_url}
                 style={{
                   borderRadius: 10,
                   objectFit: "cover",
@@ -141,7 +150,7 @@ const Profile = () => {
           )}
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
-              <Text>{githubIdentity.name}</Text>
+              <Text>{identity?.name}</Text>
               {isPro ? (
                 <Tag ml={2} colorScheme="teal">
                   <Text mr={1}>Pro</Text>
@@ -153,7 +162,7 @@ const Profile = () => {
                 </Tag>
               )}
             </Flex>
-            <Text>{githubIdentity.email}</Text>
+            <Text>{identity?.email}</Text>
           </Box>
         </Flex>
         <Flex flexDirection="row">
@@ -256,14 +265,12 @@ const Profile = () => {
               </Tooltip>
             )}
             <ProfileOptionIconButton
-              tooltip={
-                repoWindowOpen ? "Close Repo Drawer" : "Open Repo Drawer"
-              }
+              tooltip={"Change Repo"}
               comparison={repoWindowOpen}
               onClick={() => {
                 methods.setRepoWindowOpen(!repoWindowOpen);
               }}
-              ariaLabel="Open Repo Drawer"
+              ariaLabel="Change Repo"
               label="Close"
               otherLabel="Open"
               Icon={AiFillFolderOpen}

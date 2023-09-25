@@ -16,26 +16,27 @@ const Home = () => {
       flexDirection="column"
       bg={colorMode === "dark" ? "black" : "whitesmoke"}
       width="100vw"
-      height='100vh'
-      overflowY='scroll'
+      height="100vh"
+      overflowY="scroll"
     >
       {!closed && (
         <Tag
           p={2}
           py={3}
           colorScheme="blue"
-          alignItems='center'
+          alignItems="center"
           justifyContent="center"
           width="100vw"
           flexDirection="row"
           gap={3}
         >
-          <Text>DevGPT is now accessible via the web!</Text>
-          <Text>🎉</Text>
-          <Text>Improved desktop app dropping soon.</Text>
+          <Text>
+            DevGPT is now accessible via the web! 🎉 Improved desktop app coming
+            soon.
+          </Text>
           <CloseIcon
-            cursor='pointer'
-            alignSelf='flex-end'
+            cursor="pointer"
+            alignSelf="flex-end"
             ml={10}
             width="12px"
             height="12px"

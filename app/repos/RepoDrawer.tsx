@@ -16,6 +16,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
+import { mockManager } from "@/app/configs/mockManager";
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 
 //components
@@ -35,6 +36,7 @@ const RepoDrawer = () => {
   const [reposCount, setReposCount] = useState<number>(0);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
+  const [loading, setLoading] = useState(false); // For the refresh debounce
   const btnRef = useRef<any>();
 
   useEffect(() => {
@@ -42,7 +44,30 @@ const RepoDrawer = () => {
     onOpen();
   }, [repoWindowOpen, onOpen]);
 
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchRepos();
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
   useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  const fetchRepos = () => {
+    if (mockManager.isMockIntegrationsEnabled()) {
+      setRepos(mockManager.mockRepos());
+      return;
+    }
+
     if (!session) return;
     if (repos.length > 0) return;
     if (!session?.provider_token) return;
@@ -58,7 +83,11 @@ const RepoDrawer = () => {
       .catch((err: any) => {
         console.log("Failed to get repos:", { err });
       });
-  }, [repos.length, session, user]);
+  };
+
+  useEffect(() => {
+    fetchRepos();
+  }, [user, fetchRepos]);
 
   const onPreviousPage = async () =>
     session?.provider_token &&
@@ -102,7 +131,17 @@ const RepoDrawer = () => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>
-            Select a repo{reposCount ? ` (${reposCount})` : ""}
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text>Select a repo{reposCount ? ` (${reposCount})` : ""}</Text>
+              <Button
+                size="sm"
+                onClick={handleRefresh}
+                isLoading={loading}
+                disabled={loading}
+              >
+                Refresh
+              </Button>
+            </Flex>
           </DrawerHeader>
           <DrawerBody>
             {repos?.length > 0 ? (
