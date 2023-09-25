@@ -48,14 +48,14 @@ const RepoDrawer = () => {
     if (!session?.provider_token) return;
 
     getPaginatedRepos(session?.provider_token)
-      .then((allRepos) => {
+      .then((allRepos: any) => {
         if (allRepos?.nodes?.length) {
           setRepos(allRepos.nodes);
           setReposCount(allRepos.totalCount);
           setPageInfo(allRepos.pageInfo);
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log("Failed to get repos:", { err });
       });
   }, [repos.length, session, user]);
@@ -63,10 +63,9 @@ const RepoDrawer = () => {
   const onPreviousPage = async () =>
     session?.provider_token &&
     getPaginatedRepos(session?.provider_token, pageInfo?.endCursor)
-      .then((allRepos) => {
+      .then((allRepos: any) => {
         if (allRepos?.nodes?.length) {
           setRepos(allRepos.nodes);
-          console.log(allRepos.pageInfo);
           setPageInfo(allRepos.pageInfo);
         }
       })
@@ -77,14 +76,13 @@ const RepoDrawer = () => {
   const onNextPage = async () =>
     session?.provider_token &&
     getPaginatedRepos(session?.provider_token, null, pageInfo?.endCursor)
-      .then((allRepos) => {
+      .then((allRepos: any) => {
         if (allRepos?.nodes?.length) {
           setRepos(allRepos.nodes);
-          console.log(allRepos.pageInfo);
           setPageInfo(allRepos.pageInfo);
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log("Failed to get repos:", { err });
       });
 
