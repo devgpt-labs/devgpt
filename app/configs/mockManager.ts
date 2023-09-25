@@ -3,7 +3,7 @@ class MockConfigurationManager {
 
   constructor() {
     this.config = {
-      MOCK_INTEGRATIONS: 'false',
+      MOCK_INTEGRATIONS: "true",
     };
   }
 
@@ -12,18 +12,18 @@ class MockConfigurationManager {
   }
 
   isMockIntegrationsEnabled(): boolean {
-    return this.config.MOCK_INTEGRATIONS === 'true';
+    return this.config.MOCK_INTEGRATIONS === "true";
   }
 
   mockRepos() {
     return [
       {
-        name: 'SampleRepo1',
-        owner: { login: 'johnDoe' },
+        name: "SampleRepo1",
+        owner: { login: "johnDoe" },
       },
       {
-        name: 'SampleRepo2',
-        owner: { login: 'johnDoe' },
+        name: "SampleRepo2",
+        owner: { login: "johnDoe" },
       },
     ];
   }
@@ -57,8 +57,11 @@ class MockConfigurationManager {
             {
               id: "mock",
               provider: "mock",
-              identity_data: { name: "Mock User", email: "mockEmail@example.com" }
-            }
+              identity_data: {
+                name: "Mock User",
+                email: "mockEmail@example.com",
+              },
+            },
           ],
           factors: [],
         },
@@ -75,8 +78,11 @@ class MockConfigurationManager {
           {
             id: "mock",
             provider: "mock",
-            identity_data: { name: "Mock User", email: "mockEmail@example.com" }
-          }
+            identity_data: {
+              name: "Mock User",
+              email: "mockEmail@example.com",
+            },
+          },
         ],
       },
       isPro: true,

@@ -111,8 +111,9 @@ const Profile = () => {
   }, [user]);
 
   useEffect(() => {
-    getPromptCount(user, setPromptCount);
-  }, [user]);
+    if (promptCount != 0) return;
+    getPromptCount(user?.email, setPromptCount);
+  }, [user.email]);
 
   return (
     <Flex
