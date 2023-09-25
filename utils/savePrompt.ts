@@ -7,7 +7,6 @@ export async function savePrompt(
   prompt: string,
   response: string
 ) {
- 
   if (!email || !prompt || !response) {
     throw new Error("Missing required fields");
   }
@@ -24,7 +23,7 @@ export async function savePrompt(
   }
   const { data, error } = await supabase
     .from("prompts")
-    .insert([{ email_address: email, prompt: prompt, output: response }])
+    .upsert([{ email_address: email, prompt: prompt, output: response }])
     .select();
 
   if (error) {
