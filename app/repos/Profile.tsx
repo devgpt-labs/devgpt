@@ -30,11 +30,7 @@ import {
   GiBattery50,
   GiBattery0,
 } from "react-icons/gi";
-import {
-  MoonIcon,
-  SunIcon,
-  StarIcon,
-} from "@chakra-ui/icons";
+import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
 
 interface ProfileOptionIconButtonProps {
@@ -60,7 +56,10 @@ const ProfileOptionIconButton = ({
   OtherIcon,
 }: ProfileOptionIconButtonProps) => {
   return (
-    <Tooltip label={tooltip ? tooltip : comparison ? label : otherLabel} placement="top">
+    <Tooltip
+      label={tooltip ? tooltip : comparison ? label : otherLabel}
+      placement="top"
+    >
       <IconButton
         _hover={{
           transform: "translateY(-4px)",
@@ -76,14 +75,11 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, methods, repoWindowOpen, isPro, repo } = useSessionContext();
+  const { user, methods, repoWindowOpen, isPro } = useSessionContext();
   const { colorMode, toggleColorMode } = useColorMode();
-  const {
-    isOpen: isSettingsOpen,
-    onOpen: onSettingsOpen,
-    onClose: onSettingsClose,
-    onToggle: onSettingsToggle,
-  } = useDisclosure({ defaultIsOpen: false });
+  const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
+    defaultIsOpen: false,
+  });
 
   const {
     isOpen: isUpgradeOpen,
@@ -97,7 +93,7 @@ const Profile = () => {
 
   useEffect(() => {
     getPromptCount(user, setPromptCount);
-  }, []);
+  }, [user]);
 
   if (!user) return null;
   if (!user?.identities) return null;
@@ -106,7 +102,7 @@ const Profile = () => {
     <Flex
       mt={3}
       flexDirection="column"
-      w="4xl"
+      w="6xl"
       maxW="full"
       rounded="lg"
       className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -166,8 +162,9 @@ const Profile = () => {
               <Flex gap={2}>
                 {!isPro && (
                   <Tooltip
-                    label={`${10 - promptCount
-                      }/10 Free Prompts Remaining Today`}
+                    label={`${
+                      10 - promptCount
+                    }/10 Free Prompts Remaining Today`}
                     placement="top"
                   >
                     <IconButton
@@ -259,7 +256,9 @@ const Profile = () => {
               </Tooltip>
             )}
             <ProfileOptionIconButton
-              tooltip={repoWindowOpen ? "Close Repo Drawer" : "Open Repo Drawer"}
+              tooltip={
+                repoWindowOpen ? "Close Repo Drawer" : "Open Repo Drawer"
+              }
               comparison={repoWindowOpen}
               onClick={() => {
                 methods.setRepoWindowOpen(!repoWindowOpen);

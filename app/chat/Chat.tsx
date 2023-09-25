@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "@/context/useSessionContext";
-import { Box, Tooltip, Flex, Text, SkeletonText } from "@chakra-ui/react";
+import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
 
 //prompts
 import userPrompt from "@/app/prompts/user";
@@ -31,7 +31,7 @@ const Chat = () => {
 
   useEffect(() => {
     getPromptCount(user, setPromptCount);
-  }, []);
+  }, [user]);
 
   // todo move this to session context
   if (!user) return null;
@@ -108,7 +108,7 @@ const Chat = () => {
   };
 
   return (
-    <Flex direction="column" maxW="full">
+    <Flex direction="column" w="full" maxW="6xl">
       <Box
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"

@@ -32,10 +32,11 @@ const RepoDrawer = () => {
   useEffect(() => {
     if (repoWindowOpen === null) return;
     onOpen();
-  }, [repoWindowOpen]);
+  }, [repoWindowOpen, onOpen]);
 
   useEffect(() => {
     if (!session) return;
+    if (repos.length > 0) return;
 
     getRepos(session?.provider_token)
       .then((allRepos) => {
@@ -44,7 +45,7 @@ const RepoDrawer = () => {
       .catch((err) => {
         console.log("Failed to get repos:", { err });
       });
-  }, [user]);
+  }, [user, session]);
 
   if (!user) {
     return null;
@@ -66,7 +67,7 @@ const RepoDrawer = () => {
             {repos?.length > 0 ? (
               <>
                 <Input
-                  placeholder='Search repos'
+                  placeholder="Search repos"
                   value={filter}
                   onChange={(e) => {
                     setFilter(e.target.value);
@@ -78,7 +79,7 @@ const RepoDrawer = () => {
                       .toLowerCase()
                       .includes(filter.toLowerCase());
                   })
-                  ?.map((repoOption, index) => {
+                  ?.map((repoOption) => {
                     return (
                       <Flex
                         key={repoOption.name + repoOption.owner.login}
@@ -109,7 +110,7 @@ const RepoDrawer = () => {
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                            repo.owner === repoOption.owner.login
+                          repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>

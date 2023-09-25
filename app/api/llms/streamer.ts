@@ -25,15 +25,15 @@ const recoverContent = (str: string) => {
 };
 
 export type StreamEvents = {
-  onError: (error: unknown) => void;
+  onError: (_error: unknown) => void;
   onComplete: () => void;
-  onData: (data: string) => void;
+  onData: (_data: string) => void;
 };
 
 export class Streamer {
-  private onError: (error: unknown) => void;
+  private onError: (_error: unknown) => void;
   private onComplete: () => void;
-  private onData: (data: string) => void;
+  private onData: (_data: string) => void;
 
   constructor(streamEvent: StreamEvents) {
     this.onError = streamEvent.onError;
