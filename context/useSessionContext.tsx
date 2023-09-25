@@ -77,61 +77,45 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       });
     }
   };
-
   useEffect(() => {
-    if (isMockEnabled) {
-      setUser(mockManager.mockData().user as unknown as User);
-      setSession(mockManager.mockData().session as unknown as Session);
-      setIsPro(mockManager.mockData().isPro);
-      setRepo(mockManager.mockData().repo);
-      setLofaf(mockManager.mockData().lofaf);
-      setTechStack(mockManager.mockData().techStack);
-      setContext(mockManager.mockData().context);
-      setBranch(mockManager.mockData().branch);
-      setMessages(mockManager.mockData().messages);
-      return;
-    }
-
-    if (
-      lastUsedTrainingSettings?.repo !== repo?.repo ||
-      lastUsedTrainingSettings?.owner !== repo?.owner ||
-      lastUsedTrainingSettings?.lofaf.length !== lofaf?.length
-    ) {
-      setMessages([]); //reset messages
-      setupContextMessages();
-    }
-  }, [lofaf, repo, session, user, repo.repo]);
-
-  useEffect(() => {
-    if (isMockEnabled) {
-      setUser(mockManager.mockData().user as unknown as User);
-      setSession(mockManager.mockData().session as unknown as Session);
-      setIsPro(mockManager.mockData().isPro);
-      setRepo(mockManager.mockData().repo);
-      setLofaf(mockManager.mockData().lofaf);
-      setTechStack(mockManager.mockData().techStack);
-      setContext(mockManager.mockData().context);
-      setBranch(mockManager.mockData().branch);
-      setMessages(mockManager.mockData().messages);
+    if (isMockEnabled && !user) {
+      const mockData = mockManager.mockData();
+      setUser(mockData.user as unknown as User);
+      setSession(mockData.session as unknown as Session);
+      setIsPro(mockData.isPro);
+      setRepo(mockData.repo);
+      setLofaf(mockData.lofaf);
+      setTechStack(mockData.techStack);
+      setContext(mockData.context);
+      setBranch(mockData.branch);
+      setMessages(mockData.messages);
     } else {
+      if (
+        messages.length === 0 ||
+        lastUsedTrainingSettings?.repo !== repo?.repo ||
+        lastUsedTrainingSettings?.owner !== repo?.owner ||
+        lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+      ) {
+        setMessages([]); // reset messages
+        setupContextMessages();
+      }
+
       if (supabase) {
         const setData = async () => {
           const {
             data: { session },
             error,
-            // @ts-ignore
+            //@ts-ignore
           } = await supabase.auth.getSession();
           if (error) throw error;
           setSession(session);
-          // @ts-ignore
-          setUser(session?.user);
+          setUser(session?.user as unknown as User);
         };
 
         const { data: listener } = supabase.auth.onAuthStateChange(
           (_event, session) => {
             setSession(session);
-            // @ts-ignore
-            setUser(session?.user);
+            setUser(session?.user as unknown as User);
           }
         );
 
@@ -141,25 +125,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           listener?.subscription.unsubscribe();
         };
       }
-    }
-  }, [isMockEnabled]);
 
-  useEffect(() => {
-    if (!mockManager.isMockIntegrationsEnabled()) {
-      if (
-        messages.length === 0 ||
-        lastUsedTrainingSettings?.repo !== repo?.repo ||
-        lastUsedTrainingSettings?.owner !== repo?.owner ||
-        lastUsedTrainingSettings?.lofaf.length !== lofaf.length
-      ) {
-        setMessages([]);
-        setupContextMessages();
-      }
-    }
-  }, [lofaf, session, user, repo]);
-
-  useEffect(() => {
-    if (!mockManager.isMockIntegrationsEnabled()) {
       const loadPaymentStatus = async () => {
         const githubIdentity: any = user?.identities?.find(
           (identity) => identity?.provider === "github"
@@ -169,7 +135,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       };
       loadPaymentStatus();
     }
-  }, [user]);
+  }, [isMockEnabled, lofaf, session, user, repo.repo]);
 
   const value = {
     repoWindowOpen,
