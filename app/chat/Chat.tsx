@@ -29,8 +29,6 @@ const Chat = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const { user, session, messages, methods, repo }: any = useSessionContext();
 
-  console.log({ session })
-
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
