@@ -62,15 +62,6 @@ const RepoDrawer = () => {
     }
   }, [loading]);
 
-  useEffect(() => {
-    if (repoWindowOpen === null) return;
-    onOpen();
-  }, [repoWindowOpen]);
-
-  useEffect(() => {
-    fetchRepos();
-  }, [user]);
-
   const fetchRepos = () => {
     if (mockManager.isMockIntegrationsEnabled()) {
       setRepos(mockManager.mockRepos());
@@ -93,6 +84,10 @@ const RepoDrawer = () => {
         console.log("Failed to get repos:", { err });
       });
   };
+
+  useEffect(() => {
+    fetchRepos();
+  }, [user, fetchRepos]);
 
   const onPreviousPage = async () =>
     session?.provider_token &&

@@ -44,11 +44,6 @@ interface ProfileOptionIconButtonProps {
   OtherIcon?: any;
 }
 
-interface ProviderIdentity {
-  provider: string;
-  identity_data: Identity;
-}
-
 interface Identity {
   provider: "github" | "gitlab" | "bitbucket" | "mock";
   avatar_url?: string;
@@ -88,15 +83,12 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, repoWindowOpen, isPro, repo, methods } = useSessionContext();
+  const { user, repoWindowOpen, isPro, methods } = useSessionContext();
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { colorMode, toggleColorMode } = useColorMode();
-  const {
-    isOpen: isSettingsOpen,
-    onOpen: onSettingsOpen,
-    onClose: onSettingsClose,
-    onToggle: onSettingsToggle,
-  } = useDisclosure({ defaultIsOpen: false });
+  const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
+    defaultIsOpen: false,
+  });
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
@@ -113,7 +105,7 @@ const Profile = () => {
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
-  }, [user.email]);
+  }, [user.email, promptCount]);
 
   return (
     <Flex
