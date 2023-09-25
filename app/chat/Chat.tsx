@@ -1,29 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { ConversationStyleToggle } from "./RateConversation";
-import { Header } from "./ChatHeader";
-import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
-import Profile from "@/app/repos/Profile";
-=======
-import { useSessionContext } from "@/context/useSessionContext";
-import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
->>>>>>> main
 
 //prompts
 import userPrompt from "@/app/prompts/user";
 
 //components
 import Response from "@/app/components/Response";
-<<<<<<< HEAD
-=======
 import Profile from "@/app/repos/Profile";
 import { PromptInput } from "./PromptInput";
 import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
->>>>>>> main
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";

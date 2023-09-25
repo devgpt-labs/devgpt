@@ -30,15 +30,7 @@ import {
   GiBattery50,
   GiBattery0,
 } from "react-icons/gi";
-<<<<<<< HEAD
-import {
-  MoonIcon,
-  SunIcon,
-  StarIcon,
-} from "@chakra-ui/icons";
-=======
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
->>>>>>> main
 import { FaBug } from "react-icons/fa";
 
 interface ProfileOptionIconButtonProps {
@@ -58,11 +50,11 @@ interface ProviderIdentity {
 }
 
 interface Identity {
-  provider: 'github' | 'gitlab' | 'bitbucket' | 'mock';
+  provider: "github" | "gitlab" | "bitbucket" | "mock";
   avatar_url?: string;
   name?: string;
   email?: string;
-  bio?: string; 
+  bio?: string;
 }
 
 // TODO: Convert all of the buttons on this menu to use this component
@@ -96,8 +88,7 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-<<<<<<< HEAD
-  const { user, methods, repoWindowOpen, isPro, repo } = useSessionContext();
+  const { user, repoWindowOpen, isPro, repo } = useSessionContext();
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const {
@@ -106,25 +97,15 @@ const Profile = () => {
     onClose: onSettingsClose,
     onToggle: onSettingsToggle,
   } = useDisclosure({ defaultIsOpen: false });
-=======
-  const { user, methods, repoWindowOpen, isPro } = useSessionContext();
-  const { colorMode, toggleColorMode } = useColorMode();
-  const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
-    defaultIsOpen: false,
-  });
-
->>>>>>> main
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
   } = useDisclosure({ defaultIsOpen: false });
 
-
   useEffect(() => {
-    var identity = user?.identities?.find(
-      (identity: { provider: string; }) =>
-        ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
+    var identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
     )?.identity_data;
     setIdentity(identity);
   }, [user]);

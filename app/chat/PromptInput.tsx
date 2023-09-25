@@ -30,13 +30,9 @@ interface Props {
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [failMessage, setFailMessage] = useState<string>("");
-<<<<<<< HEAD
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
-  const { repo, session, methods, repoWindowOpen, branch, user, messages } =
-=======
   const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
   const { repo, session, methods, repoWindowOpen, branch, messages } =
->>>>>>> main
     useSessionContext();
   const toast = useToast();
 
@@ -141,8 +137,12 @@ export const PromptInput: FC<Props> = (props) => {
       </>
     );
   }
-  
-  if ((messages.length === 0 && repo.repo !== "") && process.env.NODE_ENV !== 'development') {
+
+  if (
+    messages.length === 0 &&
+    repo.repo !== "" &&
+    process.env.NODE_ENV !== "development"
+  ) {
     return (
       <Flex flexDirection="row" alignItems="center" mt={5}>
         <Spinner />
@@ -150,7 +150,6 @@ export const PromptInput: FC<Props> = (props) => {
       </Flex>
     );
   }
-
 
   return (
     <Flex flexDirection="column">

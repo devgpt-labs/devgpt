@@ -3,16 +3,12 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import { Repo } from "@/app/types/prompts";
 import { Message } from "@/app/types/chat";
-<<<<<<< HEAD
-=======
 
 //utils
 import { checkIfPro } from "@/utils/checkIfPro";
 
 //prompts
->>>>>>> main
 import createContextMessages from "@/utils/addContextMessages";
-import { checkIfPro } from "@/utils/checkIfPro";
 import { mockManager } from "@/app/configs/mockManager";
 import { SessionOptions } from "http2";
 
@@ -46,8 +42,9 @@ const defaultContext: any = {
 const SessionContext = createContext(defaultContext);
 const isMockEnabled = mockManager.isMockIntegrationsEnabled();
 
-
-export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
+export const SessionProvider: React.FC<SessionProviderProps> = ({
+  children,
+}) => {
   const [repoWindowOpen, setRepoWindowOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [isPro, setIsPro] = useState<boolean>(false);
@@ -58,7 +55,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   const [context, setContext] = useState<string>("");
   const [branch, setBranch] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [lastUsedTrainingSettings, setLastUsedTrainingSettings] = useState<any>(null);
+  const [lastUsedTrainingSettings, setLastUsedTrainingSettings] =
+    useState<any>(null);
 
   const setupContextMessages = () => {
     if (messages.length === 0) {
@@ -81,7 +79,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   };
 
   useEffect(() => {
-<<<<<<< HEAD
     if (isMockEnabled) {
       setUser(mockManager.mockData().user as unknown as User);
       setSession(mockManager.mockData().session as unknown as Session);
@@ -92,11 +89,11 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       setContext(mockManager.mockData().context);
       setBranch(mockManager.mockData().branch);
       setMessages(mockManager.mockData().messages);
-    } else {
-  
-      if (supabase) {
-        const setData = async () => {
-=======
+      return;
+    }
+
+    if (!supabase) return;
+
     if (
       lastUsedTrainingSettings?.repo !== repo?.repo ||
       lastUsedTrainingSettings?.owner !== repo?.owner ||
@@ -112,7 +109,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     if (supabase) {
       const setData = async () => {
         if (supabase) {
->>>>>>> main
           const {
             data: { session },
             error,
@@ -122,20 +118,22 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
           setSession(session);
           // @ts-ignore
           setUser(session?.user);
-        };
+        }
 
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-          setSession(session);
-          // @ts-ignore
-          setUser(session?.user);
-        });
+        const { data: listener } = supabase.auth.onAuthStateChange(
+          (_event, session) => {
+            setSession(session);
+            // @ts-ignore
+            setUser(session?.user);
+          }
+        );
 
         setData();
 
         return () => {
           listener?.subscription.unsubscribe();
         };
-      }
+      };
     }
   }, [isMockEnabled]);
 
@@ -176,7 +174,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     techStack,
     context,
     branch,
-    messages, 
+    messages,
     methods: {
       setRepoWindowOpen,
       signOut: () => {
