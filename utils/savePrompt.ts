@@ -23,8 +23,7 @@ export async function savePrompt(
   }
   const { data, error } = await supabase
     .from("prompts")
-    .upsert([{ email_address: email, prompt: prompt, output: response }])
-    .select();
+    .insert([{ email_address: email, prompt: prompt, output: response }]);
 
   if (error) {
     console.error(error);
