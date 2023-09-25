@@ -11,7 +11,7 @@ const signInWithBitbucket = async () => {
 	await supabase.auth.signInWithOAuth({
 		provider: "bitbucket",
 		options: {
-			scopes: "repo"
+			scopes: "repository",
 		},
 	});
 };

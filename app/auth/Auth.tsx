@@ -36,21 +36,21 @@ const Auth = () => {
           Icon={BsGithub}
         />
         <GitConnectorButton
-          color="#FC6D27"
-          provider="Sign In With GitLab"
-          setLoading={setLoading}
-          loading={loading}
-          handle={signInWithGitlab}
-          Icon={AiFillGitlab}
-          tooltip="Coming soon!"
-        />
-        <GitConnectorButton
           color="#0c61db"
           provider="Sign In With BitBucket"
           setLoading={setLoading}
           loading={loading}
           handle={signInWithBitbucket}
           Icon={FaBitbucket}
+          tooltip="Coming soon!"
+        />
+        <GitConnectorButton
+          color="#FC6D27"
+          provider="Sign In With GitLab"
+          setLoading={setLoading}
+          loading={loading}
+          handle={signInWithGitlab}
+          Icon={AiFillGitlab}
           tooltip="Coming soon!"
         />
         <Heading size="xs" mt="2">

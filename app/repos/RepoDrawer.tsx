@@ -14,6 +14,8 @@ import {
   useDisclosure,
   Skeleton,
   Stack,
+  InputRightElement,
+  InputGroup,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
 import { mockManager } from "@/app/configs/mockManager";
@@ -133,27 +135,33 @@ const RepoDrawer = () => {
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
               <Text>Select a repo{reposCount ? ` (${reposCount})` : ""}</Text>
-              <Button
-                size="sm"
-                onClick={handleRefresh}
-                isLoading={loading}
-                disabled={loading}
-              >
-                Refresh
-              </Button>
             </Flex>
           </DrawerHeader>
           <DrawerBody>
             {repos?.length > 0 ? (
               <>
-                <Input
-                  className="mb-2"
-                  placeholder="Search repos"
-                  value={filter}
-                  onChange={(e) => {
-                    setFilter(e.target.value);
-                  }}
-                />
+                <InputGroup>
+                  <Input
+                    pr='4.5rem'
+                    className="mb-2"
+                    placeholder="Search repos"
+                    value={filter}
+                    onChange={(e) => {
+                      setFilter(e.target.value);
+                    }}
+                  />
+                  <InputRightElement width='4.5rem' mr={1}>
+                    <Button
+                      size="sm"
+                      onClick={handleRefresh}
+                      isLoading={loading}
+                      disabled={loading}
+                    >
+                      Refresh
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+
                 {repos
                   .filter((repoOption) => {
                     return repoOption.name
@@ -191,7 +199,7 @@ const RepoDrawer = () => {
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                          repo.owner === repoOption.owner.login
+                            repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>
