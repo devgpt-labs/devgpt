@@ -36,6 +36,7 @@ const RepoDrawer = () => {
 
   useEffect(() => {
     if (!session) return;
+    if (repos.length > 0) return;
 
     getRepos(session?.provider_token)
       .then((allRepos) => {

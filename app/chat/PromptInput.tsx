@@ -30,6 +30,7 @@ interface Props {
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [failMessage, setFailMessage] = useState<string>("");
+  const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
   const { repo, session, methods, repoWindowOpen, branch, messages } =
     useSessionContext();
   const toast = useToast();
@@ -77,6 +78,15 @@ export const PromptInput: FC<Props> = (props) => {
       return;
     }
 
+    if (
+      previousLofafSettings?.owner === repo?.owner &&
+      previousLofafSettings?.repo === repo?.repo &&
+      previousLofafSettings?.branch === branch
+    ) {
+      //skip if we already have the files for this repo
+      return;
+    }
+
     getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
       .then((files: any) => {
         if (!files) return;
@@ -84,6 +94,12 @@ export const PromptInput: FC<Props> = (props) => {
         // Move this to global session
         const repoFiles = files?.tree?.map((file: any) => {
           return file.path;
+        });
+
+        setPreviousLofafSettings({
+          owner: repo.owner,
+          repo: repo.repo,
+          branch: branch,
         });
 
         methods.setLofaf(repoFiles);

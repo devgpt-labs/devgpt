@@ -16,7 +16,7 @@ const createContextMessages = async (
 ) => {
   let newMessages: any = messages;
 
-  if (!lofaf) {
+  if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
     return newMessages;
   }
 

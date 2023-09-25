@@ -101,12 +101,12 @@ export const SessionProvider = ({ children }: any) => {
     if (
       lastUsedTrainingSettings?.repo !== repo?.repo ||
       lastUsedTrainingSettings?.owner !== repo?.owner ||
-      lastUsedTrainingSettings?.lofaf.length !== lofaf.length
+      lastUsedTrainingSettings?.lofaf.length !== lofaf?.length
     ) {
       setMessages([]); //reset messages
       setupContextMessages();
     }
-  }, [lofaf, repo, session, user, repo?.repo]);
+  }, [lofaf, repo, session, user, repo.repo]);
 
   useEffect(() => {
     //set user and session

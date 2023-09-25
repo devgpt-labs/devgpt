@@ -108,7 +108,7 @@ const Chat = () => {
   };
 
   return (
-    <Flex direction="column" maxW="full">
+    <Flex direction="column" w="full" maxW="6xl">
       <Box
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"

@@ -102,7 +102,7 @@ const Profile = () => {
     <Flex
       mt={3}
       flexDirection="column"
-      w="4xl"
+      w="6xl"
       maxW="full"
       rounded="lg"
       className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
