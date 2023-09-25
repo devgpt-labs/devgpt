@@ -73,24 +73,24 @@ export const PromptInput: FC<Props> = (props) => {
   };
 
   useEffect(() => {
-    setAllFiles([]);
-
     if (!repo.owner || !repo.repo || !session?.provider_token) {
+      // No details provided, skip.
+      console.log("No repo provided.");
+
       return;
     }
 
-    if (
-      previousLofafSettings?.owner === repo?.owner &&
-      previousLofafSettings?.repo === repo?.repo &&
-      previousLofafSettings?.branch === branch
-    ) {
-      //skip if we already have the files for this repo
-      return;
+    if (previousLofafSettings.owner === repo.owner || previousLofafSettings.repo === repo.repo || previousLofafSettings.branch === branch) {
+      // This repo has already been scanned, skip.
+      console.log("Repo already been scanned.");
+      return
     }
 
     getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
       .then((files: any) => {
-        if (!files) return;
+        if (!files) {
+          console.log("Return early, no files found.");
+        }
 
         // Move this to global session
         const repoFiles = files?.tree?.map((file: any) => {
@@ -118,7 +118,7 @@ export const PromptInput: FC<Props> = (props) => {
         methods.setRepo({ owner: "", repo: "" });
         console.error({ err });
       });
-  }, [repo.owner, repo.repo, branch, methods, session?.provider_token, toast]);
+  }, [repo.owner, repo.repo, branch, session?.provider_token, toast, methods]);
 
   if (repo.repo === "") {
     return (

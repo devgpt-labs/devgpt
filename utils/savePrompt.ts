@@ -13,8 +13,7 @@ export async function savePrompt(
   }
 
   if (mockManager.isMockIntegrationsEnabled()) {
-    console.log("In development mode. Not saving to Supabase.");
-    console.log({ email, prompt, response });
+    // "In development mode. Not saving to Supabase."
     // Mock a response
     return { email_address: email, prompt: prompt, output: response };
   }

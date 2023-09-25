@@ -4,8 +4,6 @@ import { supabase } from "@/utils/supabase";
 const getPromptCount = async (emailAddress: string, setPromptCount: any) => {
   if (!supabase) return;
 
-  console.log("getting prompt count...");
-
   const { data, error } = await supabase
     .from("prompts")
     .select("id")
