@@ -31,7 +31,7 @@ const userInput = async (
   );
 
   prompt = `
-		${prompt}, please use the code in our conversation so far as a guide.
+		Please ${prompt}
 
 		${
       existing_code.length > 0

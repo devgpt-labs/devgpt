@@ -22,16 +22,21 @@ import { BsHourglassSplit } from "react-icons/bs";
 interface Props {
   promptCount: number;
   prompt: string;
-  setPrompt: (prompt: string) => void;
-  onSubmit: (prompt: string) => void;
+  setPrompt: (_prompt: string) => void;
+  onSubmit: (_prompt: string) => void;
   isLoading: boolean;
 }
 
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [failMessage, setFailMessage] = useState<string>("");
+<<<<<<< HEAD
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const { repo, session, methods, repoWindowOpen, branch, user, messages } =
+=======
+  const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
+  const { repo, session, methods, repoWindowOpen, branch, messages } =
+>>>>>>> main
     useSessionContext();
   const toast = useToast();
 
@@ -78,6 +83,15 @@ export const PromptInput: FC<Props> = (props) => {
       return;
     }
 
+    if (
+      previousLofafSettings?.owner === repo?.owner &&
+      previousLofafSettings?.repo === repo?.repo &&
+      previousLofafSettings?.branch === branch
+    ) {
+      //skip if we already have the files for this repo
+      return;
+    }
+
     getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
       .then((files: any) => {
         if (!files) return;
@@ -85,6 +99,12 @@ export const PromptInput: FC<Props> = (props) => {
         // Move this to global session
         const repoFiles = files?.tree?.map((file: any) => {
           return file.path;
+        });
+
+        setPreviousLofafSettings({
+          owner: repo.owner,
+          repo: repo.repo,
+          branch: branch,
         });
 
         methods.setLofaf(repoFiles);
@@ -100,8 +120,9 @@ export const PromptInput: FC<Props> = (props) => {
           `There was an error fetching your repo files for ${repo.repo}. This is likely due to an incorrect branch name. You can change the branch name being used in "Settings", the default branch name is "main"`
         );
         methods.setRepo({ owner: "", repo: "" });
+        console.error({ err });
       });
-  }, [repo.owner, repo.repo, branch]);
+  }, [repo.owner, repo.repo, branch, methods, session?.provider_token, toast]);
 
   if (repo.repo === "") {
     return (
@@ -148,7 +169,6 @@ export const PromptInput: FC<Props> = (props) => {
                 <Tag
                   mr={1}
                   mb={1}
-                  autoFocus
                   key={file}
                   cursor="pointer"
                   onClick={() => handleKeyDown(file)}
@@ -188,7 +208,6 @@ export const PromptInput: FC<Props> = (props) => {
             onChange={(e) => {
               props.setPrompt(e.target.value);
             }}
-            autoFocus
             value={props.prompt}
             type="text"
             id="message"

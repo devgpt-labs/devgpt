@@ -16,7 +16,7 @@ const createContextMessages = async (
 ) => {
   let newMessages: any = messages;
 
-  if (!lofaf) {
+  if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
     return newMessages;
   }
 
@@ -218,7 +218,13 @@ const addMessage = async (
 
   messages.push({
     role: "assistant",
-    content: String(assistantMessage),
+    content: String(`
+		I'd love to help! Here's what I came up with:
+		
+		\`\`\`
+		${assistantMessage}
+		\`\`\`
+		`),
   });
 
   return messages;

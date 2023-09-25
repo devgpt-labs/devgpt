@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Flex, Tag, Box, useColorMode } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import { vscDarkPlus, oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import {
+  vscDarkPlus,
+  oneLight,
+} from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";
@@ -13,21 +16,20 @@ interface ResponseProps {
 }
 
 const Response = ({ content }: ResponseProps) => {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    setCopied(false)
-  }, [content])
+    setCopied(false);
+  }, [content]);
 
-  const theme = colorMode === 'light' ? oneLight : vscDarkPlus
+  const theme = colorMode === "light" ? oneLight : vscDarkPlus;
 
   return (
-    <Flex flex={1} my={1} flexDirection={"column"} whiteSpace='pre-wrap'>
+    <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
       <ReactMarkdown
-
         components={{
-          code({ node, inline, className, children, ...props }) {
+          code({ inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
@@ -46,12 +48,12 @@ const Response = ({ content }: ResponseProps) => {
                     PreTag="div"
                   />
                   <Tag
-                    size='lg'
+                    size="lg"
                     cursor={"pointer"}
                     colorScheme="whatsapp"
                     onClick={() => {
                       copyToClipboard(String(children));
-                      setCopied(true)
+                      setCopied(true);
                     }}
                   >
                     {copied ? "Copied!" : "Copy"}

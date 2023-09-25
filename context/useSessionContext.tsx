@@ -3,6 +3,14 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import { Repo } from "@/app/types/prompts";
 import { Message } from "@/app/types/chat";
+<<<<<<< HEAD
+=======
+
+//utils
+import { checkIfPro } from "@/utils/checkIfPro";
+
+//prompts
+>>>>>>> main
 import createContextMessages from "@/utils/addContextMessages";
 import { checkIfPro } from "@/utils/checkIfPro";
 import { mockManager } from "@/app/configs/mockManager";
@@ -73,6 +81,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   };
 
   useEffect(() => {
+<<<<<<< HEAD
     if (isMockEnabled) {
       setUser(mockManager.mockData().user as unknown as User);
       setSession(mockManager.mockData().session as unknown as Session);
@@ -87,6 +96,23 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   
       if (supabase) {
         const setData = async () => {
+=======
+    if (
+      lastUsedTrainingSettings?.repo !== repo?.repo ||
+      lastUsedTrainingSettings?.owner !== repo?.owner ||
+      lastUsedTrainingSettings?.lofaf.length !== lofaf?.length
+    ) {
+      setMessages([]); //reset messages
+      setupContextMessages();
+    }
+  }, [lofaf, repo, session, user, repo.repo]);
+
+  useEffect(() => {
+    //set user and session
+    if (supabase) {
+      const setData = async () => {
+        if (supabase) {
+>>>>>>> main
           const {
             data: { session },
             error,

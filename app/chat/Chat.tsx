@@ -1,17 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { ConversationStyleToggle } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import { PromptInput } from "./PromptInput";
 import { useSessionContext } from "@/context/useSessionContext";
 import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
 import Profile from "@/app/repos/Profile";
+=======
+import { useSessionContext } from "@/context/useSessionContext";
+import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
+>>>>>>> main
 
 //prompts
 import userPrompt from "@/app/prompts/user";
 
 //components
 import Response from "@/app/components/Response";
+<<<<<<< HEAD
+=======
+import Profile from "@/app/repos/Profile";
+import { PromptInput } from "./PromptInput";
+import { ConversationStyleToggle } from "./RateConversation";
+import { Header } from "./ChatHeader";
+>>>>>>> main
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
@@ -31,7 +43,7 @@ const Chat = () => {
 
   useEffect(() => {
     getPromptCount(user, setPromptCount);
-  }, []);
+  }, [user]);
 
   // todo move this to session context
   if (!user) return null;
@@ -54,7 +66,7 @@ const Chat = () => {
     const tokenLimit = await getTokenLimit(user.email);
     const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 10 && !isPro) {
+    if (promptCount > 75 && !isPro) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
@@ -108,14 +120,11 @@ const Chat = () => {
   };
 
   return (
-    <Flex direction="column" maxW="full" flex={{ md: "initial", base: 1 }}>
+    <Flex direction="column" w="full" maxW="6xl">
       <Box
-        w="4xl"
-        maxW="full"
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-        flex={{ md: "initial", base: 1 }}
-        justifyContent={{ md: "flex-start", base: "space-between" }}
+        justifyContent="flex-start"
       >
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">

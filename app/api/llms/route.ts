@@ -20,8 +20,8 @@ export async function POST(request: Request) {
         ...payload.messages, // returning the sent messages
         {
           role: "bot",
-          content: `Mock response for: ${lastMessage}`
-        }
+          content: `Mock response for: ${lastMessage}`,
+        },
       ],
     };
     return new Response(JSON.stringify(mockResponse));

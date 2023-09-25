@@ -16,8 +16,16 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSessionContext } from "@/context/useSessionContext";
-import getRepos from "@/utils/github/getRepos";
-import { mockManager } from "@/app/configs/mockManager"; 
+import { mockManager } from "@/app/configs/mockManager";
+import { getPaginatedRepos } from "@/utils/github/getRepos";
+
+//components
+type PageInfo = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+};
 
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
@@ -25,28 +33,16 @@ const RepoDrawer = () => {
   });
   const { repo, methods, session, user, repoWindowOpen } = useSessionContext();
   const [repos, setRepos] = useState<any[]>([]);
+  const [reposCount, setReposCount] = useState<number>(0);
+  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
   const [loading, setLoading] = useState(false); // For the refresh debounce
   const btnRef = useRef<any>();
 
-
-
-  const fetchRepos = () => {
-    if (mockManager.isMockIntegrationsEnabled()) {
-      setRepos(mockManager.mockRepos());
-      return;
-    }
-  
-    if (!session) return;
-  
-    getRepos(session?.provider_token)
-      .then((allRepos) => {
-        setRepos(allRepos);
-      })
-      .catch((err) => {
-        console.log("Failed to get repos:", { err });
-      });
-  };
+  useEffect(() => {
+    if (repoWindowOpen === null) return;
+    onOpen();
+  }, [repoWindowOpen, onOpen]);
 
   const handleRefresh = () => {
     setLoading(true);
@@ -75,6 +71,55 @@ const RepoDrawer = () => {
     fetchRepos();
   }, [user]);
 
+  const fetchRepos = () => {
+    if (mockManager.isMockIntegrationsEnabled()) {
+      setRepos(mockManager.mockRepos());
+      return;
+    }
+
+    if (!session) return;
+    if (repos.length > 0) return;
+    if (!session?.provider_token) return;
+
+    getPaginatedRepos(session?.provider_token)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setReposCount(allRepos.totalCount);
+          setPageInfo(allRepos.pageInfo);
+        }
+      })
+      .catch((err: any) => {
+        console.log("Failed to get repos:", { err });
+      });
+  };
+
+  const onPreviousPage = async () =>
+    session?.provider_token &&
+    getPaginatedRepos(session?.provider_token, pageInfo?.endCursor)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setPageInfo(allRepos.pageInfo);
+        }
+      })
+      .catch((err) => {
+        console.log("Failed to get repos:", { err });
+      });
+
+  const onNextPage = async () =>
+    session?.provider_token &&
+    getPaginatedRepos(session?.provider_token, null, pageInfo?.endCursor)
+      .then((allRepos: any) => {
+        if (allRepos?.nodes?.length) {
+          setRepos(allRepos.nodes);
+          setPageInfo(allRepos.pageInfo);
+        }
+      })
+      .catch((err: any) => {
+        console.log("Failed to get repos:", { err });
+      });
+
   if (!user) {
     return null;
   }
@@ -92,8 +137,13 @@ const RepoDrawer = () => {
           <DrawerCloseButton />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
-              <Text>Select a repo</Text>
-              <Button size="sm" onClick={handleRefresh} isLoading={loading} disabled={loading}>
+              <Text>Select a repo{reposCount ? ` (${reposCount})` : ""}</Text>
+              <Button
+                size="sm"
+                onClick={handleRefresh}
+                isLoading={loading}
+                disabled={loading}
+              >
                 Refresh
               </Button>
             </Flex>
@@ -102,7 +152,8 @@ const RepoDrawer = () => {
             {repos?.length > 0 ? (
               <>
                 <Input
-                  placeholder='Search repos'
+                  className="mb-2"
+                  placeholder="Search repos"
                   value={filter}
                   onChange={(e) => {
                     setFilter(e.target.value);
@@ -114,7 +165,7 @@ const RepoDrawer = () => {
                       .toLowerCase()
                       .includes(filter.toLowerCase());
                   })
-                  ?.map((repoOption, index) => {
+                  ?.map((repoOption) => {
                     return (
                       <Flex
                         key={repoOption.name + repoOption.owner.login}
@@ -145,7 +196,7 @@ const RepoDrawer = () => {
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                            repo.owner === repoOption.owner.login
+                          repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>
@@ -164,7 +215,22 @@ const RepoDrawer = () => {
               </Stack>
             )}
           </DrawerBody>
-          <DrawerFooter />
+          {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
+            <DrawerFooter className="gap-2">
+              <>
+                {pageInfo.hasPreviousPage && (
+                  <Button size="sm" variant="outline" onClick={onPreviousPage}>
+                    Previous
+                  </Button>
+                )}
+                {pageInfo.hasNextPage && (
+                  <Button size="sm" variant="outline" onClick={onNextPage}>
+                    Next
+                  </Button>
+                )}
+              </>
+            </DrawerFooter>
+          )}
         </DrawerContent>
       </Drawer>
     </>
