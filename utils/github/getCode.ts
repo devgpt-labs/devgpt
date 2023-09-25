@@ -1,6 +1,12 @@
-const getCode = async (owner: any, repo: any, path: any, access_token: any) => {
-  // Define the GitHub API URL for getting repository contents
-  const api_url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+const getCode = async (
+  owner: any,
+  repo: any,
+  path: any,
+  access_token: any,
+  branch: any
+) => {
+  // Define the GitHub API URL for getting repository contents with the specified branch
+  const api_url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
   // Set up headers with the access token for authentication
   const headers = {

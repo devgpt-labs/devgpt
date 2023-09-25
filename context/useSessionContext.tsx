@@ -66,7 +66,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         String(repo?.owner),
         String(repo?.repo),
         String(session?.provider_token),
-        String(user?.email)
+        String(user?.email),
+        String(branch)
       ).then((newMessages: any) => {
         setLastUsedTrainingSettings({
           repo: repo?.repo,

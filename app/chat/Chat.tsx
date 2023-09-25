@@ -27,7 +27,8 @@ const Chat = () => {
   const [failMessage, setFailMessage] = useState<string>("");
   const [prompt, setPrompt] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, session, messages, methods, repo }: any = useSessionContext();
+  const { user, session, messages, methods, repo, branch }: any =
+    useSessionContext();
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -48,7 +49,8 @@ const Chat = () => {
       prompt,
       repo.owner,
       repo.repo,
-      String(session?.provider_token)
+      String(session?.provider_token),
+      String(branch)
     );
 
     const tokensInString = await getTokensFromString(prompt);

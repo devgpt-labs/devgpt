@@ -12,7 +12,8 @@ const createContextMessages = async (
   owner: string,
   repo: string,
   access_token: string,
-  emailAddress: string
+  emailAddress: string,
+  branch: string
 ) => {
   let newMessages: any = messages;
 
@@ -33,7 +34,8 @@ const createContextMessages = async (
       owner,
       repo,
       access_token,
-      emailAddress
+      emailAddress,
+      branch
     );
 
     return newMessages;
@@ -67,7 +69,8 @@ const addContext = async (
   owner: string,
   repo: string,
   access_token: string,
-  emailAddress: string
+  emailAddress: string,
+  branch: string
 ) => {
   try {
     const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
@@ -76,12 +79,12 @@ const addContext = async (
       usefulFiles,
       owner,
       repo,
-      access_token
+      access_token,
+      branch
     );
 
-    const usefulFilePrompts: any = await getUsefulFilePrompts(
-      usefulFileContents
-    );
+    const usefulFilePrompts: any =
+      await getUsefulFilePrompts(usefulFileContents);
 
     usefulFilePrompts.forEach((prompt: any) => {
       addMessage(messages, prompt.userPrompt, prompt.fileContent, emailAddress);
@@ -144,12 +147,13 @@ const getUsefulFileContents = async (
   files: any,
   owner: string,
   repo: string,
-  access_token: string
+  access_token: string,
+  branch: string
 ) => {
   try {
     // Map each item to a promise
     const promises = files.map(async (file: any) => {
-      let code = await getCode(owner, repo, file.trim(), access_token);
+      let code = await getCode(owner, repo, file.trim(), access_token, branch);
       code = code.content;
       code = Buffer.from(code, "base64").toString("ascii");
 

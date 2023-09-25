@@ -6,13 +6,14 @@ const userInput = async (
   prompt: string,
   owner: string,
   repo: string,
-  access_token: string
+  access_token: string,
+  branch: string
 ) => {
   let filePaths = getFilesFromString(prompt);
 
   const existing_code = await Promise.all(
     filePaths.map(async (file) => {
-      const code = await getCode(owner, repo, file, access_token);
+      const code = await getCode(owner, repo, file, access_token, branch);
 
       //decrypt from base64
       let content = code.content;
