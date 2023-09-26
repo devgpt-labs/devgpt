@@ -89,7 +89,7 @@ const RepoDrawer = () => {
 
   useEffect(() => {
     fetchRepos();
-  }, [user, fetchRepos]);
+  }, []);
 
   const onPreviousPage = async () =>
     session?.provider_token &&
@@ -142,7 +142,7 @@ const RepoDrawer = () => {
               <>
                 <InputGroup>
                   <Input
-                    pr='4.5rem'
+                    pr="4.5rem"
                     className="mb-2"
                     placeholder="Search repos"
                     value={filter}
@@ -150,7 +150,7 @@ const RepoDrawer = () => {
                       setFilter(e.target.value);
                     }}
                   />
-                  <InputRightElement width='4.5rem' mr={1}>
+                  <InputRightElement width="4.5rem" mr={1}>
                     <Button
                       size="sm"
                       onClick={handleRefresh}
@@ -199,7 +199,7 @@ const RepoDrawer = () => {
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                            repo.owner === repoOption.owner.login
+                          repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>

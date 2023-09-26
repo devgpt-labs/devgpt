@@ -100,7 +100,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         setupContextMessages();
       }
 
-      if (supabase) {
+      if (supabase && !session) {
         const setData = async () => {
           const {
             data: { session },
@@ -118,9 +118,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
             setUser(session?.user as unknown as User);
           }
         );
-
         setData();
-
         return () => {
           listener?.subscription.unsubscribe();
         };
@@ -135,7 +133,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       };
       loadPaymentStatus();
     }
-  }, [isMockEnabled, lofaf, session, user, repo.repo]);
+  }, [session, repo.repo]);
 
   const value = {
     repoWindowOpen,
