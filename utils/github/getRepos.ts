@@ -17,7 +17,7 @@ export const getPaginatedRepos = async (
   // Set up GraphQL query with a max of 30 items per page
   const query = `query {
     viewer {
-      repositories(first: 30, orderBy: {field: NAME, direction: ASC}, isFork: false${
+      repositories(first: 30, orderBy: {field: NAME, direction: ASC} ${
         before ? `,before: "${before}"` : ""
       }${after ? `,after: "${after}"` : ""}) {
       nodes {
