@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "@/context/useSessionContext";
-import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Input,
+  Text,
+  SkeletonText,
+  Button,
+  useColorMode,
+} from "@chakra-ui/react";
 
 //prompts
 import userPrompt from "@/app/prompts/user";
@@ -10,8 +18,9 @@ import userPrompt from "@/app/prompts/user";
 import Response from "@/app/components/Response";
 import Profile from "@/app/repos/Profile";
 import { PromptInput } from "./PromptInput";
-import { ConversationStyleToggle } from "./RateConversation";
+import { RateConversation } from "./RateConversation";
 import { Header } from "./ChatHeader";
+import { useCompletion } from "ai/react";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
@@ -28,6 +37,7 @@ const Chat = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
   const { user, session, messages, methods, repo }: any = useSessionContext();
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -55,7 +65,7 @@ const Chat = () => {
     const tokenLimit = await getTokenLimit(user.email);
     const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 75 && !isPro) {
+    if (!isPro && promptCount > 7) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
@@ -108,6 +118,9 @@ const Chat = () => {
     setIsLoading(false);
   };
 
+  const { completion, input, handleInputChange, handleSubmit } =
+    useCompletion();
+
   return (
     <Flex direction="column" w="full" maxW="6xl">
       <Box
@@ -116,6 +129,8 @@ const Chat = () => {
         justifyContent="flex-start"
       >
         <Header />
+        <Text className="whitespace-pre-wrap my-6">{input}</Text>
+        <Text className="whitespace-pre-wrap my-6">{completion}</Text>
         <Box className="max-h-[50vh] overflow-y-auto">
           {isLoading && !response && (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
@@ -126,13 +141,45 @@ const Chat = () => {
             </>
           )}
         </Box>
-        <ConversationStyleToggle visible={isFinished} />
+        {isFinished && (
+          <Flex
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems='center'
+            mt={2}
+          >
+            <RateConversation />
+            <Text mx={4}>or</Text>
+            <Button
+              px={4}
+              _hover={{
+                bg: colorMode === "light" ? "gray.300" : "black",
+              }}
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              alignSelf="center"
+              rounded="full"
+              onClick={() => {
+                setIsFinished(false);
+                setIsLoading(false);
+                setResponse("");
+                setFailMessage("");
+              }}
+            >
+              Start A New Session
+            </Button>
+          </Flex>
+        )}
+
         <PromptInput
+          //new
+          onChange={handleInputChange}
+          onSubmit={handleSubmit}
+          //old
           promptCount={promptCount}
           prompt={prompt}
           setPrompt={setPrompt}
           isLoading={isLoading}
-          onSubmit={(prompt: any) => submitHandler(prompt)}
         />
         <Text mt={2} fontSize={14}>
           {failMessage}

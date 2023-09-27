@@ -11,7 +11,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 
-export const ConversationStyleToggle = ({ visible }: any) => {
+export const RateConversation = () => {
   const toast = useToast();
   const { colorMode } = useColorMode();
 
@@ -26,14 +26,11 @@ export const ConversationStyleToggle = ({ visible }: any) => {
     });
   };
 
-  if (visible === false) return null;
-
   return (
     <Center>
       <Box
-        mt={4}
         minW="60"
-        className="rounded-full p-1"
+        className="rounded-full"
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
         <List className="flex justify-between gap-1 text-sm">
@@ -72,7 +69,7 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
       py={2}
       px={4}
       _hover={{
-        bg: colorMode === "light" ? "gray.100" : "black",
+        bg: colorMode === "light" ? "gray.300" : "black",
       }}
       className={`border border-transparent cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
     >

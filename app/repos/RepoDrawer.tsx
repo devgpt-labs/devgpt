@@ -20,6 +20,8 @@ import {
 import { useSessionContext } from "@/context/useSessionContext";
 import { mockManager } from "@/app/configs/mockManager";
 import { getPaginatedRepos } from "@/utils/github/getRepos";
+import { supabase } from "@/utils/supabase";
+// import getRepos from "@/utils/bitbucket/getRepos";
 
 //components
 type PageInfo = {
@@ -56,6 +58,8 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
+
+
     if (loading) {
       const timer = setTimeout(() => {
         setLoading(false);
@@ -74,6 +78,12 @@ const RepoDrawer = () => {
     if (repos.length > 0) return;
     if (!session?.provider_token) return;
 
+    // getRepos for bitbucket
+    // getRepos(session.provider_token).then((allRepos: any) => {
+    //   setRepos(allRepos);
+    //   console.log({ allRepos });
+    // });
+
     getPaginatedRepos(session?.provider_token)
       .then((allRepos: any) => {
         if (allRepos?.nodes?.length) {
@@ -89,7 +99,7 @@ const RepoDrawer = () => {
 
   useEffect(() => {
     fetchRepos();
-  }, [user, fetchRepos]);
+  }, [user]);
 
   const onPreviousPage = async () =>
     session?.provider_token &&
@@ -121,6 +131,17 @@ const RepoDrawer = () => {
     return null;
   }
 
+  const signUserOut = async () => {
+    await supabase?.auth.signOut();
+  };
+
+  if (!session.provider_token) {
+    console.log("logging out");
+
+    if (!supabase) return;
+    signUserOut();
+  }
+
   return (
     <>
       <Drawer
@@ -142,7 +163,7 @@ const RepoDrawer = () => {
               <>
                 <InputGroup>
                   <Input
-                    pr='4.5rem'
+                    pr="4.5rem"
                     className="mb-2"
                     placeholder="Search repos"
                     value={filter}
@@ -150,7 +171,7 @@ const RepoDrawer = () => {
                       setFilter(e.target.value);
                     }}
                   />
-                  <InputRightElement width='4.5rem' mr={1}>
+                  <InputRightElement width="4.5rem" mr={1}>
                     <Button
                       size="sm"
                       onClick={handleRefresh}
@@ -163,12 +184,12 @@ const RepoDrawer = () => {
                 </InputGroup>
 
                 {repos
-                  .filter((repoOption) => {
+                  .filter((repoOption: any) => {
                     return repoOption.name
                       .toLowerCase()
                       .includes(filter.toLowerCase());
                   })
-                  ?.map((repoOption) => {
+                  ?.map((repoOption: any) => {
                     return (
                       <Flex
                         key={repoOption.name + repoOption.owner.login}
@@ -209,15 +230,15 @@ const RepoDrawer = () => {
               </>
             ) : (
               <Stack mt={4} spacing={2}>
+                <Text fontSize={14} mb={2}>
+                  Taking too long to load? Try logging out and logging back in.
+                </Text>
                 <Skeleton height="40px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
-                <Text p={3} size="sm">
-                  Taking too long to load? Try logging out and logging back in.
-                </Text>
               </Stack>
             )}
           </DrawerBody>

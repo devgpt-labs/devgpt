@@ -29,6 +29,7 @@ interface Props {
 
 export const PromptInput: FC<Props> = (props) => {
   const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
+  const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
@@ -38,6 +39,7 @@ export const PromptInput: FC<Props> = (props) => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setPreviousPrompt(props.prompt);
     if (props.prompt.length === 0 || props.isLoading) return null;
     setHasSentAMessage(true);
     props.onSubmit(props.prompt);
@@ -80,10 +82,14 @@ export const PromptInput: FC<Props> = (props) => {
       return;
     }
 
-    if (previousLofafSettings.owner === repo.owner || previousLofafSettings.repo === repo.repo || previousLofafSettings.branch === branch) {
+    if (
+      previousLofafSettings.owner === repo.owner ||
+      previousLofafSettings.repo === repo.repo ||
+      previousLofafSettings.branch === branch
+    ) {
       // This repo has already been scanned, skip.
       console.log("Repo already been scanned.");
-      return
+      return;
     }
 
     getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
@@ -234,6 +240,9 @@ export const PromptInput: FC<Props> = (props) => {
           )}
         </Button>
       </form>
+      <SlideFade in={hasSentAMessage} offsetY="20px">
+        <Text mt={5}>{previousPrompt}</Text>
+      </SlideFade>
     </Flex>
   );
 };

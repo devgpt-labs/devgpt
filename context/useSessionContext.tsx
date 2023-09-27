@@ -28,14 +28,14 @@ const defaultContext: any = {
   branch: "",
   messages: [{ role: null, content: null }],
   methods: {
-    setRepoWindowOpen: () => {},
-    signOut: () => {},
-    setRepo: () => {},
-    setLofaf: () => {},
-    setTechStack: () => {},
-    setContext: () => {},
-    setBranch: () => {},
-    setMessages: () => {},
+    setRepoWindowOpen: () => { },
+    signOut: () => { },
+    setRepo: () => { },
+    setLofaf: () => { },
+    setTechStack: () => { },
+    setContext: () => { },
+    setBranch: () => { },
+    setMessages: () => { },
   },
 };
 
@@ -79,6 +79,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   };
 
   useEffect(() => {
+
+
     if (isMockEnabled) {
       setUser(mockManager.mockData().user as unknown as User);
       setSession(mockManager.mockData().session as unknown as Session);
@@ -137,6 +139,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
 
         setData();
 
+
+
         return () => {
           listener?.subscription.unsubscribe();
         };
@@ -145,6 +149,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   }, [isMockEnabled]);
 
   useEffect(() => {
+
+
     if (!mockManager.isMockIntegrationsEnabled()) {
       if (
         messages.length === 0 ||
@@ -154,11 +160,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       ) {
         setMessages([]);
         setupContextMessages();
+
+
       }
     }
   }, [lofaf, session, user, repo]);
 
   useEffect(() => {
+
+
     if (!mockManager.isMockIntegrationsEnabled()) {
       const loadPaymentStatus = async () => {
         const githubIdentity: any = user?.identities?.find(
@@ -168,6 +178,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         setIsPro(pro);
       };
       loadPaymentStatus();
+
+
     }
   }, [user]);
 

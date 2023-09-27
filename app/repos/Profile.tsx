@@ -89,14 +89,22 @@ const Profile = () => {
   const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
     defaultIsOpen: false,
   });
+
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const {
+    isOpen: isKeyOpen,
+    onOpen: onKeyOpen,
+    onClose: onKeyClose,
+  } = useDisclosure({ defaultIsOpen: false });
+
+
   useEffect(() => {
-    var identity = user?.identities?.find((identity: { provider: string }) =>
+    let identity = user?.identities?.find((identity: { provider: string }) =>
       ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
     )?.identity_data;
     setIdentity(identity);
@@ -129,35 +137,33 @@ const Profile = () => {
       >
         <Flex flexDirection="row">
           {identity?.avatar_url && (
-            <Tooltip label={`via ${identity.provider}`}>
-              <Image
-                _hover={{
-                  boxShadow: "0px 0px 10px 0px gold",
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                alt="Avatar"
-                src={identity?.avatar_url}
-                style={{
-                  borderRadius: 10,
-                  objectFit: "cover",
-                }}
-                maxHeight={40}
-                width="40px"
-                height="40px"
-              />
-            </Tooltip>
+            <Image
+              _hover={{
+                boxShadow: "0px 0px 10px 0px gold",
+                transform: "translateY(-2px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              alt="Avatar"
+              src={identity?.avatar_url}
+              style={{
+                borderRadius: 10,
+                objectFit: "cover",
+              }}
+              maxHeight={40}
+              width="40px"
+              height="40px"
+            />
           )}
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
               <Text>{identity?.name}</Text>
               {isPro ? (
-                <Tag ml={2} colorScheme="teal">
+                <Tag ml={2} colorScheme="blue">
                   <Text mr={1}>Pro</Text>
                   <AiFillStar />
                 </Tag>
               ) : (
-                <Tag ml={2} colorScheme="teal">
+                <Tag ml={2} colorScheme="blue">
                   Free
                 </Tag>
               )}
@@ -171,9 +177,8 @@ const Profile = () => {
               <Flex gap={2}>
                 {!isPro && (
                   <Tooltip
-                    label={`${
-                      10 - promptCount
-                    }/10 Free Prompts Remaining Today`}
+                    label={`${10 - promptCount
+                      }/10 Free Prompts Remaining Today`}
                     placement="top"
                   >
                     <IconButton
@@ -285,6 +290,20 @@ const Profile = () => {
                 onClick={() => supabase?.auth.signOut()}
                 aria-label="Signout"
                 icon={<PiSignOutBold size={14} />}
+              />
+            </Tooltip>
+            <Tooltip
+              label={isSettingsOpen ? "Close Settings" : "Open Settings"}
+              placement="top"
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={onSettingsToggle}
+                aria-label="Open Settings"
+                icon={<IoMdSettings size={18} />}
               />
             </Tooltip>
             <Tooltip
