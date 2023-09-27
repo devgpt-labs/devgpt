@@ -1,6 +1,6 @@
 {
   "name": "devgpt",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,38 +12,25 @@
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/provider": "^2.4.1",
     "@chakra-ui/react": "^2.8.1",
-    "@choc-ui/chakra-autocomplete": "^5.2.7",
-    "@microsoft/fetch-event-source": "^2.0.1",
     "@supabase/auth-ui-react": "^0.4.5",
     "@supabase/auth-ui-shared": "^0.1.7",
     "@supabase/supabase-js": "^2.33.2",
-    "@types/node": "18.16.3",
-    "@types/react": "18.2.0",
-    "@types/react-dom": "18.2.1",
-    "@vercel/analytics": "^1.0.2",
-    "autoprefixer": "10.4.14",
     "dotenv": "^16.3.1",
-    "eslint-config-next": "13.3.2",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "fs": "^0.0.1-security",
-    "gpt-tokenizer": "^2.1.1",
-    "next": "13.3.2",
-    "postcss": "8.4.23",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
     "react-icons": "^4.11.0",
-    "react-markdown": "^8.0.7",
-    "react-spinners": "^0.13.8",
-    "react-syntax-highlighter": "^15.5.0",
     "stripe": "^13.6.0",
     "supabase": "^1.93.0",
-    "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "zustand": "^4.4.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "react-markdown": "^8.0.7",
+    "gpt-tokenizer": "^2.1.1"
   },
   "devDependencies": {
-    "@types/react-syntax-highlighter": "^15.5.7",
-    "eslint": "^8.50.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-unused-imports": "^3.0.0"
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
   }
 }
