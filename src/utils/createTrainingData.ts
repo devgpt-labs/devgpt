@@ -1,20 +1,28 @@
-import { Message } from "@/pages/types/chat";
+//types
+import { Message } from "@/types/chat";
 //prompts
-import { system } from "@/pages/prompts/system";
+import { system } from "@/prompts/system";
+//utils
 import sendLLM from "./sendLLM";
 import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
 import getCode from "./github/getCode";
+//store
 
-const createContextMessages = async (
-  messages: Message[],
+const MAX_TRAINING_FILES = 15;
+
+const createTrainingData = async (
   lofaf: string,
-  owner: string,
-  repo: string,
-  access_token: string,
-  emailAddress: string
+  repo: any,
+  user: any,
+  session: any
 ) => {
-  let newMessages: any = messages;
+  const emailAddress = user.email;
+  const access_token = session?.provider_token;
+  const owner = repo?.owner;
+  repo = repo?.repo;
+
+  let newMessages: any = [];
 
   if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
     return newMessages;
@@ -43,22 +51,10 @@ const createContextMessages = async (
   }
 };
 
-export default createContextMessages;
+export default createTrainingData;
 
-//todo move these interfaces
 interface UsefulFile {
   fileName: string;
-}
-
-interface UsefulFileContent {
-  fileName: string;
-  fileContent: string;
-}
-
-interface UsefulFilePrompt {
-  fileName: string;
-  fileContent: string;
-  userPrompt: string;
 }
 
 const addContext = async (
@@ -94,8 +90,6 @@ const addContext = async (
 };
 
 const getUsefulFiles = async (lofaf: string) => {
-  //send lofaf to the LLM and get back an array of useful files.
-
   try {
     //todo move this to prompts folder
     const response = await sendLLM(
@@ -104,7 +98,6 @@ const getUsefulFiles = async (lofaf: string) => {
 		This is the files in their project: "${lofaf}".
 		Return an example of a front-end and back-end file that you can use to understand the developer's coding style.
 		E.g. "MyFrontEndComponent.tsx", "my-back-end-route.ts", "README.md" 
-		Pick 5 files max.
 	`,
       [
         {
@@ -131,7 +124,9 @@ const getUsefulFiles = async (lofaf: string) => {
       response?.choices?.[0]?.message?.function_call?.arguments
     );
 
-    const usefulFilesArray = useful_files_csv.split(",").splice(0, 5);
+    const usefulFilesArray = useful_files_csv
+      .split(",")
+      .splice(0, MAX_TRAINING_FILES);
 
     return usefulFilesArray;
   } catch (error) {
@@ -169,7 +164,6 @@ const getUsefulFileContents = async (
 const getUsefulFilePrompts = async (files: any) => {
   try {
     const promises = files.map(async (file: any) => {
-      //todo move to prompts folder
       const response = await sendLLM(
         `
 					I am going to provide you with the contents of a software developer's file.
@@ -190,7 +184,6 @@ const getUsefulFilePrompts = async (files: any) => {
       };
     });
 
-    // Wait for all promises to resolve
     const filesWithPrompts = await Promise.all(promises);
 
     return filesWithPrompts;

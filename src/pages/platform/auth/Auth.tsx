@@ -39,9 +39,7 @@ const Auth = () => {
 
   return (
     <>
-      {user === null ? (
-        <Spinner />
-      ) : user === undefined ? (
+      {!user ? (
         <>
           <Box
             className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"

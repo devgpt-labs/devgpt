@@ -21,8 +21,12 @@ import {
 //stores
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
+import messageStore from "@/store/Messages";
 
+//utils
 import { getPaginatedRepos } from "@/utils/github/getRepos";
+import createTrainingData from "@/utils/createTrainingData";
+import getLofaf from "@/utils/github/getLofaf";
 
 //components
 type PageInfo = {
@@ -37,7 +41,8 @@ const RepoDrawer = () => {
     defaultIsOpen: false,
   });
 
-  const { repo, repoWindowOpen, setRepo }: any = repoStore();
+  const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
+  const { setMessages } = messageStore();
   const { session, user }: any = authStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -47,12 +52,9 @@ const RepoDrawer = () => {
   const [loading, setLoading] = useState(false); // For the refresh debounce
   const btnRef = useRef<any>();
 
-  console.log("test");
-
   useEffect(() => {
-    console.log({ repoWindowOpen });
-    onOpen();
     if (repoWindowOpen === null) return;
+    onOpen();
   }, [repoWindowOpen]);
 
   const handleRefresh = () => {
@@ -94,6 +96,11 @@ const RepoDrawer = () => {
   useEffect(() => {
     fetchRepos();
   }, []);
+
+  useEffect(() => {
+    if (repos.length != 0) return;
+    fetchRepos();
+  }, [session]);
 
   const onPreviousPage = async () =>
     session?.provider_token &&
@@ -194,11 +201,37 @@ const RepoDrawer = () => {
 
                         <Button
                           size="sm"
-                          onClick={() => {
+                          onClick={async () => {
                             onClose();
                             setRepo({
                               owner: repoOption.owner.login,
                               repo: repoOption.name,
+                            });
+
+                            await getLofaf(
+                              repoOption.owner.login,
+                              repoOption.name,
+                              session
+                            ).then(async (lofaf: any) => {
+                              let lofafArray = lofaf.tree;
+                              lofafArray = lofafArray.map((item: any) => {
+                                return item.path;
+                              });
+
+                              const lofafString = lofafArray.join(",");
+
+                              setLofaf(lofafArray);
+                              await createTrainingData(
+                                lofafString,
+                                {
+                                  owner: repoOption.owner.login,
+                                  repo: repoOption.name,
+                                },
+                                user,
+                                session
+                              ).then((trainingData) => {
+                                setMessages(trainingData);
+                              });
                             });
                           }}
                         >

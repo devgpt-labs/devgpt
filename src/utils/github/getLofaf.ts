@@ -2,7 +2,13 @@ import getDefaultBranch from "./getDefaultBranch";
 import IGNORED_FILES from "@/configs/ignoredFiles";
 import IGNORED_FOLDERS from "@/configs/ignoredFolders";
 
-const getLofaf = async (owner: any, repo: any, branch: any, token: any) => {
+//store
+import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
+
+const getLofaf = async (owner: any, repo: any, session: any) => {
+  const token = session?.provider_token;
+
   const main_branch = await getDefaultBranch(owner, repo, token);
 
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${main_branch}?recursive=1`;

@@ -39,7 +39,7 @@ const Chat = () => {
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
-  }, [user.email]);
+  }, [user?.email]);
 
   // todo move this to session context
   if (!user) return null;

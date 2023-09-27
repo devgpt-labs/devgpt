@@ -8,7 +8,7 @@ const useStore = create((set) => ({
   user: null,
   session: null,
   isPro: false,
-  signout: () => {
+  signOut: () => {
     supabase?.auth.signOut();
     set({ user: null, session: null });
   },
@@ -27,7 +27,7 @@ const useStore = create((set) => ({
     )?.identity_data;
     const pro = await checkIfPro(githubIdentity?.email);
 
-    set({ user: session?.user, session, isPro: pro });
+    set({ user: session?.user, session: session, isPro: pro });
   },
 }));
 export default useStore;

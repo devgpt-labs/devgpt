@@ -286,7 +286,9 @@ const Profile = () => {
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
-                onClick={signOut}
+                onClick={() => {
+                  signOut();
+                }}
                 aria-label="Signout"
                 icon={<PiSignOutBold size={14} />}
               />

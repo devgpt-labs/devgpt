@@ -14,7 +14,6 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { FC, FormEvent } from "react";
-import getLofaf from "@/utils/github/getLofaf";
 import { LuSend } from "react-icons/lu";
 import { BsHourglassSplit } from "react-icons/bs";
 
@@ -32,26 +31,10 @@ interface Props {
 }
 
 export const PromptInput: FC<Props> = (props) => {
-  const [allFiles, setAllFiles] = useState<any[]>([]); // [ { name: 'file1', content: 'file1 content' }
   const [failMessage, setFailMessage] = useState<string>("");
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
-  const [previousLofafSettings, setPreviousLofafSettings] = useState<any>({});
-
-  const {
-    repo,
-    branch,
-    repoWindowOpen,
-    setLofaf,
-    setRepo,
-    setRepoWindowOpen,
-  }: any = repoStore();
+  const { repo, repoWindowOpen, lofaf, setRepoWindowOpen }: any = repoStore();
   const { messages }: any = messageStore();
-  const { session }: any = authStore();
-
-  console.log({ messages });
-  console.log({ repo });
-
-  const toast = useToast();
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,7 +52,7 @@ export const PromptInput: FC<Props> = (props) => {
   }
 
   // Get the current file being targeted with @
-  const selectedFile = allFiles?.filter((file) => {
+  const selectedFile = lofaf?.filter((file: any) => {
     if (file?.toLowerCase()?.includes(withAt?.[0]?.toLowerCase())) {
       return file;
     }
@@ -89,59 +72,7 @@ export const PromptInput: FC<Props> = (props) => {
     input?.focus();
   };
 
-  useEffect(() => {
-    if (!repo.owner || !repo.repo || !session?.provider_token) {
-      // No details provided, skip.
-      console.log("No repo provided.");
-
-      return;
-    }
-
-    if (
-      previousLofafSettings.owner === repo.owner ||
-      previousLofafSettings.repo === repo.repo ||
-      previousLofafSettings.branch === branch
-    ) {
-      // This repo has already been scanned, skip.
-      console.log("Repo already been scanned.");
-      return;
-    }
-
-    getLofaf(repo.owner, repo.repo, branch, session?.provider_token)
-      .then((files: any) => {
-        if (!files) {
-          console.log("Return early, no files found.");
-        }
-
-        // Move this to global session
-        const repoFiles = files?.tree?.map((file: any) => {
-          return file.path;
-        });
-
-        setPreviousLofafSettings({
-          owner: repo.owner,
-          repo: repo.repo,
-          branch: branch,
-        });
-
-        setLofaf(repoFiles);
-        setAllFiles(repoFiles);
-      })
-      .catch((err) => {
-        toast({
-          title: "Error",
-          description:
-            "There was an error fetching your repo files. This is likely due to an incorrect branch name.",
-        });
-        setFailMessage(
-          `There was an error fetching your repo files for ${repo.repo}. This is likely due to an incorrect branch name. You can change the branch name being used in "Settings", the default branch name is "main"`
-        );
-        setRepo({ owner: "", repo: "" });
-        console.error({ err });
-      });
-  }, [repo.owner, repo.repo, branch, session?.provider_token, toast]);
-
-  if (repo.repo === "") {
+  if (!repo.repo) {
     return (
       <>
         <Button
@@ -159,7 +90,7 @@ export const PromptInput: FC<Props> = (props) => {
     );
   }
 
-  if (messages?.length === 0 && repo.repo !== "") {
+  if (messages?.length === 0 && repo.repo) {
     return (
       <Flex flexDirection="row" alignItems="center" mt={5}>
         <Spinner />
