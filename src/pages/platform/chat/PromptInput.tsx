@@ -32,6 +32,7 @@ interface Props {
 
 export const PromptInput: FC<Props> = (props) => {
   const [failMessage, setFailMessage] = useState<string>("");
+  const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const { repo, repoWindowOpen, lofaf, setRepoWindowOpen }: any = repoStore();
   const { messages }: any = messageStore();
@@ -40,6 +41,7 @@ export const PromptInput: FC<Props> = (props) => {
     e.preventDefault();
     if (props.prompt?.length === 0 || props.isLoading) return null;
     setHasSentAMessage(true);
+    setPreviousPrompt(props.prompt);
     props.onSubmit(props.prompt, e);
   };
 
@@ -112,7 +114,7 @@ export const PromptInput: FC<Props> = (props) => {
         )}
         <Flex flexDirection="row" flexWrap="wrap">
           <SlideFade key={match} in={selectedFile[0] ? true : false}>
-            {selectedFile.map((file, index) => {
+            {selectedFile.map((file: any, index: any) => {
               if (index > 12) return null;
               return (
                 <Tag
@@ -182,6 +184,9 @@ export const PromptInput: FC<Props> = (props) => {
           )}
         </Button>
       </form>
+      <SlideFade in={hasSentAMessage} offsetY="20px">
+        <Text mt={5}>{previousPrompt}</Text>
+      </SlideFade>
     </Flex>
   );
 };

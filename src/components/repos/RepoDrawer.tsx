@@ -27,6 +27,7 @@ import messageStore from "@/store/Messages";
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
+import { supabase } from "@/utils/supabase";
 
 //components
 type PageInfo = {
@@ -115,21 +116,31 @@ const RepoDrawer = () => {
         console.log("Failed to get repos:", { err });
       });
 
-  const onNextPage = async () =>
+  const onNextPage = async () => {
     session?.provider_token &&
-    getPaginatedRepos(session?.provider_token, null, pageInfo?.endCursor)
-      .then((allRepos: any) => {
-        if (allRepos?.nodes?.length) {
-          setRepos(allRepos.nodes);
-          setPageInfo(allRepos.pageInfo);
-        }
-      })
-      .catch((err: any) => {
-        console.log("Failed to get repos:", { err });
-      });
+      getPaginatedRepos(session?.provider_token, null, pageInfo?.endCursor)
+        .then((allRepos: any) => {
+          if (allRepos?.nodes?.length) {
+            setRepos(allRepos.nodes);
+            setPageInfo(allRepos.pageInfo);
+          }
+        })
+        .catch((err: any) => {
+          console.log("Failed to get repos:", { err });
+        });
+  };
+
+  const signUserOut = async () => {
+    if (!supabase) return null;
+    await supabase.auth.signOut();
+  };
 
   if (!user) {
     return null;
+  }
+
+  if (!session.provider_token) {
+    signUserOut();
   }
 
   return (
@@ -154,7 +165,7 @@ const RepoDrawer = () => {
                 <InputGroup>
                   <Input
                     pr="4.5rem"
-                    className="mb-2"
+                    mb={2}
                     placeholder="Search repos"
                     value={filter}
                     onChange={(e) => {
@@ -236,7 +247,7 @@ const RepoDrawer = () => {
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                          repo.owner === repoOption.owner.login
+                            repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>
@@ -246,20 +257,21 @@ const RepoDrawer = () => {
               </>
             ) : (
               <Stack mt={4} spacing={2}>
+                <Text fontSize={14} mb={2}>
+                  Is this taking too long? Try logging out and logging back in.
+                </Text>
                 <Skeleton height="40px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
-                <Text p={3} size="sm">
-                  Taking too long to load? Try logging out and logging back in.
-                </Text>
+
               </Stack>
             )}
           </DrawerBody>
           {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
-            <DrawerFooter className="gap-2">
+            <DrawerFooter gap={2}>
               <>
                 {pageInfo.hasPreviousPage && (
                   <Button size="sm" variant="outline" onClick={onPreviousPage}>

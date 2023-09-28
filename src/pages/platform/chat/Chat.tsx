@@ -1,6 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, SkeletonText, Input, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  SkeletonText,
+  Input,
+  Button,
+  useColorMode,
+} from "@chakra-ui/react";
 import { useCompletion } from "ai/react";
 
 //stores
@@ -15,7 +23,7 @@ import userPrompt from "@/prompts/user";
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
 import { PromptInput } from "./PromptInput";
-import { ConversationStyleToggle } from "./RateConversation";
+import { RateConversation } from "./RateConversation";
 import { Header } from "./ChatHeader";
 
 //utils
@@ -27,14 +35,15 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [failMessage, setFailMessage] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
   const [prompt, setPrompt] = useState<string>("");
 
-  const { repo }: any = repoStore();
   // const { messages, setMessages }: any = messageStore();
+  const { repo }: any = repoStore();
+  const { colorMode } = useColorMode();
   const { user, session }: any = authStore();
 
   const { completion, handleInputChange, handleSubmit } = useCompletion();
@@ -66,7 +75,7 @@ const Chat = () => {
     const tokenLimit = await getTokenLimit(user.email);
     const isPro = await checkIfPro(user.email);
 
-    if (promptCount > 75 && !isPro) {
+    if (!isPro && promptCount > 16) {
       setIsLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
@@ -94,37 +103,62 @@ const Chat = () => {
       >
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">
-          <Input
-            className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-            value={prompt}
-            placeholder="Describe your business..."
-            onChange={(e: any) => {
-              setPrompt(e.target.value);
-            }}
-          />
-          <Button
-            onClick={async (e: any) => {
-              const checks = await submitChecks();
-              if (!checks) return null;
-              handleSubmit(e);
-            }}
-          >
-            Submit
-          </Button>
-
+          <Flex flexDirection="row" mt={4}>
+            <Input
+              className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+              value={prompt}
+              placeholder="Describe your business..."
+              onChange={(e: any) => {
+                setPrompt(e.target.value);
+              }}
+            />
+            <Button
+              bgGradient={"linear(to-r, blue.500, teal.500)"}
+              ml={4}
+              onClick={async (e: any) => {
+                const checks = await submitChecks();
+                if (!checks) return null;
+                handleSubmit(e);
+              }}
+            >
+              Submit
+            </Button>
+          </Flex>
           {isLoading && !completion ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
           ) : (
             <Response content={String(completion)} />
           )}
-
-          {/* {response && (
-            <>
-              <Response content={String(response)} />
-            </>
-          )} */}
         </Box>
-        <ConversationStyleToggle visible={isFinished} />
+        {completion && isFinished && (
+          <Flex
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            mt={2}
+          >
+            <RateConversation />
+            <Text mx={4}>or</Text>
+            <Button
+              px={4}
+              _hover={{
+                bg: colorMode === "light" ? "gray.300" : "black",
+              }}
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              alignSelf="center"
+              rounded="full"
+              onClick={() => {
+                setIsFinished(false);
+                setIsLoading(false);
+                setResponse("");
+                setFailMessage("");
+              }}
+            >
+              Start A New Chat
+            </Button>
+          </Flex>
+        )}
         {/* <PromptInput
           promptCount={promptCount}
           prompt={prompt}

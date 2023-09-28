@@ -29,6 +29,7 @@ import astro from "@/assets/astro.png";
 //components
 import Chat from "@/pages/platform/chat/Chat";
 import RepoDrawer from "@/components/repos/RepoDrawer";
+import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 
 const Auth = () => {
   const { fetch, user, session }: any = useStore();
@@ -42,9 +43,15 @@ const Auth = () => {
       {!user ? (
         <>
           <Box
-            className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-            maxW="500px" // Set maximum width for larger screens
-            mx="auto" // Center the box horizontally
+            w='40%'
+            rounded='lg'
+            overflow='hidden'
+            p={5}
+            flexDirection='column'
+            // TODO: shadow needs readding / fixing here
+            boxShadow='blues'
+            border="1px solid #1a202c"
+            shadow="2xl"
           >
             <Header />
             <VStack spacing={2} mt={3} width="100%" alignItems="center">
@@ -57,14 +64,13 @@ const Auth = () => {
               <GitConnectorButton
                 color="#0c61db"
                 provider="Sign In With BitBucket"
-                handle={() => {}}
+                handle={signInWithBitbucket}
                 Icon={FaBitbucket}
-                tooltip="Coming soon!"
               />
               <GitConnectorButton
                 color="#FC6D27"
                 provider="Sign In With GitLab"
-                handle={() => {}}
+                handle={() => { }}
                 Icon={AiFillGitlab}
                 tooltip="Coming soon!"
               />

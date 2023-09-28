@@ -7,11 +7,12 @@ import {
   useToast,
   ListItem,
   List,
+  Flex,
   Fade,
   useColorMode,
 } from "@chakra-ui/react";
 
-export const ConversationStyleToggle = ({ visible }: any) => {
+export const RateConversation = ({ visible }: any) => {
   const toast = useToast();
   const { colorMode } = useColorMode();
 
@@ -30,20 +31,25 @@ export const ConversationStyleToggle = ({ visible }: any) => {
 
   return (
     <Center>
-      <Box
-        mt={4}
+      <Flex
         minW="60"
-        className="rounded-full p-1"
+        rounded="full"
+        flexDirection="row"
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <List className="flex justify-between gap-1 text-sm">
+        <List
+          display="flex"
+          justifyContent="space-between"
+          gap={1}
+          fontSize="sm"
+        >
           <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
           <ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👀</ToggleItem>
           <ToggleItem onClick={onClickHandler}>🚀</ToggleItem>
         </List>
-      </Box>
+      </Flex>
     </Center>
   );
 };
@@ -72,9 +78,16 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
       py={2}
       px={4}
       _hover={{
-        bg: colorMode === "light" ? "gray.100" : "black",
+        bg: colorMode === "light" ? "gray.300" : "black",
       }}
-      className={`border border-transparent cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
+      alignItems="center"
+      flex={1}
+      rounded="full"
+      display="flex"
+      justifyContent="center"
+      flexGrow={1}
+      cursor="pointer"
+      border="transparent"
     >
       <Box>
         {!showCheckmark && <Text>{props.children}</Text>}
