@@ -29,6 +29,7 @@ import astro from "@/assets/astro.png";
 //components
 import Chat from "@/pages/platform/chat/Chat";
 import RepoDrawer from "@/components/repos/RepoDrawer";
+import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 
 const Auth = () => {
   const { fetch, user, session }: any = useStore();
@@ -42,7 +43,7 @@ const Auth = () => {
       {!user ? (
         <>
           <Box
-            w='full'
+            w='40%'
             rounded='lg'
             overflow='hidden'
             p={5}
@@ -63,9 +64,8 @@ const Auth = () => {
               <GitConnectorButton
                 color="#0c61db"
                 provider="Sign In With BitBucket"
-                handle={() => { }}
+                handle={signInWithBitbucket}
                 Icon={FaBitbucket}
-                tooltip="Coming soon!"
               />
               <GitConnectorButton
                 color="#FC6D27"
