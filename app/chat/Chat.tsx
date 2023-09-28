@@ -184,7 +184,7 @@ const Chat = () => {
           prompt={prompt}
           setPrompt={setPrompt}
           isLoading={isLoading}
-          onSubmit={handleSubmit}
+        // onSubmit={handleSubmit}
         />
         <Text mt={2} fontSize={14}>
           {failMessage}

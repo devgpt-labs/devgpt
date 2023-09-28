@@ -3,7 +3,9 @@ import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
 // Create an OpenAI API client (that's edge friendly!)
-const openai = new OpenAI({ apiKey: "" });
+const openai = new OpenAI({
+	apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+});
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge";
