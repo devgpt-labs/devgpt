@@ -44,9 +44,6 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user.email]);
 
-  // todo move this to session context
-  if (!user) return null;
-
   const submitHandler = async (prompt: string) => {
     setIsLoading(true);
     setResponse("");
@@ -121,6 +118,8 @@ const Chat = () => {
   const { completion, input, handleInputChange, handleSubmit } =
     useCompletion();
 
+  if (!user) return null;
+
   return (
     <Flex direction="column" w="full" maxW="6xl">
       <Box
@@ -129,8 +128,17 @@ const Chat = () => {
         justifyContent="flex-start"
       >
         <Header />
-        <Text className="whitespace-pre-wrap my-6">{input}</Text>
-        <Text className="whitespace-pre-wrap my-6">{completion}</Text>
+        <Box className="mx-auto w-full max-w-md py-24 flex flex-col stretch">
+          <Input
+            className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+            value={input}
+            placeholder="Describe your business..."
+            onChange={handleInputChange}
+          />
+          <Button onClick={handleSubmit}>Submit</Button>
+          <Text>{input}</Text>
+          <Text className="whitespace-pre-wrap my-6">{completion}</Text>
+        </Box>
         <Box className="max-h-[50vh] overflow-y-auto">
           {isLoading && !response && (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
@@ -146,7 +154,7 @@ const Chat = () => {
             width="100%"
             flexDirection="row"
             justifyContent="center"
-            alignItems='center'
+            alignItems="center"
             mt={2}
           >
             <RateConversation />
@@ -172,14 +180,11 @@ const Chat = () => {
         )}
 
         <PromptInput
-          //new
-          onChange={handleInputChange}
-          onSubmit={handleSubmit}
-          //old
           promptCount={promptCount}
           prompt={prompt}
           setPrompt={setPrompt}
           isLoading={isLoading}
+          onSubmit={handleSubmit}
         />
         <Text mt={2} fontSize={14}>
           {failMessage}
