@@ -42,8 +42,15 @@ const Auth = () => {
       {!user ? (
         <>
           <Box
-            className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-            p={4}
+            w='full'
+            rounded='lg'
+            overflow='hidden'
+            p={5}
+            flexDirection='column'
+            // TODO: shadow needs readding / fixing here
+            boxShadow='blues'
+            border="1px solid #1a202c"
+            shadow="2xl"
           >
             <Header />
             <VStack spacing={2} mt={3} width="100%" alignItems="center">

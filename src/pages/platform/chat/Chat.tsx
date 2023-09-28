@@ -1,6 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, SkeletonText, Input, Button, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  SkeletonText,
+  Input,
+  Button,
+  useColorMode,
+} from "@chakra-ui/react";
 import { useCompletion } from "ai/react";
 
 //stores
@@ -116,46 +124,41 @@ const Chat = () => {
               Submit
             </Button>
           </Flex>
-
           {isLoading && !completion ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
           ) : (
             <Response content={String(completion)} />
           )}
-
-          {/* {response && (
-            <>
-              <Response content={String(response)} />
-            </>
-          )} */}
         </Box>
-        <Flex
-          width="100%"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          mt={2}
-        >
-          <RateConversation />
-          <Text mx={4}>or</Text>
-          <Button
-            px={4}
-            _hover={{
-              bg: colorMode === "light" ? "gray.300" : "black",
-            }}
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            alignSelf="center"
-            rounded="full"
-            onClick={() => {
-              setIsFinished(false);
-              setIsLoading(false);
-              setResponse("");
-              setFailMessage("");
-            }}
+        {completion && isFinished && (
+          <Flex
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            mt={2}
           >
-            Start A New Session
-          </Button>
-        </Flex>
+            <RateConversation />
+            <Text mx={4}>or</Text>
+            <Button
+              px={4}
+              _hover={{
+                bg: colorMode === "light" ? "gray.300" : "black",
+              }}
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              alignSelf="center"
+              rounded="full"
+              onClick={() => {
+                setIsFinished(false);
+                setIsLoading(false);
+                setResponse("");
+                setFailMessage("");
+              }}
+            >
+              Start A New Chat
+            </Button>
+          </Flex>
+        )}
         {/* <PromptInput
           promptCount={promptCount}
           prompt={prompt}

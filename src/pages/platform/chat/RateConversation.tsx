@@ -32,13 +32,17 @@ export const RateConversation = ({ visible }: any) => {
   return (
     <Center>
       <Flex
-        mt={4}
         minW="60"
-        className="rounded-full"
-        flexDirection='row'
+        rounded="full"
+        flexDirection="row"
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <List className="flex justify-between gap-1 text-sm">
+        <List
+          display="flex"
+          justifyContent="space-between"
+          gap={1}
+          fontSize="sm"
+        >
           <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
           <ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
@@ -76,7 +80,14 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
       _hover={{
         bg: colorMode === "light" ? "gray.300" : "black",
       }}
-      className={`border border-transparent cursor-pointer grow justify-center flex rounded-full flex-1 items-center`}
+      alignItems="center"
+      flex={1}
+      rounded="full"
+      display="flex"
+      justifyContent="center"
+      flexGrow={1}
+      cursor="pointer"
+      border="transparent"
     >
       <Box>
         {!showCheckmark && <Text>{props.children}</Text>}

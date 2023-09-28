@@ -114,7 +114,7 @@ export const PromptInput: FC<Props> = (props) => {
         )}
         <Flex flexDirection="row" flexWrap="wrap">
           <SlideFade key={match} in={selectedFile[0] ? true : false}>
-            {selectedFile.map((file, index) => {
+            {selectedFile.map((file: any, index: any) => {
               if (index > 12) return null;
               return (
                 <Tag

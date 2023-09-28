@@ -126,7 +126,12 @@ const Profile = () => {
       w="6xl"
       maxW="full"
       rounded="lg"
-      className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+      // TODO: shadow needs readding / fixing here
+      boxShadow="0px 0px 900px 0px blue"
+      border="1px solid #1a202c"
+      p={5}
+      overflow='hidden'
+      shadow="2xl"
     >
       <KeyModal
         isKeyOpen={isKeyOpen}

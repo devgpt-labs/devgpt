@@ -165,7 +165,7 @@ const RepoDrawer = () => {
                 <InputGroup>
                   <Input
                     pr="4.5rem"
-                    className="mb-2"
+                    mb={2}
                     placeholder="Search repos"
                     value={filter}
                     onChange={(e) => {
@@ -271,7 +271,7 @@ const RepoDrawer = () => {
             )}
           </DrawerBody>
           {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
-            <DrawerFooter className="gap-2">
+            <DrawerFooter gap={2}>
               <>
                 {pageInfo.hasPreviousPage && (
                   <Button size="sm" variant="outline" onClick={onPreviousPage}>
