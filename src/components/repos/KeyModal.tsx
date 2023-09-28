@@ -80,8 +80,8 @@ const KeyModal = ({ isKeyOpen, onKeyOpen, onKeyClose }: any) => {
           {/* <Text fontSize={14} color="gray.400" mr={10}>
             If you don't have or don't want to use your Open-AI key, you can
             upgrade to use our key.
-          </Text> */}
-          {/* <Button mr={2}>Upgrade</Button> */}
+          </Text>
+          <Button mr={2}>Upgrade</Button> */}
           <Button onClick={saveKeyInCookies}>Save</Button>
         </Flex>
       </ModalContent>
