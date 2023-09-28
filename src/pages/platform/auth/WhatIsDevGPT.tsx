@@ -26,7 +26,7 @@ const GitConnectorButton = () => {
         <Text fontWeight={"normal"} mr={2}>
           What is DevGPT?
         </Text>
-        <FaUserAstronaut color="white" />
+        <FaUserAstronaut />
       </Button>
       <Modal size='sm' isOpen={isOpen} onClose={onClose} isCentered={true}>
         <ModalOverlay />

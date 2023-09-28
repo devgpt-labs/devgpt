@@ -50,7 +50,7 @@ const Response = ({ content }: ResponseProps) => {
                   <Tag
                     size="lg"
                     cursor={"pointer"}
-                    colorScheme="whatsapp"
+                    colorScheme="blue"
                     onClick={() => {
                       copyToClipboard(String(children));
                       setCopied(true);

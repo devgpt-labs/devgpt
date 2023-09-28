@@ -22,7 +22,7 @@ import { IoMdSettings } from "react-icons/io";
 import { PiSignOutBold } from "react-icons/pi";
 import { AiFillStar } from "react-icons/ai";
 import getPromptCount from "@/utils/getPromptCount";
-import { BiSolidBookBookmark } from "react-icons/bi";
+import { BiKey, BiSolidBookBookmark } from "react-icons/bi";
 import {
   GiBattery100,
   GiBattery75,
@@ -54,6 +54,7 @@ interface Identity {
 //stores
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
+import KeyModal from "./KeyModal";
 
 // TODO: Convert all of the buttons on this menu to use this component
 const ProfileOptionIconButton = ({
@@ -93,14 +94,21 @@ const Profile = () => {
   const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
     defaultIsOpen: false,
   });
+
   const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const {
+    isOpen: isKeyOpen,
+    onOpen: onKeyOpen,
+    onClose: onKeyClose,
+  } = useDisclosure({ defaultIsOpen: false });
+
   useEffect(() => {
-    var identity = user?.identities?.find((identity: { provider: string }) =>
+    let identity = user?.identities?.find((identity: { provider: string }) =>
       ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
     )?.identity_data;
     setIdentity(identity);
@@ -120,6 +128,11 @@ const Profile = () => {
       rounded="lg"
       className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
     >
+      <KeyModal
+        isKeyOpen={isKeyOpen}
+        onKeyOpen={onKeyOpen}
+        onKeyClose={onKeyClose}
+      />
       <UpgradeModal
         isUpgradeOpen={isUpgradeOpen}
         onUpgradeOpen={onUpgradeOpen}
@@ -133,35 +146,33 @@ const Profile = () => {
       >
         <Flex flexDirection="row">
           {identity?.avatar_url && (
-            <Tooltip label={`via ${identity.provider}`}>
-              <Image
-                _hover={{
-                  boxShadow: "0px 0px 10px 0px gold",
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                alt="Avatar"
-                src={identity?.avatar_url}
-                style={{
-                  borderRadius: 10,
-                  objectFit: "cover",
-                }}
-                maxHeight={40}
-                width="40px"
-                height="40px"
-              />
-            </Tooltip>
+            <Image
+              _hover={{
+                boxShadow: "0px 0px 10px 0px gold",
+                transform: "translateY(-2px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              alt="Avatar"
+              src={identity?.avatar_url}
+              style={{
+                borderRadius: 10,
+                objectFit: "cover",
+              }}
+              maxHeight={40}
+              width="40px"
+              height="40px"
+            />
           )}
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
               <Text>{identity?.name}</Text>
               {isPro ? (
-                <Tag ml={2} colorScheme="teal">
+                <Tag ml={2} colorScheme="blue">
                   <Text mr={1}>Pro</Text>
                   <AiFillStar />
                 </Tag>
               ) : (
-                <Tag ml={2} colorScheme="teal">
+                <Tag ml={2} colorScheme="blue">
                   Free
                 </Tag>
               )}
@@ -175,9 +186,8 @@ const Profile = () => {
               <Flex gap={2}>
                 {!isPro && (
                   <Tooltip
-                    label={`${
-                      10 - promptCount
-                    }/10 Free Prompts Remaining Today`}
+                    label={`${10 - promptCount
+                      }/10 Free Prompts Remaining Today`}
                     placement="top"
                   >
                     <IconButton
@@ -305,6 +315,20 @@ const Profile = () => {
                 onClick={onSettingsToggle}
                 aria-label="Open Settings"
                 icon={<IoMdSettings size={18} />}
+              />
+            </Tooltip>
+            <Tooltip
+              label='Enter Open AI key'
+              placement="top"
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={onKeyOpen}
+                aria-label="Enter Open AI key"
+                icon={<BiKey size={18} />}
               />
             </Tooltip>
           </Flex>

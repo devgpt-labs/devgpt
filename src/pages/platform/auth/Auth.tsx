@@ -43,8 +43,7 @@ const Auth = () => {
         <>
           <Box
             className="w-full rounded-lg overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-            maxW="500px" // Set maximum width for larger screens
-            mx="auto" // Center the box horizontally
+            p={4}
           >
             <Header />
             <VStack spacing={2} mt={3} width="100%" alignItems="center">
@@ -57,14 +56,14 @@ const Auth = () => {
               <GitConnectorButton
                 color="#0c61db"
                 provider="Sign In With BitBucket"
-                handle={() => {}}
+                handle={() => { }}
                 Icon={FaBitbucket}
                 tooltip="Coming soon!"
               />
               <GitConnectorButton
                 color="#FC6D27"
                 provider="Sign In With GitLab"
-                handle={() => {}}
+                handle={() => { }}
                 Icon={AiFillGitlab}
                 tooltip="Coming soon!"
               />
