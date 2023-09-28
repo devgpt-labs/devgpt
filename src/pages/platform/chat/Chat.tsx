@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, SkeletonText } from "@chakra-ui/react";
+import { Box, Flex, Text, SkeletonText, Input, Button } from "@chakra-ui/react";
+import { useCompletion } from "ai/react";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -29,12 +30,14 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [failMessage, setFailMessage] = useState<string>("");
-  const [prompt, setPrompt] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
+  const [prompt, setPrompt] = useState<string>("");
 
   const { repo }: any = repoStore();
-  const { messages, setMessages }: any = messageStore();
+  // const { messages, setMessages }: any = messageStore();
   const { user, session }: any = authStore();
+
+  const { completion, handleInputChange, handleSubmit } = useCompletion();
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -44,21 +47,22 @@ const Chat = () => {
   // todo move this to session context
   if (!user) return null;
 
-  const submitHandler = async (prompt: string) => {
+  const submitChecks = async () => {
     setIsLoading(true);
-    setResponse("");
-    setPrompt("");
-    setIsFinished(false);
     setFailMessage("");
 
-    prompt = await userPrompt(
+    const modifiedPrompt = await userPrompt(
       prompt,
       repo.owner,
       repo.repo,
       String(session?.provider_token)
     );
 
-    const tokensInString = await getTokensFromString(prompt);
+    const target: any = { target: { value: modifiedPrompt } };
+
+    handleInputChange(target);
+
+    const tokensInString = await getTokensFromString(modifiedPrompt);
     const tokenLimit = await getTokenLimit(user.email);
     const isPro = await checkIfPro(user.email);
 
@@ -67,7 +71,7 @@ const Chat = () => {
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
       );
-      return null;
+      return false;
     }
 
     if (tokensInString > tokenLimit) {
@@ -75,44 +79,10 @@ const Chat = () => {
       setFailMessage(
         "Your prompt is too long currently to run, try to include less files and more precise information."
       );
-      return null;
+      return false;
     }
 
-    const newMessages: Array<any> = [
-      ...messages,
-      { role: "user", content: String(prompt) },
-    ];
-
-    setMessages(newMessages);
-
-    const response: Response = await fetch("/api/llms", {
-      method: "POST",
-      body: JSON.stringify({ messages: newMessages }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-
-    let completeResponse = "";
-
-    while (true) {
-      const { value, done: doneReading } = await reader.read();
-      const chunkValue = decoder.decode(value);
-
-      completeResponse += chunkValue;
-      if (doneReading) {
-        setIsFinished(true);
-        savePrompt(String(user.email), prompt.trim(), String(completeResponse));
-        break;
-      }
-
-      setResponse(completeResponse);
-    }
-
-    setIsLoading(false);
+    return true;
   };
 
   return (
@@ -124,23 +94,44 @@ const Chat = () => {
       >
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">
-          {isLoading && !response && (
+          <Input
+            className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+            value={prompt}
+            placeholder="Describe your business..."
+            onChange={(e: any) => {
+              setPrompt(e.target.value);
+            }}
+          />
+          <Button
+            onClick={async (e: any) => {
+              const checks = await submitChecks();
+              if (!checks) return null;
+              handleSubmit(e);
+            }}
+          >
+            Submit
+          </Button>
+
+          {isLoading && !completion ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
+          ) : (
+            <Response content={String(completion)} />
           )}
-          {response && (
+
+          {/* {response && (
             <>
               <Response content={String(response)} />
             </>
-          )}
+          )} */}
         </Box>
         <ConversationStyleToggle visible={isFinished} />
-        <PromptInput
+        {/* <PromptInput
           promptCount={promptCount}
           prompt={prompt}
           setPrompt={setPrompt}
           isLoading={isLoading}
           onSubmit={(prompt: any) => submitHandler(prompt)}
-        />
+        /> */}
         <Text mt={2} fontSize={14}>
           {failMessage}
         </Text>

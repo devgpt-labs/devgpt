@@ -40,7 +40,7 @@ export const PromptInput: FC<Props> = (props) => {
     e.preventDefault();
     if (props.prompt?.length === 0 || props.isLoading) return null;
     setHasSentAMessage(true);
-    props.onSubmit(props.prompt);
+    props.onSubmit(props.prompt, e);
   };
 
   // This logic breaks down the prompt to find @'d files

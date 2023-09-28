@@ -25,7 +25,9 @@
     "zustand": "^4.4.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-markdown": "^8.0.7",
-    "gpt-tokenizer": "^2.1.1"
+    "gpt-tokenizer": "^2.1.1",
+    "ai": "^2.2.13",
+    "openai": "^4.10.0"
   },
   "devDependencies": {
     "@types/node": "latest",
