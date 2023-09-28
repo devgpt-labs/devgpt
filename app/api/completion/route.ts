@@ -3,9 +3,7 @@ import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
 // Create an OpenAI API client (that's edge friendly!)
-const openai = new OpenAI({
-	// apiKey: "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",
-});
+const openai = new OpenAI({ apiKey: "" });
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge";
@@ -20,15 +18,15 @@ export async function POST(req: Request) {
 		model: "gpt-3.5-turbo",
 		stream: true,
 		messages: [
-      {
-        "role": "system",
-        "content": "I am a helpful assistant called Jerry"
-      },
-      {
-        "role": "user",
-        "content": "Hello world, what is your name?"
-      },
-    ]
+			{
+				role: "system",
+				content: "I am a helpful assistant called Jerry",
+			},
+			{
+				role: "user",
+				content: "Hello world, what is your name?",
+			},
+		],
 	});
 
 	// Convert the response into a friendly text-stream
