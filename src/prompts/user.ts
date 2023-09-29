@@ -31,7 +31,7 @@ const userInput = async (
   );
 
   prompt = `
-		Please ${prompt}
+		${prompt}
 
 		${
       existing_code?.length > 0

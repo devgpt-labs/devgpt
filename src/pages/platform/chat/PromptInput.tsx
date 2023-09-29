@@ -42,10 +42,8 @@ export const PromptInput: FC<Props> = (props) => {
     if (props.prompt?.length === 0 || props.isLoading) return null;
     setHasSentAMessage(true);
     setPreviousPrompt(props.prompt);
-    props.onSubmit(props.prompt, e);
+    props.onSubmit(props.prompt);
   };
-
-
 
   // This logic breaks down the prompt to find @'d files
   const regex = /@([^ ]+)/g;
@@ -64,7 +62,6 @@ export const PromptInput: FC<Props> = (props) => {
 
   console.log(lofaf);
   console.log(withAt);
-
 
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {

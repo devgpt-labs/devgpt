@@ -29,7 +29,6 @@ import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
-import examples from "./examples";
 
 //components
 type PageInfo = {
@@ -161,7 +160,7 @@ const RepoDrawer = () => {
     });
 
     // Get Lofaf
-    const lofaf = await getLofaf(repo.owner.login, repo.name, session)
+    const lofaf = await getLofaf(repo.owner.login, repo.name, session);
 
     // Manipulate lofaf
     let lofafArray = lofaf.tree;
@@ -176,7 +175,7 @@ const RepoDrawer = () => {
     setLofaf(lofafArray);
 
     // Create training data
-    const trainingData = await createTrainingData(
+    let trainingData = await createTrainingData(
       lofafString,
       {
         owner: repo.owner.login,
@@ -184,38 +183,21 @@ const RepoDrawer = () => {
       },
       user,
       session
-    )
+    );
 
-    // Set messages to be the training data
-    setMessages(trainingData);
+    console.log({ trainingData });
 
-    const baseContent = {
-      messages: [
-        {
-          role: "system",
-          content: "Marv is a factual chat-bot that is also sarcastic but very polite.",
-        },
-        { role: "user", content: "" },
-        {
-          role: "assistant",
-          content: "",
-        },
-      ],
-    };
-
-    // Replace the user question and assistant response with the examples
-    const content: any = examples.map((example) => {
-      const clonedContent = JSON.parse(JSON.stringify(baseContent)); // Clone the base content
-      clonedContent.messages[0].content = example.messages[0].content; // Set user question
-      clonedContent.messages[1].content = example.messages[1].content; // Set assistant response
-      return clonedContent;
-    });
+    return;
 
     // Convert the content to JSONL format
-    const jsonlContent = content.map(JSON.stringify).join("\n");
+    const jsonlContent = trainingData.map(JSON.stringify).join("\n");
+
+    console.log({ jsonlContent });
 
     // Convert to a blob
     const blob = new Blob([jsonlContent], { type: "text/plain" });
+
+    console.log({ blob });
 
     // Convert to a file
     const file = new File([blob], "training.jsonl");
@@ -226,18 +208,17 @@ const RepoDrawer = () => {
       purpose: "fine-tune",
     });
 
-    // Generate random ID for the fine-tuning job
-    // const randomID = Math.random().toString(36).substring(7);
-
     // Create a fine-tuning job from the uploaded file
     const finetune = await openai.fineTuning.jobs.create({
       training_file: uploadedFiles.id,
-      model: `gpt-3.5-turbo-0613`,
+      model: `gpt-3.5-turbo`,
+      hyperparameters: { n_epochs: 3 },
     });
+
+    console.log({ finetune });
 
     // Set the fine-tuning ID
     setFinetuningId(finetune.id);
-    console.log(finetune);
   };
 
   const checkProgressOfFineTuning = async () => {
@@ -249,11 +230,14 @@ const RepoDrawer = () => {
       console.log("Fine-tuning has completed successfully.");
       console.log("Fine-tuned model ID:", job.fine_tuned_model);
     } else if (job.status === "failed") {
-      console.log("Fine-tuning has failed. Check the error message:", job.error);
+      console.log(
+        "Fine-tuning has failed. Check the error message:",
+        job.error
+      );
     } else {
       console.log("Fine-tuning is still in progress.");
     }
-  }
+  };
 
   return (
     <>
@@ -335,7 +319,7 @@ const RepoDrawer = () => {
                           onClick={() => handleSelectRepo(repoOption)}
                         >
                           {repo.repo === repoOption.name &&
-                            repo.owner === repoOption.owner.login
+                          repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>

@@ -41,8 +41,6 @@ const KeyModal = ({ isKeyOpen, onKeyOpen, onKeyClose }: any) => {
   const retrieveKey = async () => {
     const cookieKey = await Cookies.get(cookieName);
 
-    console.log(cookieKey);
-
     if (cookieKey !== undefined) {
       setKey(JSON.parse(cookieKey));
     }

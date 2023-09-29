@@ -7,212 +7,217 @@ import sendLLM from "./sendLLM";
 import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
 import getCode from "./github/getCode";
+import generateTrainingPrompts from "@/prompts/generateTrainingPrompts";
+import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 
-const MAX_TRAINING_FILES = 15;
+const MAX_TRAINING_FILES = 20;
 
 const createTrainingData = async (
-	lofaf: string,
-	repo: any,
-	user: any,
-	session: any
+  lofaf: string,
+  repo: any,
+  user: any,
+  session: any
 ) => {
-	const emailAddress = user.email;
-	const access_token = session?.provider_token;
-	const owner = repo?.owner;
-	repo = repo?.repo;
+  const emailAddress = user.email;
+  const access_token = session?.provider_token;
+  const owner = repo?.owner;
+  repo = repo?.repo;
 
-	let newMessages: any = [];
+  console.log("called createTrainingData");
 
-	if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
-		return newMessages;
-	}
+  if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
+    return [];
+  }
 
-	try {
-		newMessages.push({
-			role: "system",
-			content: system(), //add system message
-		});
+  try {
+    let newMessages: any = [];
 
-		// add context messages
-		newMessages = await addContext(
-			newMessages,
-			lofaf,
-			owner,
-			repo,
-			access_token,
-			emailAddress
-		);
+    // add context messages
+    newMessages = await addContext(
+      newMessages,
+      lofaf,
+      owner,
+      repo,
+      access_token,
+      emailAddress
+    );
 
-		return newMessages;
-	} catch (error) {
-		console.warn(error);
-		return newMessages;
-	}
+    return newMessages;
+  } catch (error) {
+    console.warn(error);
+    return [];
+  }
 };
 
 export default createTrainingData;
 
 interface UsefulFile {
-	fileName: string;
+  fileName: string;
 }
 
 const addContext = async (
-	messages: Message[],
-	lofaf: string,
-	owner: string,
-	repo: string,
-	access_token: string,
-	emailAddress: string
+  messages: Message[],
+  lofaf: string,
+  owner: string,
+  repo: string,
+  access_token: string,
+  emailAddress: string
 ) => {
-	try {
+  try {
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
-		const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
+    const usefulFileContents: any = await getUsefulFileContents(
+      usefulFiles,
+      owner,
+      repo,
+      access_token
+    );
 
-		const usefulFileContents: any = await getUsefulFileContents(
-			usefulFiles,
-			owner,
-			repo,
-			access_token
-		);
+    const usefulFilePrompts: any = await getUsefulFilePrompts(
+      usefulFileContents
+    );
 
-		const usefulFilePrompts: any = await getUsefulFilePrompts(
-			usefulFileContents
-		);
+    const systemPrompt = await system();
 
-		usefulFilePrompts.forEach((prompt: any) => {
-			addMessage(messages, prompt.userPrompt, prompt.fileContent, emailAddress);
-		});
+    usefulFilePrompts.forEach((prompt: any) => {
+      const tokenLimit = await getTokenLimit(emailAddress);
+      if (getTokensFromString(prompt.fileContent) < tokenLimit) {
+        addMessage(
+          messages,
+          prompt.userPrompt,
+          prompt.fileContent,
+          prompt.fileName,
+          systemPrompt
+        );
+      }
+    });
 
-		return messages;
-	} catch {
-		return messages;
-	}
+    return messages;
+  } catch {
+    return messages;
+  }
 };
 
 const getUsefulFiles = async (lofaf: string) => {
-	try {
-		//todo move this to prompts folder
-		const response = await sendLLM(
-			`
-		You are about to help a software developer with their job.
-		This is the files in their project: "${lofaf}".
-		Return an example of a front-end and back-end file that you can use to understand the developer's coding style.
-		E.g. "MyFrontEndComponent.tsx", "my-back-end-route.ts", "README.md" 
-	`,
-			[
-				{
-					name: "process_useful_files_array",
-					description: "Processes an array of useful files.",
-					parameters: {
-						type: "object",
-						properties: {
-							useful_files_csv: {
-								type: "string",
-								description: "A comma separated list of useful files",
-							},
-							optional_comments: {
-								type: "string",
-								description: "Any optional comments about this list",
-							},
-						},
-					},
-				},
-			]
-		);
+  try {
+    const { prompt: filesPrompt, functions: filesFunction } =
+      await selectTrainingFiles(lofaf);
 
-		const { useful_files_csv } = JSON.parse(
-			response?.choices?.[0]?.message?.function_call?.arguments
-		);
+    const response = await sendLLM(filesPrompt, filesFunction);
 
-		const usefulFilesArray = useful_files_csv
-			.split(",")
-			.splice(0, MAX_TRAINING_FILES);
+    const { useful_files_csv } = JSON.parse(
+      response?.choices?.[0]?.message?.function_call?.arguments
+    );
 
-		return usefulFilesArray;
-	} catch (error) {
-		console.warn(error);
-		return [];
-	}
+    const usefulFilesArray = useful_files_csv
+      .split(",")
+      .splice(0, MAX_TRAINING_FILES);
+
+    return usefulFilesArray;
+  } catch (error) {
+    console.warn(error);
+    return [];
+  }
 };
 
 const getUsefulFileContents = async (
-	files: any,
-	owner: string,
-	repo: string,
-	access_token: string
+  files: any,
+  owner: string,
+  repo: string,
+  access_token: string
 ) => {
-	try {
-		// Map each item to a promise
-		const promises = files.map(async (file: any) => {
-			let code = await getCode(owner, repo, file.trim(), access_token);
-			code = code.content;
-			code = Buffer.from(code, "base64").toString("ascii");
+  try {
+    // Map each item to a promise
+    const promises = files.map(async (file: any) => {
+      let code = await getCode(owner, repo, file.trim(), access_token);
 
-			return { fileName: file, fileContent: code };
-		});
+      if (!code?.content) {
+        return;
+      }
 
-		// Wait for all promises to resolve
-		const filesWithContent = await Promise.all(promises);
+      code = code.content;
+      code = Buffer.from(code, "base64").toString("ascii");
 
-		return filesWithContent;
-	} catch (error) {
-		console.warn(error);
-		return false;
-	}
+      return { fileName: file, fileContent: code };
+    });
+
+    // Wait for all promises to resolve
+    let filesWithContent = await Promise.all(promises);
+
+    // Remove any undefined values
+    filesWithContent = filesWithContent.filter((file: any) => file);
+
+    return filesWithContent;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
 };
 
 const getUsefulFilePrompts = async (files: any) => {
-	try {
-		const promises = files.map(async (file: any) => {
-			const response = await sendLLM(
-				`
-					I am going to provide you with the contents of a software developer's file.
-					Can you respond with the prompts that the developer would have entered to generate this file?
+  try {
+    const promises = files.map(async (file: any) => {
+      if (!file.fileContent) {
+        return;
+      }
 
-					E.g. "Generate a readme for my project", "Make a component that the user can use to rate a conversation"
-					
-					File: "${file.fileContent}"
-				`
-			);
+      const { prompt: trainingPrompt } = await generateTrainingPrompts(
+        file.fileContent
+      );
 
-			const prompt = response?.choices?.[0]?.message?.content;
+      const response = await sendLLM(trainingPrompt);
 
-			return {
-				fileName: file.fileName,
-				fileContent: file.fileContent,
-				userPrompt: prompt,
-			};
-		});
+      const prompt = response?.choices?.[0]?.message?.content;
 
-		const filesWithPrompts = await Promise.all(promises);
+      return {
+        fileName: file.fileName,
+        fileContent: file.fileContent,
+        userPrompt: prompt,
+      };
+    });
 
-		return filesWithPrompts;
-	} catch (error) {
-		console.warn(error);
-		return false;
-	}
+    let filesWithPrompts = await Promise.all(promises);
+
+    // Remove any undefined values
+    filesWithPrompts = filesWithPrompts.filter((file: any) => file);
+
+    return filesWithPrompts;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
 };
 
 const addMessage = async (
-	messages: Message[],
-	userMessage: string,
-	assistantMessage: string,
-	emailAddress: string
+  messages: any,
+  userMessage: string,
+  assistantMessage: string,
+  fileName: string,
+  systemPrompt: string
 ) => {
-	const tokenLimit = await getTokenLimit(emailAddress);
-	if (getTokensFromString(userMessage) > tokenLimit) {
-		return messages;
-	}
+  const codeBlock = "````";
 
-	messages.push({
-		role: "user",
-		content: String(userMessage),
-	});
+  messages.push({
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: String(userMessage),
+      },
+      {
+        role: "assistant",
+        content: `
+Sure! Here you go:
+${codeBlock}${fileName}
+${assistantMessage}
+${codeBlock}
+				`,
+      },
+    ],
+  });
 
-	messages.push({
-		role: "assistant",
-		content: String(assistantMessage),
-	});
-
-	return messages;
+  return messages;
 };
