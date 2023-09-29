@@ -3,71 +3,86 @@ export const getPaginatedRepos = async (
   before?: string | null,
   after?: string
 ) => {
-  if (!access_token) return console.error("Error: No access token provided");
+  if (!access_token) {
+    console.error("Error: No access token provided");
+    return;
+  }
 
-  // Define the GitHub API GraphQL URL
   const graphql_api_url = "https://api.github.com/graphql";
 
-  // Set up headers with the access token for authentication
   const headers = {
     Authorization: `Bearer ${access_token}`,
     "Content-Type": "application/json",
   };
 
-  // Set up GraphQL query to fetch both user and organization repositories
-  const query = `query {
-    viewer {
-      repositories(first: 30, orderBy: { field: NAME, direction: ASC } ${
-        before ? `, before: "${before}"` : ""
-      }${after ? `, after: "${after}"` : ""}) {
-        nodes {
-          name
-          owner {
-            login
-          }
-        }
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
-        }
-        totalCount
-      }
-      organizations(first: 10) {
-        nodes {
-          repositories(first: 30, orderBy: { field: NAME, direction: ASC } ${
-            before ? `, before: "${before}"` : ""
-          }${after ? `, after: "${after}"` : ""}) {
+  const query = `
+      query GetPaginatedRepos($before: String, $after: String) {
+        viewer {
+          repositories(first: 50, orderBy: { field: NAME, direction: ASC }, before: $before, after: $after) {
             nodes {
               name
               owner {
                 login
               }
             }
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
+            totalCount
+          }
+          organizations(first: 10) {
+            nodes {
+              repositories(first: 50, orderBy: { field: NAME, direction: ASC }, before: $before, after: $after) {
+                nodes {
+                  name
+                  owner {
+                    login
+                  }
+                }
+              }
+            }
           }
         }
       }
-    }
-  }
-  `;
+    `;
 
   try {
-    // Make a GET request to the GitHub API
     const response = await fetch(graphql_api_url, {
       method: "POST",
       headers,
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({
+        query,
+        variables: {
+          before,
+          after,
+        },
+      }),
     });
 
-    // Parse the JSON response to get the list of repositories
+    if (!response.ok) {
+      throw new Error(
+        `GitHub API responded with ${response.status}: ${response.statusText}`
+      );
+    }
+
     const data = await response.json();
+
+    if (
+      !data.viewer ||
+      !data.viewer.repositories ||
+      !data.viewer.organizations
+    ) {
+      throw new Error("Unexpected response format from the GitHub API.");
+    }
+
     const userRepos = data.viewer.repositories.nodes;
     const orgRepos = data.viewer.organizations.nodes.flatMap(
       (org: any) => org.repositories.nodes
     );
 
-    // Combine user and organization repositories into a single array
     const allRepos = [...userRepos, ...orgRepos];
 
     return {
@@ -77,5 +92,15 @@ export const getPaginatedRepos = async (
     };
   } catch (error) {
     console.error(error);
+    return {
+      nodes: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: 0,
+    };
   }
 };
