@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 
 //stores
+import OpenAI from "openai";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import messageStore from "@/store/Messages";
@@ -28,6 +29,7 @@ import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
+import examples from "./examples";
 
 //components
 type PageInfo = {
@@ -37,11 +39,15 @@ type PageInfo = {
   endCursor: string;
 };
 
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
     defaultIsOpen: false,
   });
-
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
   const { setMessages } = messageStore();
   const { session, user }: any = authStore();
@@ -51,6 +57,7 @@ const RepoDrawer = () => {
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
   const [loading, setLoading] = useState(false); // For the refresh debounce
+  const [finetuningId, setFinetuningId] = useState<string>(""); // For the refresh debounce
   const btnRef = useRef<any>();
 
   useEffect(() => {
@@ -143,6 +150,111 @@ const RepoDrawer = () => {
     signUserOut();
   }
 
+  const handleSelectRepo = async (repo: any) => {
+    // Close the modal, no more user input required
+    onClose();
+
+    // Set repo to be the new repo
+    setRepo({
+      owner: repo.owner.login,
+      repo: repo.name,
+    });
+
+    // Get Lofaf
+    const lofaf = await getLofaf(repo.owner.login, repo.name, session)
+
+    // Manipulate lofaf
+    let lofafArray = lofaf.tree;
+    lofafArray = lofafArray.map((item: any) => {
+      return item.path;
+    });
+
+    // Join the lofaf together
+    const lofafString = lofafArray.join(",");
+
+    // Set Lofaf
+    setLofaf(lofafArray);
+
+    // Create training data
+    const trainingData = await createTrainingData(
+      lofafString,
+      {
+        owner: repo.owner.login,
+        repo: repo.name,
+      },
+      user,
+      session
+    )
+
+    // Set messages to be the training data
+    setMessages(trainingData);
+
+    const baseContent = {
+      messages: [
+        {
+          role: "system",
+          content: "Marv is a factual chat-bot that is also sarcastic but very polite.",
+        },
+        { role: "user", content: "" },
+        {
+          role: "assistant",
+          content: "",
+        },
+      ],
+    };
+
+    // Replace the user question and assistant response with the examples
+    const content: any = examples.map((example) => {
+      const clonedContent = JSON.parse(JSON.stringify(baseContent)); // Clone the base content
+      clonedContent.messages[0].content = example.messages[0].content; // Set user question
+      clonedContent.messages[1].content = example.messages[1].content; // Set assistant response
+      return clonedContent;
+    });
+
+    // Convert the content to JSONL format
+    const jsonlContent = content.map(JSON.stringify).join("\n");
+
+    // Convert to a blob
+    const blob = new Blob([jsonlContent], { type: "text/plain" });
+
+    // Convert to a file
+    const file = new File([blob], "training.jsonl");
+
+    // Upload the file to openai API
+    const uploadedFiles = await openai.files.create({
+      file,
+      purpose: "fine-tune",
+    });
+
+    // Generate random ID for the fine-tuning job
+    // const randomID = Math.random().toString(36).substring(7);
+
+    // Create a fine-tuning job from the uploaded file
+    const finetune = await openai.fineTuning.jobs.create({
+      training_file: uploadedFiles.id,
+      model: `gpt-3.5-turbo-0613`,
+    });
+
+    // Set the fine-tuning ID
+    setFinetuningId(finetune.id);
+    console.log(finetune);
+  };
+
+  const checkProgressOfFineTuning = async () => {
+    const job = await openai.fineTuning.jobs.retrieve(finetuningId);
+
+    console.log("Job Status:", job.status);
+
+    if (job.status === "succeeded") {
+      console.log("Fine-tuning has completed successfully.");
+      console.log("Fine-tuned model ID:", job.fine_tuned_model);
+    } else if (job.status === "failed") {
+      console.log("Fine-tuning has failed. Check the error message:", job.error);
+    } else {
+      console.log("Fine-tuning is still in progress.");
+    }
+  }
+
   return (
     <>
       <Drawer
@@ -164,7 +276,7 @@ const RepoDrawer = () => {
               <>
                 <InputGroup>
                   <Input
-                    pr="4.5rem"
+                    pr="10rem"
                     mb={2}
                     placeholder="Search repos"
                     value={filter}
@@ -172,7 +284,7 @@ const RepoDrawer = () => {
                       setFilter(e.target.value);
                     }}
                   />
-                  <InputRightElement width="4.5rem" mr={1}>
+                  <InputRightElement width="10rem" mr={1}>
                     <Button
                       size="sm"
                       onClick={handleRefresh}
@@ -180,6 +292,14 @@ const RepoDrawer = () => {
                       disabled={loading}
                     >
                       Refresh
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={checkProgressOfFineTuning}
+                      isLoading={loading}
+                      disabled={loading}
+                    >
+                      Check Progress
                     </Button>
                   </InputRightElement>
                 </InputGroup>
@@ -212,39 +332,7 @@ const RepoDrawer = () => {
 
                         <Button
                           size="sm"
-                          onClick={async () => {
-                            onClose();
-                            setRepo({
-                              owner: repoOption.owner.login,
-                              repo: repoOption.name,
-                            });
-
-                            await getLofaf(
-                              repoOption.owner.login,
-                              repoOption.name,
-                              session
-                            ).then(async (lofaf: any) => {
-                              let lofafArray = lofaf.tree;
-                              lofafArray = lofafArray.map((item: any) => {
-                                return item.path;
-                              });
-
-                              const lofafString = lofafArray.join(",");
-
-                              setLofaf(lofafArray);
-                              await createTrainingData(
-                                lofafString,
-                                {
-                                  owner: repoOption.owner.login,
-                                  repo: repoOption.name,
-                                },
-                                user,
-                                session
-                              ).then((trainingData) => {
-                                setMessages(trainingData);
-                              });
-                            });
-                          }}
+                          onClick={() => handleSelectRepo(repoOption)}
                         >
                           {repo.repo === repoOption.name &&
                             repo.owner === repoOption.owner.login
@@ -266,7 +354,6 @@ const RepoDrawer = () => {
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
                 <Skeleton height="30px" />
-
               </Stack>
             )}
           </DrawerBody>

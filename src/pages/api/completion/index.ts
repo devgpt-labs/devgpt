@@ -13,10 +13,14 @@ export default async function handler(req: Request, res: Response) {
   let { prompt } = await req.json();
 
   const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
-    stream: true,
+    model: "ft:gpt-3.5-turbo-0613:personal::83tJGjoZ",
+    // model: "gpt-3.5-turbo",
+    stream: false,
     messages: [{ role: "user", content: prompt }],
   });
-  const stream = OpenAIStream(response);
-  return new StreamingTextResponse(stream);
+
+  console.log(response);
+  
+  // const stream = OpenAIStream(response);
+  // return new StreamingTextResponse(stream);
 }

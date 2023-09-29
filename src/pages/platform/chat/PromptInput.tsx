@@ -45,6 +45,8 @@ export const PromptInput: FC<Props> = (props) => {
     props.onSubmit(props.prompt, e);
   };
 
+
+
   // This logic breaks down the prompt to find @'d files
   const regex = /@([^ ]+)/g;
   const withAt: any = [];
@@ -59,6 +61,10 @@ export const PromptInput: FC<Props> = (props) => {
       return file;
     }
   });
+
+  console.log(lofaf);
+  console.log(withAt);
+
 
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {

@@ -7,7 +7,6 @@ import sendLLM from "./sendLLM";
 import getTokenLimit from "./getTokenLimit";
 import getTokensFromString from "./getTokensFromString";
 import getCode from "./github/getCode";
-import Cookies from "js-cookie";
 
 const MAX_TRAINING_FILES = 15;
 
@@ -66,13 +65,6 @@ const addContext = async (
 	emailAddress: string
 ) => {
 	try {
-		// Check if cookies already exist with this repo + owner, if it does, use that instead
-		const cookieName = repo + "/" + owner;
-		const cookie = await Cookies.get(repo + owner);
-		if (cookie) {
-			console.log("This repo has already been trained in cookies, restoring.");
-			return JSON.parse(cookie);
-		}
 
 		const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
@@ -90,8 +82,6 @@ const addContext = async (
 		usefulFilePrompts.forEach((prompt: any) => {
 			addMessage(messages, prompt.userPrompt, prompt.fileContent, emailAddress);
 		});
-
-		Cookies.set(cookieName, JSON.stringify(messages), { expires: 14 });
 
 		return messages;
 	} catch {
