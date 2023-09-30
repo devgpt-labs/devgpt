@@ -14,8 +14,6 @@ const openai = new OpenAI({
 export default async function handler(req: Request, res: Response) {
   let { prompt } = await req.json();
 
-  console.log({ prompt });
-
   const systemPrompt = await system();
 
   const response = await openai.chat.completions.create({
@@ -26,8 +24,6 @@ export default async function handler(req: Request, res: Response) {
       { role: "user", content: prompt },
     ],
   });
-
-  //console.log(response);
 
   const stream = OpenAIStream(response);
   return new StreamingTextResponse(stream);

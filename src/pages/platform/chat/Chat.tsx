@@ -9,7 +9,8 @@ import {
   Button,
   useColorMode,
 } from "@chakra-ui/react";
-import { useCompletion } from "ai/react";
+import { useChat } from "ai/react";
+import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -40,18 +41,39 @@ const Chat = () => {
   const [failMessage, setFailMessage] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
   const [prompt, setPrompt] = useState<string>("");
+  const [trainingDataRetrieved, setTrainingDataRetrieved] =
+    useState<boolean>(false);
 
   // const { messages, setMessages }: any = messageStore();
   const { repo }: any = repoStore();
   const { colorMode } = useColorMode();
   const { user, session }: any = authStore();
 
-  const { completion, handleInputChange, handleSubmit } = useCompletion();
+  const { messages, initialMessages, handleInputChange, handleSubmit } =
+    useChat();
 
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
+
+  const retrieveTrainingData = async () => {
+    const trainingData = await Cookies.get(
+      `${repo.owner}_${repo.name}_training`
+    );
+    if (!trainingData) return;
+    console.log({ trainingData });
+    setTrainingDataRetrieved(true);
+    initialMessages(JSON.parse(String(trainingData)));
+  };
+
+  useEffect(() => {
+    retrieveTrainingData();
+  }, [repo]);
+
+  useEffect(() => {
+    retrieveTrainingData();
+  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -94,8 +116,12 @@ const Chat = () => {
     return true;
   };
 
+  if (!trainingDataRetrieved) {
+    return <Text>Please train a model before chatting with it.</Text>;
+  }
+
   return (
-    <Flex direction="column" w="full" maxW="6xl" maxH='70vh' my={40}>
+    <Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
       <Box
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
