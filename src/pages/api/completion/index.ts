@@ -2,7 +2,9 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 
 import OpenAI from "openai";
 
-// IMPORTANT! Set the runtime to edge
+//prompts
+import { system } from "@/prompts/system";
+
 export const runtime = "edge";
 
 const openai = new OpenAI({
@@ -12,11 +14,17 @@ const openai = new OpenAI({
 export default async function handler(req: Request, res: Response) {
   let { prompt } = await req.json();
 
+  console.log({ prompt });
+
+  const systemPrompt = await system();
+
   const response = await openai.chat.completions.create({
-    model: "ft:gpt-3.5-turbo-0613:personal::84ACw105",
-    // model: "gpt-3.5-turbo",
+    model: "gpt-4",
     stream: true,
-    messages: [{ role: "user", content: prompt }],
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: prompt },
+    ],
   });
 
   //console.log(response);

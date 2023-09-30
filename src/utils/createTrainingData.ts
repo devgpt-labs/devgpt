@@ -11,6 +11,7 @@ import generateTrainingPrompts from "@/prompts/generateTrainingPrompts";
 import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 
 const MAX_TRAINING_FILES = 20;
+const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true";
 
 const createTrainingData = async (
   lofaf: string,
@@ -22,8 +23,6 @@ const createTrainingData = async (
   const access_token = session?.provider_token;
   const owner = repo?.owner;
   repo = repo?.repo;
-
-  console.log("called createTrainingData");
 
   if (!lofaf || !owner || !repo || !access_token || !emailAddress) {
     return [];
@@ -41,6 +40,17 @@ const createTrainingData = async (
       access_token,
       emailAddress
     );
+
+    if (TRAIN_FOR_ENCODING) {
+      const systemPrompt = await system();
+
+      newMessages.unshift({
+        role: "system",
+        content: systemPrompt,
+      });
+    }
+
+    console.log({ newMessages });
 
     return newMessages;
   } catch (error) {
@@ -79,8 +89,9 @@ const addContext = async (
 
     const systemPrompt = await system();
 
+    const tokenLimit = await getTokenLimit(emailAddress);
+
     usefulFilePrompts.forEach((prompt: any) => {
-      const tokenLimit = await getTokenLimit(emailAddress);
       if (getTokensFromString(prompt.fileContent) < tokenLimit) {
         addMessage(
           messages,
@@ -197,12 +208,9 @@ const addMessage = async (
 ) => {
   const codeBlock = "````";
 
-  messages.push({
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
+  if (TRAIN_FOR_ENCODING) {
+    //train for encoding
+    messages.push(
       {
         role: "user",
         content: String(userMessage),
@@ -210,14 +218,36 @@ const addMessage = async (
       {
         role: "assistant",
         content: `
-Sure! Here you go:
-${codeBlock}${fileName}
-${assistantMessage}
-${codeBlock}
-				`,
-      },
-    ],
-  });
+				${codeBlock} ${fileName}
+				${assistantMessage}
+				${codeBlock}
+					`,
+      }
+    );
+  } else {
+    //train for fine-tuning
+    messages.push({
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: String(userMessage),
+        },
+        {
+          role: "assistant",
+          content: `
+	Sure! Here you go:
+	${codeBlock}${fileName}
+	${assistantMessage}
+	${codeBlock}
+					`,
+        },
+      ],
+    });
+  }
 
   return messages;
 };

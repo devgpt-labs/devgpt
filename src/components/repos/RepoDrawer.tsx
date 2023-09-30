@@ -17,6 +17,7 @@ import {
   InputRightElement,
   InputGroup,
 } from "@chakra-ui/react";
+import Cookies from "js-cookie";
 
 //stores
 import OpenAI from "openai";
@@ -48,7 +49,6 @@ const RepoDrawer = () => {
     defaultIsOpen: false,
   });
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { setMessages } = messageStore();
   const { session, user }: any = authStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -187,38 +187,38 @@ const RepoDrawer = () => {
 
     console.log({ trainingData });
 
-    return;
+    Cookies.set(
+      `${repo.owner.login}_${repo.name}_training`,
+      JSON.stringify(trainingData),
+      { expires: 30 }
+    );
 
-    // Convert the content to JSONL format
-    const jsonlContent = trainingData.map(JSON.stringify).join("\n");
+    if (process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true") {
+      // Convert the content to JSONL format
+      const jsonlContent = trainingData.map(JSON.stringify).join("\n");
 
-    console.log({ jsonlContent });
+      // Convert to a blob
+      const blob = new Blob([jsonlContent], { type: "text/plain" });
 
-    // Convert to a blob
-    const blob = new Blob([jsonlContent], { type: "text/plain" });
+      // Convert to a file
+      const file = new File([blob], "training.jsonl");
 
-    console.log({ blob });
+      // Upload the file to openai API
+      const uploadedFiles = await openai.files.create({
+        file,
+        purpose: "fine-tune",
+      });
 
-    // Convert to a file
-    const file = new File([blob], "training.jsonl");
+      // Create a fine-tuning job from the uploaded file
+      const finetune = await openai.fineTuning.jobs.create({
+        training_file: uploadedFiles.id,
+        model: `gpt-3.5-turbo`,
+        hyperparameters: { n_epochs: 3 },
+      });
 
-    // Upload the file to openai API
-    const uploadedFiles = await openai.files.create({
-      file,
-      purpose: "fine-tune",
-    });
-
-    // Create a fine-tuning job from the uploaded file
-    const finetune = await openai.fineTuning.jobs.create({
-      training_file: uploadedFiles.id,
-      model: `gpt-3.5-turbo`,
-      hyperparameters: { n_epochs: 3 },
-    });
-
-    console.log({ finetune });
-
-    // Set the fine-tuning ID
-    setFinetuningId(finetune.id);
+      // Set the fine-tuning ID
+      setFinetuningId(finetune.id);
+    }
   };
 
   const checkProgressOfFineTuning = async () => {
