@@ -2,13 +2,16 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 
 import OpenAI from "openai";
 
+//utils
+import getLLMToken from "@/utils/getLLMToken";
+
 //prompts
 import { system } from "@/prompts/system";
 
 export const runtime = "edge";
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  apiKey: getLLMToken(),
 });
 
 export default async function handler(req: Request, res: Response) {

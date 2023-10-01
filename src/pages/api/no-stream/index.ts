@@ -3,8 +3,11 @@ import OpenAI from "openai";
 // IMPORTANT! Set the runtime to edge
 //export const runtime = "edge";
 
+//utils
+import getLLMToken from "@/utils/getLLMToken";
+
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  apiKey: getLLMToken(),
 });
 
 import type { NextApiRequest, NextApiResponse } from "next";

@@ -26,6 +26,7 @@ import authStore from "@/store/Auth";
 import messageStore from "@/store/Messages";
 
 //utils
+import getLLMToken from "@/utils/getLLMToken";
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
@@ -40,7 +41,7 @@ type PageInfo = {
 };
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  apiKey: getLLMToken(),
   dangerouslyAllowBrowser: true,
 });
 
