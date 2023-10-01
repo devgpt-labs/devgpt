@@ -41,7 +41,7 @@ type PageInfo = {
 };
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY_1,
+  apiKey: getLLMToken(),
   dangerouslyAllowBrowser: true,
 });
 
@@ -187,8 +187,7 @@ const RepoDrawer = () => {
       session
     );
 
-    console.log({ trainingData });
-
+    //set training data in store
     setMessages(trainingData);
 
     Cookies.set(

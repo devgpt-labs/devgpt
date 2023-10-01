@@ -60,9 +60,6 @@ export const PromptInput: FC<Props> = (props) => {
     }
   });
 
-  console.log(lofaf);
-  console.log(withAt);
-
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {
     // Append currentSuggestion to prompt

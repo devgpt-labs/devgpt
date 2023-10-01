@@ -36,6 +36,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
+  const [initialMessages, setInitialMessages] = useState<string[]>([]);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [failMessage, setFailMessage] = useState<string>("");
@@ -49,8 +50,9 @@ const Chat = () => {
   const { colorMode } = useColorMode();
   const { user, session }: any = authStore();
 
-  const { messages, initialMessages, handleInputChange, handleSubmit } =
-    useChat();
+  const { messages, handleInputChange, handleSubmit } = useChat({
+    initialMessages: initialMessages,
+  });
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -60,22 +62,23 @@ const Chat = () => {
   const retrieveTrainingData = async () => {
     if (savedMessages.length > 0) {
       setTrainingDataRetrieved(true);
-      initialMessages(savedMessages);
+      setInitialMessages(savedMessages);
       return;
     } else {
       //load from cookies
       const trainingData = await Cookies.get(
         `${repo.owner}_${repo.name}_training`
       );
+
       if (!trainingData) return;
       setTrainingDataRetrieved(true);
-      initialMessages(JSON.parse(String(trainingData)));
+      setInitialMessages(JSON.parse(String(trainingData)));
     }
   };
 
   useEffect(() => {
     retrieveTrainingData();
-  }, [repo]);
+  }, [repo, savedMessages.length]);
 
   useEffect(() => {
     retrieveTrainingData();
@@ -156,13 +159,13 @@ const Chat = () => {
               Submit
             </Button>
           </Flex>
-          {isLoading && !completion ? (
+          {isLoading && !messages[messages.length - 1] ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
           ) : (
-            <Response content={String(completion)} />
+            <Response content={String(messages[messages.length - 1].content)} />
           )}
         </Box>
-        {completion && isFinished && (
+        {messages[messages.length - 1] && isFinished && (
           <Flex
             width="100%"
             flexDirection="row"

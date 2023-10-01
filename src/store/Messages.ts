@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 const useStore = create((set) => ({
   messages: [],
-  setMessages: () => set((messages: any) => ({ messages: messages })),
+  setMessages: (messages: any) => set({ messages }),
 }));
 
 export default useStore;

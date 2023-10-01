@@ -11,7 +11,7 @@ import generateTrainingPrompts from "@/prompts/generateTrainingPrompts";
 import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 
 const MAX_TRAINING_FILES = 20;
-const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true";
+const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE != "true";
 
 const createTrainingData = async (
   lofaf: string,
@@ -49,8 +49,6 @@ const createTrainingData = async (
         content: systemPrompt,
       });
     }
-
-    console.log({ newMessages });
 
     return newMessages;
   } catch (error) {

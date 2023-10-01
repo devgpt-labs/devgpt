@@ -5,9 +5,6 @@ import OpenAI from "openai";
 //utils
 import getLLMToken from "@/utils/getLLMToken";
 
-//prompts
-import { system } from "@/prompts/system";
-
 export const runtime = "edge";
 
 const openai = new OpenAI({
@@ -15,17 +12,14 @@ const openai = new OpenAI({
 });
 
 export default async function handler(req: Request, res: Response) {
-  let { prompt } = await req.json();
+  let { messages } = await req.json();
 
-  const systemPrompt = await system();
+  console.log({ messages });
 
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     stream: true,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt },
-    ],
+    messages: messages,
   });
 
   const stream = OpenAIStream(response);
