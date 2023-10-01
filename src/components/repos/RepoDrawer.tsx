@@ -41,7 +41,7 @@ type PageInfo = {
 };
 
 const openai = new OpenAI({
-  apiKey: getLLMToken(),
+  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY_1,
   dangerouslyAllowBrowser: true,
 });
 
@@ -51,6 +51,7 @@ const RepoDrawer = () => {
   });
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
   const { session, user }: any = authStore();
+  const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
   const [reposCount, setReposCount] = useState<number>(0);
@@ -187,6 +188,8 @@ const RepoDrawer = () => {
     );
 
     console.log({ trainingData });
+
+    setMessages(trainingData);
 
     Cookies.set(
       `${repo.owner.login}_${repo.name}_training`,

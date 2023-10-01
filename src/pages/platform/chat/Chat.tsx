@@ -44,7 +44,7 @@ const Chat = () => {
   const [trainingDataRetrieved, setTrainingDataRetrieved] =
     useState<boolean>(false);
 
-  // const { messages, setMessages }: any = messageStore();
+  const { messages: savedMessages }: any = messageStore();
   const { repo }: any = repoStore();
   const { colorMode } = useColorMode();
   const { user, session }: any = authStore();
@@ -58,13 +58,19 @@ const Chat = () => {
   }, [user?.email]);
 
   const retrieveTrainingData = async () => {
-    const trainingData = await Cookies.get(
-      `${repo.owner}_${repo.name}_training`
-    );
-    if (!trainingData) return;
-    console.log({ trainingData });
-    setTrainingDataRetrieved(true);
-    initialMessages(JSON.parse(String(trainingData)));
+    if (savedMessages.length > 0) {
+      setTrainingDataRetrieved(true);
+      initialMessages(savedMessages);
+      return;
+    } else {
+      //load from cookies
+      const trainingData = await Cookies.get(
+        `${repo.owner}_${repo.name}_training`
+      );
+      if (!trainingData) return;
+      setTrainingDataRetrieved(true);
+      initialMessages(JSON.parse(String(trainingData)));
+    }
   };
 
   useEffect(() => {
