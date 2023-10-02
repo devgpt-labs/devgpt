@@ -125,10 +125,6 @@ const Chat = () => {
     return true;
   };
 
-  if (!trainingDataRetrieved) {
-    return <Text>Please train a model before chatting with it.</Text>;
-  }
-
   return (
     <Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
       <Box
@@ -136,6 +132,9 @@ const Chat = () => {
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
         justifyContent="flex-start"
       >
+        {trainingDataRetrieved && (
+          <Text>Please train a model before chatting with it.</Text>
+        )}
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">
           <Flex flexDirection="row" mt={4}>
@@ -162,7 +161,9 @@ const Chat = () => {
           {isLoading && !messages[messages.length - 1] ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
           ) : (
-            <Response content={String(messages[messages.length - 1].content)} />
+            <Response
+              content={String(messages[messages.length - 1]?.content)}
+            />
           )}
         </Box>
         {messages[messages.length - 1] && isFinished && (
