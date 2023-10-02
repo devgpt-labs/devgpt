@@ -8,8 +8,6 @@ const openai = new OpenAI({
 });
 
 const handler = async (req: Request, res: Response) => {
-	console.log("ran");
-
 	let { prompt } = await req.json();
 
 	const response: any = await openai.chat.completions.create({

@@ -10,7 +10,6 @@ const sendLLM = async (prompt: string, functions?: any) => {
   const json = await response.json();
 
   console.log(json);
-  
 
   return json;
 };

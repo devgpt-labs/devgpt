@@ -145,7 +145,6 @@ const RepoDrawer = () => {
     return null;
   }
 
-  console.log(session);
   if (!session.provider_token) {
 
     signUserOut();
@@ -249,7 +248,6 @@ const RepoDrawer = () => {
         latency: 0,
       },
     ]);
-    console.log(finetune);
   };
 
   const checkProgressOfFineTuning = async () => {

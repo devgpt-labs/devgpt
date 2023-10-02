@@ -61,8 +61,6 @@ const Chat = () => {
 		handleSubmit(e);
 	};
 
-	console.log({ messages });
-
 	// This logic breaks down the prompt to find @'d files
 	const regex = /@([^ ]+)/g;
 	const withAt: any = [];
@@ -181,8 +179,6 @@ const Chat = () => {
 								<Flex flexDirection="row" flexWrap="wrap">
 									<SlideFade key={match} in={selectedFile[0] ? true : false}>
 										{selectedFile.map((file: any, index: any) => {
-											console.log(file);
-
 											if (index > 12) return null;
 											return (
 												<Tag
