@@ -13,11 +13,12 @@ import {
 	Tag,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
-
+import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
+import messageStore from "@/store/Messages";
 
 //prompts
 import userPrompt from "@/prompts/user";
@@ -40,19 +41,26 @@ import Calculator from "@/components/repos/Calculator";
 
 const Chat = () => {
 	const [response, setResponse] = useState<string>("");
-	const [previousPrompt, setPreviousPrompt] = useState<string>("");
+	const [initialMessages, setInitialMessages] = useState<any>([]);
 	const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+
+	const [previousPrompt, setPreviousPrompt] = useState<string>("");
 	const [isFinished, setIsFinished] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [failMessage, setFailMessage] = useState<string>("");
 	const [promptCount, setPromptCount] = useState<number>(0);
 	const [prompt, setPrompt] = useState<string>("");
+	const [trainingDataRetrieved, setTrainingDataRetrieved] =
+		useState<boolean>(false);
 
-	const { repo, repoWindowOpen, setRepoWindowOpen, lofaf }: any = repoStore();
+	const { messages: savedMessages }: any = messageStore();
+	const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
 	const { colorMode } = useColorMode();
 	const { user, session }: any = authStore();
 
-	const { messages, input, handleInputChange, handleSubmit } = useChat();
+	const { messages, handleInputChange, handleSubmit } = useChat({
+		initialMessages: initialMessages,
+	});
 
 	const submitPrompt = (e: any) => {
 		setPreviousPrompt(prompt);
@@ -68,6 +76,34 @@ const Chat = () => {
 	while ((match = regex.exec(prompt))) {
 		withAt.push(match[1]);
 	}
+
+	const retrieveTrainingData = async () => {
+		if (savedMessages.length > 0) {
+			setTrainingDataRetrieved(true);
+			setInitialMessages(savedMessages);
+			return;
+		} else {
+			//load from cookies
+			const trainingData = await Cookies.get(
+				`${repo.owner}_${repo.name}_training`
+			);
+
+			if (!trainingData) return;
+			setTrainingDataRetrieved(true);
+			setInitialMessages(JSON.parse(String(trainingData)));
+		}
+	};
+
+	useEffect(() => {
+		retrieveTrainingData();
+	}, [repo, savedMessages.length]);
+
+	useEffect(() => {
+		retrieveTrainingData();
+	}, []);
+
+	// todo move this to session context
+	if (!user) return null;
 
 	// Get the current file being targeted with @
 	const selectedFile = lofaf?.filter((file: any) => {
@@ -138,108 +174,109 @@ const Chat = () => {
 
 	return (
 		<Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
+			{/* {messages.map(m => (
+					<div key={m.id}>
+						{m.role === 'user' ? 'User: ' : 'AI: '}
+						{m.content}
+					</div>
+				))} */}
 			<Box
 				rounded="lg"
 				className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
 				justifyContent="flex-start"
 			>
+				{!repo.repo && (
+					<>
+						<Button
+							width="100%"
+							mt={4}
+							onClick={() => {
+								setRepoWindowOpen(!repoWindowOpen);
+							}}
+						>
+							Select a repo to get started
+						</Button>
+						<Text fontSize={12} mt={2}>
+							{failMessage}
+						</Text>
+					</>
+				)}
 				<Header />
-				{messages.map(m => (
-					<div key={m.id}>
-						{m.role === 'user' ? 'User: ' : 'AI: '}
-						{m.content}
-					</div>
-				))}
 				<Box className="max-h-[50vh] overflow-y-auto">
-					<Flex flexDirection="column" mt={4}>
-						{/* {!repo.repo && (
-							<>
-								<Button
-									width="100%"
-									mt={4}
-									onClick={() => {
-										setRepoWindowOpen(!repoWindowOpen);
-									}}
-								>
-									Select a repo to get started
-								</Button>
-								<Text fontSize={12} mt={2}>
-									{failMessage}
-								</Text>
-							</>
-						)} */}
-						{true && (
-							<>
-								{withAt?.length > 0 && (
-									<Flex alignItems={"center"} my={2}>
-										<Kbd>Tab</Kbd>
-										<Text ml={1}> to accept suggestion</Text>
-									</Flex>
-								)}
-								<Flex flexDirection="row" flexWrap="wrap">
-									<SlideFade key={match} in={selectedFile[0] ? true : false}>
-										{selectedFile.map((file: any, index: any) => {
-											if (index > 12) return null;
-											return (
-												<Tag
-													mr={1}
-													mb={1}
-													key={file}
-													cursor="pointer"
-													onClick={() => handleKeyDown(file)}
-												>
-													{file}
-												</Tag>
-											);
-										})}
-									</SlideFade>
-								</Flex>
-								<Flex flexDirection="row">
-									<Input
-										className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-										value={prompt}
-										placeholder="Describe your business..."
-										onChange={(e: any) => {
-											setPrompt(e.target.value);
-										}}
-										onKeyDown={(e: any) => {
-											// If key equals tab, autocomplete
-											if (e.key === "Tab") {
-												e.preventDefault();
-												handleKeyDown(selectedFile[0]);
-												return;
-											}
-
-											// If key equals enter, submit
-											if (e.key === "Enter" && !e.shiftKey) {
-												e.preventDefault();
-												submitPrompt(e);
-												return;
-											}
-										}}
-									/>
-									<Button
-										bgGradient={"linear(to-r, blue.500, teal.500)"}
-										ml={4}
-										onClick={async (e: any) => {
-											const checks = await submitChecks();
-											if (!checks) return null;
-											submitPrompt(e);
-										}}
+					{withAt?.length > 0 && (
+						<Flex alignItems={"center"} my={2}>
+							<Kbd>Tab</Kbd>
+							<Text ml={1}> to accept suggestion</Text>
+						</Flex>
+					)}
+					<Flex flexDirection="row" flexWrap="wrap">
+						<SlideFade key={match} in={selectedFile[0] ? true : false}>
+							{selectedFile.map((file: any, index: any) => {
+								if (index > 12) return null;
+								return (
+									<Tag
+										mr={1}
+										mb={1}
+										key={file}
+										cursor="pointer"
+										onClick={() => handleKeyDown(file)}
 									>
-										Submit
-									</Button>
-								</Flex>
-							</>
-						)}
+										{file}
+									</Tag>
+								);
+							})}
+						</SlideFade>
 					</Flex>
-					{/* {isLoading && !completion ? (
-						<SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
+					<Flex flexDirection="row" mt={4}>
+						<Input
+							className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+							value={prompt}
+							placeholder="Describe your business..."
+							onChange={(e: any) => {
+								setPrompt(e.target.value);
+							}}
+							onKeyDown={(e: any) => {
+								// If key equals tab, autocomplete
+								if (e.key === "Tab") {
+									e.preventDefault();
+									handleKeyDown(selectedFile[0]);
+									return;
+								}
+
+								// If key equals enter, submit
+								if (e.key === "Enter" && !e.shiftKey) {
+									e.preventDefault();
+									submitPrompt(e);
+									return;
+								}
+							}}
+						/>
+						<Button
+							bgGradient={"linear(to-r, blue.500, teal.500)"}
+							ml={4}
+							onClick={async (e: any) => {
+								const checks = await submitChecks();
+								if (!checks) return null;
+								handleSubmit(e);
+							}}
+						>
+							Submit
+						</Button>
+					</Flex>
+					{isLoading && !messages[messages.length - 1] ? (
+						<SkeletonText
+							mt="4"
+							noOfLines={4}
+							spacing="4"
+							skeletonHeight="2"
+						/>
 					) : (
-						<Response content={String(completion)} />
-					)} */}
+						<Response
+							content={String(messages[messages.length - 1]?.content)}
+						/>
+					)}
 				</Box>
-				{/* {completion && isFinished && (
+				{messages[messages.length - 1] && isFinished && (
 					<Flex
 						width="100%"
 						flexDirection="row"
@@ -267,17 +304,16 @@ const Chat = () => {
 							Start A New Chat
 						</Button>
 					</Flex>
-				)} */}
+				)}
 				<Text mt={2} fontSize={14}>
 					{failMessage}
-				</Text>{" "}
+				</Text>
 				<SlideFade in={hasSentAMessage} offsetY="20px">
 					<Text mt={5}>{previousPrompt}</Text>
 				</SlideFade>
 			</Box>
 			<Profile />
 			<Training />
-			{/* <Calculator /> */}
 		</Flex>
 	);
 };

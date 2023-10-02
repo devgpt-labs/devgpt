@@ -1,19 +1,24 @@
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import OpenAI from "openai";
 
-// IMPORTANT! Set the runtime to edge
+//utils
+import getLLMToken from "@/utils/getLLMToken";
+
 export const runtime = "edge";
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  apiKey: getLLMToken(),
 });
 
 export default async function handler(req: Request, res: Response) {
-  let { prompt } = await req.json();
-    const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+  let { messages } = await req.json();
+
+  console.log({ messages });
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
     stream: true,
-    messages: [{ role: "user", content: prompt }],
+    messages: messages,
   });
 
   const stream = OpenAIStream(response);

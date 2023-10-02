@@ -9,9 +9,7 @@ const sendLLM = async (prompt: string, functions?: any) => {
 
   const json = await response.json();
 
-  console.log(json);
-
-  return json;
+  return json.data;
 };
 
 export default sendLLM;

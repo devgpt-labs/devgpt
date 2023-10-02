@@ -39,13 +39,56 @@ export const PromptInput: FC<Props> = (props) => {
     e.preventDefault();
     if (props.prompt?.length === 0 || props.isLoading) return null;
     setHasSentAMessage(true);
-    props.onSubmit(props.prompt, e);
+    setPreviousPrompt(props.prompt);
+    props.onSubmit(props.prompt);
   };
 
+  // This logic breaks down the prompt to find @'d files
+  const regex = /@([^ ]+)/g;
+  const withAt: any = [];
+  let match: any;
+  while ((match = regex.exec(props.prompt))) {
+    withAt.push(match[1]);
+  }
 
+  // Get the current file being targeted with @
+  const selectedFile = lofaf?.filter((file: any) => {
+    if (file?.toLowerCase()?.includes(withAt?.[0]?.toLowerCase())) {
+      return file;
+    }
+  });
 
+  // If the user clicks tab, we want to autocomplete the file name
+  const handleKeyDown = (file: any) => {
+    // Append currentSuggestion to prompt
+    const promptArray = props.prompt.split(" ");
 
+    const lastWord = promptArray[promptArray?.length - 1];
+    const newPrompt = props.prompt.replace(lastWord, `~${file}`);
 
+    props.setPrompt(newPrompt);
+    // Refocus on input
+    const input = document.getElementById("message");
+    input?.focus();
+  };
+
+  if (!repo.repo) {
+    return (
+      <>
+        <Button
+          mt={4}
+          onClick={() => {
+            setRepoWindowOpen(!repoWindowOpen);
+          }}
+        >
+          Select a repo to get started
+        </Button>
+        <Text fontSize={12} mt={2}>
+          {failMessage}
+        </Text>
+      </>
+    );
+  }
 
   if (messages?.length === 0 && repo.repo) {
     return (

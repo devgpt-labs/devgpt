@@ -17,6 +17,7 @@ import {
   InputRightElement,
   InputGroup,
 } from "@chakra-ui/react";
+import Cookies from "js-cookie";
 
 //stores
 import OpenAI from "openai";
@@ -25,11 +26,11 @@ import authStore from "@/store/Auth";
 import messageStore from "@/store/Messages";
 
 //utils
+import getLLMToken from "@/utils/getLLMToken";
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
-import examples from "./examples";
 
 //components
 type PageInfo = {
@@ -40,7 +41,7 @@ type PageInfo = {
 };
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+  apiKey: getLLMToken(),
   dangerouslyAllowBrowser: true,
 });
 
@@ -50,6 +51,7 @@ const RepoDrawer = () => {
   });
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
   const { session, user }: any = authStore();
+  const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
   const [reposCount, setReposCount] = useState<number>(0);
@@ -161,7 +163,7 @@ const RepoDrawer = () => {
     });
 
     // Get Lofaf
-    const lofaf = await getLofaf(repo.owner.login, repo.name, session)
+    const lofaf = await getLofaf(repo.owner.login, repo.name, session);
 
     // Manipulate lofaf
     let lofafArray = lofaf.tree;
@@ -176,7 +178,7 @@ const RepoDrawer = () => {
     setLofaf(lofafArray);
 
     // Create training data
-    const trainingData = await createTrainingData(
+    let trainingData = await createTrainingData(
       lofafString,
       {
         owner: repo.owner.login,
@@ -184,70 +186,55 @@ const RepoDrawer = () => {
       },
       user,
       session
-    )
+    );
 
-    const baseContent = {
-      messages: [
+    //set training data in store
+    setMessages(trainingData);
+
+    if (process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true") {
+      // Convert the content to JSONL format
+      const jsonlContent = trainingData.map(JSON.stringify).join("\n");
+
+      // Convert to a blob
+      const blob = new Blob([jsonlContent], { type: "text/plain" });
+
+      // Convert to a file
+      const file = new File([blob], "training.jsonl");
+
+      // Upload the file to openai API
+      const uploadedFiles = await openai.files.create({
+        file,
+        purpose: "fine-tune",
+      });
+
+      // Create a fine-tuning job from the uploaded file
+      const finetune = await openai.fineTuning.jobs.create({
+        training_file: uploadedFiles.id,
+        model: `gpt-3.5-turbo`,
+        hyperparameters: { n_epochs: 3 },
+      });
+
+      // Create a new row in the models table in Supabase
+      if (!supabase) return
+
+      const { data, error } = await supabase.from("models").insert([
         {
-          role: "system",
-          content: "Marv is a factual chat-bot that is also sarcastic but very polite.",
+          user_id: user.id,
+          repo: repo.name,
+          owner: repo.owner.login,
+          branch: 'main',
+          training_data: finetune.id,
+          training_method: 'fine-tune',
+          quantity: 0,
+          epochs: 0,
+          // latency: 0,
+          // frequency: 0,
         },
-        { role: "user", content: "" },
-        {
-          role: "assistant",
-          content: "",
-        },
-      ],
-    };
+      ]);
 
-    // Replace the user question and assistant response with the examples
-    const content: any = examples.map((example) => {
-      const clonedContent = JSON.parse(JSON.stringify(baseContent)); // Clone the base content
-      clonedContent.messages[0].content = example.messages[0].content; // Set user question
-      clonedContent.messages[1].content = example.messages[1].content; // Set assistant response
-      return clonedContent;
-    });
-
-    // Convert the content to JSONL format
-    const jsonlContent = content.map(JSON.stringify).join("\n");
-
-    // Convert to a blob
-    const blob = new Blob([jsonlContent], { type: "text/plain" });
-
-    // Convert to a file
-    const file = new File([blob], "training.jsonl");
-
-    // Upload the file to openai API
-    const uploadedFiles = await openai.files.create({
-      file,
-      purpose: "fine-tune",
-    });
-
-    // Generate random ID for the fine-tuning job
-    // const randomID = Math.random().toString(36).substring(7);
-
-    // Create a fine-tuning job from the uploaded file
-    const finetune = await openai.fineTuning.jobs.create({
-      training_file: uploadedFiles.id,
-      model: `gpt-3.5-turbo`,
-    });
-
-    // Set the fine-tuning ID
-    setFinetuningId(finetune.id);
-
-    // Create a new row in the models table in Supabase
-    if (!supabase) return
-    const { data, error } = await supabase.from("models").insert([
-      {
-        user_id: user.id,
-        repo: repo.name,
-        owner: repo.owner.login,
-        model: finetune.id,
-        branch: 'main',
-        epochs: 0,
-        latency: 0,
-      },
-    ]);
+      // Set the fine-tuning ID
+      setFinetuningId(finetune.id);
+    }
   };
 
   const checkProgressOfFineTuning = async () => {
@@ -259,11 +246,14 @@ const RepoDrawer = () => {
       console.log("Fine-tuning has completed successfully.");
       console.log("Fine-tuned model ID:", job.fine_tuned_model);
     } else if (job.status === "failed") {
-      console.log("Fine-tuning has failed. Check the error message:", job.error);
+      console.log(
+        "Fine-tuning has failed. Check the error message:",
+        job.error
+      );
     } else {
       console.log("Fine-tuning is still in progress.");
     }
-  }
+  };
 
   return (
     <>
