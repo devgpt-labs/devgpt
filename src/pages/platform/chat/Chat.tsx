@@ -9,7 +9,8 @@ import {
   Button,
   useColorMode,
 } from "@chakra-ui/react";
-import { useCompletion } from "ai/react";
+import { useChat } from "ai/react";
+import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -35,23 +36,53 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 const Chat = () => {
   const [response, setResponse] = useState<string>("");
+  const [initialMessages, setInitialMessages] = useState<string[]>([]);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [failMessage, setFailMessage] = useState<string>("");
   const [promptCount, setPromptCount] = useState<number>(0);
   const [prompt, setPrompt] = useState<string>("");
+  const [trainingDataRetrieved, setTrainingDataRetrieved] =
+    useState<boolean>(false);
 
-  // const { messages, setMessages }: any = messageStore();
+  const { messages: savedMessages }: any = messageStore();
   const { repo }: any = repoStore();
   const { colorMode } = useColorMode();
   const { user, session }: any = authStore();
 
-  const { completion, handleInputChange, handleSubmit } = useCompletion();
+  const { messages, handleInputChange, handleSubmit } = useChat({
+    initialMessages: initialMessages,
+  });
 
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
+
+  const retrieveTrainingData = async () => {
+    if (savedMessages.length > 0) {
+      setTrainingDataRetrieved(true);
+      setInitialMessages(savedMessages);
+      return;
+    } else {
+      //load from cookies
+      const trainingData = await Cookies.get(
+        `${repo.owner}_${repo.name}_training`
+      );
+
+      if (!trainingData) return;
+      setTrainingDataRetrieved(true);
+      setInitialMessages(JSON.parse(String(trainingData)));
+    }
+  };
+
+  useEffect(() => {
+    retrieveTrainingData();
+  }, [repo, savedMessages.length]);
+
+  useEffect(() => {
+    retrieveTrainingData();
+  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -95,12 +126,15 @@ const Chat = () => {
   };
 
   return (
-    <Flex direction="column" w="full" maxW="6xl" maxH='70vh' my={40}>
+    <Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
       <Box
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
         justifyContent="flex-start"
       >
+        {trainingDataRetrieved && (
+          <Text>Please train a model before chatting with it.</Text>
+        )}
         <Header />
         <Box className="max-h-[50vh] overflow-y-auto">
           <Flex flexDirection="row" mt={4}>
@@ -124,13 +158,15 @@ const Chat = () => {
               Submit
             </Button>
           </Flex>
-          {isLoading && !completion ? (
+          {isLoading && !messages[messages.length - 1] ? (
             <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
           ) : (
-            <Response content={String(completion)} />
+            <Response
+              content={String(messages[messages.length - 1]?.content)}
+            />
           )}
         </Box>
-        {completion && isFinished && (
+        {messages[messages.length - 1] && isFinished && (
           <Flex
             width="100%"
             flexDirection="row"
