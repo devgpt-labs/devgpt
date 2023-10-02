@@ -18,18 +18,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  const { prompt, functions, system } = req.body;
+  let { prompt, functions, system, messages }: any = req.body;
 
-  const messages: any = [{ role: "user", content: prompt }];
+  messages = messages || [];
+
+  messages.push({ role: "user", content: prompt });
 
   if (system) {
     messages.unshift({ role: "system", content: system });
   }
 
-  console.log({ messages });
-
   const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     functions: functions || undefined,
     stream: false,
     messages: messages,

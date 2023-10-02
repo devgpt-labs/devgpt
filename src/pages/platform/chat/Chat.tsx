@@ -12,6 +12,7 @@ import {
   Kbd,
   Tag,
   useDisclosure,
+  Heading,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -133,30 +134,41 @@ const Chat = () => {
   // todo move this to session context
   if (!user) return null;
 
-  const submitChecks = async () => {
-    setPreviousPrompt(prompt);
-    setHasSentAMessage(true);
+  const submitChecks = async (ignoreFeedback: boolean) => {
     setIsLoading(true);
     setFailMessage("");
+    setPreviousPrompt(prompt);
 
-    const promptFeedback = await promptCorrection(prompt);
+    if (!ignoreFeedback) {
+      const promptFeedback = await promptCorrection(prompt, lofaf);
 
-    if (promptFeedback?.changes) {
-      //display promptCorrection modal
-      setCorrectedPrompt(promptFeedback?.correctedPrompt);
-      onOpen();
-      return false;
+      if (promptFeedback?.changes) {
+        //display promptCorrection modal
+        setCorrectedPrompt(promptFeedback?.correctedPrompt);
+        onOpen();
+        return false;
+      }
     }
-    return false; // do not submit any prompts
+
+    const newPrompt = ignoreFeedback ? correctedPrompt || prompt : prompt;
+
+    let target: any = {
+      target: { value: newPrompt },
+    };
+
+    setHasSentAMessage(true);
+    handleInputChange(target);
+    setPrompt(newPrompt);
+    setPreviousPrompt(newPrompt);
 
     const modifiedPrompt = await userPrompt(
-      prompt,
+      newPrompt,
       repo.owner,
       repo.repo,
       String(session?.provider_token)
     );
 
-    const target: any = { target: { value: modifiedPrompt } };
+    target = { target: { value: modifiedPrompt } };
 
     handleInputChange(target);
 
@@ -186,12 +198,6 @@ const Chat = () => {
   return (
     <>
       <Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
-        {/* {messages.map(m => (
-					<div key={m.id}>
-						{m.role === 'user' ? 'User: ' : 'AI: '}
-						{m.content}
-					</div>
-				))} */}
         <Box
           rounded="lg"
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -258,7 +264,7 @@ const Chat = () => {
                   // If key equals enter, submit
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    const checks = await submitChecks();
+                    const checks = await submitChecks(false);
                     if (!checks) return null;
                     handleSubmit(e);
                   }
@@ -268,7 +274,7 @@ const Chat = () => {
                 bgGradient={"linear(to-r, blue.500, teal.500)"}
                 ml={4}
                 onClick={async (e: any) => {
-                  const checks = await submitChecks();
+                  const checks = await submitChecks(false);
                   if (!checks) return null;
                   handleSubmit(e);
                 }}
@@ -322,7 +328,7 @@ const Chat = () => {
             {failMessage}
           </Text>
           <SlideFade in={hasSentAMessage} offsetY="20px">
-            <Text mt={5}>{previousPrompt}</Text>
+            <Heading mt={5}>{previousPrompt}</Heading>
           </SlideFade>
         </Box>
         <Profile />
@@ -333,6 +339,11 @@ const Chat = () => {
         prompt={previousPrompt}
         isOpen={isOpen}
         onClose={onClose}
+        submitHandler={async (e: any) => {
+          const checks = await submitChecks(true);
+          if (!checks) return null;
+          handleSubmit(e);
+        }}
       />
     </>
   );
