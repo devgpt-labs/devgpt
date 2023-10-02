@@ -148,6 +148,7 @@ const RepoDrawer = () => {
   }
 
   if (!session.provider_token) {
+
     signUserOut();
   }
 
@@ -190,12 +191,6 @@ const RepoDrawer = () => {
     //set training data in store
     setMessages(trainingData);
 
-    Cookies.set(
-      `${repo.owner.login}_${repo.name}_training`,
-      JSON.stringify(trainingData),
-      { expires: 30 }
-    );
-
     if (process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true") {
       // Convert the content to JSONL format
       const jsonlContent = trainingData.map(JSON.stringify).join("\n");
@@ -218,6 +213,24 @@ const RepoDrawer = () => {
         model: `gpt-3.5-turbo`,
         hyperparameters: { n_epochs: 3 },
       });
+
+      // Create a new row in the models table in Supabase
+      if (!supabase) return
+
+      const { data, error } = await supabase.from("models").insert([
+        {
+          user_id: user.id,
+          repo: repo.name,
+          owner: repo.owner.login,
+          branch: 'main',
+          training_data: finetune.id,
+          training_method: 'fine-tune',
+          quantity: 0,
+          epochs: 0,
+          // latency: 0,
+          // frequency: 0,
+        },
+      ]);
 
       // Set the fine-tuning ID
       setFinetuningId(finetune.id);
@@ -322,7 +335,7 @@ const RepoDrawer = () => {
                           onClick={() => handleSelectRepo(repoOption)}
                         >
                           {repo.repo === repoOption.name &&
-                          repo.owner === repoOption.owner.login
+                            repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>

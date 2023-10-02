@@ -6,11 +6,12 @@ import OpenAI from "openai";
 //utils
 import getLLMToken from "@/utils/getLLMToken";
 
+//types
+import type { NextApiRequest, NextApiResponse } from "next";
+
 const openai = new OpenAI({
   apiKey: getLLMToken(),
 });
-
-import type { NextApiRequest, NextApiResponse } from "next";
 
 type ResponseData = {
   data: any;

@@ -31,9 +31,7 @@ interface Props {
 }
 
 export const PromptInput: FC<Props> = (props) => {
-  const [failMessage, setFailMessage] = useState<string>("");
-  const [previousPrompt, setPreviousPrompt] = useState<string>("");
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+
   const { repo, repoWindowOpen, lofaf, setRepoWindowOpen }: any = repoStore();
   const { messages }: any = messageStore();
 
@@ -106,87 +104,50 @@ export const PromptInput: FC<Props> = (props) => {
   return (
     <Flex flexDirection="column">
       <Flex flexDirection="column" alignItems="flex-start">
-        {withAt?.length > 0 && (
-          <Flex alignItems={"center"} my={2}>
-            <Kbd>Tab</Kbd>
-            <Text ml={1}> to accept suggestion</Text>
-          </Flex>
-        )}
-        <Flex flexDirection="row" flexWrap="wrap">
-          <SlideFade key={match} in={selectedFile[0] ? true : false}>
-            {selectedFile.map((file: any, index: any) => {
-              if (index > 12) return null;
-              return (
-                <Tag
-                  mr={1}
-                  mb={1}
-                  key={file}
-                  cursor="pointer"
-                  onClick={() => handleKeyDown(file)}
-                >
-                  {file}
-                </Tag>
-              );
-            })}
-          </SlideFade>
-        </Flex>
-      </Flex>
-      <form
-        className="-mx-5 px-5 mt-5 flex gap-2 items-center"
-        onSubmit={onSubmit}
-      >
-        <Tooltip
-          placement="top"
-          isOpen
-          label={!hasSentAMessage && "Write your task for DevGPT here!"}
-        >
-          <Input
-            onKeyDown={(e: any) => {
-              // If key equals tab, autocomplete
-              if (e.key === "Tab") {
-                e.preventDefault();
-                handleKeyDown(selectedFile[0]);
-                return;
-              }
 
-              // If key equals enter, submit
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                onSubmit(e);
-                return;
-              }
-            }}
-            onChange={(e) => {
-              props.setPrompt(e.target.value);
-            }}
-            value={props.prompt}
-            type="text"
-            id="message"
-            autoComplete="off"
-            name="message"
-            required
-            className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
-            placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-          />
-        </Tooltip>
-        <Button
-          bgGradient="linear(to-tr, teal.500, blue.500)"
-          disabled={props.isLoading}
-          type="submit"
-          px={6}
-          _hover={{ bg: "slate.600" }}
-          cursor="pointer"
+        <form
+          className="-mx-5 px-5 mt-5 flex gap-2 items-center"
+          onSubmit={onSubmit}
         >
-          {props.isLoading ? (
-            <BsHourglassSplit color="white" />
-          ) : (
-            <LuSend color="white" />
-          )}
-        </Button>
-      </form>
-      <SlideFade in={hasSentAMessage} offsetY="20px">
-        <Text mt={5}>{previousPrompt}</Text>
-      </SlideFade>
-    </Flex>
-  );
+          <Tooltip
+            placement="top"
+            isOpen
+            label={!hasSentAMessage && "Write your task for DevGPT here!"}
+          >
+            <Input
+
+              onChange={(e) => {
+                props.setPrompt(e.target.value);
+              }}
+              value={props.prompt}
+              type="text"
+              id="message"
+              autoComplete="off"
+              name="message"
+              required
+              className=" bg-transparent rounded-md p-4 flex-1 max-h-56 focus:ring-0 focus:outline-none"
+              placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+            />
+          </Tooltip>
+          <Button
+            bgGradient="linear(to-tr, teal.500, blue.500)"
+            disabled={props.isLoading}
+            type="submit"
+            px={6}
+            _hover={{ bg: "slate.600" }}
+            cursor="pointer"
+          >
+            {props.isLoading ? (
+              <BsHourglassSplit color="white" />
+            ) : (
+              <LuSend color="white" />
+            )}
+          </Button>
+        </form>
+        <SlideFade in={hasSentAMessage} offsetY="20px">
+          <Text mt={5}>{previousPrompt}</Text>
+        </SlideFade>
+
+      </Flex>
+      );
 };
