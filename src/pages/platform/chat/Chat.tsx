@@ -249,7 +249,7 @@ const Chat = () => {
               <Input
                 className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
                 value={prompt}
-                placeholder="Describe your business..."
+                placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
                 onChange={(e: any) => {
                   setPrompt(e.target.value);
                 }}

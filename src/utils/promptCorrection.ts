@@ -1,15 +1,15 @@
 import sendLLM from "./sendLLM";
 
 const promptCorrection = async (prompt: string, lofaf: string) => {
-  let correctedPrompt = "";
-
   //todo move to prompts
   const system = `
-	The developer is going to provide you with a prompt for a software development task
-	Do not try to complete the task
-	your task is to correct the prompt if it is wrong
+	The developer is going to provide you with a prompt for a software development task.
+	Do not try to complete the task.
+	Your task is to correct the prompt if it is wrong.
+
+	Rules:
 	If it mentions a file then the format must be ~/path/to/file.ext
-	If the prompt is already good, just return their prompt
+	Return the prompt as a function call with new prompt and a boolean indicating if changes are required.
 	`;
   const messages = [
     { role: "user", content: "Fix my login page" },
@@ -20,7 +20,26 @@ const promptCorrection = async (prompt: string, lofaf: string) => {
       content: "Make the div in ~/app/components/SignUp.tsx responsive",
     },
   ];
-
+  const functions = [
+    {
+      name: "prompt_to_llm",
+      description: "Sends a newly improved prompt to an LLM.",
+      parameters: {
+        type: "object",
+        properties: {
+          new_prompt: {
+            type: "string",
+            description: "The improved prompt",
+          },
+          changes_required: {
+            type: "boolean",
+            description: "Are changes to the prompt required?",
+          },
+        },
+        required: ["new_prompt, changes_required"],
+      },
+    },
+  ];
   prompt = `
 	${prompt}
 
@@ -28,25 +47,23 @@ const promptCorrection = async (prompt: string, lofaf: string) => {
 	${lofaf}
 	`;
 
-  const response = await sendLLM(prompt, undefined, system, messages);
+  const response = await sendLLM(prompt, functions, system, messages);
 
-  correctedPrompt = response.choices[0].message.content;
+  const { new_prompt, changes_required } = JSON.parse(
+    response?.choices?.[0]?.message?.function_call?.arguments
+  );
 
-  if (correctedPrompt === prompt) {
-    correctedPrompt = "";
-  }
-
-  if (correctedPrompt) {
+  if (!changes_required) {
+    return {
+      changes: false,
+      correctedPrompt: "",
+    };
+  } else {
     return {
       changes: true,
-      correctedPrompt: correctedPrompt,
+      correctedPrompt: new_prompt,
     };
   }
-
-  return {
-    changes: false,
-    correctedPrompt: correctedPrompt,
-  };
 };
 
 export default promptCorrection;

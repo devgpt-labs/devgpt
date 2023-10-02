@@ -10,7 +10,8 @@ import getCode from "./github/getCode";
 import generateTrainingPrompts from "@/prompts/generateTrainingPrompts";
 import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 
-const MAX_TRAINING_FILES = 20;
+//todo change to 20
+const MAX_TRAINING_FILES = 3;
 const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE != "true";
 
 const createTrainingData = async (
