@@ -1,8 +1,5 @@
 import OpenAI from "openai";
 
-// IMPORTANT! Set the runtime to edge
-//export const runtime = "edge";
-
 //utils
 import getLLMToken from "@/utils/getLLMToken";
 
@@ -21,13 +18,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  const { prompt, functions } = req.body;
+  const { prompt, functions, system } = req.body;
+
+  const messages: any = [{ role: "user", content: prompt }];
+
+  if (system) {
+    messages.unshift({ role: "system", content: system });
+  }
+
+  console.log({ messages });
 
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     functions: functions || undefined,
     stream: false,
-    messages: [{ role: "user", content: prompt }],
+    messages: messages,
   });
 
   res.status(200).json({ data: response });
