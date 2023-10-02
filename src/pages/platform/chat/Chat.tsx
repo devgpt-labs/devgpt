@@ -134,13 +134,18 @@ const Chat = () => {
   // todo move this to session context
   if (!user) return null;
 
-  const submitChecks = async (ignoreFeedback: boolean) => {
+  const submitChecks = async (
+    ignoreFeedback: boolean,
+    useOriginalPrompt?: boolean
+  ) => {
     setIsLoading(true);
     setFailMessage("");
     setPreviousPrompt(prompt);
 
+    let promptFeedback;
+
     if (!ignoreFeedback) {
-      const promptFeedback = await promptCorrection(prompt, lofaf);
+      promptFeedback = await promptCorrection(prompt, lofaf);
 
       if (promptFeedback?.changes) {
         //display promptCorrection modal
@@ -150,7 +155,8 @@ const Chat = () => {
       }
     }
 
-    const newPrompt = ignoreFeedback ? correctedPrompt || prompt : prompt;
+    const newPrompt =
+      ignoreFeedback && !useOriginalPrompt ? correctedPrompt || prompt : prompt;
 
     let target: any = {
       target: { value: newPrompt },
@@ -282,6 +288,14 @@ const Chat = () => {
                 Submit
               </Button>
             </Flex>
+            <Flex mb={3}>
+              <Text mt={2} fontSize={14}>
+                {failMessage}
+              </Text>
+              <SlideFade in={hasSentAMessage} offsetY="20px">
+                <Heading mt={5}>{previousPrompt}</Heading>
+              </SlideFade>
+            </Flex>
             {isLoading && !messages[messages.length - 1] ? (
               <SkeletonText
                 mt="4"
@@ -324,12 +338,6 @@ const Chat = () => {
               </Button>
             </Flex>
           )}
-          <Text mt={2} fontSize={14}>
-            {failMessage}
-          </Text>
-          <SlideFade in={hasSentAMessage} offsetY="20px">
-            <Heading mt={5}>{previousPrompt}</Heading>
-          </SlideFade>
         </Box>
         <Profile />
         <Training />
@@ -339,6 +347,11 @@ const Chat = () => {
         prompt={previousPrompt}
         isOpen={isOpen}
         onClose={onClose}
+        submitHandlerReject={async (e: any) => {
+          const checks = await submitChecks(true, false);
+          if (!checks) return null;
+          handleSubmit(e);
+        }}
         submitHandler={async (e: any) => {
           const checks = await submitChecks(true);
           if (!checks) return null;

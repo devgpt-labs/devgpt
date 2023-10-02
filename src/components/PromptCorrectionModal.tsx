@@ -23,6 +23,7 @@ const PromptCorrectionModal = ({
   correctedPrompt,
   prompt,
   submitHandler,
+  submitHandlerReject,
 }: any) => {
   const promptArray = prompt.split(" ");
   const correctedPromptArray = correctedPrompt.split(" ");
@@ -71,7 +72,13 @@ const PromptCorrectionModal = ({
                 be disabled in settings.
               </Text>
               <Flex mt={5} alignSelf={"flex-end"}>
-                <Button variant="ghost" onClick={onClose}>
+                <Button
+                  variant="ghost"
+                  onClick={(e) => {
+                    onClose();
+                    submitHandlerReject(e);
+                  }}
+                >
                   No thanks
                 </Button>
                 <Button
