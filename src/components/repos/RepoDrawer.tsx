@@ -49,7 +49,6 @@ const RepoDrawer = () => {
     defaultIsOpen: false,
   });
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { setMessages } = messageStore();
   const { session, user }: any = authStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -146,7 +145,9 @@ const RepoDrawer = () => {
     return null;
   }
 
+  console.log(session);
   if (!session.provider_token) {
+
     signUserOut();
   }
 
@@ -185,9 +186,6 @@ const RepoDrawer = () => {
       user,
       session
     )
-
-    // Set messages to be the training data
-    setMessages(trainingData);
 
     const baseContent = {
       messages: [
@@ -232,11 +230,25 @@ const RepoDrawer = () => {
     // Create a fine-tuning job from the uploaded file
     const finetune = await openai.fineTuning.jobs.create({
       training_file: uploadedFiles.id,
-      model: `gpt-3.5-turbo-0613`,
+      model: `gpt-3.5-turbo`,
     });
 
     // Set the fine-tuning ID
     setFinetuningId(finetune.id);
+
+    // Create a new row in the models table in Supabase
+    if (!supabase) return
+    const { data, error } = await supabase.from("models").insert([
+      {
+        user_id: user.id,
+        repo: repo.name,
+        owner: repo.owner.login,
+        model: finetune.id,
+        branch: 'main',
+        epochs: 0,
+        latency: 0,
+      },
+    ]);
     console.log(finetune);
   };
 

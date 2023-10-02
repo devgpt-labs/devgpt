@@ -1,8 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Tag } from "@chakra-ui/react";
-import { supabase } from "@/utils/supabase";
-import Repos from "./Settings";
 import {
   Box,
   Flex,
@@ -15,13 +13,22 @@ import {
   Link,
   useDisclosure,
 } from "@chakra-ui/react";
+
+// Utils
+import { supabase } from "@/utils/supabase";
+import getPromptCount from "@/utils/getPromptCount";
+import getDiscordOnline from "@/utils/getDiscordOnline";
+
+// Components
+import Repos from "./Settings";
 import UpgradeModal from "./UpgradeModal";
-import { AiFillFolderOpen } from "react-icons/ai";
-import { BsDiscord } from "react-icons/bs";
+
+// Icons
 import { IoMdSettings } from "react-icons/io";
 import { PiSignOutBold } from "react-icons/pi";
+import { AiFillFolderOpen } from "react-icons/ai";
+import { BsDiscord } from "react-icons/bs";
 import { AiFillStar } from "react-icons/ai";
-import getPromptCount from "@/utils/getPromptCount";
 import { BiKey, BiSolidBookBookmark } from "react-icons/bi";
 import {
   GiBattery100,
@@ -31,6 +38,11 @@ import {
 } from "react-icons/gi";
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
+
+// Stores
+import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
+import KeyModal from "./KeyModal";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -50,11 +62,6 @@ interface Identity {
   email?: string;
   bio?: string;
 }
-
-//stores
-import repoStore from "@/store/Repos";
-import authStore from "@/store/Auth";
-import KeyModal from "./KeyModal";
 
 // TODO: Convert all of the buttons on this menu to use this component
 const ProfileOptionIconButton = ({
@@ -87,10 +94,13 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const { user, isPro, signOut }: any = authStore();
-  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
+  const [credits, setCredits] = useState<number>(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
+  const { user, isPro, signOut }: any = authStore();
   const { colorMode, toggleColorMode } = useColorMode();
+  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+
   const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
     defaultIsOpen: false,
   });
@@ -107,8 +117,52 @@ const Profile = () => {
     onClose: onKeyClose,
   } = useDisclosure({ defaultIsOpen: false });
 
+
+  const getDiscordOnline = async () => {
+    try {
+      const response = await fetch(
+        "https://discord.com/api/guilds/931533612313112617/widget.json"
+      );
+      const json = await response.json();
+      return json.presence_count;
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching Discord data:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
-    let identity = user?.identities?.find((identity: { provider: string }) =>
+    const fetchData = async () => {
+      const count = await getDiscordOnline();
+      if (count !== null) {
+        setActiveOnDiscord(count);
+      }
+    };
+
+    // Get the current credits from 'customers' table in Supabase
+    const getCredits = async () => {
+      if (!supabase) return
+
+      const { data, error } = await supabase
+        .from("customers")
+        .select("credits")
+        .eq("id", user?.id)
+        .single();
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(data);
+      }
+    }
+
+    getCredits()
+    fetchData();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+
+  useEffect(() => {
+    const identity = user?.identities?.find((identity: { provider: string }) =>
       ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
     )?.identity_data;
     setIdentity(identity);
@@ -118,6 +172,7 @@ const Profile = () => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
   }, [user.email, promptCount]);
+
 
   return (
     <Flex
@@ -130,7 +185,7 @@ const Profile = () => {
       boxShadow="0px 0px 900px 0px blue"
       border="1px solid #1a202c"
       p={5}
-      overflow='hidden'
+      overflow="hidden"
       shadow="2xl"
     >
       <KeyModal
@@ -173,8 +228,8 @@ const Profile = () => {
               <Text>{identity?.name}</Text>
               {isPro ? (
                 <Tag ml={2} colorScheme="blue">
-                  <Text mr={1}>Pro</Text>
-                  <AiFillStar />
+                  <Text mr={1}>Credits: { }</Text>
+                  {/* <AiFillStar /> */}
                 </Tag>
               ) : (
                 <Tag ml={2} colorScheme="blue">
@@ -216,6 +271,23 @@ const Profile = () => {
                     />
                   </Tooltip>
                 )}
+                <Tooltip label="Join Discord" placement="top">
+                  <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Join Discord"
+                      icon={
+                        <Flex flexDirection='row' px={3} >
+                          <BsDiscord />
+                          <Text ml={2} fontSize={14}>{activeOnDiscord && `Online: ${activeOnDiscord}`}</Text>
+                        </Flex>
+                      }
+                    />
+                  </Link>
+                </Tooltip>
                 <ProfileOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
@@ -225,18 +297,6 @@ const Profile = () => {
                   Icon={MoonIcon}
                   OtherIcon={SunIcon}
                 />
-                <Tooltip label="Join Discord" placement="top">
-                  <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Join Discord"
-                      icon={<BsDiscord />}
-                    />
-                  </Link>
-                </Tooltip>
                 <Tooltip label="Report An Issue" placement="top">
                   <Link
                     isExternal
@@ -322,10 +382,7 @@ const Profile = () => {
                 icon={<IoMdSettings size={18} />}
               />
             </Tooltip>
-            <Tooltip
-              label='Enter Open AI key'
-              placement="top"
-            >
+            <Tooltip label="Enter Open AI key" placement="top">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",

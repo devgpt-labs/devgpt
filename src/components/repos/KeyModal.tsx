@@ -24,7 +24,7 @@ const KeyModal = ({ isKeyOpen, onKeyOpen, onKeyClose }: any) => {
   const { user }: any = authStore();
   const [key, setKey] = useState("");
   const [show, setShow] = useState(false);
-  const cookieName = "openai-key";
+  const cookieName = "i0N14vFzw1mT";
 
   const handleChange = (e: any) => {
     setKey(e.target.value);
@@ -40,8 +40,6 @@ const KeyModal = ({ isKeyOpen, onKeyOpen, onKeyClose }: any) => {
 
   const retrieveKey = async () => {
     const cookieKey = await Cookies.get(cookieName);
-
-    console.log(cookieKey);
 
     if (cookieKey !== undefined) {
       setKey(JSON.parse(cookieKey));
