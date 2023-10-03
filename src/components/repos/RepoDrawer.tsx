@@ -350,9 +350,9 @@ const RepoDrawer = () => {
                         <Button
                           size="sm"
                           onClick={() => {
-                            handleSelectRepo(repoOption)
-                            // setSelectedRepo(repoOption);
-                            // onRepoSetupOpen();
+                            // handleSelectRepo(repoOption)
+                            setSelectedRepo(repoOption);
+                            onRepoSetupOpen();
                           }}
                         >
                           {repo.repo === repoOption.name &&

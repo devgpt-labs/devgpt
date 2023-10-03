@@ -17,7 +17,7 @@ import {
 // Utils
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import getCredits from "@/utils/getCredits";
+import { AiFillBulb } from "react-icons/ai";
 
 // Components
 import Repos from "./Settings";
@@ -44,6 +44,7 @@ import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
 import CreditsModal from "./CreditsModal";
+import Training from "./Training";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -124,6 +125,13 @@ const Profile = () => {
     onClose: onCreditsClose,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const {
+    isOpen: isModelsOpen,
+    onOpen: onModelsOpen,
+    onClose: onModelsClose,
+    onToggle: onModelsToggle,
+  } = useDisclosure({ defaultIsOpen: false });
+
   const getDiscordOnline = async () => {
     try {
       const response = await fetch(
@@ -194,6 +202,7 @@ const Profile = () => {
       p={5}
       shadow="2xl"
     >
+
       <CreditsModal
         isCreditsOpen={isCreditsOpen}
         onCreditsOpen={onCreditsOpen}
@@ -385,6 +394,20 @@ const Profile = () => {
                 icon={<IoMdSettings size={18} />}
               />
             </Tooltip>
+            <Tooltip
+              label={isModelsOpen ? "Close Models" : "Open Models"}
+              placement="top"
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={onModelsToggle}
+                aria-label="Open Models"
+                icon={<AiFillBulb size={18} />}
+              />
+            </Tooltip>
             {/* <Tooltip label="Enter Open AI key" placement="top">
               <IconButton
                 _hover={{
@@ -400,6 +423,7 @@ const Profile = () => {
         </Flex>
       </Flex>
       <SlideFade in={isSettingsOpen}>{isSettingsOpen && <Repos />}</SlideFade>
+      <SlideFade in={isModelsOpen}>{isModelsOpen && <Training />}</SlideFade>
     </Flex>
   );
 };

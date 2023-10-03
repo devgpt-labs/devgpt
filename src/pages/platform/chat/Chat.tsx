@@ -202,7 +202,7 @@ const Chat = () => {
   };
 
   return (
-    <Flex overflowY='scroll'>
+    <Flex overflowY='scroll' width='full'>
       <Flex direction="column" w="full" maxW="6xl" my={40}>
         <Box
           rounded="lg"
@@ -341,7 +341,6 @@ const Chat = () => {
           )}
         </Box>
         <Profile />
-        <Training />
       </Flex>
       <PromptCorrectionModal
         correctedPrompt={correctedPrompt}
