@@ -202,146 +202,144 @@ const Chat = () => {
   };
 
   return (
-    <Flex overflowY='scroll' width='full'>
-      <Flex direction="column" w="full" maxW="6xl" my={40}>
-        <Box
-          rounded="lg"
-          className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-          justifyContent="flex-start"
-        >
-          {!repo.repo && (
-            <>
-              <Button
-                width="100%"
-                mt={4}
-                onClick={() => {
-                  setRepoWindowOpen(!repoWindowOpen);
-                }}
-              >
-                Select a repo to get started
-              </Button>
-              <Text fontSize={12} mt={2}>
-                {failMessage}
-              </Text>
-            </>
-          )}
-          <Header />
-          <Box className="max-h-[50vh] overflow-y-auto">
-            {withAt?.length > 0 && (
-              <Flex alignItems={"center"} my={2}>
-                <Kbd>Tab</Kbd>
-                <Text ml={1}> to accept suggestion</Text>
-              </Flex>
-            )}
-            <Flex flexDirection="row" flexWrap="wrap">
-              <SlideFade key={match} in={selectedFile[0] ? true : false}>
-                {selectedFile.map((file: any, index: any) => {
-                  if (index > 12) return null;
-                  return (
-                    <Tag
-                      mr={1}
-                      mb={1}
-                      key={file}
-                      cursor="pointer"
-                      onClick={() => handleKeyDown(file)}
-                    >
-                      {file}
-                    </Tag>
-                  );
-                })}
-              </SlideFade>
+    <Flex overflowY='scroll' width='full' direction="column" maxW="6xl" my={20}>
+      <Box
+        rounded="lg"
+        className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+        justifyContent="flex-start"
+      >
+        {!repo.repo && (
+          <>
+            <Button
+              width="100%"
+              mt={4}
+              onClick={() => {
+                setRepoWindowOpen(!repoWindowOpen);
+              }}
+            >
+              Select a repo to get started
+            </Button>
+            <Text fontSize={12} mt={2}>
+              {failMessage}
+            </Text>
+          </>
+        )}
+        <Header />
+        <Box className="max-h-[50vh] overflow-y-auto">
+          {withAt?.length > 0 && (
+            <Flex alignItems={"center"} my={2}>
+              <Kbd>Tab</Kbd>
+              <Text ml={1}> to accept suggestion</Text>
             </Flex>
-            <Flex flexDirection="row" mt={4}>
-              <Input
-                className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-                value={prompt}
-                placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-                onChange={(e: any) => {
-                  setPrompt(e.target.value);
-                }}
-                onKeyDown={async (e: any) => {
-                  // If key equals tab, autocomplete
-                  if (e.key === "Tab") {
-                    e.preventDefault();
-                    handleKeyDown(selectedFile[0]);
-                    return;
-                  }
+          )}
+          <Flex flexDirection="row" flexWrap="wrap">
+            <SlideFade key={match} in={selectedFile[0] ? true : false}>
+              {selectedFile.map((file: any, index: any) => {
+                if (index > 12) return null;
+                return (
+                  <Tag
+                    mr={1}
+                    mb={1}
+                    key={file}
+                    cursor="pointer"
+                    onClick={() => handleKeyDown(file)}
+                  >
+                    {file}
+                  </Tag>
+                );
+              })}
+            </SlideFade>
+          </Flex>
+          <Flex flexDirection="row" mt={4}>
+            <Input
+              className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+              value={prompt}
+              placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+              onChange={(e: any) => {
+                setPrompt(e.target.value);
+              }}
+              onKeyDown={async (e: any) => {
+                // If key equals tab, autocomplete
+                if (e.key === "Tab") {
+                  e.preventDefault();
+                  handleKeyDown(selectedFile[0]);
+                  return;
+                }
 
-                  // If key equals enter, submit
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    const checks = await submitChecks(false);
-                    if (!checks) return null;
-                    handleSubmit(e);
-                  }
-                }}
-              />
-              <Button
-                bgGradient={"linear(to-r, blue.500, teal.500)"}
-                color='white'
-                ml={4}
-                onClick={async (e: any) => {
+                // If key equals enter, submit
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
                   const checks = await submitChecks(false);
                   if (!checks) return null;
                   handleSubmit(e);
-                }}
-              >
-                Submit
-              </Button>
-            </Flex>
-            <Flex mb={3}>
-              <Text mt={2} fontSize={14}>
-                {failMessage}
-              </Text>
-              <SlideFade in={hasSentAMessage} offsetY="20px">
-                <Heading mt={5}>{previousPrompt}</Heading>
-              </SlideFade>
-            </Flex>
-            {isLoading && !messages[messages.length - 1] ? (
-              <SkeletonText
-                mt="4"
-                noOfLines={4}
-                spacing="4"
-                skeletonHeight="2"
-              />
-            ) : (
-              <Response
-                content={String(messages[messages.length - 1]?.content)}
-              />
-            )}
-          </Box>
-          {messages[messages.length - 1] && isFinished && (
-            <Flex
-              width="100%"
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
-              mt={2}
+                }
+              }}
+            />
+            <Button
+              bgGradient={"linear(to-r, blue.500, teal.500)"}
+              color='white'
+              ml={4}
+              onClick={async (e: any) => {
+                const checks = await submitChecks(false);
+                if (!checks) return null;
+                handleSubmit(e);
+              }}
             >
-              <RateConversation />
-              <Text mx={4}>or</Text>
-              <Button
-                px={4}
-                _hover={{
-                  bg: colorMode === "light" ? "gray.300" : "black",
-                }}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                alignSelf="center"
-                rounded="full"
-                onClick={() => {
-                  setIsFinished(false);
-                  setIsLoading(false);
-                  setResponse("");
-                  setFailMessage("");
-                }}
-              >
-                Start A New Chat
-              </Button>
-            </Flex>
+              Submit
+            </Button>
+          </Flex>
+          <Flex mb={3}>
+            <Text mt={2} fontSize={14}>
+              {failMessage}
+            </Text>
+            <SlideFade in={hasSentAMessage} offsetY="20px">
+              <Heading mt={5}>{previousPrompt}</Heading>
+            </SlideFade>
+          </Flex>
+          {isLoading && !messages[messages.length - 1] ? (
+            <SkeletonText
+              mt="4"
+              noOfLines={4}
+              spacing="4"
+              skeletonHeight="2"
+            />
+          ) : (
+            <Response
+              content={String(messages[messages.length - 1]?.content)}
+            />
           )}
         </Box>
-        <Profile />
-      </Flex>
+        {messages[messages.length - 1] && isFinished && (
+          <Flex
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            mt={2}
+          >
+            <RateConversation />
+            <Text mx={4}>or</Text>
+            <Button
+              px={4}
+              _hover={{
+                bg: colorMode === "light" ? "gray.300" : "black",
+              }}
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              alignSelf="center"
+              rounded="full"
+              onClick={() => {
+                setIsFinished(false);
+                setIsLoading(false);
+                setResponse("");
+                setFailMessage("");
+              }}
+            >
+              Start A New Chat
+            </Button>
+          </Flex>
+        )}
+      </Box>
+      <Profile />
       <PromptCorrectionModal
         correctedPrompt={correctedPrompt}
         prompt={previousPrompt}

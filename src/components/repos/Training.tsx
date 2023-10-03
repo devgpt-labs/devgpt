@@ -57,7 +57,6 @@ const Training = () => {
 
     return (
       <Box
-        boxShadow="md"
         width='25%'
         height={160}
         rounded="lg"
