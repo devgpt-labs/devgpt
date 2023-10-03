@@ -6,8 +6,10 @@ import { checkIfPro } from "@/utils/checkIfPro";
 
 const useStore = create((set) => ({
   user: null,
+  credits: null,
   session: null,
   isPro: false,
+  setCredits: (credits: number) => set({ credits }),
   signOut: () => {
     supabase?.auth.signOut();
     set({ user: null, session: null });

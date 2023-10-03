@@ -11,16 +11,83 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Tag,
+  SlideFade,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import authStore from "@/store/Auth";
+import { supabase } from "@/utils/supabase";
+import repoStore from "@/store/Repos";
+import { IoMdArrowDown, IoMdArrowDropdown, IoMdArrowUp } from "react-icons/io";
 
 const stages = [
-  'generating training data',
-  'training data generated',
-  'training model with data',
-  'model trained',
-]
+  "generating training data",
+  "training data generated",
+  "training model with data",
+  "model trained",
+];
 
 const Training = () => {
+  const { user }: any = authStore();
+  const { repos }: any = repoStore();
+
+  const [reposInTraining, setReposInTraining] = useState<any[]>([]);
+
+  const getRepos = async () => {
+    if (!supabase) return;
+
+    // Get repos from models table in supabase
+    const { data, error } = await supabase
+      .from("models")
+      .select("*")
+      .eq("user_id", user.id);
+
+    if (!error) {
+      setReposInTraining(data);
+    }
+  };
+
+  useEffect(() => {
+    getRepos();
+  }, [repos]);
+
+  console.log(repos);
+
+  const Repo = ({ repo }: any) => {
+    const [open, setOpen] = useState(false);
+    console.log({ repo });
+    if (!repo) return null;
+
+    return (
+      <Box
+        boxShadow="md"
+        width='25%'
+        height={160}
+        rounded="lg"
+        p={4}
+        overflowY="scroll"
+      >
+        {!open ? (
+          <>
+            <Text fontSize={14}>{repo.owner}</Text>
+            <Text fontSize={14}>{repo.repo}</Text>
+            <Text fontSize={14}>{repo.branch}</Text>
+            <Text fontSize={14}>Trained</Text>
+          </>
+        ) : (
+          <>
+            <Text fontSize={14}>Trained on:{repo.branch}</Text>
+            <Text fontSize={14}>Latency:{repo.branch}</Text>
+            <Text fontSize={14}>Last Trained:{repo.branch}</Text>
+            <Text fontSize={14}>Frequency:{repo.branch}</Text>
+            <Text fontSize={14}>EPOCHS:{repo.branch}</Text>
+          </>
+        )}
+
+      </Box>
+    );
+  };
+
   return (
     <Flex
       mt={3}
@@ -34,54 +101,29 @@ const Training = () => {
       overflow="hidden"
       shadow="2xl"
     >
-      <Text mb={2}>
-        Repos being trained:
-      </Text>
-      <Text fontSize={14}>february-labs / api / main (training)</Text>
-      <Slider my={2} aria-label='slider-ex-2' colorScheme='blue' defaultValue={30}>
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-      </Slider>
-      <Flex justifyContent='space-between'>
-        <Text fontSize={14}>Elapsed: 2 minutes</Text>
-        <Text fontSize={14}>Estimated: 5 minutes</Text>
-      </Flex>
-      {/* <Accordion defaultIndex={[0]} allowMultiple>
+      <Accordion defaultIndex={[0]} allowMultiple>
         <AccordionItem>
           <h2>
             <AccordionButton>
-              <Box as="span" flex='1' textAlign='left'>
-                Section 1 title
+              <Box as="span" flex="1" textAlign="left">
+                Models
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-            commodo consequat.
+            {reposInTraining.length > 0 ? (
+              <Flex gap={2}>
+                {reposInTraining.map((repo: any) => {
+                  return <Repo repo={repo} />;
+                })}
+              </Flex>
+            ) : (
+              <Text>No repos being trained yet.</Text>
+            )}
           </AccordionPanel>
         </AccordionItem>
-
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex='1' textAlign='left'>
-                Section 2 title
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-            commodo consequat.
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion> */}
+      </Accordion>
     </Flex>
   );
 };

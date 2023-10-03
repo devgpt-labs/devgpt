@@ -10,10 +10,10 @@ import getCode from "./github/getCode";
 import generateTrainingPrompts from "@/prompts/generateTrainingPrompts";
 import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 
-const MAX_TRAINING_FILES = 20;
 const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE != "true";
 
 const createTrainingData = async (
+  training_cycles: number,
   lofaf: string,
   repo: any,
   user: any,
@@ -33,6 +33,7 @@ const createTrainingData = async (
 
     // add context messages
     newMessages = await addContext(
+      training_cycles,
       newMessages,
       lofaf,
       owner,
@@ -64,6 +65,7 @@ interface UsefulFile {
 }
 
 const addContext = async (
+  training_cycles: number,
   messages: Message[],
   lofaf: string,
   owner: string,
@@ -75,6 +77,7 @@ const addContext = async (
     const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
 
     const usefulFileContents: any = await getUsefulFileContents(
+      training_cycles,
       usefulFiles,
       owner,
       repo,
@@ -82,6 +85,7 @@ const addContext = async (
     );
 
     const usefulFilePrompts: any = await getUsefulFilePrompts(
+      training_cycles,
       usefulFileContents
     );
 
@@ -107,7 +111,7 @@ const addContext = async (
   }
 };
 
-const getUsefulFiles = async (lofaf: string) => {
+const getUsefulFiles = async (training_cycles: number,lofaf: string) => {
   try {
     const { prompt: filesPrompt, functions: filesFunction } =
       await selectTrainingFiles(lofaf);
@@ -120,7 +124,7 @@ const getUsefulFiles = async (lofaf: string) => {
 
     const usefulFilesArray = useful_files_csv
       .split(",")
-      .splice(0, MAX_TRAINING_FILES);
+      .splice(0, training_cycles);
 
     return usefulFilesArray;
   } catch (error) {

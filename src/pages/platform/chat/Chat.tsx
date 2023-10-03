@@ -172,108 +172,106 @@ const Chat = () => {
 		return true;
 	};
 
+	console.log(messages);
+
 	return (
-		<Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
-			{/* {messages.map(m => (
-					<div key={m.id}>
-						{m.role === 'user' ? 'User: ' : 'AI: '}
-						{m.content}
-					</div>
-				))} */}
+		<Flex direction="column" w="full" maxW="6xl" my={40}>
 			<Box
 				rounded="lg"
-				className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+				className="overflow-hidden p-5 flex flex-col border shadow-2xl shadow-blue-900/30"
 				justifyContent="flex-start"
 			>
-				{!repo.repo && (
-					<>
-						<Button
-							width="100%"
-							mt={4}
-							onClick={() => {
-								setRepoWindowOpen(!repoWindowOpen);
-							}}
-						>
-							Select a repo to get started
-						</Button>
-						<Text fontSize={12} mt={2}>
-							{failMessage}
-						</Text>
-					</>
-				)}
 				<Header />
 				<Box className="max-h-[50vh] overflow-y-auto">
-					{withAt?.length > 0 && (
-						<Flex alignItems={"center"} my={2}>
-							<Kbd>Tab</Kbd>
-							<Text ml={1}> to accept suggestion</Text>
-						</Flex>
+					{!repo.repo && (
+						<>
+							<Button
+								width="100%"
+								mt={4}
+								onClick={() => {
+									setRepoWindowOpen(!repoWindowOpen);
+								}}
+							>
+								Select a repo to get started
+							</Button>
+							<Text fontSize={12} mt={2}>
+								{failMessage}
+							</Text>
+						</>
 					)}
-					<Flex flexDirection="row" flexWrap="wrap">
-						<SlideFade key={match} in={selectedFile[0] ? true : false}>
-							{selectedFile.map((file: any, index: any) => {
-								if (index > 12) return null;
-								return (
-									<Tag
-										mr={1}
-										mb={1}
-										key={file}
-										cursor="pointer"
-										onClick={() => handleKeyDown(file)}
-									>
-										{file}
-									</Tag>
-								);
-							})}
-						</SlideFade>
-					</Flex>
-					<Flex flexDirection="row" mt={4}>
-						<Input
-							className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-							value={prompt}
-							placeholder="Describe your business..."
-							onChange={(e: any) => {
-								setPrompt(e.target.value);
-							}}
-							onKeyDown={(e: any) => {
-								// If key equals tab, autocomplete
-								if (e.key === "Tab") {
-									e.preventDefault();
-									handleKeyDown(selectedFile[0]);
-									return;
-								}
+					{repo.repo && (
+						<>
+							{withAt?.length > 0 && (
+								<Flex alignItems={"center"} my={2}>
+									<Kbd>Tab</Kbd>
+									<Text ml={1}> to accept suggestion</Text>
+								</Flex>
+							)}
+							<Flex flexDirection="row" flexWrap="wrap">
+								<SlideFade key={match} in={selectedFile[0] ? true : false}>
+									{selectedFile.map((file: any, index: any) => {
+										if (index > 12) return null;
+										return (
+											<Tag
+												mr={1}
+												mb={1}
+												key={file}
+												cursor="pointer"
+												onClick={() => handleKeyDown(file)}
+											>
+												{file}
+											</Tag>
+										);
+									})}
+								</SlideFade>
+							</Flex>
+							<Flex flexDirection="row" mt={4}>
+								<Input
+									className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+									value={prompt}
+									placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo"
+									onChange={(e: any) => {
+										setPrompt(e.target.value);
+									}}
+									onKeyDown={(e: any) => {
+										// If key equals tab, autocomplete
+										if (e.key === "Tab") {
+											e.preventDefault();
+											handleKeyDown(selectedFile[0]);
+											return;
+										}
 
-								// If key equals enter, submit
-								if (e.key === "Enter" && !e.shiftKey) {
-									e.preventDefault();
-									submitPrompt(e);
-									return;
-								}
-							}}
-						/>
-						<Button
-							bgGradient={"linear(to-r, blue.500, teal.500)"}
-							ml={4}
-							onClick={async (e: any) => {
-								const checks = await submitChecks();
-								if (!checks) return null;
-								handleSubmit(e);
-							}}
-						>
-							Submit
-						</Button>
-					</Flex>
+										// If key equals enter, submit
+										if (e.key === "Enter" && !e.shiftKey) {
+											e.preventDefault();
+											submitPrompt(e);
+											return;
+										}
+									}}
+								/>
+								<Button
+									bgGradient={"linear(to-r, blue.500, teal.500)"}
+									color='white'
+									ml={4}
+									onClick={async (e: any) => {
+										const checks = await submitChecks();
+										if (!checks) return null;
+										handleSubmit(e);
+									}}
+								>
+									Submit
+								</Button>
+							</Flex>
+						</>
+					)}
+
 					{isLoading && !messages[messages.length - 1] ? (
-						<SkeletonText
-							mt="4"
-							noOfLines={4}
-							spacing="4"
-							skeletonHeight="2"
-						/>
+						<SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
 					) : (
-						<Response
-							content={String(messages[messages.length - 1]?.content)}
-						/>
+						<></>
+						// <Response
+						// 	content={String(messages[messages.length - 1]?.content)}
+						// />
 					)}
 				</Box>
 				{messages[messages.length - 1] && isFinished && (
@@ -314,6 +312,7 @@ const Chat = () => {
 			</Box>
 			<Profile />
 			<Training />
+			{/* <Calculator /> */}
 		</Flex>
 	);
 };
