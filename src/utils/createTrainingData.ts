@@ -74,10 +74,9 @@ const addContext = async (
   emailAddress: string
 ) => {
   try {
-    const usefulFiles: UsefulFile[] = await getUsefulFiles(lofaf);
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(training_cycles, lofaf);
 
     const usefulFileContents: any = await getUsefulFileContents(
-      training_cycles,
       usefulFiles,
       owner,
       repo,
@@ -85,7 +84,6 @@ const addContext = async (
     );
 
     const usefulFilePrompts: any = await getUsefulFilePrompts(
-      training_cycles,
       usefulFileContents
     );
 

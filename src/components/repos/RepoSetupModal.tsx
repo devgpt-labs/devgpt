@@ -63,8 +63,6 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo }: any) => {
 
   if (!repo) return null;
 
-  console.log({ repo });
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

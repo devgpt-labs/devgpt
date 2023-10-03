@@ -51,11 +51,8 @@ const Training = () => {
     getRepos();
   }, [repos]);
 
-  console.log(repos);
-
   const Repo = ({ repo }: any) => {
     const [open, setOpen] = useState(false);
-    console.log({ repo });
     if (!repo) return null;
 
     return (

@@ -34,15 +34,9 @@ const CreditsModal = ({
   const [packets, setPackets] = useState<any>(1);
   const [show, setShow] = useState(false);
 
-  console.log(process.env);
-
-
   const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
     ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
     : "notoken";
-
-  console.log(token);
-
 
   const handleChange = (e: any) => {
     if (e.target.value < 5) return;
@@ -82,9 +76,6 @@ const CreditsModal = ({
 
     if (!session) return
     window.open(session?.url, "_blank");
-
-    console.log(session);
-
   }
 
   const addCredits = async () => {
@@ -102,6 +93,7 @@ const CreditsModal = ({
 
     if (error) {
       console.log(error);
+      return null
     }
 
     onCreditsClose();
@@ -115,8 +107,6 @@ const CreditsModal = ({
   const identity = user?.identities?.find((identity: { provider: string }) =>
     ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
   )?.identity_data;
-
-  console.log(identity);
 
   useEffect(() => {
     // retrieveKey();

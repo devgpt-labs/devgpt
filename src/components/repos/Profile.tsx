@@ -153,8 +153,6 @@ const Profile = () => {
     }
   };
 
-  console.log(credits);
-
   useEffect(() => {
     const fetchData = async () => {
       const count: any = await getDiscordOnline();
@@ -194,7 +192,6 @@ const Profile = () => {
       boxShadow="0px 0px 0px 0px #1a202c"
       border="1px solid #1a202c"
       p={5}
-      overflow="hidden"
       shadow="2xl"
     >
       <CreditsModal
