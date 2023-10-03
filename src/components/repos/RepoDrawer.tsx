@@ -159,7 +159,7 @@ const RepoDrawer = () => {
     // Get Lofaf
     const lofaf = await getLofaf(repo.owner.login, repo.name, session);
     const epochs = 3;
-    const training_cycles = 2
+    const training_cycles = 2;
 
     // Manipulate lofaf
     let lofafArray = lofaf.tree;
@@ -186,7 +186,6 @@ const RepoDrawer = () => {
     );
 
     console.log({ trainingData });
-
 
     //set training data in store
     setMessages(trainingData);
@@ -350,13 +349,13 @@ const RepoDrawer = () => {
                         <Button
                           size="sm"
                           onClick={() => {
-                            // handleSelectRepo(repoOption)
-                            setSelectedRepo(repoOption);
-                            onRepoSetupOpen();
+                            handleSelectRepo(repoOption);
+                            //setSelectedRepo(repoOption);
+                            //onRepoSetupOpen();
                           }}
                         >
                           {repo.repo === repoOption.name &&
-                            repo.owner === repoOption.owner.login
+                          repo.owner === repoOption.owner.login
                             ? "Selected"
                             : "Select"}
                         </Button>
