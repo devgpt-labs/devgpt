@@ -15,6 +15,11 @@ import {
   Flex,
   Textarea,
   Tag,
+  List,
+  ListItem,
+  ListIcon,
+  OrderedList,
+  UnorderedList,
 } from "@chakra-ui/react";
 
 const PromptCorrectionModal = ({
@@ -37,62 +42,71 @@ const PromptCorrectionModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} isCentered={true} size="2xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            Improve your prompt
-            <Tag colorScheme="purple" ml={3}>
-              Experimental
-            </Tag>
+            <Flex>
+              <Text>Improve your prompt</Text>
+              <Tag colorScheme="purple" ml={3}>
+                Experimental
+              </Tag>
+            </Flex>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pt={3}>
-            <Text size="md" mb={3}>
-              Original prompt:
-            </Text>
-            <Card>
-              <CardBody>
-                <Heading size={"lg"}>{prompt}</Heading>
-              </CardBody>
-            </Card>
-            <Text size="md" mb={3} mt={5}>
-              Corrected prompt:
-            </Text>
-            <Card mt={3}>
-              <CardBody>
-                <Textarea size={"lg"}>{correctedPrompt}</Textarea>
-              </CardBody>
-            </Card>
+            <Flex flexDirection="row" gap={10}>
+              <Flex flexDirection="column">
+                <Text size="md" mb={3}>
+                  Original prompt:
+                </Text>
+                <Card>
+                  <CardBody>
+                    <Heading size={"md"}>{prompt}</Heading>
+                  </CardBody>
+                </Card>
+                <Text size="md" mb={3} mt={5}>
+                  New prompt:
+                </Text>
+                <Textarea size={"md"}>{correctedPrompt}</Textarea>
+              </Flex>
+              <UnorderedList>
+                <ListItem>Wrap content in ""</ListItem>
+                <ListItem>Use the @ command to target files</ListItem>
+                <ListItem>Give specific instructions or questions</ListItem>
+                <ListItem>You can disable this in the settings</ListItem>
+              </UnorderedList>
+            </Flex>
           </ModalBody>
           <ModalFooter>
-            <Flex flexDirection={"column"} w="full" alignItems={"center"}>
-              <Text textAlign={"center"} w="sm">
-                Tip: We use ~ to represent your project root directory, this can
-                be disabled in settings.
-              </Text>
-              <Flex mt={5} alignSelf={"flex-end"}>
-                <Button
-                  variant="ghost"
-                  onClick={(e) => {
-                    onClose();
-                    submitHandlerReject(e);
-                  }}
-                >
-                  No thanks
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  color="white"
-                  mr={3}
-                  onClick={(e) => {
-                    onClose();
-                    submitHandler(e);
-                  }}
-                >
-                  Accept Suggestion
-                </Button>
-              </Flex>
+            <Flex
+              gap={2}
+              mt={2}
+              alignSelf="flex-end"
+              flexDirection="row"
+              w="full"
+              justifyContent="flex-end"
+            >
+              <Button
+                variant="ghost"
+                onClick={(e) => {
+                  onClose();
+                  submitHandlerReject(e);
+                }}
+              >
+                Reject
+              </Button>
+              <Button
+                width="100%"
+                colorScheme="blue"
+                color="white"
+                onClick={(e) => {
+                  onClose();
+                  submitHandler(e);
+                }}
+              >
+                Accept Suggestion
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>

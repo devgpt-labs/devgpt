@@ -273,6 +273,7 @@ const RepoDrawer = () => {
         isOpen={isRepoSetupOpen}
         onClose={onRepoSetupClose}
         onOpen={onRepoSetupOpen}
+        onSubmit={handleSelectRepo}
       />
       <Drawer
         isOpen={isOpen}

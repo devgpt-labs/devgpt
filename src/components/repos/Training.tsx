@@ -57,6 +57,7 @@ const Training = () => {
 
     return (
       <Box
+        boxShadow="md"
         width='25%'
         height={160}
         rounded="lg"
@@ -91,35 +92,17 @@ const Training = () => {
       w="6xl"
       maxW="full"
       rounded="lg"
-      boxShadow="0px 0px 900px 0px blue"
-      border="1px solid #1a202c"
-      p={5}
       overflow="hidden"
-      shadow="2xl"
     >
-      <Accordion defaultIndex={[0]} allowMultiple>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Models
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            {reposInTraining.length > 0 ? (
-              <Flex gap={2}>
-                {reposInTraining.map((repo: any) => {
-                  return <Repo repo={repo} />;
-                })}
-              </Flex>
-            ) : (
-              <Text>No repos being trained yet.</Text>
-            )}
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+      {reposInTraining.length > 0 ? (
+        <Flex gap={2}>
+          {reposInTraining.map((repo: any) => {
+            return <Repo repo={repo} />;
+          })}
+        </Flex>
+      ) : (
+        <Text>No repos being trained yet.</Text>
+      )}
     </Flex>
   );
 };

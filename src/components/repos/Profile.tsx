@@ -103,7 +103,11 @@ const Profile = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
 
-  const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
+  const {
+    isOpen: isSettingsOpen,
+    onToggle: onSettingsToggle,
+    onClose: onSettingsClose,
+  } = useDisclosure({
     defaultIsOpen: false,
   });
 
@@ -202,7 +206,6 @@ const Profile = () => {
       p={5}
       shadow="2xl"
     >
-
       <CreditsModal
         isCreditsOpen={isCreditsOpen}
         onCreditsOpen={onCreditsOpen}
@@ -356,12 +359,12 @@ const Profile = () => {
               </Tooltip>
             )}
             <ProfileOptionIconButton
-              tooltip={"Change Repo"}
+              tooltip={"Train Repo"}
               comparison={repoWindowOpen}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}
-              ariaLabel="Change Repo"
+              ariaLabel="Train Repo"
               label="Close"
               otherLabel="Open"
               Icon={AiFillFolderOpen}
@@ -389,7 +392,10 @@ const Profile = () => {
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
-                onClick={onSettingsToggle}
+                onClick={() => {
+                  onSettingsToggle();
+                  onModelsClose();
+                }}
                 aria-label="Open Settings"
                 icon={<IoMdSettings size={18} />}
               />
@@ -403,7 +409,10 @@ const Profile = () => {
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
-                onClick={onModelsToggle}
+                onClick={() => {
+                  onModelsToggle();
+                  onSettingsClose();
+                }}
                 aria-label="Open Models"
                 icon={<AiFillBulb size={18} />}
               />
