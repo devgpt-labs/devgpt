@@ -164,8 +164,8 @@ const Chat = () => {
 
     setHasSentAMessage(true);
     handleInputChange(target);
-    setPrompt(newPrompt);
     setPreviousPrompt(newPrompt);
+    setPrompt("");
 
     const modifiedPrompt = await userPrompt(
       newPrompt,
