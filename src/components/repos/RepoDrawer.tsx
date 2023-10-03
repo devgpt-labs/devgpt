@@ -17,7 +17,6 @@ import {
   InputRightElement,
   InputGroup,
 } from "@chakra-ui/react";
-import Cookies from "js-cookie";
 
 //stores
 import OpenAI from "openai";
@@ -31,6 +30,7 @@ import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
+import RepoSetupModal from "./RepoSetupModal";
 
 //components
 type PageInfo = {
@@ -49,8 +49,14 @@ const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
     defaultIsOpen: false,
   });
+  const {
+    isOpen: isRepoSetupOpen,
+    onOpen: onRepoSetupOpen,
+    onClose: onRepoSetupClose,
+  } = useDisclosure();
+
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user }: any = authStore();
+  const { session, user, signOut }: any = authStore();
   const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -60,6 +66,8 @@ const RepoDrawer = () => {
   const [loading, setLoading] = useState(false); // For the refresh debounce
   const [finetuningId, setFinetuningId] = useState<string>(""); // For the refresh debounce
   const btnRef = useRef<any>();
+
+  const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   useEffect(() => {
     if (repoWindowOpen === null) return;
@@ -138,20 +146,6 @@ const RepoDrawer = () => {
         });
   };
 
-  const signUserOut = async () => {
-    if (!supabase) return null;
-    await supabase.auth.signOut();
-  };
-
-  if (!user) {
-    return null;
-  }
-
-  if (!session.provider_token) {
-
-    signUserOut();
-  }
-
   const handleSelectRepo = async (repo: any) => {
     // Close the modal, no more user input required
     onClose();
@@ -164,6 +158,8 @@ const RepoDrawer = () => {
 
     // Get Lofaf
     const lofaf = await getLofaf(repo.owner.login, repo.name, session);
+    const epochs = 3;
+    const training_cycles = 2
 
     // Manipulate lofaf
     let lofafArray = lofaf.tree;
@@ -179,6 +175,7 @@ const RepoDrawer = () => {
 
     // Create training data
     let trainingData = await createTrainingData(
+      training_cycles,
       lofafString,
       {
         owner: repo.owner.login,
@@ -187,6 +184,9 @@ const RepoDrawer = () => {
       user,
       session
     );
+
+    console.log({ trainingData });
+
 
     //set training data in store
     setMessages(trainingData);
@@ -215,48 +215,65 @@ const RepoDrawer = () => {
       });
 
       // Create a new row in the models table in Supabase
-      if (!supabase) return
+      if (!supabase) return;
 
       const { data, error } = await supabase.from("models").insert([
         {
           user_id: user.id,
           repo: repo.name,
           owner: repo.owner.login,
-          branch: 'main',
-          training_data: finetune.id,
-          training_method: 'fine-tune',
-          quantity: 0,
-          epochs: 0,
-          // latency: 0,
-          // frequency: 0,
+          branch: "main",
+          training_data: "ft:model_id",
+          // training_data: finetune.id,
+          training_method: "fine-tune",
+          quantity: training_cycles,
+          epochs: epochs,
         },
       ]);
+
+      if (error) {
+        console.log(error);
+      }
 
       // Set the fine-tuning ID
       setFinetuningId(finetune.id);
     }
   };
 
-  const checkProgressOfFineTuning = async () => {
-    const job = await openai.fineTuning.jobs.retrieve(finetuningId);
+  // const checkProgressOfFineTuning = async () => {
+  //   const job = await openai.fineTuning.jobs.retrieve(finetuningId);
 
-    console.log("Job Status:", job.status);
+  //   console.log("Job Status:", job.status);
 
-    if (job.status === "succeeded") {
-      console.log("Fine-tuning has completed successfully.");
-      console.log("Fine-tuned model ID:", job.fine_tuned_model);
-    } else if (job.status === "failed") {
-      console.log(
-        "Fine-tuning has failed. Check the error message:",
-        job.error
-      );
-    } else {
-      console.log("Fine-tuning is still in progress.");
-    }
-  };
+  //   if (job.status === "succeeded") {
+  //     console.log("Fine-tuning has completed successfully.");
+  //     console.log("Fine-tuned model ID:", job.fine_tuned_model);
+  //   } else if (job.status === "failed") {
+  //     console.log(
+  //       "Fine-tuning has failed. Check the error message:",
+  //       job.error
+  //     );
+  //   } else {
+  //     console.log("Fine-tuning is still in progress.");
+  //   }
+  // };
+
+  if (!user) {
+    return null;
+  }
+
+  if (!session.provider_token) {
+    signOut();
+  }
 
   return (
     <>
+      <RepoSetupModal
+        repo={selectedRepo}
+        isOpen={isRepoSetupOpen}
+        onClose={onRepoSetupClose}
+        onOpen={onRepoSetupOpen}
+      />
       <Drawer
         isOpen={isOpen}
         placement="right"
@@ -276,7 +293,7 @@ const RepoDrawer = () => {
               <>
                 <InputGroup>
                   <Input
-                    pr="10rem"
+                    pr="4rem"
                     mb={2}
                     placeholder="Search repos"
                     value={filter}
@@ -284,7 +301,7 @@ const RepoDrawer = () => {
                       setFilter(e.target.value);
                     }}
                   />
-                  <InputRightElement width="10rem" mr={1}>
+                  <InputRightElement width="4rem" mr={1}>
                     <Button
                       size="sm"
                       onClick={handleRefresh}
@@ -293,14 +310,14 @@ const RepoDrawer = () => {
                     >
                       Refresh
                     </Button>
-                    <Button
+                    {/* <Button
                       size="sm"
                       onClick={checkProgressOfFineTuning}
                       isLoading={loading}
                       disabled={loading}
                     >
                       Check Progress
-                    </Button>
+                    </Button> */}
                   </InputRightElement>
                 </InputGroup>
 
@@ -332,7 +349,11 @@ const RepoDrawer = () => {
 
                         <Button
                           size="sm"
-                          onClick={() => handleSelectRepo(repoOption)}
+                          onClick={() => {
+                            handleSelectRepo(repoOption)
+                            // setSelectedRepo(repoOption);
+                            // onRepoSetupOpen();
+                          }}
                         >
                           {repo.repo === repoOption.name &&
                             repo.owner === repoOption.owner.login

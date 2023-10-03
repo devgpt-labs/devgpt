@@ -30,6 +30,7 @@ const Home = () => {
           width="100vw"
           flexDirection="row"
           gap={3}
+          color="white"
         >
           <Text>
             DevGPT is now accessible via the web! 🎉 Improved desktop app coming

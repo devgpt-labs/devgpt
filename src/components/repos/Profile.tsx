@@ -17,7 +17,7 @@ import {
 // Utils
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import getDiscordOnline from "@/utils/getDiscordOnline";
+import getCredits from "@/utils/getCredits";
 
 // Components
 import Repos from "./Settings";
@@ -43,6 +43,7 @@ import { FaBug } from "react-icons/fa";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
+import CreditsModal from "./CreditsModal";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -117,6 +118,11 @@ const Profile = () => {
     onClose: onKeyClose,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const {
+    isOpen: isCreditsOpen,
+    onOpen: onCreditsOpen,
+    onClose: onCreditsClose,
+  } = useDisclosure({ defaultIsOpen: false });
 
   const getDiscordOnline = async () => {
     try {
@@ -132,34 +138,37 @@ const Profile = () => {
     }
   };
 
+  const getCredits = async (emailAddress: string) => {
+    if (!supabase) return;
+
+    const { data, error } = await supabase
+      .from("customers")
+      .select("credits")
+      .eq("email_address", emailAddress)
+      .single();
+
+    if (error) throw error;
+    if (data !== null) {
+      setCredits(data.credits);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const count = await getDiscordOnline();
+      const count: any = await getDiscordOnline();
+      const credits: any = await getCredits(user?.email);
+
       if (count !== null) {
         setActiveOnDiscord(count);
       }
+
+      if (credits !== null) {
+        setCredits(credits);
+      }
     };
 
-    // Get the current credits from 'customers' table in Supabase
-    const getCredits = async () => {
-      if (!supabase) return
-
-      const { data, error } = await supabase
-        .from("customers")
-        .select("credits")
-        .eq("id", user?.id)
-        .single();
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(data);
-      }
-    }
-
-    getCredits()
     fetchData();
-  }, []); // Empty dependency array means this effect runs once when the component mounts
-
+  }, [isCreditsOpen]); // Empty dependency array means this effect runs once when the component mounts
 
   useEffect(() => {
     const identity = user?.identities?.find((identity: { provider: string }) =>
@@ -173,7 +182,6 @@ const Profile = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user.email, promptCount]);
 
-
   return (
     <Flex
       mt={3}
@@ -181,13 +189,16 @@ const Profile = () => {
       w="6xl"
       maxW="full"
       rounded="lg"
-      // TODO: shadow needs readding / fixing here
-      boxShadow="0px 0px 900px 0px blue"
+      boxShadow="0px 0px 0px 0px #1a202c"
       border="1px solid #1a202c"
       p={5}
-      overflow="hidden"
       shadow="2xl"
     >
+      <CreditsModal
+        isCreditsOpen={isCreditsOpen}
+        onCreditsOpen={onCreditsOpen}
+        onCreditsClose={onCreditsClose}
+      />
       <KeyModal
         isKeyOpen={isKeyOpen}
         onKeyOpen={onKeyOpen}
@@ -225,17 +236,7 @@ const Profile = () => {
           )}
           <Box ml={15} flexDirection="column">
             <Flex flexDirection="row" alignItems="center">
-              <Text>{identity?.name}</Text>
-              {isPro ? (
-                <Tag ml={2} colorScheme="blue">
-                  <Text mr={1}>Credits: { }</Text>
-                  {/* <AiFillStar /> */}
-                </Tag>
-              ) : (
-                <Tag ml={2} colorScheme="blue">
-                  Free
-                </Tag>
-              )}
+              <Text onClick={onCreditsOpen}>{identity?.name}</Text>
             </Flex>
             <Text>{identity?.email}</Text>
           </Box>
@@ -280,9 +281,11 @@ const Profile = () => {
                       }}
                       aria-label="Join Discord"
                       icon={
-                        <Flex flexDirection='row' px={3} >
+                        <Flex flexDirection="row" px={3}>
                           <BsDiscord />
-                          <Text ml={2} fontSize={14}>{activeOnDiscord && `Online: ${activeOnDiscord}`}</Text>
+                          <Text ml={2} fontSize={14}>
+                            {activeOnDiscord && `Online: ${activeOnDiscord}`}
+                          </Text>
                         </Flex>
                       }
                     />
@@ -382,7 +385,7 @@ const Profile = () => {
                 icon={<IoMdSettings size={18} />}
               />
             </Tooltip>
-            <Tooltip label="Enter Open AI key" placement="top">
+            {/* <Tooltip label="Enter Open AI key" placement="top">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
@@ -392,7 +395,7 @@ const Profile = () => {
                 aria-label="Enter Open AI key"
                 icon={<BiKey size={18} />}
               />
-            </Tooltip>
+            </Tooltip> */}
           </Flex>
         </Flex>
       </Flex>

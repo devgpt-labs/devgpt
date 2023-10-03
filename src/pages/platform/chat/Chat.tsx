@@ -202,8 +202,8 @@ const Chat = () => {
   };
 
   return (
-    <>
-      <Flex direction="column" w="full" maxW="6xl" maxH="70vh" my={40}>
+    <Flex overflowY='scroll'>
+      <Flex direction="column" w="full" maxW="6xl" my={40}>
         <Box
           rounded="lg"
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -278,6 +278,7 @@ const Chat = () => {
               />
               <Button
                 bgGradient={"linear(to-r, blue.500, teal.500)"}
+                color='white'
                 ml={4}
                 onClick={async (e: any) => {
                   const checks = await submitChecks(false);
@@ -358,7 +359,7 @@ const Chat = () => {
           handleSubmit(e);
         }}
       />
-    </>
+    </Flex>
   );
 };
 
