@@ -17,7 +17,7 @@ import {
 // Utils
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { AiFillBulb } from "react-icons/ai";
+import { MdScience } from "react-icons/md";
 
 // Components
 import Repos from "./Settings";
@@ -44,7 +44,7 @@ import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
 import CreditsModal from "./CreditsModal";
-import Models from "./Models";
+import Models from "@/pages/platform/models/Models";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -250,94 +250,90 @@ const Profile = () => {
           </Box>
         </Flex>
         <Flex flexDirection="row">
-          <SlideFade in={isSettingsOpen}>
-            {isSettingsOpen && (
-              <Flex gap={2}>
-                {!isPro && (
-                  <Tooltip
-                    label={`${10 - promptCount
-                      }/10 Free Prompts Remaining Today`}
-                    placement="top"
-                  >
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      onClick={onUpgradeOpen}
-                      aria-label="Upgrade"
-                      icon={
-                        promptCount === 10 ? (
-                          <GiBattery0 />
-                        ) : promptCount > 4 ? (
-                          <GiBattery50 />
-                        ) : promptCount > 0 ? (
-                          <GiBattery75 />
-                        ) : (
-                          <GiBattery100 />
-                        )
-                      }
-                    />
-                  </Tooltip>
-                )}
-                <Tooltip label="Join Discord" placement="top">
-                  <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Join Discord"
-                      icon={
-                        <Flex flexDirection="row" px={3}>
-                          <BsDiscord />
-                          <Text ml={2} fontSize={14}>
-                            {activeOnDiscord && `Online: ${activeOnDiscord}`}
-                          </Text>
-                        </Flex>
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                <ProfileOptionIconButton
-                  comparison={colorMode === "light"}
-                  onClick={toggleColorMode}
-                  ariaLabel="Turn the lights on"
-                  label="Dark"
-                  otherLabel="Light"
-                  Icon={MoonIcon}
-                  OtherIcon={SunIcon}
+          <Flex gap={2}>
+            {!isPro && (
+              <Tooltip
+                label={`${10 - promptCount
+                  }/10 Free Prompts Remaining Today`}
+                placement="top"
+              >
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  onClick={onUpgradeOpen}
+                  aria-label="Upgrade"
+                  icon={
+                    promptCount === 10 ? (
+                      <GiBattery0 />
+                    ) : promptCount > 4 ? (
+                      <GiBattery50 />
+                    ) : promptCount > 0 ? (
+                      <GiBattery75 />
+                    ) : (
+                      <GiBattery100 />
+                    )
+                  }
                 />
-                <Tooltip label="Report An Issue" placement="top">
-                  <Link
-                    isExternal
-                    href="https://github.com/february-labs/devgpt-releases/issues"
-                  >
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Report An Issue"
-                      icon={<FaBug />}
-                    />
-                  </Link>
-                </Tooltip>
-                <Tooltip label="Read The Docs" placement="top">
-                  <Link isExternal href="https://docs.devgpt.com">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Read The Docs"
-                      icon={<BiSolidBookBookmark />}
-                    />
-                  </Link>
-                </Tooltip>
-              </Flex>
+              </Tooltip>
             )}
-          </SlideFade>
+            <Tooltip label="Join Discord" placement="top">
+              <Link isExternal href="https://discord.com/invite/6GFtwzuvtw">
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  aria-label="Join Discord"
+                  icon={
+                    <Flex flexDirection="row" px={3}>
+                      <BsDiscord />
+                      <Text ml={2} fontSize={14}>
+                        {activeOnDiscord && `Online: ${activeOnDiscord}`}
+                      </Text>
+                    </Flex>
+                  }
+                />
+              </Link>
+            </Tooltip>
+            <ProfileOptionIconButton
+              comparison={colorMode === "light"}
+              onClick={toggleColorMode}
+              ariaLabel="Turn the lights on"
+              label="Dark"
+              otherLabel="Light"
+              Icon={MoonIcon}
+              OtherIcon={SunIcon}
+            />
+            <Tooltip label="Report An Issue" placement="top">
+              <Link
+                isExternal
+                href="https://github.com/february-labs/devgpt-releases/issues"
+              >
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  aria-label="Report An Issue"
+                  icon={<FaBug />}
+                />
+              </Link>
+            </Tooltip>
+            <Tooltip label="Read The Docs" placement="top">
+              <Link isExternal href="https://docs.devgpt.com">
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  aria-label="Read The Docs"
+                  icon={<BiSolidBookBookmark />}
+                />
+              </Link>
+            </Tooltip>
+          </Flex>
           <Flex gap={2} ml={2}>
             {!isPro && (
               <Tooltip label="Upgrade" placement="top">
@@ -354,7 +350,7 @@ const Profile = () => {
                 />
               </Tooltip>
             )}
-            <ProfileOptionIconButton
+            {/* <ProfileOptionIconButton
               tooltip={"Train Repo"}
               comparison={repoWindowOpen}
               onClick={() => {
@@ -365,7 +361,7 @@ const Profile = () => {
               otherLabel="Open"
               Icon={AiFillFolderOpen}
               OtherIcon={AiFillFolderOpen}
-            />
+            /> */}
             <Tooltip
               label={"View Models"}
               placement="top"
@@ -380,11 +376,10 @@ const Profile = () => {
                   onSettingsClose();
                 }}
                 aria-label="View Models"
-                icon={<AiFillBulb size={18} />}
+                icon={<MdScience size={18} />}
               />
             </Tooltip>
-
-            <Tooltip
+            {/* <Tooltip
               label={isSettingsOpen ? "Close Settings" : "Open Settings"}
               placement="top"
             >
@@ -400,7 +395,7 @@ const Profile = () => {
                 aria-label="Open Settings"
                 icon={<IoMdSettings size={18} />}
               />
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip label="Signout" placement="top">
               <IconButton
                 _hover={{
@@ -436,7 +431,7 @@ const Profile = () => {
           />
         )}
       </SlideFade>
-    </Flex>
+    </Flex >
   );
 };
 

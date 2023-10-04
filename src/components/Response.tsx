@@ -27,9 +27,12 @@ const Response = ({ content }: ResponseProps) => {
 
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
+
       <ReactMarkdown
         components={{
           code({ inline, className, children, ...props }) {
+            console.log(children);
+
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
@@ -51,6 +54,7 @@ const Response = ({ content }: ResponseProps) => {
                     size="lg"
                     cursor={"pointer"}
                     colorScheme="blue"
+                    color='white'
                     onClick={() => {
                       copyToClipboard(String(children));
                       setCopied(true);

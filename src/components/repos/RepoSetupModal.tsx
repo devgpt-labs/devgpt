@@ -94,8 +94,9 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             Cancel
           </Button>
           <Button
+            width='100%'
             bgGradient={"linear(to-r, blue.500,teal.500)"}
-            color={"white"}
+            color="white"
             onClick={() => {
               onSubmit(repo);
               onClose();

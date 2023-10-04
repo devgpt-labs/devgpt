@@ -13,7 +13,14 @@ const calculateTotalCost = (modelsInTraining: any, addition: number) => {
 	// Add these two together as numbers not as strings
 	const newCost = Number(cost) + Number(addition);
 
-	return newCost;
+	// If newCost is not a number, return 0
+	if (isNaN(newCost)) {
+		return 0;
+	}
+
+	// Return the final cost, rounded to 2 decimal places
+	return newCost.toFixed(2)
+
 };
 
 export default calculateTotalCost;
