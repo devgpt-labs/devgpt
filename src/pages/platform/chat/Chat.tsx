@@ -212,8 +212,6 @@ const Chat = () => {
     return true;
   };
 
-  console.log(messages);
-
   useEffect(() => {
     getModels(
       (e: any) => {
@@ -223,10 +221,6 @@ const Chat = () => {
       user
     );
   }, []);
-
-  // Get models
-
-  // Set this to be the active model
 
   return (
     <Flex overflowY="scroll" width="full" direction="column" maxW="90%" py={6}>

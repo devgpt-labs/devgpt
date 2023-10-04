@@ -162,8 +162,6 @@ const RepoDrawer = () => {
       repo: name,
     });
 
-    console.log(session);
-
     // Get Lofaf
     const lofaf = await getLofaf(owner, name, session);
     const epochs = 3;
@@ -192,8 +190,6 @@ const RepoDrawer = () => {
       user,
       session
     );
-
-    console.log({ trainingData });
 
     //set training data in store
     setMessages(trainingData);

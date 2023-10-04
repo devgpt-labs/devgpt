@@ -31,8 +31,6 @@ const Response = ({ content }: ResponseProps) => {
       <ReactMarkdown
         components={{
           code({ inline, className, children, ...props }) {
-            console.log(children);
-
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
