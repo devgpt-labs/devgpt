@@ -3,7 +3,11 @@
   "ignoreCommand": "npm dlx turbo-ignore",
   "crons": [
     {
-      "path": "/api/cron/10m",
+      "path": "/api/cron/payments/10m",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/training/10m",
       "schedule": "*/10 * * * *"
     }
   ]

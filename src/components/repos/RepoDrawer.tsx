@@ -26,13 +26,13 @@ import {
 } from "@chakra-ui/react";
 
 //stores
-import OpenAI from "openai";
+
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import messageStore from "@/store/Messages";
 
 //utils
-import getLLMToken from "@/utils/getLLMToken";
+
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
@@ -47,11 +47,6 @@ type PageInfo = {
   endCursor: string;
 };
 
-const openai = new OpenAI({
-  apiKey: getLLMToken(),
-  dangerouslyAllowBrowser: true,
-});
-
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
     defaultIsOpen: false,
@@ -63,7 +58,7 @@ const RepoDrawer = () => {
   } = useDisclosure();
 
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user, signOut }: any = authStore();
+  const { session, user, signOut, stripe_customer_id }: any = authStore();
   const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -166,108 +161,23 @@ const RepoDrawer = () => {
       repo: name,
     });
 
-    console.log(session);
+    // Create a new row in the models table in Supabase
+    if (!supabase) return;
 
-    // Get Lofaf
-    const lofaf = await getLofaf(owner, name, session);
-    const epochs = 3;
-    const training_cycles = 2;
-
-    // Manipulate lofaf
-    let lofafArray = lofaf.tree;
-    lofafArray = lofafArray.map((item: any) => {
-      return item.path;
-    });
-
-    // Join the lofaf together
-    const lofafString = lofafArray.join(",");
-
-    // Set Lofaf
-    setLofaf(lofafArray);
-
-    // Create training data
-    let trainingData = await createTrainingData(
-      training_cycles,
-      lofafString,
+    const { data, error } = await supabase.from("models").insert([
       {
-        owner: owner,
+        stripe_customer_id: stripe_customer_id,
         repo: name,
+        owner: owner,
+        branch: "main",
+        epochs: 1,
+        output: null,
+        training_method: "ENCODING",
+        frequency: 1,
+        sample_size: 5,
       },
-      user,
-      session
-    );
-
-    console.log({ trainingData });
-
-    //set training data in store
-    setMessages(trainingData);
-
-    if (process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true") {
-      // Convert the content to JSONL format
-      const jsonlContent = trainingData.map(JSON.stringify).join("\n");
-
-      // Convert to a blob
-      const blob = new Blob([jsonlContent], { type: "text/plain" });
-
-      // Convert to a file
-      const file = new File([blob], "training.jsonl");
-
-      // Upload the file to openai API
-      const uploadedFiles = await openai.files.create({
-        file,
-        purpose: "fine-tune",
-      });
-
-      // Create a fine-tuning job from the uploaded file
-      const finetune = await openai.fineTuning.jobs.create({
-        training_file: uploadedFiles.id,
-        model: `gpt-3.5-turbo`,
-        hyperparameters: { n_epochs: 3 },
-      });
-
-      // Create a new row in the models table in Supabase
-      if (!supabase) return;
-
-      const { data, error } = await supabase.from("models").insert([
-        {
-          user_id: user?.id,
-          repo: name,
-          owner: owner,
-          branch: "main",
-          training_data: "ft:model_id",
-          // training_data: finetune.id,
-          training_method: "fine-tune",
-          quantity: training_cycles,
-          epochs: epochs,
-        },
-      ]);
-
-      if (error) {
-        console.log(error);
-      }
-
-      // Set the fine-tuning ID
-      setFinetuningId(finetune.id);
-    }
+    ]);
   };
-
-  // const checkProgressOfFineTuning = async () => {
-  //   const job = await openai.fineTuning.jobs.retrieve(finetuningId);
-
-  //   console.log("Job Status:", job.status);
-
-  //   if (job.status === "succeeded") {
-  //     console.log("Fine-tuning has completed successfully.");
-  //     console.log("Fine-tuned model ID:", job.fine_tuned_model);
-  //   } else if (job.status === "failed") {
-  //     console.log(
-  //       "Fine-tuning has failed. Check the error message:",
-  //       job.error
-  //     );
-  //   } else {
-  //     console.log("Fine-tuning is still in progress.");
-  //   }
-  // };
 
   // Get all models from supabase
   const getModels = async () => {
@@ -342,14 +252,6 @@ const RepoDrawer = () => {
                     >
                       Refresh
                     </Button>
-                    {/* <Button
-                      size="sm"
-                      onClick={checkProgressOfFineTuning}
-                      isLoading={loading}
-                      disabled={loading}
-                    >
-                      Check Progress
-                    </Button> */}
                   </InputRightElement>
                 </InputGroup>
 
@@ -358,7 +260,10 @@ const RepoDrawer = () => {
                     <h2>
                       <AccordionButton>
                         <Box as="span" flex="1" textAlign="left">
-                          Trained Models {trainedModels.length ? ` (${trainedModels.length})` : ""}
+                          Trained Models{" "}
+                          {trainedModels.length
+                            ? ` (${trainedModels.length})`
+                            : ""}
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
@@ -409,7 +314,8 @@ const RepoDrawer = () => {
                     <h2>
                       <AccordionButton>
                         <Box as="span" flex="1" textAlign="left">
-                          Train A New Model {reposCount ? ` (${reposCount})` : ""}
+                          Train A New Model{" "}
+                          {reposCount ? ` (${reposCount})` : ""}
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
