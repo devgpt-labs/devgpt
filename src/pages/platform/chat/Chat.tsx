@@ -234,10 +234,11 @@ const Chat = () => {
               width="100%"
               mt={4}
               onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
+                // TODO: This should open models page
+                setRepoWindowOpen(true);
               }}
             >
-              Train a repo to get started
+              Train a model to get started
             </Button>
             <Text fontSize={12} mt={2}>
               {failMessage}

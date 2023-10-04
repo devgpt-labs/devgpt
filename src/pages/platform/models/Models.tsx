@@ -37,6 +37,7 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  InputRightElement,
 } from "@chakra-ui/react";
 
 //stores
@@ -317,7 +318,7 @@ const Models = ({ onClose }: any) => {
               <Heading size="md" mt={5} mb={3}>
                 Billing and Model Cost
               </Heading>
-              <Text mb={2}>Prompts</Text>
+              <Text mb={2}>Monthly Budget</Text>
               <InputGroup>
                 <InputLeftAddon children="$" />
                 <Input
@@ -326,6 +327,11 @@ const Models = ({ onClose }: any) => {
                   type="number"
                   placeholder="per month"
                 />
+                <InputRightElement width='4.5rem'>
+                  <Button h='1.75rem' size='sm' onClick={() => { }}>
+                    Save
+                  </Button>
+                </InputRightElement>
               </InputGroup>
               <TableContainer>
                 <Table variant="striped">

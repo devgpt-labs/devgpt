@@ -21,13 +21,13 @@ import {
 } from "@chakra-ui/react";
 
 //stores
-import OpenAI from "openai";
+
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import messageStore from "@/store/Messages";
 
 //utils
-import getLLMToken from "@/utils/getLLMToken";
+
 import { getPaginatedRepos } from "@/utils/github/getRepos";
 import createTrainingData from "@/utils/createTrainingData";
 import getLofaf from "@/utils/github/getLofaf";
@@ -43,11 +43,6 @@ type PageInfo = {
   endCursor: string;
 };
 
-const openai = new OpenAI({
-  apiKey: getLLMToken(),
-  dangerouslyAllowBrowser: true,
-});
-
 const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({
     defaultIsOpen: false,
@@ -59,7 +54,7 @@ const RepoDrawer = () => {
   } = useDisclosure();
 
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user, signOut }: any = authStore();
+  const { session, user, signOut, stripe_customer_id }: any = authStore();
   const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -150,6 +145,8 @@ const RepoDrawer = () => {
   };
 
   const handleSelectRepo = async (repo: any) => {
+    console.log({ repo });
+
     // Close the modal, no more user input required
     onClose();
 
@@ -162,110 +159,35 @@ const RepoDrawer = () => {
       repo: name,
     });
 
-    // Get Lofaf
-    const lofaf = await getLofaf(owner, name, session);
-    const epochs = 3;
-    const training_cycles = 2;
+    // Create a new row in the models table in Supabase
+    if (!supabase) return;
 
-    // Manipulate lofaf
-    let lofafArray = lofaf.tree;
-    lofafArray = lofafArray.map((item: any) => {
-      return item.path;
-    });
-
-    // Join the lofaf together
-    const lofafString = lofafArray.join(",");
-
-    // Set Lofaf
-    setLofaf(lofafArray);
-
-    // Create training data
-    let trainingData = await createTrainingData(
-      training_cycles,
-      lofafString,
+    const { data, error } = await supabase.from("models").insert([
       {
-        owner: owner,
+        stripe_customer_id: stripe_customer_id,
         repo: name,
+        owner: owner,
+        branch: "main",
+        epochs: 1,
+        output: null,
+        training_method: "ENCODING",
+        frequency: 1,
+        sample_size: 5,
       },
-      user,
-      session
-    );
+    ]);
 
-    //set training data in store
-    setMessages(trainingData);
-
-    if (process.env.NEXT_PUBLIC_FINE_TUNE_MODE === "true") {
-      // Convert the content to JSONL format
-      const jsonlContent = trainingData.map(JSON.stringify).join("\n");
-
-      // Convert to a blob
-      const blob = new Blob([jsonlContent], { type: "text/plain" });
-
-      // Convert to a file
-      const file = new File([blob], "training.jsonl");
-
-      // Upload the file to openai API
-      const uploadedFiles = await openai.files.create({
-        file,
-        purpose: "fine-tune",
-      });
-
-      // Create a fine-tuning job from the uploaded file
-      const finetune = await openai.fineTuning.jobs.create({
-        training_file: uploadedFiles.id,
-        model: `gpt-3.5-turbo`,
-        hyperparameters: { n_epochs: 3 },
-      });
-
-      // Create a new row in the models table in Supabase
-      if (!supabase) return;
-
-      const { data, error } = await supabase.from("models").insert([
-        {
-          user_id: user?.id,
-          repo: name,
-          owner: owner,
-          branch: "main",
-          training_data: "ft:model_id",
-          // training_data: finetune.id,
-          training_method: "fine-tune",
-          quantity: training_cycles,
-          epochs: epochs,
-        },
-      ]);
-
-      if (error) {
-        console.log(error);
-      }
-
-      // Set the fine-tuning ID
-      setFinetuningId(finetune.id);
+    if (error) {
+      console.log(error);
     }
   };
 
-  // const checkProgressOfFineTuning = async () => {
-  //   const job = await openai.fineTuning.jobs.retrieve(finetuningId);
 
-  //   console.log("Job Status:", job.status);
-
-  //   if (job.status === "succeeded") {
-  //     console.log("Fine-tuning has completed successfully.");
-  //     console.log("Fine-tuned model ID:", job.fine_tuned_model);
-  //   } else if (job.status === "failed") {
-  //     console.log(
-  //       "Fine-tuning has failed. Check the error message:",
-  //       job.error
-  //     );
-  //   } else {
-  //     console.log("Fine-tuning is still in progress.");
-  //   }
-  // };
 
   useEffect(() => {
     getModels(
       setTrainedModels,
       () => { },
-      user
+      stripe_customer_id
     );
   }, [repos]);
 
@@ -323,64 +245,55 @@ const RepoDrawer = () => {
                     >
                       Refresh
                     </Button>
-                    {/* <Button
-                      size="sm"
-                      onClick={checkProgressOfFineTuning}
-                      isLoading={loading}
-                      disabled={loading}
-                    >
-                      Check Progress
-                    </Button> */}
                   </InputRightElement>
                 </InputGroup>
 
-                {repos
-                  .filter((repoOption) => {
-                    return repoOption.name
-                      .toLowerCase()
-                      .includes(filter.toLowerCase());
-                  })
-                  .filter((repoOption) => {
-                    // Remove any that are found on the models table
-                    return !trainedModels.some(
-                      (model) =>
-                        model.repo === repoOption.name &&
-                        model.owner === repoOption.owner.login
-                    );
-                  })
-                  ?.map((repoOption) => {
-                    return (
-                      <Flex
-                        key={repoOption.name + repoOption.owner.login}
-                        mb={2}
-                        flexDirection="row"
-                        justifyContent={"space-between"}
-                        alignItems={"center"}
-                      >
-                        <Flex flexDirection="column">
-                          <Text fontSize={16}>
-                            {repoOption.name.substring(0, 16)}
-                            {repoOption.name?.length > 16 && "..."}
-                          </Text>
-
-                          <Text fontSize={12} color="gray">
-                            {repoOption.owner.login}
-                          </Text>
-                        </Flex>
-
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            handleSelectRepo(repoOption);
-                            setSelectedRepo(repoOption);
-                            onRepoSetupOpen();
-                          }}
+                {
+                  repos
+                    .filter((repoOption) => {
+                      return repoOption.name
+                        .toLowerCase()
+                        .includes(filter.toLowerCase());
+                    })
+                    .filter((repoOption) => {
+                      // Remove any that are found on the models table
+                      return !trainedModels.some(
+                        (model) =>
+                          model.repo === repoOption.name &&
+                          model.owner === repoOption.owner.login
+                      );
+                    })
+                    ?.map((repoOption) => {
+                      return (
+                        <Flex
+                          key={repoOption.name + repoOption.owner.login}
+                          mb={2}
+                          flexDirection="row"
+                          justifyContent={"space-between"}
+                          alignItems={"center"}
                         >
-                          Train
-                        </Button>
-                      </Flex>
-                    );
-                  })}
+                          <Flex flexDirection="column">
+                            <Text fontSize={16}>
+                              {repoOption.name.substring(0, 16)}
+                              {repoOption.name?.length > 16 && "..."}
+                            </Text>
+
+                            <Text fontSize={12} color="gray">
+                              {repoOption.owner.login}
+                            </Text>
+                          </Flex>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRepo(repoOption);
+                              onRepoSetupOpen();
+                            }}
+                          >
+                            Train
+                          </Button>
+                        </Flex >
+                      );
+                    })}
               </>
             ) : (
               <Stack mt={4} spacing={2}>
@@ -395,7 +308,7 @@ const RepoDrawer = () => {
                 <Skeleton height="30px" />
               </Stack>
             )}
-          </DrawerBody>
+          </DrawerBody >
           {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
             <DrawerFooter gap={2}>
               <>
@@ -412,7 +325,7 @@ const RepoDrawer = () => {
               </>
             </DrawerFooter>
           )}
-        </DrawerContent>
+        </DrawerContent >
       </Drawer >
     </>
   );
