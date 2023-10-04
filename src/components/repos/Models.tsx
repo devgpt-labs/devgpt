@@ -56,8 +56,8 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
 
 const ModelCard = ({ model, onClose }: any) => {
-  const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore()
-  const { colorMode } = useColorMode()
+  const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore();
+  const { colorMode } = useColorMode();
 
   const deleteModel = async () => {
     if (!supabase) return;
@@ -70,7 +70,6 @@ const ModelCard = ({ model, onClose }: any) => {
   };
 
   console.log(colorMode);
-
 
   if (!model) return null;
 
@@ -91,8 +90,7 @@ const ModelCard = ({ model, onClose }: any) => {
                     icon={<DeleteIcon />}
                   />
                   <IconButton
-                    onClick={() => {
-                    }}
+                    onClick={() => { }}
                     aria-label="Edit Model"
                     icon={<EditIcon />}
                   />
@@ -154,6 +152,17 @@ const ModelCard = ({ model, onClose }: any) => {
           </Stack>
         </CardBody>
       </Card>
+      {/* <Setup
+        repo={repo}
+        trainingMethod={trainingMethod}
+        cycles={cycles}
+        frequency={frequency}
+        epochs={epochs}
+        setCycles={setCycles}
+        setFrequency={setFrequency}
+        setEpochs={setEpochs}
+        setTrainingMethod={setTrainingMethod}
+      /> */}
     </GridItem>
   );
 };
@@ -220,7 +229,6 @@ const Models = ({ onClose }: any) => {
   useEffect(() => {
     getModels();
   }, [repos]);
-
 
   const calculateStatSum = (stat: string) => {
     return modelsInTraining.length > 0 ? (
@@ -289,8 +297,8 @@ const Models = ({ onClose }: any) => {
           ) : (
             <Flex
               flexDirection="column"
-              justifyContent='center'
-              alignItems='center'
+              justifyContent="center"
+              alignItems="center"
               gap={2}
               width="100%"
               height="100%"
@@ -318,7 +326,7 @@ const Models = ({ onClose }: any) => {
                 <Input
                   value={budget}
                   onChange={handleBudgetChange}
-                  type="tel"
+                  type="number"
                   placeholder="per month"
                 />
               </InputGroup>
