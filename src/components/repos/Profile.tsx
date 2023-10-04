@@ -44,7 +44,7 @@ import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
 import CreditsModal from "./CreditsModal";
-import Training from "./Training";
+import Models from "./Models";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -103,7 +103,11 @@ const Profile = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
 
-  const { isOpen: isSettingsOpen, onToggle: onSettingsToggle } = useDisclosure({
+  const {
+    isOpen: isSettingsOpen,
+    onToggle: onSettingsToggle,
+    onClose: onSettingsClose,
+  } = useDisclosure({
     defaultIsOpen: false,
   });
 
@@ -194,15 +198,10 @@ const Profile = () => {
     <Flex
       mt={3}
       flexDirection="column"
-      w="6xl"
-      maxW="full"
       rounded="lg"
-      boxShadow="0px 0px 0px 0px #1a202c"
       border="1px solid #1a202c"
       p={5}
-      shadow="2xl"
     >
-
       <CreditsModal
         isCreditsOpen={isCreditsOpen}
         onCreditsOpen={onCreditsOpen}
@@ -356,17 +355,52 @@ const Profile = () => {
               </Tooltip>
             )}
             <ProfileOptionIconButton
-              tooltip={"Change Repo"}
+              tooltip={"Train Repo"}
               comparison={repoWindowOpen}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}
-              ariaLabel="Change Repo"
+              ariaLabel="Train Repo"
               label="Close"
               otherLabel="Open"
               Icon={AiFillFolderOpen}
               OtherIcon={AiFillFolderOpen}
             />
+            <Tooltip
+              label={"View Models"}
+              placement="top"
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={() => {
+                  onModelsToggle();
+                  onSettingsClose();
+                }}
+                aria-label="View Models"
+                icon={<AiFillBulb size={18} />}
+              />
+            </Tooltip>
+
+            <Tooltip
+              label={isSettingsOpen ? "Close Settings" : "Open Settings"}
+              placement="top"
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={() => {
+                  onSettingsToggle();
+                  onModelsClose();
+                }}
+                aria-label="Open Settings"
+                icon={<IoMdSettings size={18} />}
+              />
+            </Tooltip>
             <Tooltip label="Signout" placement="top">
               <IconButton
                 _hover={{
@@ -378,34 +412,6 @@ const Profile = () => {
                 }}
                 aria-label="Signout"
                 icon={<PiSignOutBold size={14} />}
-              />
-            </Tooltip>
-            <Tooltip
-              label={isSettingsOpen ? "Close Settings" : "Open Settings"}
-              placement="top"
-            >
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onClick={onSettingsToggle}
-                aria-label="Open Settings"
-                icon={<IoMdSettings size={18} />}
-              />
-            </Tooltip>
-            <Tooltip
-              label={isModelsOpen ? "Close Models" : "Open Models"}
-              placement="top"
-            >
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onClick={onModelsToggle}
-                aria-label="Open Models"
-                icon={<AiFillBulb size={18} />}
               />
             </Tooltip>
             {/* <Tooltip label="Enter Open AI key" placement="top">
@@ -423,7 +429,13 @@ const Profile = () => {
         </Flex>
       </Flex>
       <SlideFade in={isSettingsOpen}>{isSettingsOpen && <Repos />}</SlideFade>
-      <SlideFade in={isModelsOpen}>{isModelsOpen && <Training />}</SlideFade>
+      <SlideFade in={isModelsOpen}>
+        {isModelsOpen && (
+          <Models
+            onClose={onModelsClose}
+          />
+        )}
+      </SlideFade>
     </Flex>
   );
 };

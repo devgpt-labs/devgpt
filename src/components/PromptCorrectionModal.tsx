@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -15,6 +16,14 @@ import {
   Flex,
   Textarea,
   Tag,
+  List,
+  ListItem,
+  ListIcon,
+  OrderedList,
+  UnorderedList,
+  InputGroup,
+  InputLeftAddon,
+  Input,
 } from "@chakra-ui/react";
 
 const PromptCorrectionModal = ({
@@ -22,11 +31,13 @@ const PromptCorrectionModal = ({
   onClose,
   correctedPrompt,
   prompt,
+  setPrompt,
   submitHandler,
   submitHandlerReject,
 }: any) => {
   const promptArray = prompt.split(" ");
   const correctedPromptArray = correctedPrompt.split(" ");
+  const [show, setShow] = useState(false);
 
   const common = correctedPromptArray.filter(
     (word: any) => !promptArray.includes(word)
@@ -37,62 +48,80 @@ const PromptCorrectionModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} isCentered={true} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
-            Improve your prompt
-            <Tag colorScheme="purple" ml={3}>
-              Experimental
-            </Tag>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pt={3}>
-            <Text size="md" mb={3}>
-              Original prompt:
+          <Flex p={4} flexDirection="column" width="100%">
+            <Flex>
+              <ModalCloseButton />
+              <Text fontSize={18}>Improve your prompt</Text>
+              <Tag colorScheme="purple" ml={3}>
+                Experimental
+              </Tag>
+            </Flex>
+            <Text fontSize={14} color="gray.400">
+              This is an experimental feature that will help you improve your
+              prompts. It will suggest words that you can add to your prompt.
             </Text>
-            <Card>
-              <CardBody>
-                <Heading size={"lg"}>{prompt}</Heading>
-              </CardBody>
-            </Card>
-            <Text size="md" mb={3} mt={5}>
-              Corrected prompt:
+            <Flex flexDirection="column" width="100%" my={2}>
+              <InputGroup mb={2}>
+                <InputLeftAddon children="old" />
+                <Input isReadOnly={true} value={prompt} type="text" placeholder="old prompt" />
+              </InputGroup>
+              <InputGroup width='100%'>
+                <InputLeftAddon children="new" />
+                <Input value={correctedPrompt} type="text" placeholder="old prompt" />
+              </InputGroup>
+            </Flex>
+            <Text
+              color="gray.400"
+              cursor="pointer"
+              textDecoration={"underline"}
+              onClick={() => {
+                setShow(!show);
+              }}
+            >
+              View how to improve prompts
             </Text>
-            <Card mt={3}>
-              <CardBody>
-                <Textarea size={"lg"}>{correctedPrompt}</Textarea>
-              </CardBody>
-            </Card>
-          </ModalBody>
+            {show && (
+              <UnorderedList>
+                <ListItem>Wrap content in ""</ListItem>
+                <ListItem>Use the @ command to target files</ListItem>
+                <ListItem>Give specific instructions or questions</ListItem>
+                <ListItem>You can disable this in the settings</ListItem>
+              </UnorderedList>
+            )}
+          </Flex>
+
           <ModalFooter>
-            <Flex flexDirection={"column"} w="full" alignItems={"center"}>
-              <Text textAlign={"center"} w="sm">
-                Tip: We use ~ to represent your project root directory, this can
-                be disabled in settings.
-              </Text>
-              <Flex mt={5} alignSelf={"flex-end"}>
-                <Button
-                  variant="ghost"
-                  onClick={(e) => {
-                    onClose();
-                    submitHandlerReject(e);
-                  }}
-                >
-                  No thanks
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  color="white"
-                  mr={3}
-                  onClick={(e) => {
-                    onClose();
-                    submitHandler(e);
-                  }}
-                >
-                  Accept Suggestion
-                </Button>
-              </Flex>
+            <Flex
+              gap={2}
+              alignSelf="flex-end"
+              flexDirection="row"
+              w="full"
+              justifyContent="flex-end"
+            >
+              <Button
+                variant="ghost"
+                onClick={(e) => {
+                  submitHandlerReject(e);
+                  onClose();
+                }}
+              >
+                Reject
+              </Button>
+              <Button
+                width="100%"
+                colorScheme="blue"
+                color="white"
+                onClick={(e) => {
+                  setPrompt(correctedPrompt);
+                  submitHandler(e);
+                  onClose();
+                }}
+              >
+                Accept Suggestion
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>
