@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm turbo build",
+  "ignoreCommand": "npm dlx turbo-ignore",
+  "crons": [
+    {
+      "path": "/api/cron/10m",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}
