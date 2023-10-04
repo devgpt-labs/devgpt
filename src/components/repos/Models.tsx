@@ -43,6 +43,7 @@ import {
 import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
+import Setup from "./Setup";
 
 //utils
 import moment from "moment";
@@ -58,6 +59,7 @@ import { PiCircleLight } from "react-icons/pi";
 const ModelCard = ({ model, onClose }: any) => {
   const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore();
   const { colorMode } = useColorMode();
+  const [show, setShow] = useState<boolean>(false);
 
   const deleteModel = async () => {
     if (!supabase) return;
@@ -69,101 +71,92 @@ const ModelCard = ({ model, onClose }: any) => {
     }
   };
 
-  console.log(colorMode);
-
   if (!model) return null;
 
   return (
-    <GridItem w="full">
-      <Card rounded="lg" p={4}>
-        <CardBody>
-          <Stack divider={<StackDivider />} spacing="4">
-            <Box>
-              <Flex justifyContent={"space-between"}>
-                <Heading size="md" mb={2}>
-                  {model.repo}
-                </Heading>
-                <Flex flexDirection={"row"} gap={2}>
-                  <IconButton
-                    onClick={deleteModel}
-                    aria-label="Delete Model"
-                    icon={<DeleteIcon />}
-                  />
-                  <IconButton
-                    onClick={() => { }}
-                    aria-label="Edit Model"
-                    icon={<EditIcon />}
-                  />
-                  <IconButton
-                    onClick={() => {
-                      setRepo({
-                        owner: model.owner,
-                        repo: model.repo,
-                      });
-                    }}
-                    aria-label="Select Model"
-                    icon={
-                      repo.repo === model.repo ? (
-                        <AiFillCheckCircle />
-                      ) : (
-                        <PiCircleLight />
-                      )
-                    }
-                  />
-                </Flex>
-              </Flex>
-              <Badge mb={3} colorScheme="teal">
-                {model.training_method}
-              </Badge>
-              <Text fontSize={14}>
-                {model.owner} - {model.branch}
-              </Text>
-            </Box>
-            <Box>
-              <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                <GridItem>
-                  <Stat>
-                    <StatLabel>Epochs</StatLabel>
-                    <StatNumber>{model.epochs}</StatNumber>
-                    <StatHelpText>
-                      {moment(model.created_at).format(
-                        "MMMM Do YYYY, h:mm:ss a"
-                      )}
-                    </StatHelpText>
-                  </Stat>
-                </GridItem>
-                <GridItem>
-                  <Stat>
-                    <StatLabel>Sample_size</StatLabel>
-                    <StatNumber>{model.sample_size}</StatNumber>
-                    <StatHelpText>
-                      {moment(model.created_at).format(
-                        "MMMM Do YYYY, h:mm:ss a"
-                      )}
-                    </StatHelpText>
-                  </Stat>
-                </GridItem>
-              </Grid>
-              <Heading mt={3} size="sm">
-                Training Frequency
+    <Card rounded="lg" p={4} flexDirection='row'>
+      <CardBody>
+        <Stack divider={<StackDivider />} spacing="4">
+          <Box>
+            <Flex justifyContent={"space-between"}>
+              <Heading size="md" mb={2}>
+                {model.repo}
               </Heading>
-              <Text fontSize={14}>Every {model.frequency} new commits</Text>
-            </Box>
-          </Stack>
-        </CardBody>
-      </Card>
-      {/* <Setup
-        repo={repo}
-        trainingMethod={trainingMethod}
-        cycles={cycles}
-        frequency={frequency}
-        epochs={epochs}
-        setCycles={setCycles}
-        setFrequency={setFrequency}
-        setEpochs={setEpochs}
-        setTrainingMethod={setTrainingMethod}
-      /> */}
-    </GridItem>
+              <Flex flexDirection={"row"} gap={2}>
+                <IconButton
+                  onClick={deleteModel}
+                  aria-label="Delete Model"
+                  icon={<DeleteIcon />}
+                />
+                <IconButton
+                  onClick={() => setShow(!show)}
+                  aria-label="Edit Model"
+                  icon={<EditIcon />}
+                />
+                <IconButton
+                  onClick={() => {
+                    setRepo({
+                      owner: model.owner,
+                      repo: model.repo,
+                    });
+                  }}
+                  aria-label="Select Model"
+                  icon={
+                    repo.repo === model.repo ? (
+                      <AiFillCheckCircle />
+                    ) : (
+                      <PiCircleLight />
+                    )
+                  }
+                />
+              </Flex>
+            </Flex>
+            <Badge mb={3} colorScheme="teal">
+              {model.training_method}
+            </Badge>
+            <Text fontSize={14}>
+              {model.owner} - {model.branch}
+            </Text>
+            <Text fontSize={14}>
+              {moment(model.created_at).format("MMMM Do YYYY, h:mm:ss a")}
+            </Text>
+          </Box>
+          <Box>
+            <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+              <GridItem>
+                <Stat>
+                  <StatLabel>Frequency</StatLabel>
+                  <StatNumber>{model.frequency}</StatNumber>
+                  <Text fontSize={10}>Train every X commits</Text>
+                </Stat>
+              </GridItem>
+              <GridItem>
+                <Stat>
+                  <StatLabel>Sample Size</StatLabel>
+                  <StatNumber>{model.sample_size}</StatNumber>
+                  <Text fontSize={10}>Train on X amount of files</Text>
+                </Stat>
+              </GridItem>
+            </Grid>
+          </Box>
+        </Stack>
+        {show && (
+          <Flex flexDirection="column" mt={4}>
+            <Setup
+            // repo={repo}
+            // trainingMethod={trainingMethod}
+            // cycles={cycles}
+            // frequency={frequency}
+            // epochs={epochs}
+            // setCycles={setCycles}
+            // setFrequency={setFrequency}
+            // setEpochs={setEpochs}
+            // setTrainingMethod={setTrainingMethod}
+            />
+          </Flex>
+        )}
+      </CardBody>
+    </Card>
   );
 };
 
@@ -288,7 +281,7 @@ const Models = ({ onClose }: any) => {
               </Flex>
             </Grid>
           )}
-          {modelsInTraining.length > 0 ? (
+          {!loading && modelsInTraining.length > 0 ? (
             <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               {modelsInTraining.map((model: any) => {
                 return <ModelCard onClose={onClose} model={model} />;

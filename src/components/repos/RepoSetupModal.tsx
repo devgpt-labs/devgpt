@@ -50,41 +50,7 @@ import { IoMdInformationCircle } from "react-icons/io";
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import Setup from "./Setup";
 
-const SliderInput = ({
-  label,
-  value,
-  tooltip,
-  Icon,
-  onChange,
-  increment,
-  max,
-}: any) => {
-  return (
-    <Flex gap={2} flexDirection="column">
-      <Tooltip placement="right" label={tooltip}>
-        <Flex flexDirection="row" alignItems="center" gap={2}>
-          <Text>
-            {label} ({value})
-          </Text>
-          <IoMdInformationCircle />
-        </Flex>
-      </Tooltip>
-      <Slider
-        aria-label={label}
-        defaultValue={value}
-        onChange={onChange}
-        min={increment}
-        max={max}
-        step={increment}
-      >
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-        <SliderThumb zIndex={1} />
-      </Slider>
-    </Flex>
-  );
-};
+
 
 const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
   const [cycles, setCycles] = useState(5);
