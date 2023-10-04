@@ -29,8 +29,6 @@ import userPrompt from "@/prompts/user";
 //components
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
-import Training from "@/components/repos/Models";
-import { PromptInput } from "./PromptInput";
 import { RateConversation } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
@@ -70,7 +68,7 @@ const Chat = () => {
   const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const { colorMode } = useColorMode();
-  const { user, session }: any = authStore();
+  const { user, session, stripe_customer_id }: any = authStore();
 
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
@@ -214,11 +212,11 @@ const Chat = () => {
 
   useEffect(() => {
     getModels(
-      (e: any) => {
-        console.log(e);
+      (data: any) => {
+        console.log({ data });
       },
-      null,
-      user
+      () => { },
+      stripe_customer_id
     );
   }, []);
 

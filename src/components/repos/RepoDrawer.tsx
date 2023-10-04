@@ -264,7 +264,7 @@ const RepoDrawer = () => {
   useEffect(() => {
     getModels(
       setTrainedModels,
-      null,
+      () => { },
       user
     );
   }, [repos]);

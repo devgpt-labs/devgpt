@@ -1,13 +1,13 @@
 import { supabase } from "./supabase";
 
 // Get all models from supabase
-  const getModels = async (setState: any, setLoading: any, user: any) => {
+  const getModels = async (setState: any, setLoading: any, stripe_customer_id: any) => {
     if (!supabase) return;
 
     const { data, error } = await supabase
       .from("models")
       .select("*")
-      .eq("user_id", user?.id);
+      .eq("stripe_customer_id", stripe_customer_id);
 
     if (!error) {
       setState(data);

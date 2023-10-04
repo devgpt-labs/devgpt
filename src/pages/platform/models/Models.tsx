@@ -177,7 +177,7 @@ const ModelCard = ({ model, onClose }: any) => {
 };
 
 const Models = ({ onClose }: any) => {
-  const { user }: any = authStore();
+  const { user, stripe_customer_id }: any = authStore();
   const { colorMode }: any = useColorMode();
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [showBilling, setShowBilling] = useState<boolean>(false);
@@ -207,7 +207,7 @@ const Models = ({ onClose }: any) => {
     getModels(
       setModelsInTraining,
       setLoading,
-      user,
+      stripe_customer_id,
     );
   }, [repos]);
 
