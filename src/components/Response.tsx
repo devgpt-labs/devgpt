@@ -27,6 +27,7 @@ const Response = ({ content }: ResponseProps) => {
 
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
+
       <ReactMarkdown
         components={{
           code({ inline, className, children, ...props }) {
@@ -51,6 +52,7 @@ const Response = ({ content }: ResponseProps) => {
                     size="lg"
                     cursor={"pointer"}
                     colorScheme="blue"
+                    color='white'
                     onClick={() => {
                       copyToClipboard(String(children));
                       setCopied(true);

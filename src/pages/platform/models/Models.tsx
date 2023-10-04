@@ -37,20 +37,28 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  InputRightElement,
 } from "@chakra-ui/react";
 
 //stores
 import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
-import Setup from "./Setup";
+import Setup from "@/components/repos/Setup";
 
 //utils
 import moment from "moment";
 import calculateTotalCost from "@/utils/calculateTotalCost";
+import getModels from "@/utils/getModels";
+
 
 //icons
-import { EditIcon, DeleteIcon, SmallAddIcon } from "@chakra-ui/icons";
+import {
+  EditIcon,
+  DeleteIcon,
+  SmallAddIcon,
+  ArrowBackIcon,
+} from "@chakra-ui/icons";
 import { BiCircle, BiSolidDollarCircle } from "react-icons/bi";
 import { PiSelectionBackground } from "react-icons/pi";
 import { AiFillCheckCircle } from "react-icons/ai";
@@ -74,7 +82,7 @@ const ModelCard = ({ model, onClose }: any) => {
   if (!model) return null;
 
   return (
-    <Card rounded="lg" p={4} flexDirection='row'>
+    <Card rounded="lg" p={4} flexDirection="row">
       <CardBody>
         <Stack divider={<StackDivider />} spacing="4">
           <Box>
@@ -111,9 +119,18 @@ const ModelCard = ({ model, onClose }: any) => {
                 />
               </Flex>
             </Flex>
-            <Badge mb={3} colorScheme="teal">
-              {model.training_method}
-            </Badge>
+            <Flex flexDirection="column" gap={1} mb={3}>
+              <Badge colorScheme="teal" alignSelf="flex-start">
+                In Use: {repo.repo === model.repo ? 'TRUE' : 'FALSE'}
+              </Badge>
+              <Badge colorScheme="teal" alignSelf="flex-start">
+                Method: {model.training_method}
+              </Badge>
+              <Badge colorScheme="teal" alignSelf="flex-start">
+                Status: Ready To Use
+              </Badge>
+            </Flex>
+
             <Text fontSize={14}>
               {model.owner} - {model.branch}
             </Text>
@@ -143,15 +160,15 @@ const ModelCard = ({ model, onClose }: any) => {
         {show && (
           <Flex flexDirection="column" mt={4}>
             <Setup
-            // repo={repo}
-            // trainingMethod={trainingMethod}
-            // cycles={cycles}
-            // frequency={frequency}
-            // epochs={epochs}
-            // setCycles={setCycles}
-            // setFrequency={setFrequency}
-            // setEpochs={setEpochs}
-            // setTrainingMethod={setTrainingMethod}
+              repo={model}
+              trainingMethod={model.training_method}
+              cycles={model.sample_size}
+              frequency={model.frequency}
+              epochs={model.epochs}
+              setCycles={() => { }}
+              setFrequency={() => { }}
+              setEpochs={() => { }}
+              setTrainingMethod={() => { }}
             />
           </Flex>
         )}
@@ -161,7 +178,7 @@ const ModelCard = ({ model, onClose }: any) => {
 };
 
 const Models = ({ onClose }: any) => {
-  const { user }: any = authStore();
+  const { user, stripe_customer_id }: any = authStore();
   const { colorMode }: any = useColorMode();
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [showBilling, setShowBilling] = useState<boolean>(false);
@@ -187,40 +204,12 @@ const Models = ({ onClose }: any) => {
     setBudget(e.target.value);
   };
 
-  const getModels = async () => {
-    if (!supabase) return;
-
-    // Get repos from models table in supabase
-    const { data, error } = await supabase
-      .from("models")
-      .select("*")
-      .eq("user_id", user.id);
-
-    if (!error) {
-      setModelsInTraining(data);
-      setLoading(false);
-    }
-
-    if (!data || data.length === 0)
-      return setModelsInTraining([
-        {
-          id: "1",
-          created_at: "2021-09-12T18:51:02.000Z",
-          user_id: "1",
-          repo: "devgpt-web",
-          owner: "devgpt-labs",
-          branch: "main",
-          epochs: 1,
-          output: '{"JSON_output": "data"}',
-          training_method: "Encoding",
-          sample_size: 15,
-          frequency: 25,
-        },
-      ]);
-  };
-
   useEffect(() => {
-    getModels();
+    getModels(
+      setModelsInTraining,
+      setLoading,
+      stripe_customer_id,
+    );
   }, [repos]);
 
   const calculateStatSum = (stat: string) => {
@@ -247,32 +236,49 @@ const Models = ({ onClose }: any) => {
           p={4}
           bg={colorMode === "light" ? "gray.50" : "black"}
         >
-          <Flex alignItems="center" gap={3} mb={3}>
-            <Heading size="md">Models</Heading>
-            <Button
-              onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-                onClose();
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Create
-            </Button>
-            <Button
-              onClick={() => {
-                if (showBilling) return setShowBilling(false);
+          <Flex
+            alignItems="center"
+            justifyContent="space-between"
+            gap={3}
+            mb={3}
+            mr={10}
+          >
+            <Flex flexDirection="row" alignItems="center">
+              <IconButton
+                onClick={onClose}
+                aria-label="Close"
+                icon={<ArrowBackIcon />}
+              />
+              <Heading size="md" ml={4}>
+                Models
+              </Heading>
+            </Flex>
+            <Flex gap={2}>
+              <Button
+                onClick={() => {
+                  setRepoWindowOpen(!repoWindowOpen);
+                  onClose();
+                }}
+                rightIcon={<SmallAddIcon />}
+              >
+                Create
+              </Button>
+              <Button
+                onClick={() => {
+                  if (showBilling) return setShowBilling(false);
 
-                setShowBilling(true);
-                const element = document.getElementById("billing");
-                element?.scrollIntoView({ behavior: "smooth" });
-              }}
-              rightIcon={<BiSolidDollarCircle />}
-            >
-              Billing
-            </Button>
+                  setShowBilling(true);
+                  const element = document.getElementById("billing");
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                rightIcon={<BiSolidDollarCircle />}
+              >
+                Billing
+              </Button>
+            </Flex>
           </Flex>
 
-          {loading && (
+          {loading ? (
             <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               <Flex flexDirection="row" gap={4}>
                 <Skeleton width="400px" height="400px" />
@@ -280,8 +286,7 @@ const Models = ({ onClose }: any) => {
                 <Skeleton width="400px" height="400px" />
               </Flex>
             </Grid>
-          )}
-          {!loading && modelsInTraining.length > 0 ? (
+          ) : modelsInTraining.length > 0 ? (
             <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               {modelsInTraining.map((model: any) => {
                 return <ModelCard onClose={onClose} model={model} />;
@@ -313,7 +318,7 @@ const Models = ({ onClose }: any) => {
               <Heading size="md" mt={5} mb={3}>
                 Billing and Model Cost
               </Heading>
-              <Text mb={2}>Prompts</Text>
+              <Text mb={2}>Monthly Budget</Text>
               <InputGroup>
                 <InputLeftAddon children="$" />
                 <Input
@@ -322,6 +327,11 @@ const Models = ({ onClose }: any) => {
                   type="number"
                   placeholder="per month"
                 />
+                <InputRightElement width='4.5rem'>
+                  <Button h='1.75rem' size='sm' onClick={() => { }}>
+                    Save
+                  </Button>
+                </InputRightElement>
               </InputGroup>
               <TableContainer>
                 <Table variant="striped">

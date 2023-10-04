@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const useStore = create((set) => ({
-  repoWindowOpen: true,
+  repoWindowOpen: false,
   repo: { owner: null, repo: null },
   lofaf: [],
   branch: "",

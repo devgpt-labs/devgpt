@@ -13,6 +13,7 @@ import {
   Tag,
   useDisclosure,
   Heading,
+  Spinner,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -28,8 +29,6 @@ import userPrompt from "@/prompts/user";
 //components
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
-import Training from "@/components/repos/Models";
-import { PromptInput } from "./PromptInput";
 import { RateConversation } from "./RateConversation";
 import { Header } from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
@@ -42,18 +41,24 @@ import getPromptCount from "@/utils/getPromptCount";
 import { checkIfPro } from "@/utils/checkIfPro";
 import Calculator from "@/components/repos/Calculator";
 import promptCorrection from "@/utils/promptCorrection";
+import getModels from "@/utils/getModels";
 
 const Chat = () => {
-  const [response, setResponse] = useState<string>("");
-  const [initialMessages, setInitialMessages] = useState<any>([]);
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
-
-  const [previousPrompt, setPreviousPrompt] = useState<string>("");
-  const [isFinished, setIsFinished] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [failMessage, setFailMessage] = useState<string>("");
+  // Constants
   const [promptCount, setPromptCount] = useState<number>(0);
+
+  // Sending prompts
+  const [loading, setLoading] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
+  const [failMessage, setFailMessage] = useState<string>("");
+
+  // Load state
+  const [initialMessages, setInitialMessages] = useState<any>([]);
+  const [response, setResponse] = useState<string>("");
+
+  // Active state
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+  const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [trainingDataRetrieved, setTrainingDataRetrieved] =
     useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
@@ -63,7 +68,7 @@ const Chat = () => {
   const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const { colorMode } = useColorMode();
-  const { user, session }: any = authStore();
+  const { user, session, stripe_customer_id }: any = authStore();
 
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
@@ -93,6 +98,10 @@ const Chat = () => {
       setInitialMessages(JSON.parse(String(trainingData)));
     }
   };
+
+  useEffect(() => {
+    setLoading(false);
+  }, [messages]);
 
   useEffect(() => {
     retrieveTrainingData();
@@ -138,9 +147,10 @@ const Chat = () => {
     ignoreFeedback: boolean,
     useOriginalPrompt?: boolean
   ) => {
-    setIsLoading(true);
+    setLoading(true);
     setFailMessage("");
     setPreviousPrompt(prompt);
+    setLoading(true);
 
     let promptFeedback;
 
@@ -182,7 +192,7 @@ const Chat = () => {
     const isPro = await checkIfPro(user.email);
 
     if (!isPro && promptCount > 16) {
-      setIsLoading(false);
+      setLoading(false);
       setFailMessage(
         "You have reached your prompt limit for today, upgrade or check back tomorrow!"
       );
@@ -190,7 +200,7 @@ const Chat = () => {
     }
 
     if (tokensInString > tokenLimit) {
-      setIsLoading(false);
+      setLoading(false);
       setFailMessage(
         "Your prompt is too long currently to run, try to include less files and more precise information."
       );
@@ -200,8 +210,15 @@ const Chat = () => {
     return true;
   };
 
-  console.log(messages);
-
+  useEffect(() => {
+    getModels(
+      (data: any) => {
+        console.log({ data });
+      },
+      () => { },
+      stripe_customer_id
+    );
+  }, []);
 
   return (
     <Flex overflowY="scroll" width="full" direction="column" maxW="90%" py={6}>
@@ -217,10 +234,11 @@ const Chat = () => {
               width="100%"
               mt={4}
               onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
+                // TODO: This should open models page
+                setRepoWindowOpen(true);
               }}
             >
-              Select a repo to get started
+              Train a model to get started
             </Button>
             <Text fontSize={12} mt={2}>
               {failMessage}
@@ -262,6 +280,10 @@ const Chat = () => {
                   setPrompt(e.target.value);
                 }}
                 onKeyDown={async (e: any) => {
+                  if (prompt.length < 3) {
+                    return
+                  }
+
                   // If key equals tab, autocomplete
                   if (e.key === "Tab") {
                     e.preventDefault();
@@ -273,13 +295,7 @@ const Chat = () => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     const checks = await submitChecks(false);
-
-                    console.log(checks);
-
                     if (!checks) return null;
-
-                    console.log('ran');
-
                     handleSubmit(e);
                   }
                 }}
@@ -288,13 +304,14 @@ const Chat = () => {
                 bgGradient={"linear(to-r, blue.500, teal.500)"}
                 color="white"
                 ml={4}
+                width="10rem"
                 onClick={async (e: any) => {
                   const checks = await submitChecks(false);
                   if (!checks) return null;
                   handleSubmit(e);
                 }}
               >
-                Submit
+                {loading ? <Spinner size="sm" /> : "Submit"}
               </Button>
             </Flex>
             <Flex mb={3}>
@@ -305,7 +322,7 @@ const Chat = () => {
                 {/* <Heading mt={5}>{previousPrompt}</Heading> */}
               </SlideFade>
             </Flex>
-            {isLoading && !messages[messages.length - 1] ? (
+            {loading && !messages[messages.length - 1] ? (
               <SkeletonText
                 mt="4"
                 noOfLines={4}
@@ -320,7 +337,7 @@ const Chat = () => {
           </Box>
         )}
 
-        {messages[messages.length - 1] && isFinished && (
+        {messages[messages.length - 1] && loading && (
           <Flex
             width="100%"
             flexDirection="row"
@@ -339,8 +356,7 @@ const Chat = () => {
               alignSelf="center"
               rounded="full"
               onClick={() => {
-                setIsFinished(false);
-                setIsLoading(false);
+                setLoading(false);
                 setResponse("");
                 setFailMessage("");
               }}
@@ -353,20 +369,13 @@ const Chat = () => {
       <Profile />
       <PromptCorrectionModal
         correctedPrompt={correctedPrompt}
+        setCorrectedPrompt={setCorrectedPrompt}
         prompt={previousPrompt}
         setPrompt={setPrompt}
         isOpen={isOpen}
         onClose={onClose}
-        submitHandlerReject={async (e: any) => {
-          const checks = await submitChecks(true, false);
-          if (!checks) return null;
-          handleSubmit(e);
-        }}
-        submitHandler={async (e: any) => {
-          const checks = await submitChecks(true);
-          if (!checks) return null;
-          handleSubmit(e);
-        }}
+        onSubmit={handleSubmit}
+        setLoading={setLoading}
       />
     </Flex>
   );

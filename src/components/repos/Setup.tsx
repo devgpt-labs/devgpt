@@ -36,6 +36,7 @@ import {
   MenuOptionGroup,
   MenuDivider,
   Box,
+  Badge,
 } from "@chakra-ui/react";
 import { PhoneIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { FaCrown } from "react-icons/fa";
@@ -96,6 +97,10 @@ const Setup = ({
   setEpochs,
   setTrainingMethod,
 }: any) => {
+
+  const owner = repo?.owner?.login || repo?.owner
+  const name = repo?.name || repo?.repo
+
   return (
     <>
       <Box
@@ -108,18 +113,18 @@ const Setup = ({
       >
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <FaCrown />
-          <Text>{repo?.owner?.login}</Text>
+          <Text>{owner}</Text>
         </Flex>
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <MdLabel />
-          <Text>{repo?.name}</Text>
+          <Text>{name}</Text>
         </Flex>
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <BiGitBranch />
           <Text>main</Text>
         </Flex>
         <Divider my={2} />
-        <Text>Use {trainingMethod} method</Text>
+        <Badge mb={1}>Use {trainingMethod} method</Badge>
         <Text>Trained on {cycles} files</Text>
         <Text>Train {frequency} every month</Text>
         <Text>Run {epochs} Epochs each cycle</Text>
@@ -127,13 +132,16 @@ const Setup = ({
         <Text>
           Estimated Price Per Month: $
           {/* A 0 is added to this calculation as we have nothing else to add */}
-          {calculateTotalCost([
-            {
-              frequency: frequency,
-              epochs: epochs,
-              sample_size: cycles,
-            },
-          ], 0)}
+          {calculateTotalCost(
+            [
+              {
+                frequency: frequency,
+                epochs: epochs,
+                sample_size: cycles,
+              },
+            ],
+            0
+          )}
         </Text>
       </Box>
       <Flex gap={2} flexDirection="column">
@@ -166,27 +174,6 @@ const Setup = ({
             onChange={(e: any) => setEpochs(e)}
           />
         )}
-        <Menu>
-          <MenuButton mt={2} as={Button} rightIcon={<ChevronDownIcon />}>
-            Model Training Method
-          </MenuButton>
-          <MenuList defaultValue={trainingMethod} zIndex={1000}>
-            <MenuItem
-              onClick={() => {
-                setTrainingMethod("Embedding");
-              }}
-            >
-              Embedding
-            </MenuItem>
-            {/* <MenuItem
-                  onClick={() => {
-                    setTrainingMethod("Fine-tuning");
-                  }}
-                >
-                  Fine-tuning
-                </MenuItem> */}
-          </MenuList>
-        </Menu>
       </Flex>
     </>
   );

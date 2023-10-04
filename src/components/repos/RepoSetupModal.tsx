@@ -58,10 +58,11 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
   const btnRef: any = useRef();
-
   const [repoToEdit, setRepoToEdit] = useState<any>(null);
 
   if (!repo) return null;
+
+
 
   return (
     <Drawer
@@ -94,10 +95,11 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             Cancel
           </Button>
           <Button
+            width='100%'
             bgGradient={"linear(to-r, blue.500,teal.500)"}
-            color={"white"}
+            color="white"
             onClick={() => {
-              onSubmit(repo);
+              onSubmit({ ...repo, cycles, frequency, epochs, trainingMethod });
               onClose();
             }}
           >
