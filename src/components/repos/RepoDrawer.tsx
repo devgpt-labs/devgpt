@@ -16,6 +16,13 @@ import {
   Stack,
   InputRightElement,
   InputGroup,
+  CardHeader,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Box,
 } from "@chakra-ui/react";
 
 //stores
@@ -66,7 +73,7 @@ const RepoDrawer = () => {
   const [loading, setLoading] = useState(false); // For the refresh debounce
   const [finetuningId, setFinetuningId] = useState<string>(""); // For the refresh debounce
   const btnRef = useRef<any>();
-
+  const [trainedModels, setTrainedModels] = useState<any[]>([]); // For the refresh debounce
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   useEffect(() => {
@@ -150,14 +157,19 @@ const RepoDrawer = () => {
     // Close the modal, no more user input required
     onClose();
 
+    const name = repo.name;
+    const owner = repo.owner.login;
+
     // Set repo to be the new repo
     setRepo({
-      owner: repo.owner.login,
-      repo: repo.name,
+      owner: owner,
+      repo: name,
     });
 
+    console.log(session);
+
     // Get Lofaf
-    const lofaf = await getLofaf(repo.owner.login, repo.name, session);
+    const lofaf = await getLofaf(owner, name, session);
     const epochs = 3;
     const training_cycles = 2;
 
@@ -178,8 +190,8 @@ const RepoDrawer = () => {
       training_cycles,
       lofafString,
       {
-        owner: repo.owner.login,
-        repo: repo.name,
+        owner: owner,
+        repo: name,
       },
       user,
       session
@@ -218,9 +230,9 @@ const RepoDrawer = () => {
 
       const { data, error } = await supabase.from("models").insert([
         {
-          user_id: user.id,
-          repo: repo.name,
-          owner: repo.owner.login,
+          user_id: user?.id,
+          repo: name,
+          owner: owner,
           branch: "main",
           training_data: "ft:model_id",
           // training_data: finetune.id,
@@ -257,6 +269,25 @@ const RepoDrawer = () => {
   //   }
   // };
 
+  // Get all models from supabase
+  const getModels = async () => {
+    if (!supabase) return;
+
+    const { data, error } = await supabase
+      .from("models")
+      .select("*")
+      .eq("user_id", user?.id);
+
+    if (!error) {
+      setTrainedModels(data);
+      // Find any repos that are in the models table,
+    }
+  };
+
+  useEffect(() => {
+    getModels();
+  }, [repos]);
+
   if (!user) {
     return null;
   }
@@ -279,13 +310,14 @@ const RepoDrawer = () => {
         placement="right"
         onClose={onClose}
         finalFocusRef={btnRef}
+        size={"sm"}
       >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
-              <Text>Select a repo{reposCount ? ` (${reposCount})` : ""}</Text>
+              <Text>Select a repo</Text>
             </Flex>
           </DrawerHeader>
           <DrawerBody>
@@ -321,48 +353,118 @@ const RepoDrawer = () => {
                   </InputRightElement>
                 </InputGroup>
 
-                {repos
-                  .filter((repoOption) => {
-                    return repoOption.name
-                      .toLowerCase()
-                      .includes(filter.toLowerCase());
-                  })
-                  ?.map((repoOption) => {
-                    return (
-                      <Flex
-                        key={repoOption.name + repoOption.owner.login}
-                        my={2}
-                        flexDirection="row"
-                        justifyContent={"space-between"}
-                        alignItems={"center"}
-                      >
-                        <Flex flexDirection="column">
-                          <Text fontSize={16}>
-                            {repoOption.name.substring(0, 16)}
-                            {repoOption.name?.length > 16 && "..."}
-                          </Text>
+                <Accordion defaultIndex={[1]} allowMultiple>
+                  <AccordionItem>
+                    <h2>
+                      <AccordionButton>
+                        <Box as="span" flex="1" textAlign="left">
+                          Trained Models {trainedModels.length ? ` (${trainedModels.length})` : ""}
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      {trainedModels
+                        .filter((model) => {
+                          return model.repo
+                            .toLowerCase()
+                            .includes(filter.toLowerCase());
+                        })
+                        .map((model) => {
+                          return (
+                            <Flex
+                              key={model.repo + model.owner}
+                              mb={2}
+                              flexDirection="row"
+                              justifyContent={"space-between"}
+                              alignItems={"center"}
+                            >
+                              <Flex flexDirection="column">
+                                <Text fontSize={16}>
+                                  {model.repo.substring(0, 16)}
+                                  {model.repo?.length > 16 && "..."}
+                                </Text>
 
-                          <Text fontSize={12} color="gray">
-                            {repoOption.owner.login}
-                          </Text>
-                        </Flex>
+                                <Text fontSize={12} color="gray">
+                                  {model.owner}
+                                </Text>
+                              </Flex>
 
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            handleSelectRepo(repoOption);
-                            //setSelectedRepo(repoOption);
-                            //onRepoSetupOpen();
-                          }}
-                        >
-                          {repo.repo === repoOption.name &&
-                          repo.owner === repoOption.owner.login
-                            ? "Selected"
-                            : "Select"}
-                        </Button>
-                      </Flex>
-                    );
-                  })}
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedRepo(model);
+                                  onRepoSetupOpen();
+                                }}
+                              >
+                                Select
+                              </Button>
+                            </Flex>
+                          );
+                        })}
+                    </AccordionPanel>
+                  </AccordionItem>
+
+                  <AccordionItem>
+                    <h2>
+                      <AccordionButton>
+                        <Box as="span" flex="1" textAlign="left">
+                          Train A New Model {reposCount ? ` (${reposCount})` : ""}
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      {repos
+                        .filter((repoOption) => {
+                          return repoOption.name
+                            .toLowerCase()
+                            .includes(filter.toLowerCase());
+                        })
+                        .filter((repoOption) => {
+                          // Remove any that are found on the models table
+                          return !trainedModels.some(
+                            (model) =>
+                              model.repo === repoOption.name &&
+                              model.owner === repoOption.owner.login
+                          );
+                        })
+                        ?.map((repoOption) => {
+                          return (
+                            <Flex
+                              key={repoOption.name + repoOption.owner.login}
+                              mb={2}
+                              flexDirection="row"
+                              justifyContent={"space-between"}
+                              alignItems={"center"}
+                            >
+                              <Flex flexDirection="column">
+                                <Text fontSize={16}>
+                                  {repoOption.name.substring(0, 16)}
+                                  {repoOption.name?.length > 16 && "..."}
+                                </Text>
+
+                                <Text fontSize={12} color="gray">
+                                  {repoOption.owner.login}
+                                </Text>
+                              </Flex>
+
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  handleSelectRepo(repoOption);
+                                  setSelectedRepo(repoOption);
+                                  onRepoSetupOpen();
+                                }}
+                              >
+                                Train
+                              </Button>
+                            </Flex>
+                          );
+                        })}
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
               </>
             ) : (
               <Stack mt={4} spacing={2}>

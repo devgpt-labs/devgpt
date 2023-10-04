@@ -28,7 +28,7 @@ import userPrompt from "@/prompts/user";
 //components
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
-import Training from "@/components/repos/Training";
+import Training from "@/components/repos/Models";
 import { PromptInput } from "./PromptInput";
 import { RateConversation } from "./RateConversation";
 import { Header } from "./ChatHeader";
@@ -165,7 +165,6 @@ const Chat = () => {
     setHasSentAMessage(true);
     handleInputChange(target);
     setPreviousPrompt(newPrompt);
-    setPrompt("");
 
     const modifiedPrompt = await userPrompt(
       newPrompt,
@@ -205,7 +204,7 @@ const Chat = () => {
 
 
   return (
-    <Flex overflowY="scroll" width="full" direction="column" maxW="6xl" my={20}>
+    <Flex overflowY="scroll" width="full" direction="column" maxW="90%" py={6}>
       <Box
         rounded="lg"
         className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -274,7 +273,13 @@ const Chat = () => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     const checks = await submitChecks(false);
+
+                    console.log(checks);
+
                     if (!checks) return null;
+
+                    console.log('ran');
+
                     handleSubmit(e);
                   }
                 }}
@@ -297,7 +302,7 @@ const Chat = () => {
                 {failMessage}
               </Text>
               <SlideFade in={hasSentAMessage} offsetY="20px">
-                <Heading mt={5}>{previousPrompt}</Heading>
+                {/* <Heading mt={5}>{previousPrompt}</Heading> */}
               </SlideFade>
             </Flex>
             {isLoading && !messages[messages.length - 1] ? (
@@ -349,6 +354,7 @@ const Chat = () => {
       <PromptCorrectionModal
         correctedPrompt={correctedPrompt}
         prompt={previousPrompt}
+        setPrompt={setPrompt}
         isOpen={isOpen}
         onClose={onClose}
         submitHandlerReject={async (e: any) => {
