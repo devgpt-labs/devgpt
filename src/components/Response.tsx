@@ -25,9 +25,13 @@ const Response = ({ content }: ResponseProps) => {
 
   const theme = colorMode === "light" ? oneLight : vscDarkPlus;
 
+  if (content === 'undefined') return null
+
+  console.log({ content });
+
+
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
-
       <ReactMarkdown
         components={{
           code({ inline, className, children, ...props }) {

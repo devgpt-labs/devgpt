@@ -50,8 +50,6 @@ import { IoMdInformationCircle } from "react-icons/io";
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import Setup from "./Setup";
 
-
-
 const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
   const [cycles, setCycles] = useState(5);
   const [frequency, setFrequency] = useState(10);
@@ -61,8 +59,6 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
   const [repoToEdit, setRepoToEdit] = useState<any>(null);
 
   if (!repo) return null;
-
-
 
   return (
     <Drawer
@@ -83,10 +79,12 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             cycles={cycles}
             frequency={frequency}
             epochs={epochs}
-            setCycles={setCycles}
-            setFrequency={setFrequency}
-            setEpochs={setEpochs}
-            setTrainingMethod={setTrainingMethod}
+            setCycles={(e: any) => {
+              setCycles(e)
+            }}
+            setFrequency={(e: any) => {
+              setFrequency(e)
+            }}
           />
         </DrawerBody>
 
@@ -95,7 +93,7 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             Cancel
           </Button>
           <Button
-            width='100%'
+            width="100%"
             bgGradient={"linear(to-r, blue.500,teal.500)"}
             color="white"
             onClick={() => {
