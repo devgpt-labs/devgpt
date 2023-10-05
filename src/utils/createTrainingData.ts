@@ -13,7 +13,7 @@ import selectTrainingFiles from "@/prompts/selectTrainingFiles";
 const TRAIN_FOR_ENCODING = process.env.NEXT_PUBLIC_FINE_TUNE_MODE != "true";
 
 const createTrainingData = async (
-  training_cycles: number,
+  sample_size: number,
   lofaf: string,
   repo: any,
   user: any,
@@ -33,7 +33,7 @@ const createTrainingData = async (
 
     // add context messages
     newMessages = await addContext(
-      training_cycles,
+      sample_size,
       newMessages,
       lofaf,
       owner,
@@ -65,7 +65,7 @@ interface UsefulFile {
 }
 
 const addContext = async (
-  training_cycles: number,
+  sample_size: number,
   messages: Message[],
   lofaf: string,
   owner: string,
@@ -74,7 +74,7 @@ const addContext = async (
   emailAddress: string
 ) => {
   try {
-    const usefulFiles: UsefulFile[] = await getUsefulFiles(training_cycles, lofaf);
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(sample_size, lofaf);
 
     const usefulFileContents: any = await getUsefulFileContents(
       usefulFiles,
@@ -109,7 +109,7 @@ const addContext = async (
   }
 };
 
-const getUsefulFiles = async (training_cycles: number,lofaf: string) => {
+const getUsefulFiles = async (sample_size: number, lofaf: string) => {
   try {
     const { prompt: filesPrompt, functions: filesFunction } =
       await selectTrainingFiles(lofaf);
@@ -120,9 +120,7 @@ const getUsefulFiles = async (training_cycles: number,lofaf: string) => {
       response?.choices?.[0]?.message?.function_call?.arguments
     );
 
-    const usefulFilesArray = useful_files_csv
-      .split(",")
-      .splice(0, training_cycles);
+    const usefulFilesArray = useful_files_csv.split(",").splice(0, sample_size);
 
     return usefulFilesArray;
   } catch (error) {

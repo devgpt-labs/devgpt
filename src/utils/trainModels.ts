@@ -21,29 +21,59 @@ interface Model {
   training_method: string;
   frequency: number;
   sample_size: number;
-  output: string;
+  output?: string;
 }
 
-async function trainModel(model: Model, session: any, user: any) {
-  switch (model.training_method) {
-    case "encoding":
-      return await trainRepoWithEncoding(model, session, user);
-      break;
-    case "embeddings":
-      return await trainRepoWithEmbeddings(model, session, user);
-      break;
+async function trainModels(
+  session: any,
+  user: any,
+  stripe_customer_id: string
+) {
+  if (!supabase) {
+    console.log("No supabase client found");
+    return;
+  }
+
+  if (!stripe_customer_id) {
+    console.log("No stripe customer id found");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("models")
+    .select("*")
+    .eq("stripe_id", stripe_customer_id);
+
+  if (error) return error;
+
+  const models = data;
+
+  //filter out models that already have an output
+  const models_to_train: Model[] = models.filter((model) => !model.output);
+
+  console.log({ models_to_train });
+  return;
+
+  for (const model of models_to_train) {
+    switch (model.training_method) {
+      case "encoding":
+        return await trainRepoWithEncoding(model, session, user);
+        break;
+      case "embeddings":
+        return await trainRepoWithEmbeddings(model, session, user);
+        break;
+    }
   }
 }
 
-export default trainModel;
+export default trainModels;
 
 const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   const name = model.repo;
   const owner = model.owner;
   // Get Lofaf
   const lofaf = await getLofaf(owner, name, session);
-  const epochs = 3;
-  const training_cycles = 2;
+  const sample_size = model.sample_size;
   // Manipulate lofaf
   let lofafArray = lofaf.tree;
   lofafArray = lofafArray.map((item: any) => {
@@ -53,7 +83,7 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   const lofafString = lofafArray.join(",");
   // Create training data
   let trainingData = await createTrainingData(
-    training_cycles,
+    sample_size,
     lofafString,
     {
       owner: owner,
@@ -78,7 +108,7 @@ const trainRepoWithEmbeddings = async (
   // Get Lofaf
   const lofaf = await getLofaf(owner, name, session);
   const epochs = model.epochs;
-  const training_cycles = 2;
+  const sample_size = model.sample_size;
   // Manipulate lofaf
   let lofafArray = lofaf.tree;
   lofafArray = lofafArray.map((item: any) => {
@@ -88,7 +118,7 @@ const trainRepoWithEmbeddings = async (
   const lofafString = lofafArray.join(",");
   // Create training data
   let trainingData = await createTrainingData(
-    training_cycles,
+    sample_size,
     lofafString,
     {
       owner: owner,
@@ -125,9 +155,17 @@ const setModelOutput = async (model: Model, output: string) => {
 
   const { data, error } = await supabase
     .from("models")
-    .update({ output: output })
-    .eq("stripe_customer_id", model.stripe_customer_id)
-    .eq("repo", model.repo)
-    .eq("owner", model.owner)
-    .eq("branch", model.branch);
+    .insert([
+      { stripe_customer_id: model.stripe_customer_id },
+      { repo: model.repo },
+      { owner: model.owner },
+      { branch: model.branch },
+      { epochs: model.epochs },
+      { training_method: model.training_method },
+      { frequency: model.frequency },
+      { sample_size: model.sample_size },
+      { output: output },
+      { some_column: "otherValue" },
+    ])
+    .select();
 };
