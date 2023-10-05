@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase";
-import OpenAI from "openai";
 
 //utils
-import getLofaf from "@/utils/github/getLofaf";
-import createTrainingData from "@/utils/createTrainingData";
-
-const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  : "notoken";
+import calculateTotalCost from "@/utils/calculateTotalCost";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 export const config = {
   runtime: "edge",
+};
+
+//todo move to utils
+const createModelID = (repo: string, owner: string, branch: string) => {
+  return `${repo}-${owner}-${branch}`;
 };
 
 export default async function handler(req: NextRequest) {
@@ -36,6 +36,14 @@ interface Model {
   output: string;
 }
 
+interface Log {
+  id: string;
+  created_at: string;
+  model_id: string;
+  model_settings: string;
+  fulfilled: boolean;
+}
+
 async function update(interval: string) {
   const now = Date.now();
 
@@ -46,17 +54,74 @@ async function update(interval: string) {
 
   if (error) return error;
 
-  const models = data;
+  let models = data;
 
-  //filter out models that already have an output
-  const models_to_first_time_train: Model[] = models.filter(
-    (model) => !model.output
-  );
+  models = [models[0]]; //temp for testing - delete me
 
-  //look at frequency of models and
+  for (const model of models) {
+    //get the training-log for this model
+    let { data: logData, error: logError }: any = await supabase
+      .from("training_log")
+      .select("*")
+      .eq("model_id", createModelID(model.repo, model.owner, model.branch));
 
-  for (const model of models_to_first_time_train) {
+    //filter out training logs that did not occur this month
+    logData = logData?.filter((log: Log) => {
+      const logDate = new Date(log.created_at);
+      const now = new Date();
+      return logDate.getMonth() === now.getMonth();
+    });
+
+    //model frequency is how many times per month the model should be trained
+    const numberOfTimesModelShouldBeTrainedThisMonth = model.frequency;
+    const numberOfTimeModelHasBeenTrainedThisMonth = logData.length;
+
+    if (
+      numberOfTimeModelHasBeenTrainedThisMonth >=
+      numberOfTimesModelShouldBeTrainedThisMonth
+    ) {
+      //model has been trained enough this month
+      return;
+    }
+
+    const dayOfMonth = new Date().getDate();
+
+    const numberOfTimesTrainingShouldHaveOccurred = Math.ceil(
+      dayOfMonth / (30 / numberOfTimesModelShouldBeTrainedThisMonth)
+    );
+
+    if (
+      numberOfTimesTrainingShouldHaveOccurred >
+      numberOfTimeModelHasBeenTrainedThisMonth
+    ) {
+      //scheduel training for this model
+      addTrainingLog(model);
+    }
   }
 
-  return { models_to_first_time_train, now };
+  return { models, now };
 }
+
+const addTrainingLog = async (model: Model) => {
+  if (!supabase) return "No supabase client found";
+
+  //add training log for this model
+  const { data: logData, error: logError }: any = await supabase
+    .from("training_log")
+    .insert([
+      {
+        model_id: createModelID(model.repo, model.owner, model.branch),
+        model_settings: JSON.stringify(model),
+        fulfilled: false,
+      },
+    ]);
+
+  //calculate cost of training this model
+  const costToTrain = calculateTotalCost([model], 0);
+
+  //create a new charge
+  chargeCustomer(
+    { stripe_customer_id: model.stripe_customer_id },
+    Number(costToTrain)
+  );
+};
