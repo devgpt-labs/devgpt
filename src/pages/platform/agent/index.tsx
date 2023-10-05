@@ -14,6 +14,9 @@ import {
   useDisclosure,
   Heading,
   Spinner,
+  Tooltip,
+  IconButton,
+
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -44,6 +47,11 @@ import { checkIfPro } from "@/utils/checkIfPro";
 import Calculator from "@/components/repos/Calculator";
 import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
+import { useRouter } from "next/router";
+import Models from "../models";
+
+import { BsDiscord } from "react-icons/bs";
+
 
 const Chat = () => {
   // Constants
@@ -64,8 +72,10 @@ const Chat = () => {
   const [trainingDataRetrieved, setTrainingDataRetrieved] =
     useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
+  const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
 
   const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
@@ -75,6 +85,31 @@ const Chat = () => {
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
   });
+
+  const getDiscordOnline = async () => {
+    try {
+      const response = await fetch(
+        "https://discord.com/api/guilds/931533612313112617/widget.json"
+      );
+      const json = await response.json();
+      return json.presence_count;
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching Discord data:", error);
+      return null;
+    }
+  };
+
+  const fetchData = async () => {
+    const count: any = await getDiscordOnline();
+    if (count !== null) {
+      setActiveOnDiscord(count);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
 
   // This logic breaks down the prompt to find @'d files
   const regex = /@([^ ]+)/g;
@@ -103,6 +138,12 @@ const Chat = () => {
 
   useEffect(() => {
     fetch();
+
+    // Log the user out if they are not logged in
+    if (!user) {
+      router.push("/", undefined, { shallow: true });
+      return;
+    }
   }, []);
 
   useEffect(() => {
@@ -127,7 +168,7 @@ const Chat = () => {
       (data: any) => {
         console.log({ data });
       },
-      () => {},
+      () => { },
       stripe_customer_id
     );
   }, []);
@@ -381,6 +422,29 @@ const Chat = () => {
           setLoading={setLoading}
         />
       </Flex>
+      <Box position='absolute' bottom={0} left={0}>
+        <Tooltip label="Join Discord" placement="top">
+          <Link isExternal={true} href="https://discord.com/invite/6GFtwzuvtw">
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              aria-label="Join Discord"
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  <BsDiscord />
+                  <Text ml={2} fontSize={14}>
+                    {activeOnDiscord && `Online: ${activeOnDiscord}`}
+                  </Text>
+                </Flex>
+              }
+            />
+          </Link>
+        </Tooltip>
+      </Box>
+
+
     </Template>
   );
 };

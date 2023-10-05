@@ -35,6 +35,7 @@ import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 
 const Auth = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const { fetch, user, session }: any = useStore();
 
@@ -46,9 +47,24 @@ const Auth = () => {
     console.log({ user });
     if (user) {
       console.log("pushing to /platform/agent");
+      setLoading(true);
+      // set user to loading
       router.push("/platform/agent", undefined, { shallow: true });
     }
   }, [user]);
+
+  if (loading)
+    return (
+      <Flex
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        mt={5}
+        w="full"
+      >
+        <Spinner size="xl" />
+      </Flex>
+    );
 
   return (
     <>
@@ -81,7 +97,7 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => {}}
+              handle={() => { }}
               Icon={AiFillGitlab}
               tooltip="Coming soon!"
             />
