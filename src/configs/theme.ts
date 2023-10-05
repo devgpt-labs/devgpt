@@ -2,8 +2,8 @@ import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
   config: {
-    initialColorMode: "dark",
-    useSystemColorMode: false,
+    initialColorMode: "light",
+    useSystemColorMode: true,
   },
   fonts: {
     heading: `'SatoshiBold', sans-serif`,

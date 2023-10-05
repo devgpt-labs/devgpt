@@ -97,9 +97,8 @@ const Setup = ({
   setEpochs,
   setTrainingMethod,
 }: any) => {
-
-  const owner = repo?.owner?.login || repo?.owner
-  const name = repo?.name || repo?.repo
+  const owner = repo?.owner?.login || repo?.owner;
+  const name = repo?.name || repo?.repo;
 
   return (
     <>
@@ -124,10 +123,10 @@ const Setup = ({
           <Text>main</Text>
         </Flex>
         <Divider my={2} />
-        <Badge mb={1}>Use {trainingMethod} method</Badge>
-        <Text>Trained on {cycles} files</Text>
-        <Text>Train {frequency} every month</Text>
-        <Text>Run {epochs} Epochs each cycle</Text>
+        <Badge mb={1}>Trained using {trainingMethod}</Badge>
+        <Text>Train using {cycles} sample files</Text>
+        <Text>Train {frequency} time(s) every month</Text>
+        <Text>Run {epochs} epochs each cycle</Text>
         <Divider my={2} />
         <Text>
           Estimated Price Per Month: $

@@ -68,7 +68,8 @@ const RepoDrawer = () => {
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   useEffect(() => {
-    if (repoWindowOpen === null) return;
+    console.log({ repoWindowOpen });
+    if (repoWindowOpen === null || !repoWindowOpen) return;
     onOpen();
   }, [repoWindowOpen]);
 
@@ -181,14 +182,8 @@ const RepoDrawer = () => {
     }
   };
 
-
-
   useEffect(() => {
-    getModels(
-      setTrainedModels,
-      () => { },
-      stripe_customer_id
-    );
+    getModels(setTrainedModels, () => {}, stripe_customer_id);
   }, [repos]);
 
   if (!user) {
@@ -248,52 +243,51 @@ const RepoDrawer = () => {
                   </InputRightElement>
                 </InputGroup>
 
-                {
-                  repos
-                    .filter((repoOption) => {
-                      return repoOption.name
-                        .toLowerCase()
-                        .includes(filter.toLowerCase());
-                    })
-                    .filter((repoOption) => {
-                      // Remove any that are found on the models table
-                      return !trainedModels.some(
-                        (model) =>
-                          model.repo === repoOption.name &&
-                          model.owner === repoOption.owner.login
-                      );
-                    })
-                    ?.map((repoOption) => {
-                      return (
-                        <Flex
-                          key={repoOption.name + repoOption.owner.login}
-                          mb={2}
-                          flexDirection="row"
-                          justifyContent={"space-between"}
-                          alignItems={"center"}
-                        >
-                          <Flex flexDirection="column">
-                            <Text fontSize={16}>
-                              {repoOption.name.substring(0, 16)}
-                              {repoOption.name?.length > 16 && "..."}
-                            </Text>
+                {repos
+                  .filter((repoOption) => {
+                    return repoOption.name
+                      .toLowerCase()
+                      .includes(filter.toLowerCase());
+                  })
+                  .filter((repoOption) => {
+                    // Remove any that are found on the models table
+                    return !trainedModels.some(
+                      (model) =>
+                        model.repo === repoOption.name &&
+                        model.owner === repoOption.owner.login
+                    );
+                  })
+                  ?.map((repoOption) => {
+                    return (
+                      <Flex
+                        key={repoOption.name + repoOption.owner.login}
+                        mb={2}
+                        flexDirection="row"
+                        justifyContent={"space-between"}
+                        alignItems={"center"}
+                      >
+                        <Flex flexDirection="column">
+                          <Text fontSize={16}>
+                            {repoOption.name.substring(0, 16)}
+                            {repoOption.name?.length > 16 && "..."}
+                          </Text>
 
-                            <Text fontSize={12} color="gray">
-                              {repoOption.owner.login}
-                            </Text>
-                          </Flex>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              setSelectedRepo(repoOption);
-                              onRepoSetupOpen();
-                            }}
-                          >
-                            Train
-                          </Button>
-                        </Flex >
-                      );
-                    })}
+                          <Text fontSize={12} color="gray">
+                            {repoOption.owner.login}
+                          </Text>
+                        </Flex>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedRepo(repoOption);
+                            onRepoSetupOpen();
+                          }}
+                        >
+                          Train
+                        </Button>
+                      </Flex>
+                    );
+                  })}
               </>
             ) : (
               <Stack mt={4} spacing={2}>
@@ -308,7 +302,7 @@ const RepoDrawer = () => {
                 <Skeleton height="30px" />
               </Stack>
             )}
-          </DrawerBody >
+          </DrawerBody>
           {(pageInfo?.hasPreviousPage || pageInfo?.hasNextPage) && (
             <DrawerFooter gap={2}>
               <>
@@ -325,8 +319,8 @@ const RepoDrawer = () => {
               </>
             </DrawerFooter>
           )}
-        </DrawerContent >
-      </Drawer >
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
