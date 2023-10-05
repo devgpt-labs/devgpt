@@ -1,9 +1,14 @@
-import React, { useState } from "react";
-import Auth from "@/pages/platform/auth/Auth";
+import React, { useState, useEffect } from "react";
 import { Tag, Text, Flex, useColorMode } from "@chakra-ui/react";
-import { CloseIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
 
-const Home = () => {
+//auth store
+import useStore from "@/store/Auth";
+
+const Home = ({ children }: any) => {
+  const router = useRouter();
+
+  const { user }: any = useStore();
   const { colorMode } = useColorMode();
 
   return (
@@ -16,7 +21,7 @@ const Home = () => {
     >
       <Flex
         flexDirection="column"
-        bg={colorMode === "dark" ? "black" : "whitesmoke"}
+        bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
         width="100vw"
         height="100vh"
         overflowY="scroll"
@@ -44,7 +49,7 @@ const Home = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Auth />
+          {children}
         </Flex>
       </Flex>
     </Flex>

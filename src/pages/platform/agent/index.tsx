@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
+import Link from "next/link";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -27,6 +28,7 @@ import messageStore from "@/store/Messages";
 import userPrompt from "@/prompts/user";
 
 //components
+import Template from "@/components/Template";
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
 import { RateConversation } from "./RateConversation";
@@ -68,7 +70,7 @@ const Chat = () => {
   const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const { colorMode } = useColorMode();
-  const { user, session, stripe_customer_id }: any = authStore();
+  const { user, session, stripe_customer_id, fetch }: any = authStore();
 
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
@@ -100,6 +102,10 @@ const Chat = () => {
   };
 
   useEffect(() => {
+    fetch();
+  }, []);
+
+  useEffect(() => {
     setLoading(false);
   }, [messages]);
 
@@ -109,6 +115,21 @@ const Chat = () => {
 
   useEffect(() => {
     retrieveTrainingData();
+  }, []);
+
+  useEffect(() => {
+    if (promptCount != 0) return;
+    getPromptCount(user?.email, setPromptCount);
+  }, [user?.email]);
+
+  useEffect(() => {
+    getModels(
+      (data: any) => {
+        console.log({ data });
+      },
+      () => {},
+      stripe_customer_id
+    );
   }, []);
 
   // todo move this to session context
@@ -134,14 +155,6 @@ const Chat = () => {
     const input = document.getElementById("message");
     input?.focus();
   };
-
-  useEffect(() => {
-    if (promptCount != 0) return;
-    getPromptCount(user?.email, setPromptCount);
-  }, [user?.email]);
-
-  // todo move this to session context
-  if (!user) return null;
 
   const submitChecks = async (
     ignoreFeedback: boolean,
@@ -210,174 +223,165 @@ const Chat = () => {
     return true;
   };
 
-  useEffect(() => {
-    getModels(
-      (data: any) => {
-        console.log({ data });
-      },
-      () => { },
-      stripe_customer_id
-    );
-  }, []);
-
   return (
-    <Flex overflowY="scroll" width="full" direction="column" maxW="90%" py={6}>
-      <Box
-        rounded="lg"
-        className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
-        justifyContent="flex-start"
+    <Template>
+      <Flex
+        overflowY="scroll"
+        width="full"
+        direction="column"
+        maxW="90%"
+        py={6}
       >
-        <Header />
-        {!repo.repo && (
-          <>
-            <Button
-              width="100%"
-              mt={4}
-              onClick={() => {
-                // TODO: This should open models page
-                setRepoWindowOpen(true);
-              }}
-            >
-              Train a model to get started
-            </Button>
-            <Text fontSize={12} mt={2}>
-              {failMessage}
-            </Text>
-          </>
-        )}
-        {repo.repo && (
-          <Box className="max-h-[50vh] overflow-y-auto">
-            {withAt?.length > 0 && (
-              <Flex alignItems={"center"} my={2}>
-                <Kbd>Tab</Kbd>
-                <Text ml={1}> to accept suggestion</Text>
+        <Box
+          rounded="lg"
+          className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+          justifyContent="flex-start"
+        >
+          <Header />
+          {!repo.repo && (
+            <Link href="/platform/models">
+              <Button width="100%" mt={4}>
+                Train a model to get started
+              </Button>
+              <Text fontSize={12} mt={2}>
+                {failMessage}
+              </Text>
+            </Link>
+          )}
+          {repo.repo && (
+            <Box className="max-h-[50vh] overflow-y-auto">
+              {withAt?.length > 0 && (
+                <Flex alignItems={"center"} my={2}>
+                  <Kbd>Tab</Kbd>
+                  <Text ml={1}> to accept suggestion</Text>
+                </Flex>
+              )}
+              <Flex flexDirection="row" flexWrap="wrap">
+                <SlideFade key={match} in={selectedFile[0] ? true : false}>
+                  {selectedFile.map((file: any, index: any) => {
+                    if (index > 12) return null;
+                    return (
+                      <Tag
+                        mr={1}
+                        mb={1}
+                        key={file}
+                        cursor="pointer"
+                        onClick={() => handleKeyDown(file)}
+                      >
+                        {file}
+                      </Tag>
+                    );
+                  })}
+                </SlideFade>
               </Flex>
-            )}
-            <Flex flexDirection="row" flexWrap="wrap">
-              <SlideFade key={match} in={selectedFile[0] ? true : false}>
-                {selectedFile.map((file: any, index: any) => {
-                  if (index > 12) return null;
-                  return (
-                    <Tag
-                      mr={1}
-                      mb={1}
-                      key={file}
-                      cursor="pointer"
-                      onClick={() => handleKeyDown(file)}
-                    >
-                      {file}
-                    </Tag>
-                  );
-                })}
-              </SlideFade>
-            </Flex>
-            <Flex flexDirection="row" mt={4}>
-              <Input
-                className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-                value={prompt}
-                placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-                onChange={(e: any) => {
-                  setPrompt(e.target.value);
-                }}
-                onKeyDown={async (e: any) => {
-                  if (prompt.length < 3) {
-                    return
-                  }
+              <Flex flexDirection="row" mt={4}>
+                <Input
+                  className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
+                  value={prompt}
+                  placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+                  onChange={(e: any) => {
+                    setPrompt(e.target.value);
+                  }}
+                  onKeyDown={async (e: any) => {
+                    if (prompt.length < 3) {
+                      return;
+                    }
 
-                  // If key equals tab, autocomplete
-                  if (e.key === "Tab") {
-                    e.preventDefault();
-                    handleKeyDown(selectedFile[0]);
-                    return;
-                  }
+                    // If key equals tab, autocomplete
+                    if (e.key === "Tab") {
+                      e.preventDefault();
+                      handleKeyDown(selectedFile[0]);
+                      return;
+                    }
 
-                  // If key equals enter, submit
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
+                    // If key equals enter, submit
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      const checks = await submitChecks(false);
+                      if (!checks) return null;
+                      handleSubmit(e);
+                    }
+                  }}
+                />
+                <Button
+                  bgGradient={"linear(to-r, blue.500, teal.500)"}
+                  color="white"
+                  ml={4}
+                  width="10rem"
+                  onClick={async (e: any) => {
                     const checks = await submitChecks(false);
                     if (!checks) return null;
                     handleSubmit(e);
-                  }
-                }}
-              />
+                  }}
+                >
+                  {loading ? <Spinner size="sm" /> : "Submit"}
+                </Button>
+              </Flex>
+              <Flex mb={3}>
+                <Text mt={2} fontSize={14}>
+                  {failMessage}
+                </Text>
+                <SlideFade in={hasSentAMessage} offsetY="20px">
+                  {/* <Heading mt={5}>{previousPrompt}</Heading> */}
+                </SlideFade>
+              </Flex>
+              {loading && !messages[messages.length - 1] ? (
+                <SkeletonText
+                  mt="4"
+                  noOfLines={4}
+                  spacing="4"
+                  skeletonHeight="2"
+                />
+              ) : (
+                <Response
+                  content={String(messages[messages.length - 1]?.content)}
+                />
+              )}
+            </Box>
+          )}
+
+          {messages[messages.length - 1] && loading && (
+            <Flex
+              width="100%"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              mt={2}
+            >
+              <RateConversation />
+              <Text mx={4}>or</Text>
               <Button
-                bgGradient={"linear(to-r, blue.500, teal.500)"}
-                color="white"
-                ml={4}
-                width="10rem"
-                onClick={async (e: any) => {
-                  const checks = await submitChecks(false);
-                  if (!checks) return null;
-                  handleSubmit(e);
+                px={4}
+                _hover={{
+                  bg: colorMode === "light" ? "gray.300" : "black",
+                }}
+                bg={colorMode === "light" ? "white" : "gray.800"}
+                alignSelf="center"
+                rounded="full"
+                onClick={() => {
+                  setLoading(false);
+                  setResponse("");
+                  setFailMessage("");
                 }}
               >
-                {loading ? <Spinner size="sm" /> : "Submit"}
+                Start A New Chat
               </Button>
             </Flex>
-            <Flex mb={3}>
-              <Text mt={2} fontSize={14}>
-                {failMessage}
-              </Text>
-              <SlideFade in={hasSentAMessage} offsetY="20px">
-                {/* <Heading mt={5}>{previousPrompt}</Heading> */}
-              </SlideFade>
-            </Flex>
-            {loading && !messages[messages.length - 1] ? (
-              <SkeletonText
-                mt="4"
-                noOfLines={4}
-                spacing="4"
-                skeletonHeight="2"
-              />
-            ) : (
-              <Response
-                content={String(messages[messages.length - 1]?.content)}
-              />
-            )}
-          </Box>
-        )}
-
-        {messages[messages.length - 1] && loading && (
-          <Flex
-            width="100%"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            mt={2}
-          >
-            <RateConversation />
-            <Text mx={4}>or</Text>
-            <Button
-              px={4}
-              _hover={{
-                bg: colorMode === "light" ? "gray.300" : "black",
-              }}
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              alignSelf="center"
-              rounded="full"
-              onClick={() => {
-                setLoading(false);
-                setResponse("");
-                setFailMessage("");
-              }}
-            >
-              Start A New Chat
-            </Button>
-          </Flex>
-        )}
-      </Box>
-      <Profile />
-      <PromptCorrectionModal
-        correctedPrompt={correctedPrompt}
-        setCorrectedPrompt={setCorrectedPrompt}
-        prompt={previousPrompt}
-        setPrompt={setPrompt}
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={handleSubmit}
-        setLoading={setLoading}
-      />
-    </Flex>
+          )}
+        </Box>
+        <Profile />
+        <PromptCorrectionModal
+          correctedPrompt={correctedPrompt}
+          setCorrectedPrompt={setCorrectedPrompt}
+          prompt={previousPrompt}
+          setPrompt={setPrompt}
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={handleSubmit}
+          setLoading={setLoading}
+        />
+      </Flex>
+    </Template>
   );
 };
 

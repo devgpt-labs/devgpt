@@ -44,7 +44,6 @@ import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
 import CreditsModal from "./CreditsModal";
-import Models from "@/pages/platform/models/Models";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -127,13 +126,6 @@ const Profile = () => {
     isOpen: isCreditsOpen,
     onOpen: onCreditsOpen,
     onClose: onCreditsClose,
-  } = useDisclosure({ defaultIsOpen: false });
-
-  const {
-    isOpen: isModelsOpen,
-    onOpen: onModelsOpen,
-    onClose: onModelsClose,
-    onToggle: onModelsToggle,
   } = useDisclosure({ defaultIsOpen: false });
 
   const getDiscordOnline = async () => {
@@ -253,8 +245,7 @@ const Profile = () => {
           <Flex gap={2}>
             {!isPro && (
               <Tooltip
-                label={`${10 - promptCount
-                  }/10 Free Prompts Remaining Today`}
+                label={`${10 - promptCount}/10 Free Prompts Remaining Today`}
                 placement="top"
               >
                 <IconButton
@@ -362,17 +353,14 @@ const Profile = () => {
               Icon={AiFillFolderOpen}
               OtherIcon={AiFillFolderOpen}
             /> */}
-            <Tooltip
-              label={"View Models"}
-              placement="top"
-            >
+            <Tooltip label={"View Models"} placement="top">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
                 onClick={() => {
-                  onModelsToggle();
+                  //todo add navigation
                   onSettingsClose();
                 }}
                 aria-label="View Models"
@@ -424,14 +412,7 @@ const Profile = () => {
         </Flex>
       </Flex>
       <SlideFade in={isSettingsOpen}>{isSettingsOpen && <Repos />}</SlideFade>
-      <SlideFade in={isModelsOpen}>
-        {isModelsOpen && (
-          <Models
-            onClose={onModelsClose}
-          />
-        )}
-      </SlideFade>
-    </Flex >
+    </Flex>
   );
 };
 
