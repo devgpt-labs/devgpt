@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase";
-import OpenAI from "openai";
 
 //utils
-import getLLMToken from "@/utils/getLLMToken";
-
-const openai = new OpenAI({
-  apiKey: getLLMToken(),
-  dangerouslyAllowBrowser: true,
-});
-
-const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  : "notoken";
+import calculateTotalCost from "@/utils/calculateTotalCost";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 export const config = {
   runtime: "edge",
+};
+
+//todo move to utils
+const createModelID = (repo: string, owner: string, branch: string) => {
+  return `${repo}-${owner}-${branch}`;
 };
 
 export default async function handler(req: NextRequest) {
@@ -25,6 +21,27 @@ export default async function handler(req: NextRequest) {
   return new NextResponse(JSON.stringify(response), {
     status: 200,
   });
+}
+
+interface Model {
+  created_at: string;
+  stripe_customer_id: string;
+  repo: string;
+  owner: string;
+  branch: string;
+  epochs: number;
+  training_method: string;
+  frequency: number;
+  sample_size: number;
+  output: string;
+}
+
+interface Log {
+  id: string;
+  created_at: string;
+  model_id: string;
+  model_settings: string;
+  fulfilled: boolean;
 }
 
 async function update(interval: string) {
@@ -37,67 +54,74 @@ async function update(interval: string) {
 
   if (error) return error;
 
-  const models = data;
+  let models = data;
 
-  //filter out models that already have an output
-  const models_to_train = models.filter((model) => !model.output);
+  models = [models[0]]; //temp for testing - delete me
 
-  return { models_to_train, now };
+  for (const model of models) {
+    //get the training-log for this model
+    let { data: logData, error: logError }: any = await supabase
+      .from("training_log")
+      .select("*")
+      .eq("model_id", createModelID(model.repo, model.owner, model.branch));
+
+    //filter out training logs that did not occur this month
+    logData = logData?.filter((log: Log) => {
+      const logDate = new Date(log.created_at);
+      const now = new Date();
+      return logDate.getMonth() === now.getMonth();
+    });
+
+    //model frequency is how many times per month the model should be trained
+    const numberOfTimesModelShouldBeTrainedThisMonth = model.frequency;
+    const numberOfTimeModelHasBeenTrainedThisMonth = logData.length;
+
+    if (
+      numberOfTimeModelHasBeenTrainedThisMonth >=
+      numberOfTimesModelShouldBeTrainedThisMonth
+    ) {
+      //model has been trained enough this month
+      return;
+    }
+
+    const dayOfMonth = new Date().getDate();
+
+    const numberOfTimesTrainingShouldHaveOccurred = Math.ceil(
+      dayOfMonth / (30 / numberOfTimesModelShouldBeTrainedThisMonth)
+    );
+
+    if (
+      numberOfTimesTrainingShouldHaveOccurred >
+      numberOfTimeModelHasBeenTrainedThisMonth
+    ) {
+      //scheduel training for this model
+      addTrainingLog(model);
+    }
+  }
+
+  return { models, now };
 }
 
-const trainRepoWithEncoding = async (repo: any, encoding: any) => {
-  // const name = repo.name;
-  // const owner = repo.owner.login;
-  // // Get Lofaf
-  // const lofaf = await getLofaf(owner, name, session);
-  // const epochs = 3;
-  // const training_cycles = 2;
-  // // Manipulate lofaf
-  // let lofafArray = lofaf.tree;
-  // lofafArray = lofafArray.map((item: any) => {
-  //   return item.path;
-  // });
-  // // Join the lofaf together
-  // const lofafString = lofafArray.join(",");
-  // // Set Lofaf
-  // setLofaf(lofafArray);
-  // // Create training data
-  // let trainingData = await createTrainingData(
-  //   training_cycles,
-  //   lofafString,
-  //   {
-  //     owner: owner,
-  //     repo: name,
-  //   },
-  //   user,
-  //   session
-  // );
-  // console.log({ trainingData });
-  // //set training data in store
-  // setMessages(trainingData);
-};
+const addTrainingLog = async (model: Model) => {
+  if (!supabase) return "No supabase client found";
 
-const trainRepoWithEmbeddings = async (repo: any, embeddings: any) => {
-  // // Convert the content to JSONL format
-  // const jsonlContent = trainingData.map(JSON.stringify).join("\n");
-  // // Convert to a blob
-  // const blob = new Blob([jsonlContent], { type: "text/plain" });
-  // // Convert to a file
-  // const file = new File([blob], "training.jsonl");
-  // // Upload the file to openai API
-  // const uploadedFiles = await openai.files.create({
-  //   file,
-  //   purpose: "fine-tune",
-  // });
-  // // Create a fine-tuning job from the uploaded file
-  // const finetune = await openai.fineTuning.jobs.create({
-  //   training_file: uploadedFiles.id,
-  //   model: `gpt-3.5-turbo`,
-  //   hyperparameters: { n_epochs: 3 },
-  // });
-  // if (error) {
-  //   console.log(error);
-  // }
-  // // Set the fine-tuning ID
-  // setFinetuningId(finetune.id);
+  //add training log for this model
+  const { data: logData, error: logError }: any = await supabase
+    .from("training_log")
+    .insert([
+      {
+        model_id: createModelID(model.repo, model.owner, model.branch),
+        model_settings: JSON.stringify(model),
+        fulfilled: false,
+      },
+    ]);
+
+  //calculate cost of training this model
+  const costToTrain = calculateTotalCost([model], 0);
+
+  //create a new charge
+  chargeCustomer(
+    { stripe_customer_id: model.stripe_customer_id },
+    Number(costToTrain)
+  );
 };

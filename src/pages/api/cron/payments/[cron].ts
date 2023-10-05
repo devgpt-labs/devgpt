@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabase } from "@/utils/supabase";
+
+//utils
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 import calculateTotalCost from "@/utils/calculateTotalCost";
 
 const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
   ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
   : "notoken";
+
+const stripe = new Stripe(token, {
+  apiVersion: "2023-08-16",
+});
 
 export const config = {
   runtime: "edge",
@@ -19,10 +26,6 @@ export default async function handler(req: NextRequest) {
     status: 200,
   });
 }
-
-const stripe = new Stripe(token, {
-  apiVersion: "2023-08-16",
-});
 
 async function update(interval: string) {
   const now = Date.now();
@@ -55,92 +58,30 @@ async function update(interval: string) {
 
   //async charge each customer
   for (const customer of customers_with_payments_required) {
-    //await chargeCustomer(customer.customer, customer.charge);
+    await chargeCustomer(customer.customer, customer.charge);
   }
 
   return { customers_with_payments_required, now };
 }
 
-const chargeCustomer = async (customer: any, amount: number) => {
-  const paymentMethods = await stripe.customers.listPaymentMethods(
-    customer.stripe_customer_id,
-    { type: "card" }
-  );
-
-  const payment_method = paymentMethods.data[0].id;
-
-  //use stripe to charge the customer
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount * 100,
-    currency: "usd",
-    customer: customer.stripe_customer_id,
-    automatic_payment_methods: {
-      enabled: true,
-      allow_redirects: "never",
-    },
-  });
-
-  //use the paymentIntent to charge the customer
-  const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-    payment_method: payment_method,
-  });
-
-  console.log({ confirmation });
-
-  if (!paymentIntent) return false;
-};
-
 const calculateCharge = async (customer: any) => {
   if (!supabase) return;
-
-  //check total spend for this customer this month with Stripe
-  const { data, error } = await supabase
-    .from("payments")
-    .select("*")
-    .eq("stripe_id", customer.stripe_customer_id);
-  if (error) return error;
-  const payments = data;
-
-  //filter to  payments that have been created_at this month
-  const now = Date.now();
-  const thisMonth = new Date(now).getMonth();
-  const thisYear = new Date(now).getFullYear();
-  const thisMonthPayments: any = payments.filter((payment: any) => {
-    const paymentDate = new Date(payment.created_at);
-    const paymentMonth = paymentDate.getMonth();
-    const paymentYear = paymentDate.getFullYear();
-    return paymentMonth === thisMonth && paymentYear === thisYear;
-  });
-
-  let total_spend_this_month = 0;
-
-  //add up the total spend for this month
-  thisMonthPayments.forEach((payment: any) => {
-    total_spend_this_month += payment.price / 100; //convert from cents to dollars
-  });
-
-  //check if we can still charge this customer or if they've reached their monthly budget
-  const monthly_budget = customer.monthly_budget;
-  const canChargeCustomer: boolean = total_spend_this_month < monthly_budget;
-
-  if (!canChargeCustomer) return 0.0;
-
-  const maxWeCanChargeCustomer = monthly_budget - total_spend_this_month;
 
   //calculate the amount to charge this customer based on their estimated spend from models + prompts.
   const { data: modelData, error: modelError } = await supabase
     .from("models")
     .select("*")
     .eq("stripe_customer_id", customer.stripe_customer_id);
-  if (error) return error;
+  if (modelError) return modelError;
   const models = modelData;
 
-  const estimatedCost = calculateTotalCost(models, 0);
+  console.log(customer.stripe_customer_id);
 
-  const amountToCharge =
-    estimatedCost > maxWeCanChargeCustomer
-      ? maxWeCanChargeCustomer
-      : estimatedCost;
+  let estimatedCost = calculateTotalCost(models, 0);
 
-  return amountToCharge;
+  estimatedCost = (Number(estimatedCost) * 1.2).toFixed(2); // add 20% buffer for prompting costs
+
+  console.log({ estimatedCost });
+
+  return estimatedCost;
 };
