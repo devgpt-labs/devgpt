@@ -68,7 +68,6 @@ const RepoDrawer = () => {
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   useEffect(() => {
-    console.log({ repoWindowOpen });
     if (repoWindowOpen === null || !repoWindowOpen) return;
     onOpen();
   }, [repoWindowOpen]);
@@ -183,7 +182,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => { }, stripe_customer_id);
+    getModels(setTrainedModels, () => {}, stripe_customer_id);
   }, [repos]);
 
   if (!user) {
