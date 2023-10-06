@@ -90,7 +90,15 @@ const Chat = () => {
   });
 
   useEffect(() => {
+    // Train models on load
     trainModels(session, user, stripe_customer_id);
+
+    // Get the users last used repo
+    const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
+    if (lastUsedRepo) {
+      const lastUsedRepoObject = JSON.parse(lastUsedRepo);
+      setRepo(lastUsedRepoObject);
+    }
   }, []);
 
   useEffect(() => {
@@ -111,15 +119,8 @@ const Chat = () => {
       chargeCustomer(customer, cost);
     }
 
-    const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
-
-    if (lastUsedRepo) {
-      console.log("lastUsedRepo", lastUsedRepo);
-
-      const lastUsedRepoObject = JSON.parse(lastUsedRepo);
-      setRepo(lastUsedRepoObject);
-    }
   }, [messages, correctedPrompt]);
+
 
   const getDiscordOnline = async () => {
     try {
