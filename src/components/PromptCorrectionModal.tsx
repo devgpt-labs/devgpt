@@ -1,43 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
   ModalCloseButton,
   Button,
-  Heading,
   Text,
-  Highlight,
-  Card,
-  CardBody,
   Flex,
-  Textarea,
   Tag,
-  List,
-  ListItem,
-  ListIcon,
-  OrderedList,
-  UnorderedList,
   InputGroup,
   InputLeftAddon,
   Input,
-  Grid,
   Code,
-  CardHeader,
-  CardFooter,
-  Stack,
-  IconButton,
-  StackDivider,
-  Box,
-  HStack,
-  TagLeftIcon,
-  TagLabel,
 } from "@chakra-ui/react";
-import { IoMdArrowDropdown, IoMdArrowUp } from "react-icons/io";
-import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 
 const PromptCorrectionModal = ({
   isOpen,
@@ -62,7 +37,15 @@ const PromptCorrectionModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered={true} size="5xl">
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          setLoading(false);
+          onClose()
+        }}
+        isCentered={true}
+        size="5xl"
+      >
         <ModalOverlay />
         <ModalContent>
           <Flex p={4} flexDirection="column" width="100%">
@@ -143,7 +126,7 @@ const PromptCorrectionModal = ({
               onClick={(e) => {
                 setPrompt(correctedPrompt);
                 onClose();
-                setLoading(false)
+                setLoading(false);
               }}
             >
               Accept Suggestion

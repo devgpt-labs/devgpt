@@ -12,7 +12,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 
-export const RateConversation = ({ visible }: any) => {
+const RateConversation = ({ visible }: any) => {
   const toast = useToast();
   const { colorMode } = useColorMode();
 
@@ -97,3 +97,5 @@ const ToggleItem: FC<ToggleItemProps> = (props) => {
     </ListItem>
   );
 };
+
+export default RateConversation;

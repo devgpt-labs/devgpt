@@ -1,98 +1,27 @@
-import React, { useState, useRef } from "react";
+import React, { } from "react";
 import {
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Input,
   Text,
   Divider,
   Flex,
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  InputGroup,
-  InputLeftElement,
-  Tooltip,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderMark,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   Box,
   Badge,
 } from "@chakra-ui/react";
-import { PhoneIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { PhoneIcon } from "@chakra-ui/icons";
 import { FaCrown } from "react-icons/fa";
 import { MdLabel } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
+import SliderInput from "./SliderInput";
 
 //stores
-import repoStore from "@/store/Repos";
-import authStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
-import { IoMdInformationCircle } from "react-icons/io";
 import calculateTotalCost from "@/utils/calculateTotalCost";
-
-const SliderInput = ({
-  label,
-  value,
-  tooltip,
-  Icon,
-  onChange,
-  increment,
-  max,
-}: any) => {
-  return (
-    <Flex gap={2} flexDirection="column">
-      <Tooltip placement="right" label={tooltip}>
-        <Flex flexDirection="row" alignItems="center" gap={2}>
-          <Text>
-            {label} ({value})
-          </Text>
-          <IoMdInformationCircle />
-        </Flex>
-      </Tooltip>
-      <Slider
-        aria-label={label}
-        defaultValue={value}
-        onChange={onChange}
-        min={increment}
-        max={max}
-        step={increment}
-      >
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-        <SliderThumb zIndex={1} />
-      </Slider>
-    </Flex>
-  );
-};
 
 const Setup = ({
   repo,
   trainingMethod,
-  cycles,
+  sampleSize,
   frequency,
   epochs,
-  setCycles,
+  setSampleSize,
   setFrequency,
   setEpochs,
   setTrainingMethod,
@@ -124,7 +53,7 @@ const Setup = ({
         </Flex>
         <Divider my={2} />
         <Badge mb={1}>Trained using {trainingMethod}</Badge>
-        <Text>Train using {cycles} sample files</Text>
+        <Text>Train using {sampleSize} sample files</Text>
         <Text>Train {frequency} time(s) every month</Text>
         <Text>Run {epochs} epochs each cycle</Text>
         <Divider my={2} />
@@ -136,7 +65,7 @@ const Setup = ({
               {
                 frequency: frequency,
                 epochs: epochs,
-                sample_size: cycles,
+                sample_size: sampleSize,
               },
             ],
             0
@@ -150,8 +79,8 @@ const Setup = ({
           max={100}
           Icon={PhoneIcon}
           tooltip="Sample Size is the number of files to train on. If this is set to 10, 10 important files will be selected from the repo to train on."
-          value={cycles}
-          onChange={(e: any) => setCycles(e)}
+          value={sampleSize}
+          onChange={(e: any) => setSampleSize(e)}
         />
         <SliderInput
           label="Frequency"

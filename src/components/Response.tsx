@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Flex, Tag, Box, useColorMode } from "@chakra-ui/react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import {
-  vscDarkPlus,
-  oneLight,
-} from "react-syntax-highlighter/dist/cjs/styles/prism";
+const { vscDarkPlus, oneLight } = require("react-syntax-highlighter/dist/cjs/styles/prism");
+const { Prism: SyntaxHighlighter } = require("react-syntax-highlighter");
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";
@@ -25,9 +22,13 @@ const Response = ({ content }: ResponseProps) => {
 
   const theme = colorMode === "light" ? oneLight : vscDarkPlus;
 
+  if (content === 'undefined') return null
+
+  console.log({ content });
+
+
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
-
       <ReactMarkdown
         components={{
           code({ inline, className, children, ...props }) {

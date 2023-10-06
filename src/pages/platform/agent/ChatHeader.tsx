@@ -6,7 +6,7 @@ import repoStore from "@/store/Repos";
 //components
 import Logo from "@/components/Logo";
 
-export const Header = () => {
+const ChatHeader = () => {
   const { repo }: any = repoStore();
   return (
     <Flex
@@ -21,3 +21,5 @@ export const Header = () => {
     </Flex>
   );
 };
+
+export default ChatHeader;

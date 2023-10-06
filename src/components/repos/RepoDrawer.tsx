@@ -169,11 +169,11 @@ const RepoDrawer = () => {
         repo: name,
         owner: owner,
         branch: "main",
-        epochs: 1,
-        output: null,
         training_method: "ENCODING",
-        frequency: 1,
-        sample_size: 5,
+        output: null,
+        epochs: repo.epochs,
+        frequency: repo.frequency,
+        sample_size: repo.sampleSize,
       },
     ]);
 
@@ -183,7 +183,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => {}, stripe_customer_id);
+    getModels(setTrainedModels, () => { }, stripe_customer_id);
   }, [repos]);
 
   if (!user) {

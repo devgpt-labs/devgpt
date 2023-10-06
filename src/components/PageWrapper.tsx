@@ -15,7 +15,7 @@ const Home = ({ children }: any) => {
     <Flex
       flex={{ md: "initial", base: 1 }}
       direction="column"
-      alignItems="center"
+      alignItems="flex-start"
       justifyContent={{ md: "center", base: "flex-start" }}
       className={`min-h-screen flex bg-slate-950 overflow-hidden`}
     >

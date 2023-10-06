@@ -25,7 +25,6 @@ import UpgradeModal from "./UpgradeModal";
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
-import { BsDiscord } from "react-icons/bs";
 import { BiSolidBookBookmark } from "react-icons/bi";
 import {
   GiBattery100,
@@ -93,7 +92,6 @@ const ProfileOptionIconButton = ({
 
 const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
-  const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
   const [credits, setCredits] = useState<number>(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { user, isPro, signOut }: any = authStore();

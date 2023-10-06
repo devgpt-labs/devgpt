@@ -1,7 +1,7 @@
 import { Box, Image, Text } from "@chakra-ui/react";
 import astro from "@/images/astro_profile.png";
 
-export const Header = () => {
+const Header = () => {
   return (
     <Box
       justifyContent="space-between"
@@ -23,3 +23,5 @@ export const Header = () => {
     </Box>
   );
 };
+
+export default Header;

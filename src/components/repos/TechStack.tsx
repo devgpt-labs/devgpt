@@ -1,10 +1,6 @@
 import { Flex, FormControl, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
-import {
-  AutoComplete,
-  AutoCompleteInput,
-  AutoCompleteTag,
-} from "@choc-ui/chakra-autocomplete";
+const { AutoComplete, AutoCompleteInput, AutoCompleteTag } = require("@choc-ui/chakra-autocomplete");
 
 const TechStack = () => {
   const [inputValue, setInputValue] = useState<any>("");

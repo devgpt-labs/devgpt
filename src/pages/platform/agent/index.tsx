@@ -16,7 +16,7 @@ import {
   Spinner,
   Tooltip,
   IconButton,
-
+  Badge,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -34,8 +34,8 @@ import userPrompt from "@/prompts/user";
 import Template from "@/components/Template";
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
-import { RateConversation } from "./RateConversation";
-import { Header } from "./ChatHeader";
+import RateConversation from "./RateConversation";
+import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 
 //utils
@@ -50,8 +50,7 @@ import getModels from "@/utils/getModels";
 import { useRouter } from "next/router";
 import Models from "../models";
 
-import { BsDiscord } from "react-icons/bs";
-
+import { BsDiscord, BsGithub } from "react-icons/bs";
 
 const Chat = () => {
   // Constants
@@ -73,6 +72,7 @@ const Chat = () => {
     useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
+  const [models, setModels] = useState<any>([]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -86,38 +86,25 @@ const Chat = () => {
     initialMessages: initialMessages,
   });
 
+  // Find the model in the models table that has the same name and owner
+
   const getDiscordOnline = async () => {
     try {
       const response = await fetch(
         "https://discord.com/api/guilds/931533612313112617/widget.json"
       );
+      console.log({ response });
+
       const json = await response.json();
       return json.presence_count;
     } catch (error) {
+      console.log(error);
+
       // Handle errors here
       console.error("Error fetching Discord data:", error);
       return null;
     }
   };
-
-  const fetchData = async () => {
-    const count: any = await getDiscordOnline();
-    if (count !== null) {
-      setActiveOnDiscord(count);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this effect runs once when the component mounts
-
-  // This logic breaks down the prompt to find @'d files
-  const regex = /@([^ ]+)/g;
-  const withAt: any = [];
-  let match: any;
-  while ((match = regex.exec(prompt))) {
-    withAt.push(match[1]);
-  }
 
   const retrieveTrainingData = async () => {
     if (savedMessages.length > 0) {
@@ -136,7 +123,15 @@ const Chat = () => {
     }
   };
 
+  const fetchData = async () => {
+    const count: any = await getDiscordOnline();
+    if (count !== null) {
+      setActiveOnDiscord(count);
+    }
+  };
+
   useEffect(() => {
+    fetchData();
     fetch();
 
     // Log the user out if they are not logged in
@@ -144,7 +139,29 @@ const Chat = () => {
       router.push("/", undefined, { shallow: true });
       return;
     }
-  }, []);
+
+    retrieveTrainingData();
+
+    getModels(
+      (data: any) => {
+        setModels(data);
+      },
+      () => { },
+      stripe_customer_id
+    );
+
+    const model = models?.find((model: any) => model?.repo === repo?.repo);
+
+    setInitialMessages(model?.messages || []);
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+  // This logic breaks down the prompt to find @'d files
+  const regex = /@([^ ]+)/g;
+  const withAt: any = [];
+  let match: any;
+  while ((match = regex.exec(prompt))) {
+    withAt.push(match[1]);
+  }
 
   useEffect(() => {
     setLoading(false);
@@ -155,23 +172,9 @@ const Chat = () => {
   }, [repo, savedMessages.length]);
 
   useEffect(() => {
-    retrieveTrainingData();
-  }, []);
-
-  useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
-
-  useEffect(() => {
-    getModels(
-      (data: any) => {
-        console.log({ data });
-      },
-      () => { },
-      stripe_customer_id
-    );
-  }, []);
 
   // todo move this to session context
   if (!user) return null;
@@ -183,15 +186,18 @@ const Chat = () => {
     }
   });
 
+  console.log(messages);
+
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
-
     const lastWord = promptArray[promptArray?.length - 1];
     const newPrompt = prompt.replace(lastWord, `~${file}`);
 
+    // Set prompts
     setPrompt(newPrompt);
+
     // Refocus on input
     const input = document.getElementById("message");
     input?.focus();
@@ -278,7 +284,7 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-          <Header />
+          <ChatHeader />
           {!repo.repo && (
             <Link href="/platform/models">
               <Button width="100%" mt={4}>
@@ -288,6 +294,12 @@ const Chat = () => {
                 {failMessage}
               </Text>
             </Link>
+          )}
+          {initialMessages.length === 0 && repo.repo && (
+            <Text mt={4}>
+              Your model is <Badge>Training</Badge>, the AI until this is done
+              won't be able to access your repos context.
+            </Text>
           )}
           {repo.repo && (
             <Box className="max-h-[50vh] overflow-y-auto">
@@ -368,9 +380,10 @@ const Chat = () => {
               </Flex>
               {loading && !messages[messages.length - 1] ? (
                 <SkeletonText
-                  mt="4"
+                  mb={2}
+                  mt={4}
                   noOfLines={4}
-                  spacing="4"
+                  spacing={4}
                   skeletonHeight="2"
                 />
               ) : (
@@ -411,6 +424,47 @@ const Chat = () => {
           )}
         </Box>
         <Profile />
+        <Flex mt={2} gap={2}>
+          <Tooltip label="Join Discord" placement="top">
+            <Link href="https://discord.com/invite/6GFtwzuvtw">
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                aria-label="Join Discord"
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <BsDiscord />
+                    <Text ml={2} fontSize={14}>
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      Active
+                    </Text>
+                  </Flex>
+                }
+              />
+            </Link>
+          </Tooltip>
+          <Tooltip label="Github Stars" placement="top">
+            <Link href="https://github.com/devgpt-labs/devgpt-releases">
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                aria-label="Github Stars"
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <BsGithub />
+                    <Text ml={2} fontSize={14}>
+                      334
+                    </Text>
+                  </Flex>
+                }
+              />
+            </Link>
+          </Tooltip>
+        </Flex>
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}
@@ -422,29 +476,6 @@ const Chat = () => {
           setLoading={setLoading}
         />
       </Flex>
-      <Box position='absolute' bottom={0} left={0}>
-        <Tooltip label="Join Discord" placement="top">
-          <Link isExternal={true} href="https://discord.com/invite/6GFtwzuvtw">
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Join Discord"
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <BsDiscord />
-                  <Text ml={2} fontSize={14}>
-                    {activeOnDiscord && `Online: ${activeOnDiscord}`}
-                  </Text>
-                </Flex>
-              }
-            />
-          </Link>
-        </Tooltip>
-      </Box>
-
-
     </Template>
   );
 };

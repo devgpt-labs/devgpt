@@ -14,4 +14,4 @@ const AuthOption = ({ label, Icon, url }: any) => {
   );
 };
 
-export default AuthOption;
+export default AuthOption
