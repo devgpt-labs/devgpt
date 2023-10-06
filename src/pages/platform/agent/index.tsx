@@ -17,7 +17,6 @@ import {
   Tooltip,
   IconButton,
   Badge,
-
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -35,8 +34,8 @@ import userPrompt from "@/prompts/user";
 import Template from "@/components/Template";
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
-import { RateConversation } from "./RateConversation";
-import { Header } from "./ChatHeader";
+import RateConversation from "./RateConversation";
+import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 
 //utils
@@ -52,7 +51,6 @@ import { useRouter } from "next/router";
 import Models from "../models";
 
 import { BsDiscord, BsGithub } from "react-icons/bs";
-
 
 const Chat = () => {
   // Constants
@@ -89,7 +87,6 @@ const Chat = () => {
   });
 
   // Find the model in the models table that has the same name and owner
-
 
   const getDiscordOnline = async () => {
     try {
@@ -147,15 +144,13 @@ const Chat = () => {
 
     getModels(
       (data: any) => {
-        setModels(data)
+        setModels(data);
       },
       () => { },
       stripe_customer_id
     );
 
-    const model = models?.find(
-      (model: any) => model?.repo === repo?.repo
-    );
+    const model = models?.find((model: any) => model?.repo === repo?.repo);
 
     setInitialMessages(model?.messages || []);
   }, []); // Empty dependency array means this effect runs once when the component mounts
@@ -192,7 +187,6 @@ const Chat = () => {
   });
 
   console.log(messages);
-
 
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {
@@ -290,7 +284,7 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-          <Header />
+          <ChatHeader />
           {!repo.repo && (
             <Link href="/platform/models">
               <Button width="100%" mt={4}>
@@ -302,7 +296,10 @@ const Chat = () => {
             </Link>
           )}
           {initialMessages.length === 0 && repo.repo && (
-            <Text mt={4}>Your model is <Badge>Training</Badge>, the AI until this is done won't be able to access your repos context.</Text>
+            <Text mt={4}>
+              Your model is <Badge>Training</Badge>, the AI until this is done
+              won't be able to access your repos context.
+            </Text>
           )}
           {repo.repo && (
             <Box className="max-h-[50vh] overflow-y-auto">
@@ -427,9 +424,9 @@ const Chat = () => {
           )}
         </Box>
         <Profile />
-        <Flex mt={2} gap={2} >
+        <Flex mt={2} gap={2}>
           <Tooltip label="Join Discord" placement="top">
-            <Link isExternal={true} href="https://discord.com/invite/6GFtwzuvtw">
+            <Link href="https://discord.com/invite/6GFtwzuvtw">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
@@ -449,7 +446,7 @@ const Chat = () => {
             </Link>
           </Tooltip>
           <Tooltip label="Github Stars" placement="top">
-            <Link isExternal={true} href="https://github.com/">
+            <Link href="https://github.com/devgpt-labs/devgpt-releases">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
@@ -460,7 +457,7 @@ const Chat = () => {
                   <Flex flexDirection="row" px={3}>
                     <BsGithub />
                     <Text ml={2} fontSize={14}>
-                      332
+                      334
                     </Text>
                   </Flex>
                 }

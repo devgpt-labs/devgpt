@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Flex, Tag, Box, useColorMode } from "@chakra-ui/react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactMarkdown from "react-markdown";
-import {
-  vscDarkPlus,
-  oneLight,
-} from "react-syntax-highlighter/dist/cjs/styles/prism";
+const { vscDarkPlus, oneLight } = require("react-syntax-highlighter/dist/cjs/styles/prism");
+const { Prism: SyntaxHighlighter } = require("react-syntax-highlighter");
 
 //utils
 import copyToClipboard from "@/utils/copyToClipboard";

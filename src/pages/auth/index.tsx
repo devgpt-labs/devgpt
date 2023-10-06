@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Header } from "./AuthHeader";
 import signInWithGithub from "@/utils/github/signInWithGithub";
+import AuthHeader from "./AuthHeader";
 // import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 // import signInWithGitlab from "@/utils/gitlab/signInWithGitlab";
 import {
@@ -80,7 +80,7 @@ const Auth = () => {
           border="1px solid #1a202c"
           shadow="2xl"
         >
-          <Header />
+          <AuthHeader />
           <VStack spacing={2} mt={3} width="100%" alignItems="center">
             <GitConnectorButton
               color="black"

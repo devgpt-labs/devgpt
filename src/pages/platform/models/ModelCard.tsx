@@ -44,7 +44,15 @@ import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
 
-const ModelCard = ({ model, modelsInTraining, setModelsInTraining }: any) => {
+const ModelCard = ({
+  model,
+  modelsInTraining,
+  setModelsInTraining,
+}: {
+  model: any;
+  modelsInTraining: any;
+  setModelsInTraining: () => void;
+}) => {
   const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore();
   const [deletingAModel, setDeletingAModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);

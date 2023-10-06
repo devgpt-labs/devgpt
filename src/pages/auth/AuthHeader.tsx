@@ -4,7 +4,7 @@ import AstroHead from "@/assets/astro_profile.png";
 //components
 import Logo from "@/components/Logo";
 
-export const Header = () => {
+const AuthHeader = () => {
   return (
     <Flex
       justifyContent="space-between"
@@ -24,3 +24,5 @@ export const Header = () => {
     </Flex>
   );
 };
+
+export default AuthHeader;

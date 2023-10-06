@@ -16,6 +16,7 @@
     "@supabase/auth-ui-shared": "^0.1.7",
     "@supabase/supabase-js": "^2.33.2",
     "@types/js-cookie": "^3.0.4",
+    "@types/react-spinner": "^0.2.1",
     "ai": "^2.2.13",
     "dotenv": "^16.3.1",
     "gpt-tokenizer": "^2.1.1",

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
-import SyncLoader from "react-spinners/SyncLoader";
+const SyncLoader = require('react-spinners/SyncLoader');
 
 const Loader = () => {
   return (

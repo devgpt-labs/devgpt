@@ -92,7 +92,7 @@ const Models = ({ onClose }: any) => {
   const [refresh, setRefresh] = useState<boolean>(false);
 
   // Budgets
-  const [budget, setBudget] = useState<number>(-1);
+  const [budget, setBudget] = useState<number>(0);
   const [minBudget, setMinBudget] = useState<number>(0);
 
   interface Model {
@@ -146,9 +146,6 @@ const Models = ({ onClose }: any) => {
   useEffect(() => {
     getModels(setModelsInTraining, setLoading, stripe_customer_id);
 
-    console.log({ modelsInTraining });
-
-
     if (modelsInTraining.length > 0) {
       console.log('in here');
 
@@ -156,8 +153,6 @@ const Models = ({ onClose }: any) => {
       if (!supabase) return;
 
       getMonthlyBudget().then((budget) => {
-        console.log({ budget });
-
         if (!budget) {
           setBudget(Number(calculateTotalCost(modelsInTraining, 10)));
           return;
@@ -182,7 +177,7 @@ const Models = ({ onClose }: any) => {
     );
   };
 
-  if (loading || budget === -1) {
+  if (loading) {
     return (
       <Template>
         <Box p={6} width="100vw" height="100vh">
@@ -436,7 +431,7 @@ const Models = ({ onClose }: any) => {
                     <Th isNumeric></Th>
                     <Th isNumeric>
                       <Heading>
-                        ${budget || calculateTotalCost(modelsInTraining, 0)}
+                        ${budget < Number(calculateTotalCost(modelsInTraining, 0)) * 1.2 ? budget : Number(calculateTotalCost(modelsInTraining, 0)) * 1.2}
                       </Heading>
                     </Th>
                   </Tr>
