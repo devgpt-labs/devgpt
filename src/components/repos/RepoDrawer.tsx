@@ -68,7 +68,6 @@ const RepoDrawer = () => {
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   useEffect(() => {
-    console.log({ repoWindowOpen });
     if (repoWindowOpen === null || !repoWindowOpen) return;
     onOpen();
   }, [repoWindowOpen]);
@@ -146,8 +145,6 @@ const RepoDrawer = () => {
   };
 
   const handleSelectRepo = async (repo: any) => {
-    console.log({ repo });
-
     // Close the modal, no more user input required
     onClose();
 
@@ -185,10 +182,6 @@ const RepoDrawer = () => {
   useEffect(() => {
     getModels(setTrainedModels, () => { }, stripe_customer_id);
   }, [repos]);
-
-  if (!user) {
-    return null;
-  }
 
   if (!session.provider_token) {
     signOut();

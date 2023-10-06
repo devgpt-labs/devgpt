@@ -6,9 +6,6 @@ import { useRouter } from "next/router";
 import useStore from "@/store/Auth";
 
 const Home = ({ children }: any) => {
-  const router = useRouter();
-
-  const { user }: any = useStore();
   const { colorMode } = useColorMode();
 
   return (

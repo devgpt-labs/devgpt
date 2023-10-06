@@ -24,9 +24,6 @@ const Response = ({ content }: ResponseProps) => {
 
   if (content === 'undefined') return null
 
-  console.log({ content });
-
-
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
       <ReactMarkdown

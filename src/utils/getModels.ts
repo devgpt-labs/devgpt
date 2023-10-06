@@ -18,7 +18,8 @@ const getModels = async (
 	}
 
 	if (!error) {
-		setState(data);
+		const filteredData = data.filter((model: any) => !model.deleted);
+		setState(filteredData);
 		setLoading(false);
 	}
 

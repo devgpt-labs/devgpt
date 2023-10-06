@@ -76,9 +76,8 @@ const Chat = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-
   const { messages: savedMessages }: any = messageStore();
-  const { repo, lofaf, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const { repo, lofaf }: any = repoStore();
   const { colorMode } = useColorMode();
   const { user, session, stripe_customer_id, fetch }: any = authStore();
 
@@ -93,7 +92,6 @@ const Chat = () => {
       const response = await fetch(
         "https://discord.com/api/guilds/931533612313112617/widget.json"
       );
-      console.log({ response });
 
       const json = await response.json();
       return json.presence_count;
@@ -131,17 +129,21 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    fetchData();
-    fetch();
-
-    // Log the user out if they are not logged in
-    if (!user) {
+    if (!session) {
+      console.log("no session found, returning to home");
       router.push("/", undefined, { shallow: true });
-      return;
     }
 
-    retrieveTrainingData();
+    if (!user) {
+      console.log("no user found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+  }, [session, user]);
 
+  useEffect(() => {
+    fetchData();
+    fetch();
+    retrieveTrainingData();
     getModels(
       (data: any) => {
         setModels(data);
@@ -176,17 +178,12 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  // todo move this to session context
-  if (!user) return null;
-
   // Get the current file being targeted with @
   const selectedFile = lofaf?.filter((file: any) => {
     if (file?.toLowerCase()?.includes(withAt?.[0]?.toLowerCase())) {
       return file;
     }
   });
-
-  console.log(messages);
 
   // If the user clicks tab, we want to autocomplete the file name
   const handleKeyDown = (file: any) => {

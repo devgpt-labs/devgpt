@@ -162,7 +162,7 @@ const Profile = () => {
 
   useEffect(() => {
     const identity = user?.identities?.find((identity: { provider: string }) =>
-      ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
+      ["github", "gitlab", "bitbucket", "mock"].includes(identity?.provider)
     )?.identity_data;
     setIdentity(identity);
   }, [user]);
@@ -170,7 +170,7 @@ const Profile = () => {
   useEffect(() => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
-  }, [user.email, promptCount]);
+  }, [user?.email, promptCount]);
 
   return (
     <>

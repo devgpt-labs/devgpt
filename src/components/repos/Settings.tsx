@@ -9,8 +9,6 @@ const Repos = () => {
   const { branch, setBranch }: any = repoStore();
   const { user }: any = authStore();
 
-  if (!user) return null;
-
   return (
     <>
       <Box mt={6} mb={2}>
