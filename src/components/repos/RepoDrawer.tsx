@@ -183,7 +183,7 @@ const RepoDrawer = () => {
     getModels(setTrainedModels, () => { }, stripe_customer_id);
   }, [repos]);
 
-  if (!session.provider_token) {
+  if (!session?.provider_token) {
     signOut();
   }
 

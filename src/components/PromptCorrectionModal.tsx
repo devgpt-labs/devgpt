@@ -114,7 +114,7 @@ const PromptCorrectionModal = ({
               variant="ghost"
               onClick={(e) => {
                 onClose();
-                onSubmit();
+                onSubmit(e);
               }}
             >
               Reject

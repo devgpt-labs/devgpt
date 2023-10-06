@@ -40,7 +40,6 @@ import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
-import getTokensFromString from "@/utils/getTokensFromString";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
 import { checkIfPro } from "@/utils/checkIfPro";
@@ -49,6 +48,7 @@ import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
 import { useRouter } from "next/router";
 import Models from "../models";
+import getTokensFromString from "@/utils/getTokensFromString";
 
 import { BsDiscord, BsGithub } from "react-icons/bs";
 
@@ -85,7 +85,32 @@ const Chat = () => {
     initialMessages: initialMessages,
   });
 
-  // Find the model in the models table that has the same name and owner
+  const calculateTokenCost = (usage: any) => {
+    console.log(usage);
+  }
+
+  const chargeCustomer = (customer: any, cost: any) => {
+    console.log(customer, cost);
+  }
+
+  useEffect(() => {
+    let usage: number = 0;
+    const customer = {
+      stripe_customer_id: stripe_customer_id,
+    };
+
+    const responseTokenCost = getTokensFromString(
+      String(messages[messages.length - 1]?.content)
+    );
+    const promptTokenCost = getTokensFromString(correctedPrompt);
+    const cost = calculateTokenCost(usage);
+
+    usage = responseTokenCost + promptTokenCost;
+
+    if (usage > 0) {
+      chargeCustomer(customer, cost);
+    }
+  }, [messages, correctedPrompt]);
 
   const getDiscordOnline = async () => {
     try {
@@ -294,7 +319,7 @@ const Chat = () => {
           )}
           {initialMessages.length === 0 && repo.repo && (
             <Text mt={4}>
-              Your model is <Badge>Training</Badge>, the AI until this is done
+              Your model is <Badge>Training</Badge>, until this is done the AI
               won't be able to access your repos context.
             </Text>
           )}
@@ -359,6 +384,7 @@ const Chat = () => {
                   ml={4}
                   width="10rem"
                   onClick={async (e: any) => {
+                    setLoading(true);
                     const checks = await submitChecks(false);
                     if (!checks) return null;
                     handleSubmit(e);
@@ -454,7 +480,7 @@ const Chat = () => {
                   <Flex flexDirection="row" px={3}>
                     <BsGithub />
                     <Text ml={2} fontSize={14}>
-                      334
+                      335
                     </Text>
                   </Flex>
                 }
@@ -469,7 +495,7 @@ const Chat = () => {
           setPrompt={setPrompt}
           isOpen={isOpen}
           onClose={onClose}
-          onSubmit={handleSubmit}
+          onSubmit={(e: any) => handleSubmit(e)}
           setLoading={setLoading}
         />
       </Flex>
