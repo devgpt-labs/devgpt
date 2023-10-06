@@ -12,7 +12,7 @@ const stripe = new Stripe(token, {
   apiVersion: "2023-08-16",
 });
 
-const minimum_charge = 1000; //10 dollars
+const minimum_charge = 10; //10 dollars
 
 const chargeCustomer = async (customer: any, amount: number) => {
   if (!supabase) return;
