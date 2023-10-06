@@ -191,7 +191,7 @@ const Chat = () => {
     setInitialMessages(model?.output || []);
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
-      const files = data.tree.map((file: any) => file.path);
+      const files = data?.tree?.map((file: any) => file.path);
 
       // set this
       setLofaf(files);
@@ -355,8 +355,8 @@ const Chat = () => {
                 </Flex>
               )}
               <Flex flexDirection="row" flexWrap="wrap">
-                <SlideFade key={match} in={selectedFile[0] ? true : false}>
-                  {selectedFile.map((file: any, index: any) => {
+                <SlideFade key={match} in={selectedFile?.[0] ? true : false}>
+                  {selectedFile?.map((file: any, index: any) => {
                     if (index > 12) return null;
                     return (
                       <Tag
