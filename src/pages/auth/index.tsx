@@ -73,8 +73,7 @@ const Auth = () => {
           overflow="hidden"
           p={5}
           flexDirection="column"
-          // TODO: shadow needs readding / fixing here
-          boxShadow="blues"
+          boxShadow="blue"
           border="1px solid #1a202c"
           shadow="2xl"
         >

@@ -193,9 +193,6 @@ const ModelCard = ({
                   <Tooltip label="Select Model">
                     <IconButton
                       onClick={() => {
-                        // TODO: Make sure this is commented back in
-                        // if (!model.output) return;
-
                         // Save this in cookies, and replace it each time it's clicked using js-cookie
                         saveKeyInCookies({
                           owner: model.owner,
