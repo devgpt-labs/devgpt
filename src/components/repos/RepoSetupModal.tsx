@@ -51,12 +51,11 @@ import calculateTotalCost from "@/utils/calculateTotalCost";
 import Setup from "./Setup";
 
 const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
-  const [cycles, setCycles] = useState(5);
+  const [sampleSize, setSampleSize] = useState(5);
   const [frequency, setFrequency] = useState(10);
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
   const btnRef: any = useRef();
-  const [repoToEdit, setRepoToEdit] = useState<any>(null);
 
   if (!repo) return null;
 
@@ -71,16 +70,16 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Configure Repo: {repo.name}</DrawerHeader>
+        <DrawerHeader maxW='90%'>Configure Model for repo: {repo.name}</DrawerHeader>
         <DrawerBody>
           <Setup
             repo={repo}
             trainingMethod={trainingMethod}
-            cycles={cycles}
+            sampleSize={sampleSize}
             frequency={frequency}
             epochs={epochs}
-            setCycles={(e: any) => {
-              setCycles(e)
+            setSampleSize={(e: any) => {
+              setSampleSize(e)
             }}
             setFrequency={(e: any) => {
               setFrequency(e)
@@ -97,7 +96,7 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             bgGradient={"linear(to-r, blue.500,teal.500)"}
             color="white"
             onClick={() => {
-              onSubmit({ ...repo, cycles, frequency, epochs, trainingMethod });
+              onSubmit({ ...repo, sampleSize, frequency, epochs, trainingMethod });
               onClose();
             }}
           >

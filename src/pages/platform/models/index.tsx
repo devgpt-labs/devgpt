@@ -88,7 +88,7 @@ const Models = ({ onClose }: any) => {
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [modelsInTraining, setModelsInTraining] = useState<Model[]>([]);
+  const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
 
   // Budgets

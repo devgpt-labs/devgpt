@@ -51,7 +51,7 @@ const ModelCard = ({
 }: {
   model: any;
   modelsInTraining: any;
-  setModelsInTraining: () => void;
+  setModelsInTraining: any;
 }) => {
   const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore();
   const [deletingAModel, setDeletingAModel] = useState<boolean>(false);
@@ -262,10 +262,10 @@ const ModelCard = ({
               <Setup
                 repo={model}
                 trainingMethod={model.training_method}
-                cycles={model.sample_size}
+                sampleSize={model.sample_size}
                 frequency={model.frequency}
                 epochs={model.epochs}
-                setCycles={(e: any) => {
+                setSampleSize={(e: any) => {
                   handleModelInTrainingChange({
                     target: {
                       name: "sample_size",

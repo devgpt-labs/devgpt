@@ -18,10 +18,10 @@ import calculateTotalCost from "@/utils/calculateTotalCost";
 const Setup = ({
   repo,
   trainingMethod,
-  cycles,
+  sampleSize,
   frequency,
   epochs,
-  setCycles,
+  setSampleSize,
   setFrequency,
   setEpochs,
   setTrainingMethod,
@@ -53,7 +53,7 @@ const Setup = ({
         </Flex>
         <Divider my={2} />
         <Badge mb={1}>Trained using {trainingMethod}</Badge>
-        <Text>Train using {cycles} sample files</Text>
+        <Text>Train using {sampleSize} sample files</Text>
         <Text>Train {frequency} time(s) every month</Text>
         <Text>Run {epochs} epochs each cycle</Text>
         <Divider my={2} />
@@ -65,7 +65,7 @@ const Setup = ({
               {
                 frequency: frequency,
                 epochs: epochs,
-                sample_size: cycles,
+                sample_size: sampleSize,
               },
             ],
             0
@@ -79,8 +79,8 @@ const Setup = ({
           max={100}
           Icon={PhoneIcon}
           tooltip="Sample Size is the number of files to train on. If this is set to 10, 10 important files will be selected from the repo to train on."
-          value={cycles}
-          onChange={(e: any) => setCycles(e)}
+          value={sampleSize}
+          onChange={(e: any) => setSampleSize(e)}
         />
         <SliderInput
           label="Frequency"
