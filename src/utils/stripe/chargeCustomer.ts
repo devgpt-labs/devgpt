@@ -5,89 +5,87 @@ import { supabase } from "@/utils/supabase";
 import getCustomerChargeLimits from "./getCustomerChargeLimits";
 
 const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
-	? process?.env?.NEXT_PUBLIC_STRIPE_KEY
-	: "notoken";
+  ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
+  : "notoken";
 
 const stripe = new Stripe(token, {
-	apiVersion: "2023-08-16",
+  apiVersion: "2023-08-16",
 });
 
 const minimum_charge = 1000; //10 dollars
 
 const chargeCustomer = async (customer: any, amount: number) => {
-	if (!supabase) return;
+  if (!supabase) return;
 
-	amount = Number(amount);
+  amount = Number(amount);
 
-	//get the customer's account balance from supabase
-	const { data: creditsData, error: creditsError } = await supabase
-		.from("customers")
-		.select("credits")
-		.eq("stripe_customer_id", customer.stripe_customer_id)
-		.single();
+  //get the customer's account balance from supabase
+  const { data: creditsData, error: creditsError } = await supabase
+    .from("customers")
+    .select("credits")
+    .eq("stripe_customer_id", customer.stripe_customer_id)
+    .single();
 
-	if (creditsError) {
-		console.log(creditsError);
-		return;
-	}
+  if (creditsError) {
+    console.log(creditsError);
+    return;
+  }
 
-	const { credits }: any = creditsData;
+  const { credits }: any = creditsData;
 
-	if (amount < credits) {
-		// Remove the amount from the customer's account balance
-		const { data: removeCreditsData, error: removeCreditsError } =
-			await supabase
-				.from("customers")
-				.update({ credits: (credits - amount).toFixed(2) })
-				.eq("stripe_customer_id", customer.stripe_customer_id)
-				.select();
+  if (amount < credits) {
+    // Remove the amount from the customer's account balance
+    const { data: removeCreditsData, error: removeCreditsError } =
+      await supabase
+        .from("customers")
+        .update({ credits: (credits - amount).toFixed(2) })
+        .eq("stripe_customer_id", customer.stripe_customer_id)
+        .select();
 
-		if (removeCreditsError) {
-			console.log(removeCreditsError);
-			return;
-		}
+    if (removeCreditsError) {
+      console.log(removeCreditsError);
+      return;
+    }
 
-		return;
-	}
+    return;
+  }
 
-	return; // todo - remove this line to enable charging
+  const { maxWeCanChargeCustomer, canChargeCustomer }: any =
+    await getCustomerChargeLimits(customer);
 
-	const { maxWeCanChargeCustomer, canChargeCustomer }: any =
-		await getCustomerChargeLimits(customer);
+  if (!canChargeCustomer) return;
 
-	if (!canChargeCustomer) return;
+  const paymentMethods = await stripe.customers.listPaymentMethods(
+    customer.stripe_customer_id,
+    { type: "card" }
+  );
 
-	const paymentMethods = await stripe.customers.listPaymentMethods(
-		customer.stripe_customer_id,
-		{ type: "card" }
-	);
+  const payment_method = paymentMethods.data[0].id;
 
-	const payment_method = paymentMethods.data[0].id;
+  amount = amount < minimum_charge ? minimum_charge : amount;
 
-	amount = amount < minimum_charge ? minimum_charge : amount;
+  const amountWithCaps =
+    amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
 
-	const amountWithCaps =
-		amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
+  if (amountWithCaps <= 0) return;
 
-	if (amountWithCaps <= 0) return;
+  //use stripe to charge the customer
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amountWithCaps * 100,
+    currency: "usd",
+    customer: customer.stripe_customer_id,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: "never",
+    },
+  });
 
-	//use stripe to charge the customer
-	const paymentIntent = await stripe.paymentIntents.create({
-		amount: amountWithCaps * 100,
-		currency: "usd",
-		customer: customer.stripe_customer_id,
-		automatic_payment_methods: {
-			enabled: true,
-			allow_redirects: "never",
-		},
-	});
+  //use the paymentIntent to charge the customer
+  const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
+    payment_method: payment_method,
+  });
 
-	//use the paymentIntent to charge the customer
-	const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-		payment_method: payment_method,
-	});
-
-	if (!paymentIntent) return false;
+  if (!paymentIntent) return false;
 };
 
 export default chargeCustomer;
