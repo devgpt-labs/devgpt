@@ -30,6 +30,7 @@ interface Model {
   frequency: number;
   sample_size: number;
   output: string;
+  deleted: boolean;
 }
 
 interface Log {
@@ -52,7 +53,10 @@ async function update(interval: string) {
 
   let models = data;
 
-  models = [models[0]]; //temp for testing - delete me
+  //filter out models that have deleted = true
+  models = models.filter((model: Model) => {
+    return model.deleted !== true;
+  });
 
   for (const model of models) {
     //get the training-log for this model
