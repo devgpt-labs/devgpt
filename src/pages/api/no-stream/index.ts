@@ -36,5 +36,7 @@ export default async function handler(
     messages: messages,
   });
 
+  console.log({ response });
+
   res.status(200).json({ data: response });
 }

@@ -49,7 +49,7 @@ async function trainModels(
 
   const models = data;
 
-  //todo go through each model and see if it's latest training_log has been fulfilled
+  //go through each model and see if it's latest training_log has been fulfilled
   for (const model of models) {
     //get latest training log for this model from supabase training_log table
     const { data, error } = await supabase
@@ -180,5 +180,13 @@ const setModelOutput = async (model: Model, output: string) => {
       { output: output },
       { some_column: "otherValue" },
     ])
+    .select();
+
+  //update the training_log table by setting the latest training_log to fulfilled
+  const { data: trainingLogData, error: trainingLogError } = await supabase
+    .from("training_log")
+    .update({ fulfilled: true })
+    .eq("model_id", createModelID(model.repo, model.owner, model.branch))
+    .order("created_at", { ascending: false })
     .select();
 };
