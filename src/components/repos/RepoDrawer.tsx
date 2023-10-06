@@ -180,7 +180,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => { }, stripe_customer_id);
+    getModels(setTrainedModels, () => {}, stripe_customer_id);
   }, [repos]);
 
   if (!session?.provider_token) {

@@ -1,6 +1,10 @@
 import sendLLM from "./sendLLM";
 
-const promptCorrection = async (prompt: string, lofaf: string) => {
+const promptCorrection = async (
+  prompt: string,
+  lofaf: string,
+  customer: any
+) => {
   //todo move to prompts
   const system = `
 	The developer is going to provide you with a prompt for a software development task.
@@ -47,7 +51,14 @@ const promptCorrection = async (prompt: string, lofaf: string) => {
 	${lofaf}
 	`;
 
-  const response = await sendLLM(prompt, functions, system, messages);
+  const response = await sendLLM(
+    prompt,
+    functions,
+    system,
+    messages,
+    customer,
+    true
+  );
 
   const { new_prompt, changes_required } = JSON.parse(
     response?.choices?.[0]?.message?.function_call?.arguments

@@ -2,7 +2,9 @@ const sendLLM = async (
   prompt: string,
   functions?: any,
   system?: string,
-  messages?: any
+  messages?: any,
+  customer?: any,
+  chargeable?: boolean
 ) => {
   const response: Response = await fetch("/api/no-stream", {
     method: "POST",
@@ -11,6 +13,8 @@ const sendLLM = async (
       functions: functions,
       system: system,
       messages: messages,
+      customer: customer,
+      chargeable: chargeable,
     }),
     headers: {
       "Content-Type": "application/json",
