@@ -75,13 +75,9 @@ const calculateCharge = async (customer: any) => {
   if (modelError) return modelError;
   const models = modelData;
 
-  console.log(customer.stripe_customer_id);
-
   let estimatedCost = calculateTotalCost(models, 0);
 
   estimatedCost = (Number(estimatedCost) * 1.2).toFixed(2); // add 20% buffer for prompting costs
-
-  console.log({ estimatedCost });
 
   return estimatedCost;
 };

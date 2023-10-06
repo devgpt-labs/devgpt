@@ -19,8 +19,6 @@ export default async function handler(req: Request, res: Response) {
     messages: messages,
   });
 
-  console.log({ response });
-
   const stream = OpenAIStream(response);
   return new StreamingTextResponse(stream);
 }

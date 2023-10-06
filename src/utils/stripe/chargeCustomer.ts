@@ -15,14 +15,9 @@ const stripe = new Stripe(token, {
 const minimum_charge = 1000; //10 dollars
 
 const chargeCustomer = async (customer: any, amount: number) => {
-  console.log("foo", { customer, amount });
   if (!supabase) return;
 
-  console.log("1");
-
   amount = Number(amount);
-
-  console.log("2", { amount });
 
   //get the customer's account balance from supabase
   const { data, error } = await supabase
@@ -34,17 +29,17 @@ const chargeCustomer = async (customer: any, amount: number) => {
   const { credits }: any = data;
 
   if (amount < credits) {
-    console.log("3");
-
     //remove the amount from the customer's account balance
     const { data, error } = await supabase
       .from("customers")
-      .update({ credits: credits - amount })
+      .update({ credits: (credits - amount).toFixed(2) })
       .eq("stripe_customer_id", customer.stripe_customer_id)
       .select();
 
     return;
   }
+
+  return; // todo - remove this line to enable charging
 
   const { maxWeCanChargeCustomer, canChargeCustomer }: any =
     await getCustomerChargeLimits(customer);
@@ -80,8 +75,6 @@ const chargeCustomer = async (customer: any, amount: number) => {
   const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
     payment_method: payment_method,
   });
-
-  console.log({ confirmation });
 
   if (!paymentIntent) return false;
 };

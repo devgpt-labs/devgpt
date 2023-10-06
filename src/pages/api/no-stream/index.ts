@@ -39,18 +39,11 @@ export default async function handler(
     messages: messages,
   });
 
-  console.log({ chargeable, customer });
-
   if (chargeable) {
-    console.log("1");
     const usage = response.usage?.total_tokens || 0;
     const cost = calculateTokenCost(usage);
 
-    console.log({ usage, cost });
-
     if (cost > 0) {
-      console.log("charging..");
-      return;
       chargeCustomer(customer, cost);
     }
   }

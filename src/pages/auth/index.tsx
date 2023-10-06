@@ -43,16 +43,11 @@ const Auth = () => {
   useEffect(() => {
     fetch();
 
-    trainModels(
-      session,
-      user,
-      stripe_customer_id
-    )
+    trainModels(session, user, stripe_customer_id);
   }, []);
 
   useEffect(() => {
     if (user) {
-      console.log("pushing to /platform/agent");
       setLoading(true);
       // set user to loading
       router.push("/platform/agent", undefined, { shallow: true });
@@ -103,7 +98,7 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => { }}
+              handle={() => {}}
               Icon={AiFillGitlab}
               tooltip="Coming soon!"
             />
