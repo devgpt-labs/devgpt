@@ -181,7 +181,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       stripe_customer_id
     );
   }, []);
@@ -313,11 +313,12 @@ const Chat = () => {
   return (
     <Template>
       <Flex
-        overflowY="scroll"
-        width="full"
         direction="column"
-        maxW="90%"
-        py={6}
+        overflowY="scroll"
+        flex={1}
+        w="full"
+        justifyContent={"center"}
+        p={5}
       >
         <Box
           rounded="lg"
