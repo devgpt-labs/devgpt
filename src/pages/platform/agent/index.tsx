@@ -171,10 +171,6 @@ const Chat = () => {
     setInitialMessages(model?.output);
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
-      console.log(data);
-
-      console.log(repo.owner, repo.repo, session);
-
       if (!data?.tree) return console.log("no data found");
       const files = data?.tree?.map((file: any) => file.path);
       // set this

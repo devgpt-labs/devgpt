@@ -9,7 +9,8 @@ import calculateTokenCost from "@/utils/calculateTokenCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 const openai = new OpenAI({
-  apiKey: getLLMToken(),
+  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
+  organization: getLLMToken(),
 });
 
 type ResponseData = {
