@@ -40,9 +40,9 @@ import {
   InputGroup,
   InputLeftAddon,
   InputRightElement,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
-import AreYouSureModal from "./AreYouSureModal";
+import ConfirmationModal from "./ConfirmationModal";
 import Link from "next/link";
 import ModelCard from "./ModelCard";
 
@@ -75,13 +75,13 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
 
 const Models = ({ onClose }: any) => {
-  const { user, stripe_customer_id, credits }: any = authStore();
+  const { session, user, stripe_customer_id, credits }: any = authStore();
   const router = useRouter();
   const {
-    isOpen: isAreYouSureOpen,
-    onOpen: onAreYouSureOpen,
-    onClose: onAreYouSureClose,
-    onToggle: onAreYouSureToggle,
+    isOpen: isConfirmationOpen,
+    onOpen: onConfirmationOpen,
+    onClose: onConfirmationClose,
+    onToggle: onConfirmationToggle,
   } = useDisclosure();
 
   const { colorMode }: any = useColorMode();
@@ -92,8 +92,7 @@ const Models = ({ onClose }: any) => {
   const [refresh, setRefresh] = useState<boolean>(false);
 
   // Budgets
-  const [budget, setBudget] = useState<number>(0);
-  const [minBudget, setMinBudget] = useState<number>(0);
+  const [budget, setBudget] = useState<any>(null);
 
   interface Model {
     id: string;
@@ -109,6 +108,31 @@ const Models = ({ onClose }: any) => {
     frequency: number;
   }
 
+  useEffect(() => {
+    if (!session) {
+      console.log("no session found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+
+    if (!user) {
+      console.log("no user found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+  }, [session, user]);
+
+  // Used to show how much the user will have available for prompting
+  const balanceCalculation =
+    Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));
+  let promptingBalance = balanceCalculation;
+  if (promptingBalance < 0) {
+    promptingBalance = 0;
+  }
+
+  // Used to get an estimation of how much the user will spend each month
+  const budgetEstimation =
+    Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
+
+
   const handleBudgetChange = (e: any) => {
     setBudget(e.target.value);
   };
@@ -118,14 +142,18 @@ const Models = ({ onClose }: any) => {
     const { data, error } = await supabase
       .from("customers")
       .select("monthly_budget")
-      .eq("stripe_customer_id", stripe_customer_id);
+      .eq("stripe_customer_id", stripe_customer_id)
+      .single();
 
     if (error) {
       console.log(error);
+      setBudget(budgetEstimation);
       return;
     }
 
-    return data[0].monthly_budget;
+    if (data) {
+      setBudget(data.monthly_budget);
+    };
   };
 
   const saveMonthlyBudget = async () => {
@@ -135,31 +163,24 @@ const Models = ({ onClose }: any) => {
       .update({ monthly_budget: budget })
       .eq("stripe_customer_id", stripe_customer_id);
 
+
     if (error) {
       console.log(error);
       return;
     }
+    if (data) {
+      console.log('new budget saved');
+    };
 
-    return data;
   };
 
   useEffect(() => {
+    getMonthlyBudget()
     getModels(setModelsInTraining, setLoading, stripe_customer_id);
 
     if (modelsInTraining.length > 0) {
-      console.log('in here');
-
       // Get the current budget from supabase
       if (!supabase) return;
-
-      getMonthlyBudget().then((budget) => {
-        if (!budget) {
-          setBudget(Number(calculateTotalCost(modelsInTraining, 10)));
-          return;
-        }
-
-        setBudget(budget);
-      });
     }
 
     // set budget to a
@@ -177,7 +198,7 @@ const Models = ({ onClose }: any) => {
     );
   };
 
-  if (loading) {
+  if (loading || budget === null) {
     return (
       <Template>
         <Box p={6} width="100vw" height="100vh">
@@ -226,21 +247,15 @@ const Models = ({ onClose }: any) => {
     );
   }
 
-  const balanceCalculation =
-    Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));
-  let promptingBalance = balanceCalculation;
-  if (promptingBalance < 0) {
-    promptingBalance = 0;
-  }
 
   return (
     <Template>
-      <AreYouSureModal
+      <ConfirmationModal
         header={`Set your monthly budget to $${budget}?`}
         body="Confirm you would like to change your budget. This can be changed at any time."
         confirmButtonText="Confirm"
-        isOpen={isAreYouSureOpen}
-        onClose={onAreYouSureClose}
+        isOpen={isConfirmationOpen}
+        onClose={onConfirmationClose}
         onSubmit={saveMonthlyBudget}
         setDeletingAModel={() => { }}
         handleModelInTrainingChange={() => { }}
@@ -356,22 +371,26 @@ const Models = ({ onClose }: any) => {
                     bgGradient={"linear(to-r, blue.500,teal.500)"}
                     h="1.75rem"
                     size="sm"
-                    onClick={onAreYouSureOpen}
+                    onClick={onConfirmationOpen}
                   >
                     Save
                   </Button>
                 </InputRightElement>
               </InputGroup>
-              <Badge color={promptingBalance === 0 ? 'orange' : 'teal'} alignSelf="flex-start" mt={2}>
+              <Badge
+                color={promptingBalance === 0 ? "orange" : "teal"}
+                alignSelf="flex-start"
+                mt={2}
+              >
                 This budget give you a monthly balance for prompting of $
                 {promptingBalance.toFixed(2)}
               </Badge>
               {promptingBalance === 0 && (
-                <Badge alignSelf="flex-start" mt={2} color='orange'>
-                  This budget will limit your models from reaching your settings.
+                <Badge alignSelf="flex-start" mt={2} color="orange">
+                  This budget will limit your models from reaching your
+                  settings.
                 </Badge>
               )}
-
             </Flex>
             <TableContainer>
               <Table variant="striped">
@@ -421,7 +440,9 @@ const Models = ({ onClose }: any) => {
                     <Th isNumeric>{calculateStatSum("sample_size")}</Th>
                     <Th isNumeric>{calculateStatSum("frequency")}</Th>
                     <Th isNumeric>
-                      ${budget || calculateTotalCost(modelsInTraining, 0)}
+                      $
+                      {budget ||
+                        calculateTotalCost(modelsInTraining, 0)}
                     </Th>
                   </Tr>
                   <Tr>
@@ -431,7 +452,10 @@ const Models = ({ onClose }: any) => {
                     <Th isNumeric></Th>
                     <Th isNumeric>
                       <Heading>
-                        ${budget < Number(calculateTotalCost(modelsInTraining, 0)) * 1.2 ? budget : Number(calculateTotalCost(modelsInTraining, 0)) * 1.2}
+                        $
+                        {budget < budgetEstimation
+                          ? budget
+                          : budgetEstimation.toFixed(2)}
                       </Heading>
                     </Th>
                   </Tr>
@@ -442,7 +466,7 @@ const Models = ({ onClose }: any) => {
         </SlideFade>
       </Flex>
       <RepoDrawer />
-    </Template >
+    </Template>
   );
 };
 

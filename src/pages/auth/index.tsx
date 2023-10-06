@@ -32,19 +32,25 @@ import useStore from "@/store/Auth";
 import astro from "@/assets/astro.png";
 
 import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
+import trainModels from "@/utils/trainModels";
 
 const Auth = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { fetch, user, session }: any = useStore();
+  const { fetch, user, session, stripe_customer_id }: any = useStore();
 
   useEffect(() => {
     fetch();
+
+    trainModels(
+      session,
+      user,
+      stripe_customer_id
+    )
   }, []);
 
   useEffect(() => {
-    console.log({ user });
     if (user) {
       console.log("pushing to /platform/agent");
       setLoading(true);

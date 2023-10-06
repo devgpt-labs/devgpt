@@ -7,7 +7,7 @@ import { checkIfPro } from "@/utils/checkIfPro";
 const useStore = create((set) => ({
   user: null,
   session: null,
-  strioe_customer_id: null,
+  stripe_customer_id: null,
   credits: null,
   isPro: false,
   setCredits: (credits: number) => set({ credits }),

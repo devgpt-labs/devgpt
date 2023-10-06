@@ -145,8 +145,6 @@ const RepoDrawer = () => {
   };
 
   const handleSelectRepo = async (repo: any) => {
-    console.log({ repo });
-
     // Close the modal, no more user input required
     onClose();
 
@@ -185,11 +183,7 @@ const RepoDrawer = () => {
     getModels(setTrainedModels, () => {}, stripe_customer_id);
   }, [repos]);
 
-  if (!user) {
-    return null;
-  }
-
-  if (!session.provider_token) {
+  if (!session?.provider_token) {
     signOut();
   }
 

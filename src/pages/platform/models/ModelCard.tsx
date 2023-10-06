@@ -29,7 +29,7 @@ import {
   Spinner,
   Tooltip,
 } from "@chakra-ui/react";
-import AreYouSureModal from "./AreYouSureModal";
+import ConfirmationModal from "./ConfirmationModal";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -71,8 +71,6 @@ const ModelCard = ({
       return;
     }
 
-    console.log(model.id);
-
     try {
       const { data, error } = await supabase
         .from("models")
@@ -81,9 +79,6 @@ const ModelCard = ({
         })
         .eq("id", model.id)
         .select();
-
-      console.log({ error });
-      console.log({ data });
 
       if (error) {
         console.log("Error deleting the model:", error);
@@ -94,9 +89,6 @@ const ModelCard = ({
       console.error("An error occurred:", error);
     }
   };
-
-  // Find our model in the modelsintraining array
-  const modelInTraining = modelsInTraining.find((m: any) => m.id === model.id);
 
   const handleModelInTrainingChange = (e: any) => {
     const { name, value } = e.target;
@@ -144,11 +136,10 @@ const ModelCard = ({
   };
 
   if (!model) return null;
-  if (model.deleted) return null;
 
   return (
     <>
-      <AreYouSureModal
+      <ConfirmationModal
         header="Delete this model?"
         body="Confirm you would like to delete this DevGPT model. This is a
               permanent action but you can always re-add a new model for the

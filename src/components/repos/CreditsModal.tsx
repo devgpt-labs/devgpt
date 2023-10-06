@@ -105,7 +105,7 @@ const CreditsModal = ({
   };
 
   const identity = user?.identities?.find((identity: { provider: string }) =>
-    ["github", "gitlab", "bitbucket", "mock"].includes(identity.provider)
+    ["github", "gitlab", "bitbucket", "mock"].includes(identity?.provider)
   )?.identity_data;
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const CreditsModal = ({
             width={50}
             height={50}
             rounded="full"
-            src={identity.avatar_url}
+            src={identity?.avatar_url}
           />
           <Text>{credits + packets * 115} Credits</Text>
         </Flex>
