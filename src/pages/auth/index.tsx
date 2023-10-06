@@ -32,7 +32,6 @@ import useStore from "@/store/Auth";
 import astro from "@/assets/astro.png";
 
 import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
-import trainModels from "@/utils/trainModels";
 
 const Auth = () => {
   const router = useRouter();
@@ -42,8 +41,6 @@ const Auth = () => {
 
   useEffect(() => {
     fetch();
-
-    trainModels(session, user, stripe_customer_id);
   }, []);
 
   useEffect(() => {
@@ -98,7 +95,7 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => {}}
+              handle={() => { }}
               Icon={AiFillGitlab}
               tooltip="Coming soon!"
             />

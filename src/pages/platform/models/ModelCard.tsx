@@ -30,6 +30,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import ConfirmationModal from "./ConfirmationModal";
+import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -88,6 +89,12 @@ const ModelCard = ({
     } catch (error) {
       console.error("An error occurred:", error);
     }
+  };
+
+  const saveKeyInCookies = async (repoData: any) => {
+
+    const cookieName = "recentlyUsedRepoKey";
+    Cookies.set(cookieName, JSON.stringify(repoData), { expires: 14 });
   };
 
   const handleModelInTrainingChange = (e: any) => {
@@ -188,6 +195,12 @@ const ModelCard = ({
                       onClick={() => {
                         // TODO: Make sure this is commented back in
                         // if (!model.output) return;
+
+                        // Save this in cookies, and replace it each time it's clicked using js-cookie
+                        saveKeyInCookies({
+                          owner: model.owner,
+                          repo: model.repo,
+                        });
 
                         setRepo({
                           owner: model.owner,

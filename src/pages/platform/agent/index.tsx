@@ -51,9 +51,11 @@ import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
 import calculateTokenCost from "@/utils/calculateTokenCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
+import trainModels from "@/utils/trainModels";
 
 // Icons
-import { BsDiscord, BsGithub } from "react-icons/bs";
+import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
+import getLofaf from "@/utils/github/getLofaf";
 
 const Chat = () => {
   // Constants
@@ -80,13 +82,16 @@ const Chat = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const { messages: savedMessages }: any = messageStore();
-  const { repo, lofaf }: any = repoStore();
+  const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
   const { colorMode } = useColorMode();
   const { user, session, stripe_customer_id, fetch }: any = authStore();
-
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
   });
+
+  useEffect(() => {
+    trainModels(session, user, stripe_customer_id);
+  }, []);
 
   useEffect(() => {
     let usage: number = 0;
@@ -104,6 +109,15 @@ const Chat = () => {
 
     if (usage > 0) {
       chargeCustomer(customer, cost);
+    }
+
+    const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
+
+    if (lastUsedRepo) {
+      console.log("lastUsedRepo", lastUsedRepo);
+
+      const lastUsedRepoObject = JSON.parse(lastUsedRepo);
+      setRepo(lastUsedRepoObject);
     }
   }, [messages, correctedPrompt]);
 
@@ -161,8 +175,6 @@ const Chat = () => {
   }, [session, user]);
 
   useEffect(() => {
-    fetchData();
-    fetch();
     retrieveTrainingData();
     getModels(
       (data: any) => {
@@ -171,11 +183,20 @@ const Chat = () => {
       () => { },
       stripe_customer_id
     );
+  }, []);
 
+  useEffect(() => {
+    // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
+    setInitialMessages(model?.output || []);
 
-    setInitialMessages(model?.messages || []);
-  }, []); // Empty dependency array means this effect runs once when the component mounts
+    getLofaf(repo.owner, repo.repo, session).then((data) => {
+      const files = data.tree.map((file: any) => file.path);
+
+      // set this
+      setLofaf(files);
+    });
+  }, [repo]);
 
   // This logic breaks down the prompt to find @'d files
   const regex = /@([^ ]+)/g;
@@ -285,7 +306,6 @@ const Chat = () => {
       );
       return false;
     }
-
     return true;
   };
 
@@ -314,10 +334,15 @@ const Chat = () => {
               </Text>
             </Link>
           )}
-          {initialMessages.length === 0 && repo.repo && (
+          {initialMessages.length === 0 && repo.repo ? (
             <Text mt={4}>
-              Your model is <Badge>Training</Badge>, until this is done the AI
-              won't be able to access your repos context.
+              Your trained AI model is <Badge>Training</Badge>, until this is
+              done the AI won't be able to access your repos context.
+            </Text>
+          ) : (
+            <Text mt={4}>
+              Your trained AI model is{" "}
+              <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
             </Text>
           )}
           {repo.repo && (
@@ -377,13 +402,17 @@ const Chat = () => {
                 />
                 <Button
                   bgGradient={"linear(to-r, blue.500, teal.500)"}
+                  isDisabled={loading}
                   color="white"
                   ml={4}
                   width="10rem"
                   onClick={async (e: any) => {
                     setLoading(true);
                     const checks = await submitChecks(false);
-                    if (!checks) return null;
+                    if (!checks) {
+                      console.log("checks failed, stopping");
+                      return null;
+                    }
                     handleSubmit(e);
                   }}
                 >
@@ -395,7 +424,9 @@ const Chat = () => {
                   {failMessage}
                 </Text>
                 <SlideFade in={hasSentAMessage} offsetY="20px">
-                  {/* <Heading mt={5}>{previousPrompt}</Heading> */}
+                  <Text color="gray" fontSize={12} mt={1}>
+                    {previousPrompt}
+                  </Text>
                 </SlideFade>
               </Flex>
               {loading && !messages[messages.length - 1] ? (
@@ -414,7 +445,7 @@ const Chat = () => {
             </Box>
           )}
 
-          {messages[messages.length - 1] && loading && (
+          {messages[messages.length - 1]?.content && !isLoading && (
             <Flex
               width="100%"
               flexDirection="row"
@@ -458,7 +489,7 @@ const Chat = () => {
                     <BsDiscord />
                     <Text ml={2} fontSize={14}>
                       {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                      Active
+                      Join
                     </Text>
                   </Flex>
                 }
@@ -476,6 +507,7 @@ const Chat = () => {
                 icon={
                   <Flex flexDirection="row" px={3}>
                     <BsGithub />
+                    <BsStars />
                     <Text ml={2} fontSize={14}>
                       335
                     </Text>

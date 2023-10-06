@@ -5,78 +5,89 @@ import { supabase } from "@/utils/supabase";
 import getCustomerChargeLimits from "./getCustomerChargeLimits";
 
 const token = process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  ? process?.env?.NEXT_PUBLIC_STRIPE_KEY
-  : "notoken";
+	? process?.env?.NEXT_PUBLIC_STRIPE_KEY
+	: "notoken";
 
 const stripe = new Stripe(token, {
-  apiVersion: "2023-08-16",
+	apiVersion: "2023-08-16",
 });
 
 const minimum_charge = 1000; //10 dollars
 
 const chargeCustomer = async (customer: any, amount: number) => {
-  if (!supabase) return;
+	if (!supabase) return;
 
-  amount = Number(amount);
+	amount = Number(amount);
 
-  //get the customer's account balance from supabase
-  const { data, error } = await supabase
-    .from("customers")
-    .select("credits")
-    .eq("stripe_customer_id", customer.stripe_customer_id)
-    .single();
+	//get the customer's account balance from supabase
+	const { data: creditsData, error: creditsError } = await supabase
+		.from("customers")
+		.select("credits")
+		.eq("stripe_customer_id", customer.stripe_customer_id)
+		.single();
 
-  const { credits }: any = data;
+	if (creditsError) {
+		console.log(creditsError);
+		return;
+	}
 
-  if (amount < credits) {
-    //remove the amount from the customer's account balance
-    const { data, error } = await supabase
-      .from("customers")
-      .update({ credits: (credits - amount).toFixed(2) })
-      .eq("stripe_customer_id", customer.stripe_customer_id)
-      .select();
+	const { credits }: any = creditsData;
 
-    return;
-  }
+	if (amount < credits) {
+		// Remove the amount from the customer's account balance
+		const { data: removeCreditsData, error: removeCreditsError } =
+			await supabase
+				.from("customers")
+				.update({ credits: (credits - amount).toFixed(2) })
+				.eq("stripe_customer_id", customer.stripe_customer_id)
+				.select();
 
-  return; // todo - remove this line to enable charging
+		if (removeCreditsError) {
+			console.log(removeCreditsError);
+			return;
+		}
 
-  const { maxWeCanChargeCustomer, canChargeCustomer }: any =
-    await getCustomerChargeLimits(customer);
+		return;
+	}
 
-  if (!canChargeCustomer) return;
+	return; // todo - remove this line to enable charging
 
-  const paymentMethods = await stripe.customers.listPaymentMethods(
-    customer.stripe_customer_id,
-    { type: "card" }
-  );
+	const { maxWeCanChargeCustomer, canChargeCustomer }: any =
+		await getCustomerChargeLimits(customer);
 
-  const payment_method = paymentMethods.data[0].id;
+	if (!canChargeCustomer) return;
 
-  amount = amount < minimum_charge ? minimum_charge : amount;
+	const paymentMethods = await stripe.customers.listPaymentMethods(
+		customer.stripe_customer_id,
+		{ type: "card" }
+	);
 
-  const amountWithCaps =
-    amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
+	const payment_method = paymentMethods.data[0].id;
 
-  if (amountWithCaps <= 0) return;
+	amount = amount < minimum_charge ? minimum_charge : amount;
 
-  //use stripe to charge the customer
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amountWithCaps * 100,
-    currency: "usd",
-    customer: customer.stripe_customer_id,
-    automatic_payment_methods: {
-      enabled: true,
-      allow_redirects: "never",
-    },
-  });
+	const amountWithCaps =
+		amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
 
-  //use the paymentIntent to charge the customer
-  const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-    payment_method: payment_method,
-  });
+	if (amountWithCaps <= 0) return;
 
-  if (!paymentIntent) return false;
+	//use stripe to charge the customer
+	const paymentIntent = await stripe.paymentIntents.create({
+		amount: amountWithCaps * 100,
+		currency: "usd",
+		customer: customer.stripe_customer_id,
+		automatic_payment_methods: {
+			enabled: true,
+			allow_redirects: "never",
+		},
+	});
+
+	//use the paymentIntent to charge the customer
+	const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
+		payment_method: payment_method,
+	});
+
+	if (!paymentIntent) return false;
 };
 
 export default chargeCustomer;

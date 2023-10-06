@@ -171,8 +171,21 @@ const Models = ({ onClose }: any) => {
     if (data) {
       console.log('new budget saved');
     };
-
   };
+
+  useEffect(() => {
+    // If the url contains the word billing, open the billing section
+    if (router.asPath.includes("billing")) {
+      // Show billing section
+      setShowBilling(true);
+
+      // TODO: This is a hacky fix to scroll to billing after render
+      setTimeout(() => {
+        const element = document.getElementById("billing");
+        element?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    }
+  }, []);
 
   useEffect(() => {
     getMonthlyBudget()
@@ -246,7 +259,6 @@ const Models = ({ onClose }: any) => {
       </Template>
     );
   }
-
 
   return (
     <Template>
