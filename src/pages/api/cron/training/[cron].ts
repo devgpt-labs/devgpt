@@ -4,14 +4,10 @@ import { supabase } from "@/utils/supabase";
 //utils
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
+import createModelID from "@/utils/createModelID";
 
 export const config = {
   runtime: "edge",
-};
-
-//todo move to utils
-const createModelID = (repo: string, owner: string, branch: string) => {
-  return `${repo}-${owner}-${branch}`;
 };
 
 export default async function handler(req: NextRequest) {

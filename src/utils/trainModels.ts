@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import getLLMToken from "@/utils/getLLMToken";
 import getLofaf from "@/utils/github/getLofaf";
 import createTrainingData from "@/utils/createTrainingData";
+import createModelID from "./createModelID";
 
 const openai = new OpenAI({
   apiKey: getLLMToken(),
@@ -48,20 +49,32 @@ async function trainModels(
 
   const models = data;
 
-  //filter out models that already have an output
-  const models_to_train: Model[] = models.filter((model) => !model.output);
+  //go through each model and see if it's latest training_log has been fulfilled
+  for (const model of models) {
+    //get latest training log for this model from supabase training_log table
+    const { data, error } = await supabase
+      .from("training_log")
+      .select("*")
+      .eq("model_id", createModelID(model.repo, model.owner, model.branch))
+      .order("created_at", { ascending: false })
+      .limit(1);
 
-  console.log({ models_to_train });
-  return;
+    const latest_training_log = data?.[0];
 
-  for (const model of models_to_train) {
-    switch (model.training_method) {
-      case "encoding":
-        return await trainRepoWithEncoding(model, session, user);
-        break;
-      case "embeddings":
-        return await trainRepoWithEmbeddings(model, session, user);
-        break;
+    if (!latest_training_log) {
+      return;
+    }
+
+    //if the latest training_log has not been fulfilled, train the model
+    if (!latest_training_log.fulfilled) {
+      switch (model.training_method) {
+        case "encoding":
+          return await trainRepoWithEncoding(model, session, user);
+          break;
+        case "embeddings":
+          return await trainRepoWithEmbeddings(model, session, user);
+          break;
+      }
     }
   }
 }
@@ -167,5 +180,13 @@ const setModelOutput = async (model: Model, output: string) => {
       { output: output },
       { some_column: "otherValue" },
     ])
+    .select();
+
+  //update the training_log table by setting the latest training_log to fulfilled
+  const { data: trainingLogData, error: trainingLogError } = await supabase
+    .from("training_log")
+    .update({ fulfilled: true })
+    .eq("model_id", createModelID(model.repo, model.owner, model.branch))
+    .order("created_at", { ascending: false })
     .select();
 };

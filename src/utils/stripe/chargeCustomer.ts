@@ -12,6 +12,8 @@ const stripe = new Stripe(token, {
   apiVersion: "2023-08-16",
 });
 
+const minimum_charge = 1000; //10 dollars
+
 const chargeCustomer = async (customer: any, amount: number) => {
   if (!supabase) return;
 
@@ -48,6 +50,8 @@ const chargeCustomer = async (customer: any, amount: number) => {
   );
 
   const payment_method = paymentMethods.data[0].id;
+
+  amount = amount < minimum_charge ? minimum_charge : amount;
 
   const amountWithCaps =
     amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
