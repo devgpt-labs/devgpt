@@ -56,7 +56,7 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
   const { fetch, user, session, stripe_customer_id }: any = useStore();
 
   const [sampleSize, setSampleSize] = useState(5);
-  const [frequency, setFrequency] = useState(10);
+  const [frequency, setFrequency] = useState(1);
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
   const btnRef: any = useRef();

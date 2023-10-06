@@ -17,7 +17,7 @@ import {
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { MdScience } from "react-icons/md";
+import { MdMoney, MdScience } from "react-icons/md";
 
 // Components
 import Repos from "./Settings";
@@ -325,6 +325,24 @@ const Profile = () => {
                   }}
                   aria-label="View Models"
                   icon={<MdScience size={18} />}
+                />
+              </Tooltip>
+              <Tooltip label={"View Billing"} placement="top">
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  onClick={() => {
+                    //todo add navigation
+                    // add extra information in router here to be read in billing page
+                    router.push("/platform/models", 'billing', {
+                      shallow: true,
+                    });
+                    onSettingsClose();
+                  }}
+                  aria-label="View Billing"
+                  icon={<MdMoney size={18} />}
                 />
               </Tooltip>
               <Tooltip label="Signout" placement="top">
