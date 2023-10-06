@@ -12,21 +12,25 @@ const userInput = async (
 
   const existing_code = await Promise.all(
     filePaths.map(async (file) => {
-      const code = await getCode(owner, repo, file, access_token);
+      try {
+        const code = await getCode(owner, repo, file, access_token);
 
-      //decrypt from base64
-      let content = code.content;
+        //decrypt from base64
+        let content = code.content;
 
-      if (!content) {
-        return;
+        if (!content) {
+          return;
+        }
+
+        content = Buffer.from(content, "base64").toString("ascii");
+
+        return `
+				file path: ${file.trim()}
+				code: ${content}
+				`;
+      } catch {
+        return "";
       }
-
-      content = Buffer.from(content, "base64").toString("ascii");
-
-      return `
-  		file path: ${file.trim()}
-  		code: ${content}
-  		`;
     })
   );
 

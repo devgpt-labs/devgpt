@@ -146,7 +146,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       stripe_customer_id
     );
 
@@ -176,7 +176,6 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  // todo move this to session context
   if (!user) return null;
 
   // Get the current file being targeted with @
@@ -215,7 +214,9 @@ const Chat = () => {
     let promptFeedback;
 
     if (!ignoreFeedback) {
-      promptFeedback = await promptCorrection(prompt, lofaf);
+      promptFeedback = await promptCorrection(prompt, lofaf, {
+        stripe_customer_id: stripe_customer_id,
+      });
 
       if (promptFeedback?.changes) {
         //display promptCorrection modal

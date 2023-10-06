@@ -5,6 +5,8 @@ import getLLMToken from "@/utils/getLLMToken";
 
 //types
 import type { NextApiRequest, NextApiResponse } from "next";
+import calculateTokenCost from "@/utils/calculateTokenCost";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 const openai = new OpenAI({
   apiKey: getLLMToken(),
@@ -18,7 +20,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  let { prompt, functions, system, messages }: any = req.body;
+  let { prompt, functions, system, messages, customer, chargeable }: any =
+    req.body;
 
   messages = messages || [];
 
@@ -36,7 +39,21 @@ export default async function handler(
     messages: messages,
   });
 
-  console.log({ response });
+  console.log({ chargeable, customer });
+
+  if (chargeable) {
+    console.log("1");
+    const usage = response.usage?.total_tokens || 0;
+    const cost = calculateTokenCost(usage);
+
+    console.log({ usage, cost });
+
+    if (cost > 0) {
+      console.log("charging..");
+      return;
+      chargeCustomer(customer, cost);
+    }
+  }
 
   res.status(200).json({ data: response });
 }
