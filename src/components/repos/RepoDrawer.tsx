@@ -67,6 +67,10 @@ const RepoDrawer = () => {
   const [trainedModels, setTrainedModels] = useState<any[]>([]); //
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
+  if (!user) {
+    return null;
+  }
+
   useEffect(() => {
     if (repoWindowOpen === null || !repoWindowOpen) return;
     onOpen();
@@ -180,7 +184,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => {}, stripe_customer_id);
+    getModels(setTrainedModels, () => { }, stripe_customer_id);
   }, [repos]);
 
   if (!session?.provider_token) {

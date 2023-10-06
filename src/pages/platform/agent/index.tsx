@@ -21,6 +21,7 @@ import {
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -37,19 +38,21 @@ import Profile from "@/components/repos/Profile";
 import RateConversation from "./RateConversation";
 import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
+import Models from "../models";
+import Calculator from "@/components/repos/Calculator";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
+import { checkIfPro } from "@/utils/checkIfPro";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
-import { checkIfPro } from "@/utils/checkIfPro";
-import Calculator from "@/components/repos/Calculator";
 import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
-import { useRouter } from "next/router";
-import Models from "../models";
 import getTokensFromString from "@/utils/getTokensFromString";
+import calculateTokenCost from "@/utils/calculateTokenCost";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
+// Icons
 import { BsDiscord, BsGithub } from "react-icons/bs";
 
 const Chat = () => {
@@ -84,14 +87,6 @@ const Chat = () => {
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
   });
-
-  const calculateTokenCost = (usage: any) => {
-    console.log(usage);
-  }
-
-  const chargeCustomer = (customer: any, cost: any) => {
-    console.log(customer, cost);
-  }
 
   useEffect(() => {
     let usage: number = 0;
