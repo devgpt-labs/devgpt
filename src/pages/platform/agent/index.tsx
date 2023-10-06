@@ -84,7 +84,8 @@ const Chat = () => {
   const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
   const { colorMode } = useColorMode();
-  const { user, session, stripe_customer_id, fetch }: any = authStore();
+  const { user, session, stripe_customer_id, fetch, signOut }: any =
+    authStore();
   const { messages, handleInputChange, handleSubmit } = useChat({
     initialMessages: initialMessages,
   });
@@ -118,9 +119,7 @@ const Chat = () => {
     if (usage > 0) {
       chargeCustomer(customer, cost);
     }
-
   }, [messages, correctedPrompt]);
-
 
   const getDiscordOnline = async () => {
     try {
@@ -139,49 +138,29 @@ const Chat = () => {
     }
   };
 
-  const retrieveTrainingData = async () => {
-    if (savedMessages.length > 0) {
-      setTrainingDataRetrieved(true);
-      setInitialMessages(savedMessages);
-      return;
-    } else {
-      //load from cookies
-      const trainingData = await Cookies.get(
-        `${repo.owner}_${repo.name}_training`
-      );
-
-      if (!trainingData) return;
-      setTrainingDataRetrieved(true);
-      setInitialMessages(JSON.parse(String(trainingData)));
-    }
-  };
-
-  const fetchData = async () => {
-    const count: any = await getDiscordOnline();
-    if (count !== null) {
-      setActiveOnDiscord(count);
-    }
-  };
+  console.log(session);
 
   useEffect(() => {
-    if (!session) {
-      console.log("no session found, returning to home");
+    if (!session?.provider_token) {
+      signOut();
       router.push("/", undefined, { shallow: true });
+      console.log("no session found, returning to home");
     }
 
     if (!user) {
-      console.log("no user found, returning to home");
+      signOut();
       router.push("/", undefined, { shallow: true });
+      console.log("no user found, returning to home");
     }
-  }, [session, user]);
+  }, []);
 
   useEffect(() => {
-    retrieveTrainingData();
+    // Get all models
     getModels(
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       stripe_customer_id
     );
   }, []);
@@ -189,11 +168,15 @@ const Chat = () => {
   useEffect(() => {
     // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
-    setInitialMessages(model?.output || []);
+    setInitialMessages(model?.output);
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
-      const files = data.tree.map((file: any) => file.path);
+      console.log(data);
 
+      console.log(repo.owner, repo.repo, session);
+
+      if (!data?.tree) return console.log("no data found");
+      const files = data?.tree?.map((file: any) => file.path);
       // set this
       setLofaf(files);
     });
@@ -210,10 +193,6 @@ const Chat = () => {
   useEffect(() => {
     setLoading(false);
   }, [messages]);
-
-  useEffect(() => {
-    retrieveTrainingData();
-  }, [repo, savedMessages.length]);
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -336,9 +315,9 @@ const Chat = () => {
               </Text>
             </Link>
           )}
-          {initialMessages.length === 0 && repo.repo ? (
+          {initialMessages?.length === 0 && repo.repo ? (
             <Text mt={4}>
-              Your trained AI model is <Badge>Training</Badge>, until this is
+              Your AI model is <Badge>Training</Badge>, until this is
               done the AI won't be able to access your repos context.
             </Text>
           ) : (
@@ -356,8 +335,8 @@ const Chat = () => {
                 </Flex>
               )}
               <Flex flexDirection="row" flexWrap="wrap">
-                <SlideFade key={match} in={selectedFile[0] ? true : false}>
-                  {selectedFile.map((file: any, index: any) => {
+                <SlideFade key={match} in={selectedFile?.[0] ? true : false}>
+                  {selectedFile?.map((file: any, index: any) => {
                     if (index > 12) return null;
                     return (
                       <Tag

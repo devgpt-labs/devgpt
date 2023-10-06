@@ -20,10 +20,12 @@ const SliderInput = ({
   onChange,
   increment,
   max,
+  min,
+  isDisabled
 }: any) => {
   return (
     <Flex gap={2} flexDirection="column">
-      <Tooltip placement="right" label={tooltip}>
+      <Tooltip placement="left" label={tooltip}>
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <Text>
             {label} ({value})
@@ -32,10 +34,11 @@ const SliderInput = ({
         </Flex>
       </Tooltip>
       <Slider
+        isDisabled={isDisabled}
         aria-label={label}
         defaultValue={value}
         onChange={onChange}
-        min={increment}
+        min={min}
         max={max}
         step={increment}
       >

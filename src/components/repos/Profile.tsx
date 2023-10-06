@@ -100,14 +100,6 @@ const Profile = () => {
   const router = useRouter();
 
   const {
-    isOpen: isSettingsOpen,
-    onToggle: onSettingsToggle,
-    onClose: onSettingsClose,
-  } = useDisclosure({
-    defaultIsOpen: false,
-  });
-
-  const {
     isOpen: isUpgradeOpen,
     onOpen: onUpgradeOpen,
     onClose: onUpgradeClose,
@@ -124,14 +116,6 @@ const Profile = () => {
     onOpen: onCreditsOpen,
     onClose: onCreditsClose,
   } = useDisclosure({ defaultIsOpen: false });
-
-  const {
-    isOpen: isModelsOpen,
-    onOpen: onModelsOpen,
-    onClose: onModelsClose,
-    onToggle: onModelsToggle,
-  } = useDisclosure({ defaultIsOpen: false });
-
 
   const getCredits = async (emailAddress: string) => {
     if (!supabase) return;
@@ -317,11 +301,9 @@ const Profile = () => {
                     transition: "all 0.2s ease-in-out",
                   }}
                   onClick={() => {
-                    //todo add navigation
                     router.push("/platform/models", undefined, {
                       shallow: true,
                     });
-                    onSettingsClose();
                   }}
                   aria-label="View Models"
                   icon={<MdScience size={18} />}
@@ -334,12 +316,9 @@ const Profile = () => {
                     transition: "all 0.2s ease-in-out",
                   }}
                   onClick={() => {
-                    //todo add navigation
-                    // add extra information in router here to be read in billing page
                     router.push("/platform/models", 'billing', {
                       shallow: true,
                     });
-                    onSettingsClose();
                   }}
                   aria-label="View Billing"
                   icon={<MdMoney size={18} />}
@@ -362,7 +341,6 @@ const Profile = () => {
             </Flex>
           </Flex>
         </Flex>
-        <SlideFade in={isSettingsOpen}>{isSettingsOpen && <Repos />}</SlideFade>
       </Flex>
     </>
   );

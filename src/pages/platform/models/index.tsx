@@ -437,13 +437,7 @@ const Models = ({ onClose }: any) => {
                   ) : (
                     <Text my={4}>No models have been trained yet.</Text>
                   )}
-                  <Tr>
-                    <Td>Prompting</Td>
-                    <Td isNumeric></Td>
-                    <Td isNumeric></Td>
-                    <Td isNumeric></Td>
-                    <Td isNumeric>${promptingBalance.toFixed(2)}</Td>
-                  </Tr>
+
                 </Tbody>
                 <Tfoot>
                   <Tr>
@@ -453,7 +447,7 @@ const Models = ({ onClose }: any) => {
                     <Th isNumeric>{calculateStatSum("frequency")}</Th>
                     <Th isNumeric>
                       $
-                      {budget ||
+                      {
                         calculateTotalCost(modelsInTraining, 0)}
                     </Th>
                   </Tr>
