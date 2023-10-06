@@ -29,7 +29,7 @@ import {
   Spinner,
   Tooltip,
 } from "@chakra-ui/react";
-import ConfirmationModel from "./ConfirmationModal";
+import ConfirmationModal from "./ConfirmationModal";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -139,7 +139,7 @@ const ModelCard = ({
 
   return (
     <>
-      <ConfirmationModel
+      <ConfirmationModal
         header="Delete this model?"
         body="Confirm you would like to delete this DevGPT model. This is a
               permanent action but you can always re-add a new model for the

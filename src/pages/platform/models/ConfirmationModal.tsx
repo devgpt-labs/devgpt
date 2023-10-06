@@ -11,7 +11,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-const ConfirmationModel = ({
+const ConfirmationModal = ({
   header,
   body,
   confirmButtonText,
@@ -76,4 +76,4 @@ const ConfirmationModel = ({
   );
 };
 
-export default ConfirmationModel;
+export default ConfirmationModal;
