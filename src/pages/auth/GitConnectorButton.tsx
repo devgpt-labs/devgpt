@@ -20,7 +20,7 @@ const GitConnectorButton = ({
         }}
       >
         {`${provider}`}
-        <Icon />
+        {Icon && Icon}
       </Button>
     </Tooltip>
   );
