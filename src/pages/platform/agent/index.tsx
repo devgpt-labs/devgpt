@@ -454,10 +454,9 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        <Science
+        {/* <Science
           models={models}
-
-        />
+        /> */}
         <Profile />
         <Flex mt={2} gap={2}>
           <Tooltip label="Join Discord" placement="top">
