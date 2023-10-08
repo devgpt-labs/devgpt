@@ -193,7 +193,7 @@ const setModelOutput = async (model: Model, output: string, user: any) => {
     .select();
 
   if (error) {
-    console.log(error);
+    console.log('Error:', error);
     return null;
   }
 
