@@ -1,6 +1,4 @@
 {
-  "buildCommand": "npm turbo build",
-  "ignoreCommand": "npm dlx turbo-ignore",
   "crons": [
     {
       "path": "/api/cron/payments/10m",
