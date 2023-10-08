@@ -65,6 +65,7 @@ const ConfirmationModal = ({
               });
               onClose();
             }}
+            color='white'
             bgGradient={"linear(to-r, blue.500,teal.500)"}
             width="100%"
           >

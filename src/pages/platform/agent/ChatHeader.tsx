@@ -1,4 +1,4 @@
-import { Text, Flex } from "@chakra-ui/react";
+import { Text, Flex, useColorMode } from "@chakra-ui/react";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -8,11 +8,11 @@ import Logo from "@/components/Logo";
 
 const ChatHeader = () => {
   const { repo }: any = repoStore();
+  const { colorMode } = useColorMode();
   return (
     <Flex
       justifyContent="space-between"
-      borderBottom="1px"
-      borderColor="#2D3748"
+      borderBottom={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
       pb={3}
       alignItems="center"
     >

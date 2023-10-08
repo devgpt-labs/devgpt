@@ -162,7 +162,7 @@ const Profile = () => {
         mt={3}
         flexDirection="column"
         rounded="lg"
-        border="1px solid #1a202c"
+        border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
         p={5}
       >
         <CreditsModal

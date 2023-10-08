@@ -58,7 +58,7 @@ const Auth = () => {
     return (
       <Flex
         alignItems="center"
-        justifyContent="centent"
+        justifyContent="center"
         mt={5}
         h="100vh"
         w="100vw"

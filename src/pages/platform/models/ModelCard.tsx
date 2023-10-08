@@ -296,6 +296,7 @@ const ModelCard = ({
                 <Button
                   width="100%"
                   bgGradient="linear(to-r, blue.500,teal.500)"
+                  color='white'
                   onClick={() => {
                     updateModel();
                     setSavedChanges(true);

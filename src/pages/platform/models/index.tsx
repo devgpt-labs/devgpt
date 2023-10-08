@@ -379,6 +379,7 @@ const Models = ({ onClose }: any) => {
                 />
                 <InputRightElement width="4.5rem">
                   <Button
+                    color='white'
                     bgGradient={"linear(to-r, blue.500,teal.500)"}
                     h="1.75rem"
                     size="sm"
