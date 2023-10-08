@@ -1,6 +1,7 @@
 import sendLLM from "./sendLLM";
 
 const promptCorrection = async (
+  user: any,
   prompt: string,
   lofaf: string,
   customer: any
@@ -52,6 +53,7 @@ const promptCorrection = async (
 	`;
 
   const response = await sendLLM(
+    user,
     prompt,
     functions,
     system,

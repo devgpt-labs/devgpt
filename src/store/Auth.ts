@@ -52,6 +52,11 @@ const useStore = create((set) => ({
 		)?.identity_data;
 		const pro = await checkIfPro(githubIdentity?.email);
 
+		if (!customerData) {
+			console.log("Failed to retrieve customer data");
+			return null;
+		}
+
 		set({
 			user: session?.user,
 			session: session,

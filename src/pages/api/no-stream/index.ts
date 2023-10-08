@@ -21,7 +21,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  let { prompt, functions, system, messages, customer, chargeable }: any =
+  let { prompt, functions, system, messages, customer, chargeable, email }: any =
     req.body;
 
   messages = messages || [];
@@ -45,7 +45,7 @@ export default async function handler(
     const cost = calculateTokenCost(usage);
 
     if (cost > 0) {
-      chargeCustomer(customer, cost);
+      chargeCustomer(customer, cost,email);
     }
   }
 

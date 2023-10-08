@@ -39,7 +39,8 @@ const createTrainingData = async (
       owner,
       repo,
       access_token,
-      emailAddress
+      emailAddress,
+      user,
     );
 
     if (TRAIN_FOR_ENCODING) {
@@ -71,10 +72,11 @@ const addContext = async (
   owner: string,
   repo: string,
   access_token: string,
-  emailAddress: string
+  emailAddress: string,
+  user: any
 ) => {
   try {
-    const usefulFiles: UsefulFile[] = await getUsefulFiles(sample_size, lofaf);
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(sample_size, lofaf, user);
 
     const usefulFileContents: any = await getUsefulFileContents(
       usefulFiles,
@@ -84,6 +86,7 @@ const addContext = async (
     );
 
     const usefulFilePrompts: any = await getUsefulFilePrompts(
+      user,
       usefulFileContents
     );
 
@@ -109,12 +112,12 @@ const addContext = async (
   }
 };
 
-const getUsefulFiles = async (sample_size: number, lofaf: string) => {
+const getUsefulFiles = async (sample_size: number, lofaf: string, user: any) => {
   try {
     const { prompt: filesPrompt, functions: filesFunction } =
       await selectTrainingFiles(lofaf);
 
-    const response = await sendLLM(filesPrompt, filesFunction);
+    const response = await sendLLM(user?.email, filesPrompt, filesFunction);
 
     const { useful_files_csv } = JSON.parse(
       response?.choices?.[0]?.message?.function_call?.arguments
@@ -163,7 +166,7 @@ const getUsefulFileContents = async (
   }
 };
 
-const getUsefulFilePrompts = async (files: any) => {
+const getUsefulFilePrompts = async (user: any, files: any) => {
   try {
     const promises = files.map(async (file: any) => {
       if (!file.fileContent) {
@@ -174,7 +177,7 @@ const getUsefulFilePrompts = async (files: any) => {
         file.fileContent
       );
 
-      const response = await sendLLM(trainingPrompt);
+      const response = await sendLLM(user?.email, trainingPrompt);
 
       const prompt = response?.choices?.[0]?.message?.content;
 

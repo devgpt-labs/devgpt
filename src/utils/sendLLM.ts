@@ -1,4 +1,5 @@
 const sendLLM = async (
+  email: string,
   prompt: string,
   functions?: any,
   system?: string,
@@ -9,6 +10,7 @@ const sendLLM = async (
   const response: Response = await fetch("/api/no-stream", {
     method: "POST",
     body: JSON.stringify({
+      email: email,
       prompt: prompt,
       functions: functions,
       system: system,
