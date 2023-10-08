@@ -22,6 +22,7 @@ import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Science from "@/components/repos/Science";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -86,7 +87,7 @@ const Chat = () => {
   const { colorMode } = useColorMode();
   const { user, session, stripe_customer_id, fetch, signOut }: any =
     authStore();
-  const { messages, handleInputChange, handleSubmit } = useChat({
+  const { messages, handleInputChange, handleSubmit, input } = useChat({
     initialMessages: initialMessages,
   });
 
@@ -138,8 +139,6 @@ const Chat = () => {
     }
   };
 
-  console.log(session);
-
   useEffect(() => {
     if (!session?.provider_token) {
       signOut();
@@ -168,7 +167,10 @@ const Chat = () => {
   useEffect(() => {
     // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
-    setInitialMessages(model?.output);
+
+    if (model?.output) {
+      setInitialMessages(JSON.parse(model?.output));
+    }
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
       if (!data?.tree) return console.log("no data found");
@@ -313,8 +315,8 @@ const Chat = () => {
           )}
           {initialMessages?.length === 0 && repo.repo ? (
             <Text mt={4}>
-              Your AI model is <Badge>Training</Badge>, until this is
-              done the AI won't be able to access your repos context.
+              Your AI model is <Badge>Training</Badge>, until this is done the
+              AI won't be able to access your repos context.
             </Text>
           ) : (
             <Text mt={4}>
@@ -355,6 +357,7 @@ const Chat = () => {
                   placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
                   onChange={(e: any) => {
                     setPrompt(e.target.value);
+                    handleInputChange(e);
                   }}
                   onKeyDown={async (e: any) => {
                     if (prompt.length < 3) {
@@ -384,12 +387,12 @@ const Chat = () => {
                   ml={4}
                   width="10rem"
                   onClick={async (e: any) => {
-                    setLoading(true);
-                    const checks = await submitChecks(false);
-                    if (!checks) {
-                      console.log("checks failed, stopping");
-                      return null;
-                    }
+                    // setLoading(true);
+                    // const checks = await submitChecks(false);
+                    // if (!checks) {
+                    //   console.log("checks failed, stopping");
+                    //   return null;
+                    // }
                     handleSubmit(e);
                   }}
                 >
@@ -422,7 +425,7 @@ const Chat = () => {
             </Box>
           )}
 
-          {messages[messages.length - 1]?.content && !isLoading && (
+          {messages[messages.length - 1]?.content && (
             <Flex
               width="100%"
               flexDirection="row"
@@ -451,6 +454,9 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
+        {/* <Science
+          models={models}
+        /> */}
         <Profile />
         <Flex mt={2} gap={2}>
           <Tooltip label="Join Discord" placement="top">

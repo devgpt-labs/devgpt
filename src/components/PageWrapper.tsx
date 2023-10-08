@@ -29,7 +29,6 @@ const Home = ({ children }: any) => {
           colorScheme="blue"
           alignItems="center"
           justifyContent="center"
-          width="100vw"
           flexDirection="row"
           gap={3}
           color="white"
@@ -41,6 +40,7 @@ const Home = ({ children }: any) => {
         </Tag>
 
         <Flex
+          // mx={20}
           height="95vh"
           flexDirection="column"
           alignItems="center"

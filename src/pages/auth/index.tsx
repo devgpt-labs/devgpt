@@ -13,25 +13,27 @@ import {
   Tooltip,
   Spinner,
 } from "@chakra-ui/react";
-import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
-import { BsDiscord, BsGithub } from "react-icons/bs";
-import GitConnectorButton from "./GitConnectorButton";
-import { AiFillGitlab } from "react-icons/ai";
-import { FaBitbucket } from "react-icons/fa";
+
 import { useRouter } from "next/router";
 
+//icons
+import { AiFillGitlab } from "react-icons/ai";
+import { FaBitbucket } from "react-icons/fa";
+import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
+import { BsDiscord, BsGithub } from "react-icons/bs";
+
 //components
+import GitConnectorButton from "./GitConnectorButton";
 import Template from "@/components/Template";
 import WhatIsDevGPT from "./WhatIsDevGPT";
 import AuthOption from "./AuthOption";
+import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 
 //store
 import useStore from "@/store/Auth";
 
 //assets
 import astro from "@/assets/astro.png";
-
-import signInWithBitbucket from "@/utils/bitbucket/signInWithBitbucket";
 
 const Auth = () => {
   const router = useRouter();
@@ -83,19 +85,21 @@ const Auth = () => {
               color="black"
               provider="Sign In With Github"
               handle={signInWithGithub}
-              Icon={BsGithub}
+              Icon={<BsGithub />}
+              tooltip=''
             />
             <GitConnectorButton
               color="#0c61db"
               provider="Sign In With BitBucket"
               handle={signInWithBitbucket}
-              Icon={FaBitbucket}
+              Icon={<FaBitbucket />}
+              tooltip=''
             />
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
               handle={() => { }}
-              Icon={AiFillGitlab}
+              Icon={<AiFillGitlab />}
               tooltip="Coming soon!"
             />
             <Heading size="xs" mt="2">
@@ -104,17 +108,17 @@ const Auth = () => {
             <WhatIsDevGPT />
             <AuthOption
               label="Read Our Docs"
-              Icon={BiSolidBookBookmark}
+              Icon={<BiSolidBookBookmark />}
               url="https://docs.devgpt.com"
             />
             <AuthOption
               label="Star Project On GitHub"
-              Icon={BiSolidStar}
+              Icon={<BiSolidStar />}
               url="https://github.com/devgpt-labs/devgpt-releases/"
             />
             <AuthOption
               label="Join Discord Community"
-              Icon={BsDiscord}
+              Icon={<BsDiscord />}
               url="https://discord.com/invite/6GFtwzuvtw"
             />
             <Flex
