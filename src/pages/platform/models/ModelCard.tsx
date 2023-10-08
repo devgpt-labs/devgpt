@@ -155,7 +155,7 @@ const ModelCard = ({
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={deleteModel}
-        setDeletingAModel={setDeletingAModel}
+        setLoadingState={setDeletingAModel}
         handleModelInTrainingChange={handleModelInTrainingChange}
       />
       <Card rounded="lg" flexDirection="row">

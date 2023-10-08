@@ -9,7 +9,7 @@ const getCustomerChargeLimits = async (
   const { data, error } = await supabase
     .from("payments")
     .select("*")
-    .eq("stripe_id", customer.stripe_customer_id);
+    .eq("email_address", customer.email_address);
   if (error) return error;
   const payments = data;
 
