@@ -93,7 +93,7 @@ const Auth = () => {
               provider="Sign In With BitBucket"
               handle={signInWithBitbucket}
               Icon={<FaBitbucket />}
-              tooltip=''
+              tooltip="Coming soon!"
             />
             <GitConnectorButton
               color="#FC6D27"
