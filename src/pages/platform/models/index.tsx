@@ -269,7 +269,7 @@ const Models = ({ onClose }: any) => {
         isOpen={isConfirmationOpen}
         onClose={onConfirmationClose}
         onSubmit={saveMonthlyBudget}
-        setDeletingAModel={() => { }}
+        setDeletingAModel={setLoading}
         handleModelInTrainingChange={() => { }}
       />
       <Flex

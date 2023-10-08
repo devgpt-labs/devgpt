@@ -18,7 +18,7 @@ const ConfirmationModal = ({
   isOpen,
   onClose,
   onSubmit,
-  setDeletingAModel,
+  setLoadingState,
   handleModelInTrainingChange,
 }: {
   header: string;
@@ -27,7 +27,7 @@ const ConfirmationModal = ({
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  setDeletingAModel: (value: boolean) => void;
+  setLoadingState: (value: boolean) => void;
   handleModelInTrainingChange: (e: any) => void;
 }) => {
   return (
@@ -48,7 +48,7 @@ const ConfirmationModal = ({
             mr={3}
             onClick={() => {
               onClose();
-              setDeletingAModel(false);
+              setLoadingState(false);
             }}
           >
             Close
@@ -56,7 +56,7 @@ const ConfirmationModal = ({
           <Button
             onClick={() => {
               onSubmit();
-              setDeletingAModel(false);
+              setLoadingState(false);
               handleModelInTrainingChange({
                 target: {
                   name: "deleted",

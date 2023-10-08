@@ -56,15 +56,19 @@ const Auth = () => {
 
   if (loading)
     return (
-      <Flex
-        alignItems="center"
-        justifyContent="center"
-        mt={5}
-        h="100vh"
-        w="100vw"
-      >
-        <Spinner height={20} width={20} />
-      </Flex>
+      <Template>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          mt={5}
+          h="100vh"
+          w="100vw"
+        >
+          <Spinner height={5} width={5} />
+          <Text ml={2}>Warming up...</Text>
+        </Flex>
+      </Template>
+
     );
 
   return (
