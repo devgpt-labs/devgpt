@@ -461,6 +461,21 @@ const Chat = () => {
               >
                 Start A New Chat
               </Button>
+              {/* <Button
+                px={4}
+                _hover={{
+                  bg: colorMode === "light" ? "gray.300" : "black",
+                }}
+                bg={colorMode === "light" ? "white" : "gray.800"}
+                alignSelf="center"
+                rounded="full"
+                onClick={() => {
+                  reload();
+                  setLoading(true)
+                }}
+              >
+                Re-run Prompt
+              </Button> */}
             </Flex>
           )}
         </Box>
@@ -502,7 +517,7 @@ const Chat = () => {
                     <BsGithub />
                     <BsStars />
                     <Text ml={2} fontSize={14}>
-                      335
+                      339
                     </Text>
                   </Flex>
                 }
