@@ -159,12 +159,14 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       stripe_customer_id
     );
   }, []);
 
   useEffect(() => {
+    if (initialMessages.length === 0) return;
+
     // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
 
@@ -178,7 +180,7 @@ const Chat = () => {
       // set this
       setLofaf(files);
     });
-  }, [repo]);
+  }, [repo, models]);
 
   // This logic breaks down the prompt to find @'d files
   const regex = /@([^ ]+)/g;
@@ -314,18 +316,18 @@ const Chat = () => {
             </Link>
           )}
           {initialMessages?.length === 0 && repo.repo ? (
-            <Text mt={4}>
+            <Text mt={4} mb={4}>
               Your AI model is <Badge>Training</Badge>, until this is done the
               AI won't be able to access your repos context.
             </Text>
           ) : (
-            <Text mt={4}>
+            <Text mt={4} mb={4}>
               Your trained AI model is{" "}
               <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
             </Text>
           )}
           {repo.repo && (
-            <Box className="max-h-[50vh] overflow-y-auto">
+            <Box maxH={"45vh"} overflowY={"auto"}>
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>

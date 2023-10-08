@@ -42,6 +42,8 @@ async function trainModels(
     return;
   }
 
+  console.log("model is now training...");
+
   const { data, error } = await supabase
     .from("models")
     .select("*")
@@ -69,6 +71,13 @@ async function trainModels(
       .order("created_at", { ascending: false })
       .limit(1);
 
+    console.log({ trainingLogData });
+
+    console.log(
+      "modelID",
+      createModelID(model.repo, model.owner, model.branch)
+    );
+
     const latest_training_log = trainingLogData?.[0];
 
     if (!latest_training_log) {
@@ -79,10 +88,11 @@ async function trainModels(
     //if the latest training_log has not been fulfilled, train the model
     if (!latest_training_log.fulfilled) {
       switch (model.training_method.toLowerCase()) {
-        case "encoding":
+        case "ENCODING":
+          console.log("here");
           return await trainRepoWithEncoding(model, session, user);
           break;
-        case "embeddings":
+        case "EMBEDDINGS":
           return await trainRepoWithEmbeddings(model, session, user);
           break;
         default:
@@ -96,14 +106,20 @@ async function trainModels(
 export default trainModels;
 
 const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
+  console.log("model is now encoding...");
+
   const name = model.repo;
   const owner = model.owner;
 
   if (!owner || !name || !session.provider_token) return;
 
+  console.log({ owner, name }, session.provider_token);
+
   // Get Lofaf
   const lofaf = await getLofaf(owner, name, session);
   const sample_size = model.sample_size;
+
+  console.log("FOOBAR", lofaf);
 
   // Manipulate lofaf
   let lofafArray = lofaf.tree;
@@ -126,7 +142,7 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
     session
   );
 
-  setModelOutput(model, trainingData);
+  setModelOutput(model, JSON.stringify(trainingData));
   return;
 };
 
@@ -185,6 +201,8 @@ const setModelOutput = async (model: Model, output: string) => {
   //replace output for this model in supabase with training data
   if (!supabase) return;
 
+  console.log("model output is being saved...");
+
   const { data, error } = await supabase
     .from("models")
     .update({
@@ -198,6 +216,8 @@ const setModelOutput = async (model: Model, output: string) => {
     console.log(error);
     return null;
   }
+
+  console.log("SUCCESS", data, output);
 
   //update the training_log table by setting the latest training_log to fulfilled
   const { data: trainingLogData, error: trainingLogError } = await supabase

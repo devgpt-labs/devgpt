@@ -32,7 +32,7 @@ const RateConversation = ({ visible }: any) => {
   return (
     <Center>
       <Flex
-        minW="60"
+        minW="30"
         rounded="full"
         flexDirection="row"
         bg={colorMode === "light" ? "white" : "gray.800"}
@@ -46,8 +46,6 @@ const RateConversation = ({ visible }: any) => {
           <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
           <ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
-          <ToggleItem onClick={onClickHandler}>👀</ToggleItem>
-          <ToggleItem onClick={onClickHandler}>🚀</ToggleItem>
         </List>
       </Flex>
     </Center>

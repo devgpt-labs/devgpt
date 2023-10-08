@@ -34,6 +34,7 @@ import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
 import RepoSetupModal from "./RepoSetupModal";
 import getModels from "@/utils/getModels";
+import createModelID from "@/utils/createModelID";
 
 //components
 type PageInfo = {
@@ -164,6 +165,27 @@ const RepoDrawer = () => {
     // Create a new row in the models table in Supabase
     if (!supabase) return;
 
+    //insert the first training_log
+    const { data: logData, error: logError }: any = await supabase
+      .from("training_log")
+      .insert([
+        {
+          model_id: createModelID(name, owner, "main"),
+          model_settings: JSON.stringify({
+            stripe_customer_id: stripe_customer_id,
+            repo: name,
+            owner: owner,
+            branch: "main",
+            training_method: "ENCODING",
+            output: null,
+            epochs: repo.epochs,
+            frequency: repo.frequency,
+            sample_size: repo.sampleSize,
+          }),
+          fulfilled: false,
+        },
+      ]);
+
     const { data, error } = await supabase.from("models").insert([
       {
         stripe_customer_id: stripe_customer_id,
@@ -184,7 +206,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => { }, stripe_customer_id);
+    getModels(setTrainedModels, () => {}, stripe_customer_id);
   }, [repos]);
 
   if (!session?.provider_token) {
