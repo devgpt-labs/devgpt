@@ -31,6 +31,7 @@ interface Model {
   sample_size: number;
   output: string;
   deleted: boolean;
+  email_address: string;
 }
 
 interface Log {
@@ -124,6 +125,7 @@ const addTrainingLog = async (model: Model) => {
     {
       stripe_customer_id: model.stripe_customer_id,
     },
-    Number(costToTrain)
+    Number(costToTrain),
+    model?.email_address
   );
 };
