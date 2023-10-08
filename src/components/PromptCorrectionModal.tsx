@@ -38,6 +38,7 @@ const PromptCorrectionModal = ({
   return (
     <>
       <Modal
+        closeOnOverlayClick={false}
         isOpen={isOpen}
         onClose={() => {
           setLoading(false);
