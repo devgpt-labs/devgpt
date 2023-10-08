@@ -169,7 +169,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    if (!initialMessages.length === 0) return;
+    if (initialMessages.length !== 0) return;
 
     // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
