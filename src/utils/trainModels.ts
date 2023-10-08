@@ -27,10 +27,7 @@ interface Model {
   output?: string;
 }
 
-async function trainModels(
-  session: any,
-  user: any,
-) {
+async function trainModels(session: any, user: any) {
   if (!supabase) {
     console.log("No supabase client found");
     return;
@@ -40,7 +37,6 @@ async function trainModels(
     console.log("No user found");
     return;
   }
-
 
   const { data, error } = await supabase
     .from("models")
@@ -191,7 +187,6 @@ const setModelOutput = async (model: Model, output: string, user: any) => {
       output: output,
     })
     .eq("id", model.id)
-    .eq("email_address", user?.email)
     .select();
 
   if (error) {
@@ -199,15 +194,17 @@ const setModelOutput = async (model: Model, output: string, user: any) => {
     return null;
   }
 
-  //update the training_log table by setting the latest training_log to fulfilled
-  const { data: trainingLogData, error: trainingLogError } = await supabase
-    .from("training_log")
-    .update({ fulfilled: true })
-    .eq("model_id", createModelID(model.repo, model.owner, model.branch))
-    .order("created_at", { ascending: false })
-    .select();
+  if (output && !error) {
+    //update the training_log table by setting the latest training_log to fulfilled
+    const { data: trainingLogData, error: trainingLogError } = await supabase
+      .from("training_log")
+      .update({ fulfilled: true })
+      .eq("model_id", createModelID(model.repo, model.owner, model.branch))
+      .order("created_at", { ascending: false })
+      .select();
 
-  if (trainingLogError) {
-    return null;
+    if (trainingLogError) {
+      return null;
+    }
   }
 };
