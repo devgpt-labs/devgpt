@@ -404,12 +404,12 @@ const Chat = () => {
                   ml={4}
                   width="10rem"
                   onClick={async (e: any) => {
-                    // setLoading(true);
-                    // const checks = await submitChecks(false);
-                    // if (!checks) {
-                    //   console.log("checks failed, stopping");
-                    //   return null;
-                    // }
+                    setLoading(true);
+                    const checks = await submitChecks(false);
+                    if (!checks) {
+                      console.log("checks failed, stopping");
+                      return null;
+                    }
                     setHasBeenReset(false);
                     handleSubmit(e);
                   }}
@@ -533,6 +533,19 @@ const Chat = () => {
           setPrompt={setPrompt}
           isOpen={isOpen}
           onClose={onClose}
+          onReject={async (e: any) => {
+            e.preventDefault();
+
+            // Run checks
+            const checks = await submitChecks(true, true);
+            if (!checks) return null;
+
+            // Show that we haven't reset
+            setHasBeenReset(false);
+
+            // Submit to useChat
+            handleSubmit(e);
+          }}
           onSubmit={async (e: any) => {
             e.preventDefault();
 

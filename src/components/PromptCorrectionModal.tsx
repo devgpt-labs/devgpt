@@ -21,6 +21,7 @@ const PromptCorrectionModal = ({
   setCorrectedPrompt,
   prompt,
   setPrompt,
+  onReject,
   onSubmit,
   setLoading,
 }: any) => {
@@ -115,7 +116,7 @@ const PromptCorrectionModal = ({
               variant="ghost"
               onClick={(e) => {
                 onClose();
-                onSubmit(e);
+                onReject(e);
               }}
             >
               Reject
