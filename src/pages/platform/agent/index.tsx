@@ -293,6 +293,9 @@ const Chat = () => {
     return true;
   };
 
+  console.log(initialMessages);
+
+
   return (
     <Template>
       <Flex
@@ -437,34 +440,39 @@ const Chat = () => {
             </Box>
           )}
 
-          {messages[messages.length - 1]?.content && (
-            <Flex
-              width="100%"
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
-              mt={2}
-            >
-              <RateConversation />
-              <Text mx={4}>or</Text>
-              <Button
-                px={4}
-                _hover={{
-                  bg: colorMode === "light" ? "gray.300" : "black",
-                }}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                alignSelf="center"
-                rounded="full"
-                onClick={() => {
-                  setHasBeenReset(true);
-                  setLoading(false);
-                  setResponse("");
-                  setFailMessage("");
-                }}
+          {!loading &&
+            messages[messages.length - 1] &&
+            !initialMessages?.find(
+              (message: any) =>
+                message?.content === messages[messages.length - 1]?.content
+            ) && (
+              <Flex
+                width="100%"
+                flexDirection="row"
+                justifyContent="center"
+                alignItems="center"
+                mt={2}
               >
-                Start A New Chat
-              </Button>
-              {/* <Button
+                <RateConversation />
+                <Text mx={4}>or</Text>
+                <Button
+                  px={4}
+                  _hover={{
+                    bg: 'gray.400',
+                    color: "white",
+                  }}
+                  alignSelf="center"
+                  rounded="full"
+                  onClick={() => {
+                    setHasBeenReset(true);
+                    setLoading(false);
+                    setResponse("");
+                    setFailMessage("");
+                  }}
+                >
+                  Start A New Chat
+                </Button>
+                {/* <Button
                 px={4}
                 _hover={{
                   bg: colorMode === "light" ? "gray.300" : "black",
@@ -479,8 +487,8 @@ const Chat = () => {
               >
                 Re-run Prompt
               </Button> */}
-            </Flex>
-          )}
+              </Flex>
+            )}
         </Box>
         {/* <Science
           models={models}
