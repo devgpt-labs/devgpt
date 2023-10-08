@@ -78,6 +78,7 @@ const Chat = () => {
     useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
+  const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -159,7 +160,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       stripe_customer_id
     );
   }, []);
@@ -380,6 +381,7 @@ const Chat = () => {
                       e.preventDefault();
                       const checks = await submitChecks(false);
                       if (!checks) return null;
+                      setHasBeenReset(false);
                       handleSubmit(e);
                     }
                   }}
@@ -397,6 +399,7 @@ const Chat = () => {
                     //   console.log("checks failed, stopping");
                     //   return null;
                     // }
+                    setHasBeenReset(false);
                     handleSubmit(e);
                   }}
                 >
@@ -423,6 +426,7 @@ const Chat = () => {
                 />
               ) : (
                 <Response
+                  hasBeenReset={hasBeenReset}
                   initialMessages={initialMessages}
                   content={String(messages[messages.length - 1]?.content)}
                 />
@@ -449,7 +453,7 @@ const Chat = () => {
                 alignSelf="center"
                 rounded="full"
                 onClick={() => {
-                  reload();
+                  setHasBeenReset(true);
                   setLoading(false);
                   setResponse("");
                   setFailMessage("");
@@ -513,7 +517,10 @@ const Chat = () => {
           setPrompt={setPrompt}
           isOpen={isOpen}
           onClose={onClose}
-          onSubmit={(e: any) => handleSubmit(e)}
+          onSubmit={(e: any) => {
+            setHasBeenReset(false);
+            handleSubmit(e);
+          }}
           setLoading={setLoading}
         />
       </Flex>

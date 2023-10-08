@@ -14,9 +14,14 @@ import copyToClipboard from "@/utils/copyToClipboard";
 interface ResponseProps {
   content: string;
   initialMessages: any;
+  hasBeenReset: boolean;
 }
 
-const Response = ({ content, initialMessages }: ResponseProps) => {
+const Response = ({
+  content,
+  initialMessages,
+  hasBeenReset,
+}: ResponseProps) => {
   const [copied, setCopied] = useState(false);
   const { colorMode } = useColorMode();
 
@@ -29,8 +34,8 @@ const Response = ({ content, initialMessages }: ResponseProps) => {
   // If content is one of the content in initialMessages, return null
 
   const overlap = initialMessages.map((message: any) => {
-    if (message.content === content) return true
-    return false
+    if (message.content === content) return true;
+    return false;
   });
 
   // If overlap contains true, return null
@@ -38,6 +43,8 @@ const Response = ({ content, initialMessages }: ResponseProps) => {
 
   // If content is undefined, return null
   if (content === "undefined") return null;
+
+  if (hasBeenReset) return null;
 
   return (
     <Flex flex={1} my={1} flexDirection={"column"} whiteSpace="pre-wrap">
