@@ -87,7 +87,7 @@ const Chat = () => {
   const { colorMode } = useColorMode();
   const { user, session, stripe_customer_id, fetch, signOut }: any =
     authStore();
-  const { messages, handleInputChange, handleSubmit, input } = useChat({
+  const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
     initialMessages: initialMessages,
   });
 
@@ -446,6 +446,7 @@ const Chat = () => {
                 alignSelf="center"
                 rounded="full"
                 onClick={() => {
+                  reload();
                   setLoading(false);
                   setResponse("");
                   setFailMessage("");

@@ -7,8 +7,6 @@ import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 
 const getLofaf = async (owner: any, repo: any, session: any) => {
-  console.log(owner, repo, session);
-  
   const token = session?.provider_token;
 
   const main_branch = await getDefaultBranch(owner, repo, token);

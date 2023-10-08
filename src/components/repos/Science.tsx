@@ -65,15 +65,10 @@ const Science = ({ models }: any) => {
   const [sliderValue, setSliderValue] = useState(5);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  console.log({ models });
-  console.log({ repo });
-
   // Find the model in models that matches repo
   const model = models.find(
     (model: any) => model.repo === repo.repo && model.owner === repo.owner
   );
-
-  console.log(model);
 
   if (!model) return <Skeleton height="20px" />;
 
@@ -96,7 +91,10 @@ const Science = ({ models }: any) => {
             <Stack>
               <Text>my latest prompt!</Text>
               <Badge alignSelf="flex-start">{model.training_method}</Badge>
-              <Badge alignSelf="flex-start">Last Trained: {new Date(model.created_at).toDateString()} at {new Date(model.created_at).toTimeString().slice(0, 5)}</Badge>
+              <Badge alignSelf="flex-start">
+                Last Trained: {new Date(model.created_at).toDateString()} at{" "}
+                {new Date(model.created_at).toTimeString().slice(0, 5)}
+              </Badge>
             </Stack>
             <Stack>
               <HStack>
