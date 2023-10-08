@@ -8,6 +8,7 @@ const useStore = create((set) => ({
   user: null,
   session: null,
   stripe_customer_id: null,
+  monthly_budget: null,
   credits: null,
   isPro: false,
   setCredits: (credits: number) => set({ credits }),
@@ -44,6 +45,7 @@ const useStore = create((set) => ({
       session: session,
       isPro: pro,
       stripe_customer_id: customerData[0]?.stripe_customer_id,
+      monthly_budget: customerData[0]?.monthly_budget,
       credits: customerData[0]?.credits,
     });
   },

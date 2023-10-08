@@ -35,6 +35,8 @@ import { supabase } from "@/utils/supabase";
 import RepoSetupModal from "./RepoSetupModal";
 import getModels from "@/utils/getModels";
 import createModelID from "@/utils/createModelID";
+import calculateTotalCost from "@/utils/calculateTotalCost";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 //components
 type PageInfo = {
@@ -55,7 +57,8 @@ const RepoDrawer = () => {
   } = useDisclosure();
 
   const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user, signOut, stripe_customer_id }: any = authStore();
+  const { session, user, signOut, stripe_customer_id, monthly_budget }: any =
+    authStore();
   const { setMessages }: any = messageStore();
 
   const [repos, setRepos] = useState<any[]>([]);
@@ -165,40 +168,44 @@ const RepoDrawer = () => {
     // Create a new row in the models table in Supabase
     if (!supabase) return;
 
+    const newModel = {
+      stripe_customer_id: stripe_customer_id,
+      repo: name,
+      owner: owner,
+      branch: "main",
+      training_method: "ENCODING",
+      output: null,
+      epochs: repo.epochs,
+      frequency: repo.frequency,
+      sample_size: repo.sampleSize,
+    };
+
     //insert the first training_log
     const { data: logData, error: logError }: any = await supabase
       .from("training_log")
       .insert([
         {
           model_id: createModelID(name, owner, "main"),
-          model_settings: JSON.stringify({
-            stripe_customer_id: stripe_customer_id,
-            repo: name,
-            owner: owner,
-            branch: "main",
-            training_method: "ENCODING",
-            output: null,
-            epochs: repo.epochs,
-            frequency: repo.frequency,
-            sample_size: repo.sampleSize,
-          }),
+          model_settings: JSON.stringify(newModel),
           fulfilled: false,
         },
       ]);
 
-    const { data, error } = await supabase.from("models").insert([
+    //calculate cost of training this model
+    const costToTrain = calculateTotalCost([newModel], 0);
+
+    //create a new charge
+    chargeCustomer(
       {
         stripe_customer_id: stripe_customer_id,
-        repo: name,
-        owner: owner,
-        branch: "main",
-        training_method: "ENCODING",
-        output: null,
-        epochs: repo.epochs,
-        frequency: repo.frequency,
-        sample_size: repo.sampleSize,
+        monthly_budget: monthly_budget,
       },
-    ]);
+      Number(costToTrain)
+    );
+
+    const { data, error } = await supabase
+      .from("models")
+      .insert([{ ...newModel }]);
 
     if (error) {
       console.log(error);
