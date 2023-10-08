@@ -125,11 +125,12 @@ const PromptCorrectionModal = ({
               color="white"
               onClick={(e) => {
                 setPrompt(correctedPrompt);
+                setLoading(true);
                 onClose();
-                setLoading(false);
+                onSubmit(e);
               }}
             >
-              Accept Suggestion
+              Accept and Run Suggestion
             </Button>
           </Flex>
         </ModalContent>
