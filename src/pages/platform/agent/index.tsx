@@ -451,7 +451,7 @@ const Chat = () => {
                 <Button
                   px={4}
                   _hover={{
-                    bg: 'gray.400',
+                    bg: "gray.400",
                     color: "white",
                   }}
                   alignSelf="center"
@@ -536,8 +536,17 @@ const Chat = () => {
           setPrompt={setPrompt}
           isOpen={isOpen}
           onClose={onClose}
-          onSubmit={(e: any) => {
+          onSubmit={async (e: any) => {
+            e.preventDefault();
+
+            // Run checks
+            const checks = await submitChecks(true, false);
+            if (!checks) return null;
+
+            // Show that we haven't reset
             setHasBeenReset(false);
+
+            // Submit to useChat
             handleSubmit(e);
           }}
           setLoading={setLoading}
