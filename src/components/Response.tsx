@@ -13,9 +13,10 @@ import copyToClipboard from "@/utils/copyToClipboard";
 //props types for response
 interface ResponseProps {
   content: string;
+  initialMessages: any;
 }
 
-const Response = ({ content }: ResponseProps) => {
+const Response = ({ content, initialMessages }: ResponseProps) => {
   const [copied, setCopied] = useState(false);
   const { colorMode } = useColorMode();
 
@@ -25,6 +26,17 @@ const Response = ({ content }: ResponseProps) => {
 
   const theme = colorMode === "light" ? oneLight : vscDarkPlus;
 
+  // If content is one of the content in initialMessages, return null
+
+  const overlap = initialMessages.map((message: any) => {
+    if (message.content === content) return true
+    return false
+  });
+
+  // If overlap contains true, return null
+  if (overlap.includes(true)) return null;
+
+  // If content is undefined, return null
   if (content === "undefined") return null;
 
   return (

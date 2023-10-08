@@ -159,13 +159,13 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       stripe_customer_id
     );
   }, []);
 
   useEffect(() => {
-    if (initialMessages.length === 0) return;
+    if (!initialMessages.length === 0) return;
 
     // Update the model to the newest selected one
     const model = models?.find((model: any) => model?.repo === repo?.repo);
@@ -366,6 +366,8 @@ const Chat = () => {
                       return;
                     }
 
+                    if (loading) return;
+
                     // If key equals tab, autocomplete
                     if (e.key === "Tab") {
                       e.preventDefault();
@@ -421,6 +423,7 @@ const Chat = () => {
                 />
               ) : (
                 <Response
+                  initialMessages={initialMessages}
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}

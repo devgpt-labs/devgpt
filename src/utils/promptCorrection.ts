@@ -60,6 +60,9 @@ const promptCorrection = async (
     true
   );
 
+  // TODO: Add fail check here
+  console.log(response);
+
   const { new_prompt, changes_required } = JSON.parse(
     response?.choices?.[0]?.message?.function_call?.arguments
   );
