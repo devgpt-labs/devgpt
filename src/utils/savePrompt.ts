@@ -4,7 +4,8 @@ import { supabase } from "@/utils/supabase";
 export async function savePrompt(
   email: string,
   prompt: string,
-  response: string
+  response: string,
+  tokens: number
 ) {
   if (!email || !prompt || !response) {
     throw new Error("Missing required fields");
@@ -13,9 +14,14 @@ export async function savePrompt(
   if (!supabase) {
     throw new Error("Supabase not initialized");
   }
-  const { data, error } = await supabase
-    .from("prompts")
-    .insert([{ email_address: email, prompt: prompt, output: response }]);
+  const { data, error } = await supabase.from("prompts").insert([
+    {
+      email_address: email,
+      prompt: prompt,
+      output: response,
+      tokens: tokens,
+    },
+  ]);
 
   if (error) {
     console.error(error);
