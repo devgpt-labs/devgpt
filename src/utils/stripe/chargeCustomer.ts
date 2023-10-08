@@ -22,7 +22,7 @@ const chargeCustomer = async (customer: any, amount: number) => {
   //get the customer's account balance from supabase
   const { data: creditsData, error: creditsError } = await supabase
     .from("customers")
-    .select("credits")
+    .select("*")
     .eq("stripe_customer_id", customer.stripe_customer_id)
     .single();
 
@@ -31,7 +31,7 @@ const chargeCustomer = async (customer: any, amount: number) => {
     return;
   }
 
-  const { credits }: any = creditsData;
+  const { credits, monthly_budget }: any = creditsData;
 
   if (amount < credits) {
     // Remove the amount from the customer's account balance
@@ -51,7 +51,7 @@ const chargeCustomer = async (customer: any, amount: number) => {
   }
 
   const { maxWeCanChargeCustomer, canChargeCustomer }: any =
-    await getCustomerChargeLimits(customer);
+    await getCustomerChargeLimits(customer, monthly_budget);
 
   if (!canChargeCustomer) return;
 

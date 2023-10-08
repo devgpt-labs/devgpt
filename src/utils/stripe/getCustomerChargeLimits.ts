@@ -1,6 +1,9 @@
 import { supabase } from "@/utils/supabase";
 
-const getCustomerChargeLimits = async (customer: any) => {
+const getCustomerChargeLimits = async (
+  customer: any,
+  monthly_budget: number
+) => {
   if (!supabase) return;
   //check total spend for this customer this month with Stripe
   const { data, error } = await supabase
@@ -29,8 +32,9 @@ const getCustomerChargeLimits = async (customer: any) => {
   });
 
   //check if we can still charge this customer or if they've reached their monthly budget
-  const monthly_budget = customer.monthly_budget;
-  const maxWeCanChargeCustomer = monthly_budget - total_spend_this_month;
+
+  const maxWeCanChargeCustomer =
+    Number(monthly_budget) - Number(total_spend_this_month);
   const canChargeCustomer: boolean = total_spend_this_month < monthly_budget;
 
   return { maxWeCanChargeCustomer, canChargeCustomer };

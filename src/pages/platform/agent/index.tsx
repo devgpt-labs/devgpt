@@ -353,6 +353,21 @@ const Chat = () => {
                   })}
                 </SlideFade>
               </Flex>
+              {loading && !messages[messages.length - 1] ? (
+                <SkeletonText
+                  mb={2}
+                  mt={4}
+                  noOfLines={4}
+                  spacing={4}
+                  skeletonHeight="2"
+                />
+              ) : (
+                <Response
+                  hasBeenReset={hasBeenReset}
+                  initialMessages={initialMessages}
+                  content={String(messages[messages.length - 1]?.content)}
+                />
+              )}
               <Flex flexDirection="row" mt={4}>
                 <Input
                   className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
@@ -416,21 +431,6 @@ const Chat = () => {
                   </Text>
                 </SlideFade>
               </Flex>
-              {loading && !messages[messages.length - 1] ? (
-                <SkeletonText
-                  mb={2}
-                  mt={4}
-                  noOfLines={4}
-                  spacing={4}
-                  skeletonHeight="2"
-                />
-              ) : (
-                <Response
-                  hasBeenReset={hasBeenReset}
-                  initialMessages={initialMessages}
-                  content={String(messages[messages.length - 1]?.content)}
-                />
-              )}
             </Box>
           )}
 

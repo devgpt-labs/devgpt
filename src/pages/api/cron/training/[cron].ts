@@ -121,7 +121,9 @@ const addTrainingLog = async (model: Model) => {
 
   //create a new charge
   chargeCustomer(
-    { stripe_customer_id: model.stripe_customer_id },
+    {
+      stripe_customer_id: model.stripe_customer_id,
+    },
     Number(costToTrain)
   );
 };
