@@ -53,7 +53,7 @@ import calculateTotalCost from "@/utils/calculateTotalCost";
 import Setup from "./Setup";
 
 const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
-  const { fetch, user, session, stripe_customer_id }: any = useStore();
+  const { fetch, user, session }: any = useStore();
 
   const [sampleSize, setSampleSize] = useState(5);
   const [frequency, setFrequency] = useState(1);
@@ -112,7 +112,7 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
               });
 
               // Begin model training
-              trainModels(session, user, stripe_customer_id);
+              trainModels(session, user);
 
               // Close the modal
               onClose();

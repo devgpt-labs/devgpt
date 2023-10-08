@@ -16,7 +16,7 @@ const openai = new OpenAI({
 interface Model {
   id: string;
   created_at: string;
-  stripe_customer_id: string;
+  email: string;
   repo: string;
   owner: string;
   branch: string;
@@ -30,22 +30,22 @@ interface Model {
 async function trainModels(
   session: any,
   user: any,
-  stripe_customer_id: string
 ) {
   if (!supabase) {
     console.log("No supabase client found");
     return;
   }
 
-  if (!stripe_customer_id) {
-    console.log("No stripe customer id found");
+  if (!user) {
+    console.log("No user found");
     return;
   }
+
 
   const { data, error } = await supabase
     .from("models")
     .select("*")
-    .eq("stripe_customer_id", stripe_customer_id);
+    .eq("email_address", user.email);
 
   if (!data) return;
 
@@ -126,7 +126,7 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
     session
   );
 
-  setModelOutput(model, JSON.stringify(trainingData));
+  setModelOutput(model, JSON.stringify(trainingData), user.email);
   return;
 };
 
@@ -178,10 +178,10 @@ const trainRepoWithEmbeddings = async (
     hyperparameters: { n_epochs: epochs },
   });
 
-  setModelOutput(model, finetune.id);
+  setModelOutput(model, finetune.id, user);
 };
 
-const setModelOutput = async (model: Model, output: string) => {
+const setModelOutput = async (model: Model, output: string, user: any) => {
   //replace output for this model in supabase with training data
   if (!supabase) return;
 
@@ -191,7 +191,7 @@ const setModelOutput = async (model: Model, output: string) => {
       output: output,
     })
     .eq("id", model.id)
-    .eq("stripe_customer_id", model.stripe_customer_id)
+    .eq("email_address", user?.email)
     .select();
 
   if (error) {

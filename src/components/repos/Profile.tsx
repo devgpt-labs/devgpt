@@ -165,11 +165,11 @@ const Profile = () => {
         border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
         p={5}
       >
-        <CreditsModal
+        {/* <CreditsModal
           isCreditsOpen={isCreditsOpen}
           onCreditsOpen={onCreditsOpen}
           onCreditsClose={onCreditsClose}
-        />
+        /> */}
         <KeyModal
           isKeyOpen={isKeyOpen}
           onKeyOpen={onKeyOpen}

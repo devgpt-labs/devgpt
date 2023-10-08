@@ -99,7 +99,7 @@ const Chat = () => {
       const usage = inputTokens + responseTokens;
       const cost = calculateTokenCost(usage);
 
-      chargeCustomer({ stripe_customer_id: stripe_customer_id }, cost);
+      chargeCustomer({ stripe_customer_id: stripe_customer_id }, cost, user?.email);
 
       savePrompt(
         user?.email,
@@ -112,7 +112,7 @@ const Chat = () => {
 
   useEffect(() => {
     // Train models on load
-    trainModels(session, user, stripe_customer_id);
+    trainModels(session, user);
 
     // Get the users last used repo
     const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
@@ -160,7 +160,7 @@ const Chat = () => {
         setModels(data);
       },
       () => { },
-      stripe_customer_id
+      user?.email
     );
   }, []);
 

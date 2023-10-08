@@ -142,7 +142,7 @@ const Models = ({ onClose }: any) => {
     const { data, error } = await supabase
       .from("customers")
       .select("monthly_budget")
-      .eq("stripe_customer_id", stripe_customer_id)
+      .eq("email_address", user?.email)
       .single();
 
     if (error) {
@@ -161,7 +161,7 @@ const Models = ({ onClose }: any) => {
     const { data, error } = await supabase
       .from("customers")
       .update({ monthly_budget: budget })
-      .eq("stripe_customer_id", stripe_customer_id);
+      .eq("email_address", user?.email);
 
 
     if (error) {
@@ -189,7 +189,7 @@ const Models = ({ onClose }: any) => {
 
   useEffect(() => {
     getMonthlyBudget()
-    getModels(setModelsInTraining, setLoading, stripe_customer_id);
+    getModels(setModelsInTraining, setLoading, user?.email);
 
     if (modelsInTraining.length > 0) {
       // Get the current budget from supabase
@@ -269,7 +269,7 @@ const Models = ({ onClose }: any) => {
         isOpen={isConfirmationOpen}
         onClose={onConfirmationClose}
         onSubmit={saveMonthlyBudget}
-        setDeletingAModel={setLoading}
+        setLoadingState={setLoading}
         handleModelInTrainingChange={() => { }}
       />
       <Flex

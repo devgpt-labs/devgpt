@@ -170,6 +170,7 @@ const RepoDrawer = () => {
 
     const newModel = {
       stripe_customer_id: stripe_customer_id,
+      email_address: user?.email,
       repo: name,
       owner: owner,
       branch: "main",
@@ -200,7 +201,8 @@ const RepoDrawer = () => {
         stripe_customer_id: stripe_customer_id,
         monthly_budget: monthly_budget,
       },
-      Number(costToTrain)
+      Number(costToTrain),
+      user?.email,
     );
 
     const { data, error } = await supabase
@@ -213,7 +215,7 @@ const RepoDrawer = () => {
   };
 
   useEffect(() => {
-    getModels(setTrainedModels, () => {}, stripe_customer_id);
+    getModels(setTrainedModels, () => { }, user?.email);
   }, [repos]);
 
   if (!session?.provider_token) {

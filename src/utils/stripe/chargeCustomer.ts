@@ -14,7 +14,7 @@ const stripe = new Stripe(token, {
 
 const minimum_charge = 10; //10 dollars
 
-const chargeCustomer = async (customer: any, amount: number) => {
+const chargeCustomer = async (customer: any, amount: number, email: any) => {
   if (!supabase) return;
 
   amount = Number(amount);
@@ -23,7 +23,7 @@ const chargeCustomer = async (customer: any, amount: number) => {
   const { data: creditsData, error: creditsError } = await supabase
     .from("customers")
     .select("*")
-    .eq("stripe_customer_id", customer.stripe_customer_id)
+    .eq("email_address", email)
     .single();
 
   if (creditsError) {
@@ -39,7 +39,7 @@ const chargeCustomer = async (customer: any, amount: number) => {
       await supabase
         .from("customers")
         .update({ credits: (credits - amount).toFixed(2) })
-        .eq("stripe_customer_id", customer.stripe_customer_id)
+        .eq("email_address", email)
         .select();
 
     if (removeCreditsError) {
@@ -49,6 +49,8 @@ const chargeCustomer = async (customer: any, amount: number) => {
 
     return;
   }
+
+  if(!customer.stripe_customer_id) return;
 
   const { maxWeCanChargeCustomer, canChargeCustomer }: any =
     await getCustomerChargeLimits(customer, monthly_budget);

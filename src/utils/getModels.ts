@@ -4,14 +4,14 @@ import { supabase } from "./supabase";
 const getModels = async (
 	setState: any,
 	setLoading: any,
-	stripe_customer_id: any
+	email: any
 ) => {
 	if (!supabase) return;
 
 	const { data, error } = await supabase
 		.from("models")
 		.select("*")
-		.eq("stripe_customer_id", stripe_customer_id);
+		.eq("email_address", email);
 
 	if (!error) {
 		setState(data);
