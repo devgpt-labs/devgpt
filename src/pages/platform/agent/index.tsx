@@ -90,6 +90,28 @@ const Chat = () => {
     authStore();
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
     initialMessages: initialMessages,
+    onFinish: (data: any) => {
+      // log the last message
+      console.log(messages[messages.length - 1]?.content);
+      console.log(input);
+
+      const inputTokens = getTokensFromString(input);
+      const responseTokens = getTokensFromString(
+        String(messages[messages.length - 1]?.content)
+      );
+
+      const usage = inputTokens + responseTokens;
+      const cost = calculateTokenCost(usage);
+
+      chargeCustomer({ stripe_customer_id: stripe_customer_id }, cost);
+
+      savePrompt(
+        user?.email,
+        prompt,
+        messages[messages.length - 1]?.content,
+        usage
+      );
+    },
   });
 
   useEffect(() => {
@@ -103,25 +125,6 @@ const Chat = () => {
       setRepo(lastUsedRepoObject);
     }
   }, []);
-
-  useEffect(() => {
-    let usage: number = 0;
-    const customer = {
-      stripe_customer_id: stripe_customer_id,
-    };
-
-    const responseTokenCost = getTokensFromString(
-      String(messages[messages.length - 1]?.content)
-    );
-    const promptTokenCost = getTokensFromString(correctedPrompt);
-    const cost = calculateTokenCost(usage);
-
-    usage = responseTokenCost + promptTokenCost;
-
-    if (usage > 0) {
-      chargeCustomer(customer, cost);
-    }
-  }, [messages, correctedPrompt]);
 
   const getDiscordOnline = async () => {
     try {
@@ -160,7 +163,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       stripe_customer_id
     );
   }, []);
