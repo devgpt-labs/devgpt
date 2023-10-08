@@ -62,7 +62,7 @@ const Auth = () => {
         h="100vh"
         w="100vw"
       >
-        <Spinner size="lg" />
+        <Spinner height={20} width={20} />
       </Flex>
     );
 
