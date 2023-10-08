@@ -73,6 +73,7 @@ import { BiCircle, BiRefresh, BiSolidDollarCircle } from "react-icons/bi";
 import { PiSelectionBackground } from "react-icons/pi";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
+import trainModels from "@/utils/trainModels";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -174,6 +175,9 @@ const Models = ({ onClose }: any) => {
   };
 
   useEffect(() => {
+    // Train models
+    trainModels(session, user);
+
     // If the url contains the word billing, open the billing section
     if (router.asPath.includes("billing")) {
       // Show billing section

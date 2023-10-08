@@ -28,6 +28,9 @@ interface Model {
 }
 
 async function trainModels(session: any, user: any) {
+
+  console.log('ran a cycle');
+  
   if (!supabase) {
     console.log("No supabase client found");
     return;
