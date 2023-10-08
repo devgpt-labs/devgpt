@@ -91,10 +91,6 @@ const Chat = () => {
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
     initialMessages: initialMessages,
     onFinish: (data: any) => {
-      // log the last message
-      console.log(messages[messages.length - 1]?.content);
-      console.log(input);
-
       const inputTokens = getTokensFromString(input);
       const responseTokens = getTokensFromString(
         String(messages[messages.length - 1]?.content)
@@ -292,9 +288,6 @@ const Chat = () => {
     }
     return true;
   };
-
-  console.log(initialMessages);
-
 
   return (
     <Template>

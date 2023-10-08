@@ -279,7 +279,6 @@ const Models = ({ onClose }: any) => {
         height="100vh"
         flexDirection="column"
         p={4}
-        bg={colorMode === "light" ? "gray.50" : "black"}
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">

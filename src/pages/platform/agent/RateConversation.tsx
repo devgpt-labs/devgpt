@@ -43,8 +43,8 @@ const RateConversation = ({ visible }: any) => {
           gap={1}
           fontSize="sm"
         >
-          <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>👍</ToggleItem>
+          <ToggleItem onClick={onClickHandler}>👎</ToggleItem>
           <ToggleItem onClick={onClickHandler}>❤️</ToggleItem>
         </List>
       </Flex>

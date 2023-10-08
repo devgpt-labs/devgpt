@@ -12,6 +12,7 @@ import {
   Flex,
   Tooltip,
   Spinner,
+  Text,
 } from "@chakra-ui/react";
 
 import { useRouter } from "next/router";
@@ -57,7 +58,7 @@ const Auth = () => {
     return (
       <Flex
         alignItems="center"
-        justifyContent="center"
+        justifyContent="centent"
         mt={5}
         h="100vh"
         w="100vw"
