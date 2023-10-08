@@ -62,7 +62,7 @@ const Auth = () => {
         h="100vh"
         w="100vw"
       >
-        <Spinner size="lg" />
+        <Spinner height={20} width={20} />
       </Flex>
     );
 
@@ -93,7 +93,7 @@ const Auth = () => {
               provider="Sign In With BitBucket"
               handle={signInWithBitbucket}
               Icon={<FaBitbucket />}
-              tooltip=''
+              tooltip="Coming soon!"
             />
             <GitConnectorButton
               color="#FC6D27"
