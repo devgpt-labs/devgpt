@@ -92,21 +92,18 @@ const Chat = () => {
     initialMessages: initialMessages,
     onFinish: (data: any) => {
       const inputTokens = getTokensFromString(input);
-      const responseTokens = getTokensFromString(
-        String(messages[messages.length - 1]?.content)
-      );
+      const responseTokens = getTokensFromString(String(data.content));
 
       const usage = inputTokens + responseTokens;
       const cost = calculateTokenCost(usage);
 
-      chargeCustomer({ stripe_customer_id: stripe_customer_id }, cost, user?.email);
-
-      savePrompt(
-        user?.email,
-        prompt,
-        messages[messages.length - 1]?.content,
-        usage
+      chargeCustomer(
+        { stripe_customer_id: stripe_customer_id },
+        cost,
+        user?.email
       );
+
+      savePrompt(user?.email, prompt, data.content, usage);
     },
   });
 

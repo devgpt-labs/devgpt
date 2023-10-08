@@ -65,7 +65,7 @@ const Auth = () => {
           w="100vw"
         >
           <Spinner height={5} width={5} />
-          <Text ml={2}>Warming up...</Text>
+          <Text ml={3}>Just getting started...</Text>
         </Flex>
       </Template>
 
