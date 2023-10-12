@@ -253,7 +253,7 @@ const Profile = () => {
               <Tooltip label="Report An Issue" placement="top">
                 <Link
                   isExternal
-                  href="https://github.com/february-labs/devgpt-releases/issues"
+                  href="https://github.com/devgpt-labs/devgpt-releases/issues"
                 >
                   <IconButton
                     _hover={{
