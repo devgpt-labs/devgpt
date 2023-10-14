@@ -52,6 +52,10 @@ Welcome to **DevGPT**, the AI-driven development tool designed to transform the 
 1. **How much time will this save me?**
    - Our average user saves 1.5 hours every day, allowing you to focus on more complex and fulfilling tasks.
 
+## Getting Started for Open-Source Contributors
+
+For detailed instructions on how to set up the development environment and build DevGPT from source, please visit [our documentation](https://docs.devgpt.com/february-labs/open-source-setup).
+
 ## Support
 
 For any queries, issues, or support needs, feel free to contact us at support@devgpt.com
