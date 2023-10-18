@@ -77,11 +77,9 @@ const ModelCard = ({
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(JSON.parse(model.output).length);
 
     // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
-    if (JSON.parse(model?.output)?.length === 1) {
-      console.log("in here", JSON.parse(model.output));
+    if (!model.output || JSON?.parse?.(model?.output)?.length === 1) {
 
       // Show training failed on this model
       setTrainingFailed(true);

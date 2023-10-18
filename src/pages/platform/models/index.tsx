@@ -42,6 +42,8 @@ import { BiRefresh } from "react-icons/bi";
 import trainModels from "@/utils/trainModels";
 import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
+import createModelID from "@/utils/createModelID";
+import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits, status }: any =
@@ -57,8 +59,12 @@ const Models = ({ onClose }: any) => {
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
+  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [budget, setBudget] = useState<any>(null);
+  const [someModelsAreTraining, setSomeModelsAreTraining] =
+    useState<boolean>(false);
+  const [budgetEstimation, setBudgetEstimation] = useState<number>(0);
 
   interface Model {
     id: string;
@@ -73,30 +79,6 @@ const Models = ({ onClose }: any) => {
     sample_size: number;
     frequency: number;
   }
-
-  useEffect(() => {
-    if (!session) {
-      console.log("no session found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-
-    if (!user) {
-      console.log("no user found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-  }, [session, user]);
-
-  // Used to show how much the user will have available for prompting
-  const balanceCalculation =
-    Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));
-  let promptingBalance = balanceCalculation;
-  if (promptingBalance < 0) {
-    promptingBalance = 0;
-  }
-
-  // Used to get an estimation of how much the user will spend each month
-  const budgetEstimation =
-    Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
 
   const getMonthlyBudget = async () => {
     if (!supabase) return;
@@ -133,19 +115,30 @@ const Models = ({ onClose }: any) => {
     }
   };
 
+  const findIfModelsAreTraining = async () => {
+    const areModelsTraining = await modelsInTraining.map((model: any) => {
+      if (!model.output) return true;
+      if (JSON.parse(model?.output).length === 1) return true;
+
+      return false
+    });
+
+    // If areModelsTraining array contains a true value, set someModelsAreTraining to true
+    const someModelsAreTraining = areModelsTraining.includes(true);
+    setSomeModelsAreTraining(someModelsAreTraining);
+  };
+
+  console.log(someModelsAreTraining);
+
+
   useEffect(() => {
     // Train models
     trainModels(session, user);
-  }, []);
 
-  useEffect(() => {
-    getMonthlyBudget();
-    getModels(setModelsInTraining, setLoading, user?.email);
+    // get data from training_log table
+    getTrainingLogsForModel(setTrainingLogs, user);
 
-    // set budget to a
-  }, [repos, refresh]);
-
-  useEffect(() => {
+    // Subscribe to output changes
     if (!supabase) return;
     const models = supabase
       .channel("custom-all-channel")
@@ -172,14 +165,33 @@ const Models = ({ onClose }: any) => {
       .subscribe();
   }, []);
 
+  useEffect(() => {
+    getMonthlyBudget();
+    getModels(setModelsInTraining, setLoading, user?.email);
+  }, [repos, refresh]);
+
+  useEffect(() => {
+    // Find if any models are still training
+    findIfModelsAreTraining();
+
+    // Set budget estimation
+    setBudgetEstimation(Number(calculateTotalCost(modelsInTraining, 0)) * 1.2);
+  }, [modelsInTraining]);
+
+  useEffect(() => {
+    if (!session) {
+      console.log("no session found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+
+    if (!user) {
+      console.log("no user found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+  }, [session, user]);
+
   if (loading || budget === null) return <ModelLoadingScreen />;
   if (modelsInTraining.length === 0) return <AddAModel />;
-
-  const someModelsAreTraining = modelsInTraining.some((model: any) => {
-    // find if the model has a training log open
-    if (!model.output) return true;
-    if (JSON.parse(model?.output).length === 1) return true;
-  });
 
   return (
     <Template>
@@ -237,7 +249,7 @@ const Models = ({ onClose }: any) => {
             </Button>
           </Flex>
         </Flex>
-        <Accordion allowMultiple index={[0, 1]}>
+        <Accordion allowMultiple defaultIndex={[0, 1]}>
           {someModelsAreTraining && (
             <AccordionItem>
               <h2>

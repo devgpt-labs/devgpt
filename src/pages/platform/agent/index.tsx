@@ -291,9 +291,6 @@ const Chat = () => {
     return true;
   };
 
-  console.log("here", status?.isOverdue);
-  console.log(credits);
-
   const TrainingStatus = () => {
     if (status?.isOverdue || credits < 0) return null;
 
