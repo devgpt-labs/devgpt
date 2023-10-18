@@ -56,11 +56,9 @@ async function update(interval: string) {
     customers_with_payments_required.push({ customer, charge });
   }
 
-  // async charge each customer
-  // TODO: Readd automatic charging
-  // for (const customer of customers_with_payments_required) {
-  //   await chargeCustomer(customer.customer, customer.charge, customer.email_address);
-  // }
+  for (const customer of customers_with_payments_required) {
+    await chargeCustomer(customer.customer, customer.charge, customer.email_address);
+  }
 
   return { customers_with_payments_required, now };
 }

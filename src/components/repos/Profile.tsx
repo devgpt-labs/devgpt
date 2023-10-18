@@ -26,6 +26,7 @@ import UpgradeModal from "./UpgradeModal";
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
 import { BiSolidBookBookmark } from "react-icons/bi";
+import { AiFillCreditCard } from "react-icons/ai";
 import {
   GiBattery100,
   GiBattery75,
@@ -186,7 +187,7 @@ const Profile = () => {
           justifyContent="space-between"
           width="100%"
         >
-          <Flex flexDirection="row">
+          <Flex flexDirection="row" alignItems='center'>
             {identity?.avatar_url && (
               <Image
                 _hover={{
@@ -214,39 +215,12 @@ const Profile = () => {
           </Flex>
           <Flex flexDirection="row">
             <Flex gap={2}>
-              {!isPro && (
-                <Tooltip
-                  label={`${10 - promptCount}/10 Free Prompts Remaining Today`}
-                  placement="top"
-                >
-                  <IconButton
-                    _hover={{
-                      transform: "translateY(-4px)",
-                      transition: "all 0.2s ease-in-out",
-                    }}
-                    onClick={onUpgradeOpen}
-                    aria-label="Upgrade"
-                    icon={
-                      promptCount === 10 ? (
-                        <GiBattery0 />
-                      ) : promptCount > 4 ? (
-                        <GiBattery50 />
-                      ) : promptCount > 0 ? (
-                        <GiBattery75 />
-                      ) : (
-                        <GiBattery100 />
-                      )
-                    }
-                  />
-                </Tooltip>
-              )}
-
               <ProfileOptionIconButton
                 comparison={colorMode === "light"}
                 onClick={toggleColorMode}
                 ariaLabel="Turn the lights on"
-                label="Dark"
-                otherLabel="Light"
+                label="Go Dark Mode"
+                otherLabel="Go Light Mode"
                 Icon={MoonIcon}
                 OtherIcon={SunIcon}
               />
@@ -316,12 +290,12 @@ const Profile = () => {
                     transition: "all 0.2s ease-in-out",
                   }}
                   onClick={() => {
-                    router.push("/platform/models", 'billing', {
+                    router.push("/platform/billing", undefined, {
                       shallow: true,
                     });
                   }}
                   aria-label="View Billing"
-                  icon={<MdMoney size={18} />}
+                  icon={<AiFillCreditCard size={18} />}
                 />
               </Tooltip>
               <Tooltip label="Signout" placement="top">

@@ -14,6 +14,21 @@ const stripe = new Stripe(token, {
 
 const minimum_charge = 10; //10 dollars
 
+const setUserToPaymentOverdue = async (email: string) => {
+	if (!supabase) return;
+
+	const { data: overdueData, error: overdueError } = await supabase
+		.from("customers")
+		.update({ isOverdue: true })
+		.eq("email_address", email)
+		.select();
+
+	if (overdueError) {
+		console.log(overdueError);
+		return;
+	}
+};
+
 const chargeCustomer = async (customer: any, amount: number, email: any) => {
 	if (!supabase) return;
 
@@ -27,35 +42,37 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 		.single();
 
 	if (creditsError) {
-		console.log(creditsError);
+		console.log({ creditsError });
 		return;
 	}
 
 	const { credits, monthly_budget }: any = creditsData;
 
-	if (amount < credits) {
-		// Remove the amount from the customer's account balance
-		const { data: removeCreditsData, error: removeCreditsError } =
-			await supabase
-				.from("customers")
-				.update({ credits: (credits - amount).toFixed(2) })
-				.eq("email_address", email)
-				.select();
+	// Remove the amount from the customer's account balance
+	const { data: removeCreditsData, error: removeCreditsError } = await supabase
+		.from("customers")
+		.update({ credits: (credits - amount).toFixed(2) })
+		.eq("email_address", email)
+		.select();
 
-		if (removeCreditsError) {
-			console.log(removeCreditsError);
-			return;
-		}
-
+	if (removeCreditsError) {
+		console.log({ removeCreditsError });
 		return;
 	}
 
-	if (!customer.stripe_customer_id) return;
+	// the user failed credit removal, meaning the user has to make a payment
+	if (!customer.stripe_customer_id) {
+		setUserToPaymentOverdue(email);
+		return;
+	}
 
 	const { maxWeCanChargeCustomer, canChargeCustomer }: any =
 		await getCustomerChargeLimits(customer, monthly_budget);
 
-	if (!canChargeCustomer) return;
+	if (!canChargeCustomer) {
+		setUserToPaymentOverdue(email);
+		return;
+	}
 
 	const paymentMethods = await stripe.customers.listPaymentMethods(
 		customer.stripe_customer_id,
@@ -69,7 +86,10 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 	const amountWithCaps =
 		amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
 
-	if (amountWithCaps <= 0) return;
+	if (amountWithCaps <= 0) {
+		setUserToPaymentOverdue(email);
+		return;
+	}
 
 	//use stripe to charge the customer
 	const paymentIntent = await stripe.paymentIntents.create({
@@ -87,7 +107,18 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 		payment_method: payment_method,
 	});
 
-	if (!paymentIntent) return false;
+	if (
+		confirmation.status === "requires_action" ||
+		confirmation.status === "canceled" ||
+		confirmation.status === "requires_payment_method"
+	) {
+		setUserToPaymentOverdue(email);
+	}
+
+	if (!paymentIntent) {
+		setUserToPaymentOverdue(email);
+		return;
+	}
 };
 
 export default chargeCustomer;

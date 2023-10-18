@@ -4,76 +4,44 @@ import {
   Flex,
   Text,
   Box,
-  SlideFade,
   Skeleton,
   Heading,
-  CardBody,
-  Card,
-  Tag,
   Grid,
-  GridItem,
-  Badge,
-  StackDivider,
-  Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
   Button,
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
   IconButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
   useDisclosure,
-  ModalCloseButton,
   useColorMode,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Spinner,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
 import ConfirmationModal from "./ConfirmationModal";
 import Link from "next/link";
 import ModelCard from "./ModelCard";
+import ModelInTraining from "./ModelInTraining";
+import ModelLoadingScreen from "./ModelLoadingScreen";
 
 //stores
 import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
-import Setup from "@/components/repos/Setup";
 import { useRouter } from "next/router";
 
 //utils
-import moment from "moment";
 import calculateTotalCost from "@/utils/calculateTotalCost";
-import getModels from "@/utils/getModels";
 
 //components
 import Template from "@/components/Template";
 import RepoDrawer from "@/components/repos/RepoDrawer";
 
 //icons
-import {
-  EditIcon,
-  DeleteIcon,
-  SmallAddIcon,
-  ArrowBackIcon,
-} from "@chakra-ui/icons";
-import { BiCircle, BiRefresh, BiSolidDollarCircle } from "react-icons/bi";
-import { PiSelectionBackground } from "react-icons/pi";
-import { AiFillCheckCircle } from "react-icons/ai";
-import { PiCircleLight } from "react-icons/pi";
+import { SmallAddIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import { BiRefresh } from "react-icons/bi";
 import trainModels from "@/utils/trainModels";
+import getModels from "@/utils/getModels";
+import AddAModel from "./AddAModel";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -87,9 +55,9 @@ const Models = ({ onClose }: any) => {
 
   const { colorMode }: any = useColorMode();
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
-  const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
+  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
 
   // Budgets
@@ -133,7 +101,6 @@ const Models = ({ onClose }: any) => {
   const budgetEstimation =
     Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
 
-
   const handleBudgetChange = (e: any) => {
     setBudget(e.target.value);
   };
@@ -154,7 +121,7 @@ const Models = ({ onClose }: any) => {
 
     if (data) {
       setBudget(data.monthly_budget);
-    };
+    }
   };
 
   const saveMonthlyBudget = async () => {
@@ -164,105 +131,68 @@ const Models = ({ onClose }: any) => {
       .update({ monthly_budget: budget })
       .eq("email_address", user?.email);
 
-
     if (error) {
       console.log(error);
       return;
     }
     if (data) {
-      console.log('new budget saved');
-    };
+      console.log("new budget saved");
+    }
   };
 
   useEffect(() => {
     // Train models
     trainModels(session, user);
-
-    // If the url contains the word billing, open the billing section
-    if (router.asPath.includes("billing")) {
-      // Show billing section
-      setShowBilling(true);
-
-      // TODO: This is a hacky fix to scroll to billing after render
-      setTimeout(() => {
-        const element = document.getElementById("billing");
-        element?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
   }, []);
 
   useEffect(() => {
-    getMonthlyBudget()
+    getMonthlyBudget();
     getModels(setModelsInTraining, setLoading, user?.email);
-
-    if (modelsInTraining.length > 0) {
-      // Get the current budget from supabase
-      if (!supabase) return;
-    }
 
     // set budget to a
   }, [repos, refresh]);
 
-  const calculateStatSum = (stat: string) => {
-    return modelsInTraining.length > 0 ? (
-      <>
-        {modelsInTraining
-          .map((model: any) => model?.[stat])
-          .reduce((a: any, b: any) => a + b, 0)}
-      </>
-    ) : (
-      0
-    );
-  };
+  useEffect(() => {
+    console.log({ modelsInTraining });
+  }, [modelsInTraining]);
 
-  if (loading || budget === null) {
-    return (
-      <Template>
-        <Box p={6} width="100vw" height="100vh">
-          <Flex width="100%" mb={6} justifyContent="space-between">
-            <Skeleton
-              bg="gray.700"
-              height="35px"
-              width="250px"
-              borderRadius={10}
-            />
-            <Flex flexDirection="row" gap={4}>
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-            </Flex>
-          </Flex>
-          <Grid
-            templateColumns="repeat(3, 1fr)"
-            gap={8}
-            flexWrap="wrap"
-            width="100%"
-          >
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-          </Grid>
-        </Box>
-      </Template>
-    );
-  }
+  useEffect(() => {
+    if (!supabase) return;
+    const models = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "models" },
+        (payload: any) => {
+          if (payload.new.stripe_customer_id === stripe_customer_id) {
+            // Update modelsInTraining ith the payload.new of the corresponding model
+            setModelsInTraining((modelsInTraining: any) => {
+              const newModelsInTraining = modelsInTraining.map(
+                (model: Model) => {
+                  if (model.id === payload.new.id) {
+                    return payload.new;
+                  }
+                  return model;
+                }
+              );
+              return newModelsInTraining;
+            });
+          }
+        }
+      )
+      .subscribe();
+  }, []);
+
+  if (loading || budget === null) return <ModelLoadingScreen />;
+  if (modelsInTraining.length === 0) return <AddAModel />;
+
+  const someModelsAreTraining = modelsInTraining.some((model: any) => {
+    // find if the model has a training log open
+    if (JSON.parse(model?.output).length === 1) return true;
+  });
+
+  console.log({ modelsInTraining });
+
 
   return (
     <Template>
@@ -274,7 +204,6 @@ const Models = ({ onClose }: any) => {
         onClose={onConfirmationClose}
         onSubmit={saveMonthlyBudget}
         setLoadingState={setLoading}
-        handleModelInTrainingChange={() => { }}
       />
       <Flex
         flex={1}
@@ -316,164 +245,55 @@ const Models = ({ onClose }: any) => {
             >
               Refresh
             </Button>
-            <Button
-              onClick={() => {
-                if (showBilling) return setShowBilling(false);
-
-                setShowBilling(true);
-                const element = document.getElementById("billing");
-                element?.scrollIntoView({ behavior: "smooth" });
-              }}
-              rightIcon={<BiSolidDollarCircle />}
-            >
-              Billing
-            </Button>
           </Flex>
         </Flex>
+        <Accordion allowMultiple index={[0, 1]}>
+          {someModelsAreTraining && (
+            <AccordionItem>
+              <h2>
+                <AccordionButton>
+                  <Box as="span" flex="1" textAlign="left" mt={2}>
+                    Models Being Trained
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel pb={4}>
+                <Flex width="100%" flexDirection="column" mb={4}>
+                  {modelsInTraining.map((model: any) => {
+                    return <ModelInTraining model={model} />;
+                  })}
+                </Flex>
+              </AccordionPanel>
+            </AccordionItem>
+          )}
+          <AccordionItem>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left" mt={2}>
+                  Trained Models
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
 
-        {modelsInTraining.length > 0 ? (
-          <Grid templateColumns="repeat(3, 1fr)" gap={6} flexWrap="wrap">
-            {modelsInTraining.map((model: any) => {
-              return (
-                <ModelCard
-                  model={model}
-                  modelsInTraining={modelsInTraining}
-                  setModelsInTraining={setModelsInTraining}
-                />
-              );
-            })}
-          </Grid>
-        ) : (
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            gap={2}
-            width="100%"
-            height="100%"
-          >
-            <Text>No models found yet</Text>
-            <Button
-              onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Train A New Model
-            </Button>
-          </Flex>
-        )}
-        <SlideFade in={showBilling} offsetY="20px" id="billing">
-          <Box p={5} mt={5}>
-            <Heading size="lg" mb={3}>
-              Billing
-            </Heading>
-            <Flex flexDirection={"column"} mb={3}>
-              <Heading size="md" mb={4} mt={2}>
-                Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
-              </Heading>
-              <Text mb={2}>Monthly Budget</Text>
-              <InputGroup>
-                <InputLeftAddon children="$" />
-                <Input
-                  max={10000000}
-                  value={budget}
-                  type="number"
-                  onChange={handleBudgetChange}
-                />
-                <InputRightElement width="4.5rem">
-                  <Button
-                    color='white'
-                    bgGradient={"linear(to-r, blue.500,teal.500)"}
-                    h="1.75rem"
-                    size="sm"
-                    onClick={onConfirmationOpen}
-                  >
-                    Save
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-              <Badge
-                color={promptingBalance === 0 ? "orange" : "teal"}
-                alignSelf="flex-start"
-                mt={2}
-              >
-                This budget give you a monthly balance for prompting of $
-                {promptingBalance.toFixed(2)}
-              </Badge>
-              {promptingBalance === 0 && (
-                <Badge alignSelf="flex-start" mt={2} color="orange">
-                  This budget will limit your models from reaching your
-                  settings.
-                </Badge>
+            <AccordionPanel pb={4}>
+              {modelsInTraining.length > 0 && (
+                <Grid templateColumns="repeat(3, 1fr)" gap={6} flexWrap="wrap">
+                  {modelsInTraining.map((model: any) => {
+                    return (
+                      <ModelCard
+                        model={model}
+                        modelsInTraining={modelsInTraining}
+                        setModelsInTraining={setModelsInTraining}
+                      />
+                    );
+                  })}
+                </Grid>
               )}
-            </Flex>
-            <TableContainer>
-              <Table variant="striped">
-                <Thead>
-                  <Tr>
-                    <Th>Name</Th>
-                    <Th isNumeric>Epochs</Th>
-                    <Th isNumeric>Sample_Size</Th>
-                    <Th isNumeric>Frequency</Th>
-                    <Th isNumeric>Cost</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {modelsInTraining.length > 0 ? (
-                    <>
-                      {modelsInTraining.map((model: any) => {
-                        return (
-                          <>
-                            <Tr>
-                              <Td>{model.repo}</Td>
-                              <Td isNumeric>{model.epochs}</Td>
-                              <Td isNumeric>{model.sample_size}</Td>
-                              <Td isNumeric>{model.frequency}</Td>
-                              <Td isNumeric>
-                                ${calculateTotalCost([model], 0)}
-                              </Td>
-                            </Tr>
-                          </>
-                        );
-                      })}
-                    </>
-                  ) : (
-                    <Text my={4}>No models have been trained yet.</Text>
-                  )}
-
-                </Tbody>
-                <Tfoot>
-                  <Tr>
-                    <Th>Total</Th>
-                    <Th isNumeric>{calculateStatSum("epochs")}</Th>
-                    <Th isNumeric>{calculateStatSum("sample_size")}</Th>
-                    <Th isNumeric>{calculateStatSum("frequency")}</Th>
-                    <Th isNumeric>
-                      $
-                      {
-                        calculateTotalCost(modelsInTraining, 0)}
-                    </Th>
-                  </Tr>
-                  <Tr>
-                    <Th>Estimated monthly cost</Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric>
-                      <Heading>
-                        $
-                        {budget < budgetEstimation
-                          ? budget
-                          : budgetEstimation.toFixed(2)}
-                      </Heading>
-                    </Th>
-                  </Tr>
-                </Tfoot>
-              </Table>
-            </TableContainer>
-          </Box>
-        </SlideFade>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
       </Flex>
       <RepoDrawer />
     </Template>

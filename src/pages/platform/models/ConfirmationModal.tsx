@@ -19,7 +19,6 @@ const ConfirmationModal = ({
   onClose,
   onSubmit,
   setLoadingState,
-  handleModelInTrainingChange,
 }: {
   header: string;
   body: string;
@@ -28,18 +27,22 @@ const ConfirmationModal = ({
   onClose: () => void;
   onSubmit: () => void;
   setLoadingState: (value: boolean) => void;
-  handleModelInTrainingChange: (e: any) => void;
 }) => {
   return (
-    <Modal isCentered={true} isOpen={isOpen} onClose={onClose}>
+    <Modal
+      isCentered={true}
+      isOpen={isOpen}
+      onClose={() => {
+        onClose();
+        setLoadingState(false);
+      }}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{header}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
-            {body}
-          </Text>
+          <Text>{body}</Text>
         </ModalBody>
 
         <ModalFooter>
@@ -57,15 +60,9 @@ const ConfirmationModal = ({
             onClick={() => {
               onSubmit();
               setLoadingState(false);
-              handleModelInTrainingChange({
-                target: {
-                  name: "deleted",
-                  value: true,
-                },
-              });
               onClose();
             }}
-            color='white'
+            color="white"
             bgGradient={"linear(to-r, blue.500,teal.500)"}
             width="100%"
           >

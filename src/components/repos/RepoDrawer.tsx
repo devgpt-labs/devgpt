@@ -37,6 +37,7 @@ import getModels from "@/utils/getModels";
 import createModelID from "@/utils/createModelID";
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
+import addTrainingLog from "@/utils/addTrainingLog";
 
 //components
 type PageInfo = {
@@ -169,41 +170,22 @@ const RepoDrawer = () => {
     if (!supabase) return;
 
     const newModel = {
+      created_at: new Date().toISOString(),
       stripe_customer_id: stripe_customer_id,
-      email_address: user?.email,
       repo: name,
       owner: owner,
       branch: "main",
-      training_method: "ENCODING",
-      output: null,
       epochs: repo.epochs,
+      training_method: "ENCODING",
       frequency: repo.frequency,
       sample_size: repo.sampleSize,
+      output: null,
+      deleted: false,
+      email_address: user?.email,
     };
 
     //insert the first training_log
-    const { data: logData, error: logError }: any = await supabase
-      .from("training_log")
-      .insert([
-        {
-          model_id: createModelID(name, owner, "main"),
-          model_settings: JSON.stringify(newModel),
-          fulfilled: false,
-        },
-      ]);
-
-    //calculate cost of training this model
-    const costToTrain = calculateTotalCost([newModel], 0);
-
-    //create a new charge
-    chargeCustomer(
-      {
-        stripe_customer_id: stripe_customer_id,
-        monthly_budget: monthly_budget,
-      },
-      Number(costToTrain),
-      user?.email,
-    );
+    addTrainingLog(newModel);
 
     const { data, error } = await supabase
       .from("models")

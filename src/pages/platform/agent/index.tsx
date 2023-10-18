@@ -17,10 +17,11 @@ import {
   Tooltip,
   IconButton,
   Badge,
+  Link,
+  StatUpArrow,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import Science from "@/components/repos/Science";
 
@@ -40,6 +41,7 @@ import RateConversation from "./RateConversation";
 import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import Models from "../models";
+import { supabase } from "@/utils/supabase";
 import Calculator from "@/components/repos/Calculator";
 
 //utils
@@ -55,8 +57,14 @@ import chargeCustomer from "@/utils/stripe/chargeCustomer";
 import trainModels from "@/utils/trainModels";
 
 // Icons
-import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
+import { BsDiscord, BsGithub, BsGraphUpArrow, BsStars } from "react-icons/bs";
+import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { RiRefreshFill } from "react-icons/ri";
+import { PlusSquareIcon } from "@chakra-ui/icons";
+import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
+import Stripe from "stripe";
 
 const Chat = () => {
   // Constants
@@ -74,20 +82,17 @@ const Chat = () => {
   // Active state
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
-  const [trainingDataRetrieved, setTrainingDataRetrieved] =
-    useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
-  const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const { messages: savedMessages }: any = messageStore();
   const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
-  const { colorMode } = useColorMode();
-  const { user, session, stripe_customer_id, fetch, signOut }: any =
+  const { user, session, stripe_customer_id, signOut, status, credits }: any =
     authStore();
+
+  // Handles responses, sending prompt, reloading and input.
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
     initialMessages: initialMessages,
     onFinish: (data: any) => {
@@ -107,9 +112,38 @@ const Chat = () => {
     },
   });
 
+  if (status?.isBanned) {
+    return (
+      <Template>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          mt={5}
+          h="100vh"
+          w="100vw"
+        >
+          <BiConfused />
+          <Text ml={3}>
+            Oops, something went wrong! Please get in touch with the team via
+            Discord.
+          </Text>
+        </Flex>
+      </Template>
+    );
+  }
+
   useEffect(() => {
     // Train models on load
     trainModels(session, user);
+
+    // Get all models
+    getModels(
+      (data: any) => {
+        setModels(data);
+      },
+      () => { },
+      user?.email
+    );
 
     // Get the users last used repo
     const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
@@ -117,26 +151,7 @@ const Chat = () => {
       const lastUsedRepoObject = JSON.parse(lastUsedRepo);
       setRepo(lastUsedRepoObject);
     }
-  }, []);
 
-  const getDiscordOnline = async () => {
-    try {
-      const response = await fetch(
-        "https://discord.com/api/guilds/931533612313112617/widget.json"
-      );
-
-      const json = await response.json();
-      return json.presence_count;
-    } catch (error) {
-      console.log(error);
-
-      // Handle errors here
-      console.error("Error fetching Discord data:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
     if (!session?.provider_token) {
       signOut();
       router.push("/", undefined, { shallow: true });
@@ -148,17 +163,6 @@ const Chat = () => {
       router.push("/", undefined, { shallow: true });
       console.log("no user found, returning to home");
     }
-  }, []);
-
-  useEffect(() => {
-    // Get all models
-    getModels(
-      (data: any) => {
-        setModels(data);
-      },
-      () => { },
-      user?.email
-    );
   }, []);
 
   useEffect(() => {
@@ -179,14 +183,6 @@ const Chat = () => {
     });
   }, [repo, models]);
 
-  // This logic breaks down the prompt to find @'d files
-  const regex = /@([^ ]+)/g;
-  const withAt: any = [];
-  let match: any;
-  while ((match = regex.exec(prompt))) {
-    withAt.push(match[1]);
-  }
-
   useEffect(() => {
     setLoading(false);
   }, [messages]);
@@ -195,6 +191,14 @@ const Chat = () => {
     if (promptCount != 0) return;
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
+
+  // This logic breaks down the prompt to find @'d files
+  const regex = /@([^ ]+)/g;
+  const withAt: any = [];
+  let match: any;
+  while ((match = regex.exec(prompt))) {
+    withAt.push(match[1]);
+  }
 
   // Get the current file being targeted with @
   const selectedFile = lofaf?.filter((file: any) => {
@@ -208,7 +212,7 @@ const Chat = () => {
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
     const lastWord = promptArray[promptArray?.length - 1];
-    const newPrompt = prompt.replace(lastWord, `~${file}`);
+    const newPrompt = prompt.replace(lastWord, `~/${file}`);
 
     // Set prompts
     setPrompt(newPrompt);
@@ -286,6 +290,9 @@ const Chat = () => {
     return true;
   };
 
+  console.log("here", status?.isOverdue);
+  console.log(credits);
+
   return (
     <Template>
       <Flex
@@ -303,26 +310,28 @@ const Chat = () => {
         >
           <ChatHeader />
           {!repo.repo && (
-            <Link href="/platform/models">
+            <>
               <Button width="100%" mt={4}>
                 Train a model to get started
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
               </Text>
-            </Link>
+            </>
           )}
-          {initialMessages?.length === 0 && repo.repo ? (
-            <Text mt={4} mb={4}>
-              Your AI model is <Badge>Training</Badge>, until this is done the
-              AI won't be able to access your repos context.
-            </Text>
-          ) : (
-            <Text mt={4} mb={4}>
-              Your trained AI model is{" "}
-              <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-            </Text>
-          )}
+          {!status?.isOverdue &&
+            (initialMessages?.length === 0 && repo.repo ? (
+              <Text mt={4} mb={4}>
+                Your AI model is <Badge>Training</Badge>, until this is done the
+                AI won't be able to access your repos context.
+              </Text>
+            ) : (
+              <Text my={3}>
+                Your trained AI model is{" "}
+                <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
+              </Text>
+            ))}
+
           {repo.repo && (
             <Box maxH={"45vh"} overflowY={"auto"}>
               {withAt?.length > 0 && (
@@ -331,7 +340,7 @@ const Chat = () => {
                   <Text ml={1}> to accept suggestion</Text>
                 </Flex>
               )}
-              <Flex flexDirection="row" flexWrap="wrap">
+              <Flex flexDirection="row" flexWrap="wrap" mb={2}>
                 <SlideFade key={match} in={selectedFile?.[0] ? true : false}>
                   {selectedFile?.map((file: any, index: any) => {
                     if (index > 12) return null;
@@ -364,69 +373,119 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              <Flex flexDirection="row" mt={4}>
-                <Input
-                  className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-                  value={prompt}
-                  placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-                  onChange={(e: any) => {
-                    setPrompt(e.target.value);
-                    handleInputChange(e);
-                  }}
-                  onKeyDown={async (e: any) => {
-                    if (prompt.length < 3) {
-                      return;
-                    }
 
-                    if (loading) return;
+              {status?.isOverdue ? (
+                <Flex flexDirection="column">
+                  <Text>Out of free credit</Text>
+                  <Text mb={3} fontSize={14} color="gray.600">
+                    You're out of credit now, so before you continue we'll need
+                    to charge you, then you can continue using your trained
+                    models & prompting!
+                  </Text>
+                  <Button
+                    bgGradient={"linear(to-r, blue.500, teal.500)"}
+                    onClick={() => {
+                      router.push("/platform/billing");
+                    }}
+                    width="100%"
+                    mb={3}
+                  >
+                    <Text color="white" mr={2}>
+                      Upgrade
+                    </Text>
+                    <BiUpArrowAlt color="white" />
+                  </Button>
+                  <Flex flexDirection="row" gap={3}>
+                    <Link
+                      width="50%"
+                      href="https://discord.com/invite/6GFtwzuvtw"
+                    >
+                      <Button width="100%">
+                        <Text mr={2}>Join Discord</Text>
+                        <BsDiscord />
+                      </Button>
+                    </Link>
+                    <Button
+                      onClick={() => {
+                        router.push("/platform/billing");
+                      }}
+                      width="50%"
+                    >
+                      <Text mr={2}>View Billing</Text>
+                      <AiFillCreditCard />
+                    </Button>
+                  </Flex>
+                </Flex>
+              ) : (
+                <Flex flexDirection="row">
+                  <Input
+                    border="solid 1px #1a202c"
+                    className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
+                    value={prompt}
+                    placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+                    onChange={(e: any) => {
+                      setPrompt(e.target.value);
+                      handleInputChange(e);
+                    }}
+                    onKeyDown={async (e: any) => {
+                      if (prompt.length < 3) {
+                        return;
+                      }
 
-                    // If key equals tab, autocomplete
-                    if (e.key === "Tab") {
-                      e.preventDefault();
-                      handleKeyDown(selectedFile[0]);
-                      return;
-                    }
+                      if (loading) return;
 
-                    // If key equals enter, submit
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
+                      // If key equals tab, autocomplete
+                      if (e.key === "Tab") {
+                        e.preventDefault();
+                        handleKeyDown(selectedFile[0]);
+                        return;
+                      }
+
+                      // If key equals enter, submit
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        const checks = await submitChecks(false);
+                        if (!checks) return null;
+                        setHasBeenReset(false);
+                        handleSubmit(e);
+                      }
+                    }}
+                  />
+                  <Button
+                    bgGradient={"linear(to-r, blue.500, teal.500)"}
+                    isDisabled={loading}
+                    color="white"
+                    ml={4}
+                    width="10rem"
+                    onClick={async (e: any) => {
+                      setLoading(true);
                       const checks = await submitChecks(false);
-                      if (!checks) return null;
+                      if (!checks) {
+                        console.log("checks failed, stopping");
+                        return null;
+                      }
                       setHasBeenReset(false);
                       handleSubmit(e);
-                    }
-                  }}
-                />
-                <Button
-                  bgGradient={"linear(to-r, blue.500, teal.500)"}
-                  isDisabled={loading}
-                  color="white"
-                  ml={4}
-                  width="10rem"
-                  onClick={async (e: any) => {
-                    setLoading(true);
-                    const checks = await submitChecks(false);
-                    if (!checks) {
-                      console.log("checks failed, stopping");
-                      return null;
-                    }
-                    setHasBeenReset(false);
-                    handleSubmit(e);
-                  }}
-                >
-                  {loading ? <Spinner size="sm" /> : "Submit"}
-                </Button>
-              </Flex>
-              <Flex mb={3}>
-                <Text mt={2} fontSize={14}>
+                    }}
+                  >
+                    {loading ? <Spinner size="sm" /> : "Submit"}
+                  </Button>
+                </Flex>
+              )}
+
+              {failMessage && (
+                <Text mb={3} mt={2} fontSize={14}>
                   {failMessage}
                 </Text>
-                <SlideFade in={hasSentAMessage} offsetY="20px">
-                  <Text color="gray" fontSize={12} mt={1}>
+              )}
+
+              {previousPrompt && (
+                <SlideFade in={hasSentAMessage}>
+                  <Text mb={3} color="gray" fontSize={12} mt={1}>
                     {previousPrompt}
                   </Text>
                 </SlideFade>
-              </Flex>
+              )}
             </Box>
           )}
 
@@ -441,42 +500,66 @@ const Chat = () => {
                 flexDirection="row"
                 justifyContent="center"
                 alignItems="center"
-                mt={2}
+                gap={2}
               >
-                <RateConversation />
-                <Text mx={4}>or</Text>
-                <Button
-                  px={4}
+                <IconButton
                   _hover={{
-                    bg: "gray.400",
-                    color: "white",
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
                   }}
-                  alignSelf="center"
-                  rounded="full"
+                  aria-label="Join Discord"
                   onClick={() => {
                     setHasBeenReset(true);
                     setLoading(false);
                     setResponse("");
                     setFailMessage("");
                   }}
-                >
-                  Start A New Chat
-                </Button>
-                {/* <Button
-                px={4}
-                _hover={{
-                  bg: colorMode === "light" ? "gray.300" : "black",
-                }}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                alignSelf="center"
-                rounded="full"
-                onClick={() => {
-                  reload();
-                  setLoading(true)
-                }}
-              >
-                Re-run Prompt
-              </Button> */}
+                  icon={
+                    <Flex flexDirection="row" px={3}>
+                      <PlusSquareIcon />
+                      <Text ml={2} fontSize={14}>
+                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                        New
+                      </Text>
+                    </Flex>
+                  }
+                />
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  onClick={() => {
+                    reload();
+                    setLoading(true);
+                  }}
+                  aria-label="Join Discord"
+                  icon={
+                    <Flex flexDirection="row" px={3}>
+                      <BiRefresh />
+                      <Text ml={2} fontSize={14}>
+                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                        Regenerate
+                      </Text>
+                    </Flex>
+                  }
+                />
+                <IconButton
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                  aria-label="Join Discord"
+                  icon={
+                    <Flex flexDirection="row" px={3}>
+                      <FaThumbsUp />
+                      <Text ml={2} fontSize={14}>
+                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                        Add This Response To Model Memory
+                      </Text>
+                    </Flex>
+                  }
+                />
               </Flex>
             )}
         </Box>
@@ -484,7 +567,7 @@ const Chat = () => {
           models={models}
         /> */}
         <Profile />
-        <Flex mt={2} gap={2}>
+        <Flex mt={3} gap={2}>
           <Tooltip label="Join Discord" placement="top">
             <Link href="https://discord.com/invite/6GFtwzuvtw">
               <IconButton
