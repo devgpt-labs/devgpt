@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Tag, Text, Flex, useColorMode } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-
-//auth store
-import useStore from "@/store/Auth";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();

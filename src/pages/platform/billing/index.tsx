@@ -4,22 +4,11 @@ import {
   Flex,
   Text,
   Box,
-  SlideFade,
   Skeleton,
   Heading,
-  CardBody,
-  Card,
   Tag,
-  Grid,
-  GridItem,
   Badge,
-  StackDivider,
-  Stack,
-  Stat,
   Link,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
   Button,
   Table,
   Thead,
@@ -28,51 +17,34 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   IconButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
   useDisclosure,
-  ModalCloseButton,
   useColorMode,
   Input,
   InputGroup,
   InputLeftAddon,
   InputRightElement,
-  Spinner,
+  Tooltip,
 } from "@chakra-ui/react";
 
 //stores
 import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
-import Setup from "@/components/repos/Setup";
 import { useRouter } from "next/router";
 
 //utils
-import moment from "moment";
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import getModels from "@/utils/getModels";
 
 //components
 import Template from "@/components/Template";
-import RepoDrawer from "@/components/repos/RepoDrawer";
 
 //icons
-import {
-  EditIcon,
-  DeleteIcon,
-  SmallAddIcon,
-  ArrowBackIcon,
-} from "@chakra-ui/icons";
-import { BiCircle, BiRefresh, BiSolidDollarCircle } from "react-icons/bi";
-import { PiSelectionBackground } from "react-icons/pi";
-import { AiFillCheckCircle } from "react-icons/ai";
-import { PiCircleLight } from "react-icons/pi";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import trainModels from "@/utils/trainModels";
-import { BsBack } from "react-icons/bs";
+import { RiInformationFill } from "react-icons/ri";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -270,7 +242,7 @@ const Models = ({ onClose }: any) => {
                 Billing
               </Heading>
             </Flex>
-            <Box gap={2}>
+            <Flex gap={2}>
               <Link
                 isExternal={true}
                 href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
@@ -283,16 +255,23 @@ const Models = ({ onClose }: any) => {
               >
                 <Button>Manage Payments</Button>
               </Link>
-            </Box>
+            </Flex>
           </Flex>
-
           <Flex flexDirection={"column"} mb={3}>
             <Heading size="md" mb={4} mt={2}>
               Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
             </Heading>
-            <Text fontSize={14} mb={2}>
-              Monthly Budget
-            </Text>
+            <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
+              <Text fontSize={14}>Monthly Budget</Text>
+              <Tooltip
+                placement="right"
+                label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
+              >
+                <Box>
+                  <RiInformationFill />
+                </Box>
+              </Tooltip>
+            </Flex>
             <InputGroup>
               <InputLeftAddon children="$" />
               <Input
@@ -313,9 +292,17 @@ const Models = ({ onClose }: any) => {
                 </Button>
               </InputRightElement>
             </InputGroup>
-            <Text fontSize={14} mt={2} mb={2}>
-              Prompting Budget
-            </Text>
+            <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
+              <Tooltip
+                placement="right"
+                label="Your prompt budget is decided by your monthly budget, and gives a guess of how much credit you will have for prompting after models have been trained."
+              >
+                <>
+                  <Text fontSize={14}>Prompting Budget</Text>
+                  <RiInformationFill />
+                </>
+              </Tooltip>
+            </Flex>
             <InputGroup>
               <InputLeftAddon children="$" />
               <Input

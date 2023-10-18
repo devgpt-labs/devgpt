@@ -38,6 +38,20 @@ const ModelInTraining = ({ model }: any) => {
     return null;
   }
 
+  // If the frequency is less than 5, waiting time is about 1:30 minutes, if the frequency is less than 10, the waiting time is about 2:30 minutes.
+
+  const waitingTime = () => {
+    // return the time in minutes / seconds format mm:ss
+    if (frequency < 5) {
+      return "1:30 minutes";
+    } else if (frequency < 10) {
+      return "2:30 minutes";
+    } else {
+      return "3:30 minutes";
+    }
+  }
+
+
   return (
     <Box
       p={4}
@@ -53,7 +67,7 @@ const ModelInTraining = ({ model }: any) => {
           <Text fontSize={14}>
             {status === "training"
               ? `Collecting training data...`
-              : `Retrying now...`}
+              : `Retrying now... Estimated time: ${waitingTime}.`}
           </Text>
           <Spinner size="sm" />
         </Flex>

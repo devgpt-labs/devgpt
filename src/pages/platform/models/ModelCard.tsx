@@ -73,7 +73,26 @@ const ModelCard = ({
   const [deletingModel, setDeletingModel] = useState<boolean>(false);
   const [retrainingModel, setRetrainingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
+  const [trainingFailed, setTrainingFailed] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(JSON.parse(model.output).length);
+
+    // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
+    if (JSON.parse(model?.output)?.length === 1) {
+      console.log("in here", JSON.parse(model.output));
+
+      // Show training failed on this model
+      setTrainingFailed(true);
+
+      // Get the training_id
+      const modelId = createModelID(model.repo, model.owner, model.branch);
+
+      // Set the fulfilled value back to false so retraining will take place
+      setFulfilledBackToFalseForTrainingLog(modelId);
+    }
+  }, [model]);
 
   const updateModel = async () => {
     if (!supabase) {
@@ -157,21 +176,6 @@ const ModelCard = ({
 
   if (!model) return null;
 
-  let trainingFailed = false;
-
-  // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
-  console.log(JSON.parse(model?.output)?.length);
-  if (JSON.parse(model?.output)?.length === 1) {
-
-    trainingFailed = true;
-
-    // Get the training_id
-    const modelId = createModelID(model.repo, model.owner, model.branch);
-
-    // Set the fulfilled value back to false so retraining will take place
-    setFulfilledBackToFalseForTrainingLog(modelId);
-  }
-
   return (
     <Box>
       <ConfirmationModal
@@ -201,13 +205,7 @@ const ModelCard = ({
         isOpen={isRetrainOpen}
         onClose={onRetrainClose}
         onSubmit={() => {
-          // Set output to null for this model in the models table
-          handleModelInTrainingChange({
-            target: {
-              name: "retrain",
-              value: true
-            },
-          });
+          // create new training log
         }}
         setLoadingState={setRetrainingModel}
       />

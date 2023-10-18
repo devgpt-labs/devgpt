@@ -181,7 +181,7 @@ const setModelOutput = async (model: Model, output: string, user: any) => {
   //replace output for this model in supabase with training data
   if (!supabase) return;
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("models")
     .update({
       output: output,

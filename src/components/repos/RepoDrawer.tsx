@@ -16,27 +16,17 @@ import {
   Stack,
   InputRightElement,
   InputGroup,
-  CardHeader,
-  Box,
 } from "@chakra-ui/react";
 
 //stores
-
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
 
 //utils
-
 import { getPaginatedRepos } from "@/utils/github/getRepos";
-import createTrainingData from "@/utils/createTrainingData";
-import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
 import RepoSetupModal from "./RepoSetupModal";
 import getModels from "@/utils/getModels";
-import createModelID from "@/utils/createModelID";
-import calculateTotalCost from "@/utils/calculateTotalCost";
-import chargeCustomer from "@/utils/stripe/chargeCustomer";
 import addTrainingLog from "@/utils/addTrainingLog";
 
 //components
@@ -48,9 +38,8 @@ type PageInfo = {
 };
 
 const RepoDrawer = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure({
-    defaultIsOpen: false,
-  });
+  const { isOpen, onOpen, onClose } = useDisclosure({});
+
   const {
     isOpen: isRepoSetupOpen,
     onOpen: onRepoSetupOpen,

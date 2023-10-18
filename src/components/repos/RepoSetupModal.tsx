@@ -13,6 +13,7 @@ import {
   useDisclosure,
   Badge,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 // icons
 import { MdScience } from "react-icons/md";
@@ -28,6 +29,7 @@ import trainModels from "@/utils/trainModels";
 // components
 import Setup from "./Setup";
 import calculateTotalCost from "@/utils/calculateTotalCost";
+import { Router } from "next/router";
 
 const RepoSetupModal = ({
   isOpen,
@@ -37,6 +39,7 @@ const RepoSetupModal = ({
   onSubmit,
   estimatedPrice,
 }: any) => {
+  const router = useRouter();
   const { session, user, monthly_budget }: any = authStore();
 
   const [sampleSize, setSampleSize] = useState<any>(8);
@@ -99,7 +102,7 @@ const RepoSetupModal = ({
           <Flex flexDirection="column">
             {monthly_budget < Number(cost) ? (
               <Text fontSize={14}>
-                This model's training settings exceeds your monthly budget. You can change your
+                Current training settings exceed your monthly budget. You can change your
                 budget in billing. We will block you from training this model
                 until you increase your budget incase this is an accident.
               </Text>
@@ -145,6 +148,16 @@ const RepoSetupModal = ({
               <Text mr={1}>{confirmation ? "Confirm" : "Train"}</Text>
               {confirmation ? <TiTick /> : <MdScience />}
             </Button>
+            {monthly_budget < Number(cost) && (
+              <Button
+
+                onClick={() => {
+                  router.push("/platform/billing")
+                }}
+
+                mt={2}>View Billing</Button>
+
+            )}
           </Flex>
         </DrawerFooter>
       </DrawerContent>
