@@ -57,20 +57,17 @@ const RepoDrawer = () => {
     onClose: onRepoSetupClose,
   } = useDisclosure();
 
-  const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user, signOut, stripe_customer_id, monthly_budget }: any =
-    authStore();
-  const { setMessages }: any = messageStore();
+  const { repoWindowOpen, setRepo, setLofaf }: any = repoStore();
+  const { session, user, signOut, stripe_customer_id }: any = authStore();
 
   const [repos, setRepos] = useState<any[]>([]);
   const [reposCount, setReposCount] = useState<number>(0);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
-  const [finetuningId, setFinetuningId] = useState<string>(""); //
   const [loading, setLoading] = useState(false); //
-  const btnRef = useRef<any>();
-  const [trainedModels, setTrainedModels] = useState<any[]>([]); //
+  const [trainedModels, setTrainedModels] = useState<any[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
+  const btnRef = useRef<any>();
 
   if (!user) {
     return null;
@@ -157,13 +154,10 @@ const RepoDrawer = () => {
     // Close the modal, no more user input required
     onClose();
 
-    const name = repo.name;
-    const owner = repo.owner.login;
-
     // Set repo to be the new repo
     setRepo({
-      owner: owner,
-      repo: name,
+      owner: repo.owner.login,
+      repo: repo.name,
     });
 
     // Create a new row in the models table in Supabase
@@ -172,8 +166,8 @@ const RepoDrawer = () => {
     const newModel = {
       created_at: new Date().toISOString(),
       stripe_customer_id: stripe_customer_id,
-      repo: name,
-      owner: owner,
+      repo: repo.name,
+      owner: repo.owner.login,
       branch: "main",
       epochs: repo.epochs,
       training_method: "ENCODING",
@@ -222,7 +216,7 @@ const RepoDrawer = () => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={2} />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
               Train A New Model {reposCount ? ` (${reposCount} repos) ` : ""}
@@ -261,11 +255,7 @@ const RepoDrawer = () => {
                   })
                   .filter((repoOption) => {
                     // Remove any that are found on the models table
-                    return !trainedModels.some(
-                      (model) =>
-                        model.repo === repoOption.name &&
-                        model.owner === repoOption.owner.login
-                    );
+                    return !trainedModels.some((model) => model === repoOption);
                   })
                   ?.map((repoOption) => {
                     return (
@@ -289,6 +279,8 @@ const RepoDrawer = () => {
                         <Button
                           size="sm"
                           onClick={() => {
+                            console.log({});
+
                             setSelectedRepo(repoOption);
                             onRepoSetupOpen();
                           }}

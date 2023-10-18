@@ -1,70 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  IconButton,
-  Image,
-  Text,
-  useColorMode,
-  SlideFade,
-  Tooltip,
-  Stack,
-  Link,
-  useDisclosure,
-  Skeleton,
-  Button,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderMark,
-  Badge,
-  Divider,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
-
-// Utils
-import { useRouter } from "next/router";
-import { supabase } from "@/utils/supabase";
-import getPromptCount from "@/utils/getPromptCount";
-import { MdMoney, MdScience } from "react-icons/md";
-
-// Components
-import Repos from "./Settings";
-import UpgradeModal from "./UpgradeModal";
+import { useState } from "react";
+import { Flex, Text, useColorMode, Skeleton, Button } from "@chakra-ui/react";
 
 // Icons
-import { PiSignOutBold } from "react-icons/pi";
-import { BiSolidBookBookmark } from "react-icons/bi";
-import {
-  GiBattery100,
-  GiBattery75,
-  GiBattery50,
-  GiBattery0,
-} from "react-icons/gi";
-import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
-import { FaBug, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { FiSettings } from "react-icons/fi";
-import { AiOutlineQuestionCircle } from "react-icons/ai";
-import { RiDashboardLine } from "react-icons/ri";
-import { MdLabel } from "react-icons/md";
-import { FaCrown } from "react-icons/fa";
-import { BiGitBranch } from "react-icons/bi";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 
 // Stores
 import repoStore from "@/store/Repos";
-import authStore from "@/store/Auth";
-import KeyModal from "./KeyModal";
-import CreditsModal from "./CreditsModal";
-import Models from "@/pages/platform/models";
 
 const Science = ({ models }: any) => {
   const { repo }: any = repoStore();
   const [sliderValue, setSliderValue] = useState(5);
   const [showTooltip, setShowTooltip] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const { colorMode } = useColorMode();
 
   // Find the model in models that matches repo
   const model = models.find(
@@ -83,53 +32,58 @@ const Science = ({ models }: any) => {
 
   if (!model) return <Skeleton height="20px" />;
 
-  if (feedbackGiven) return (
-    <Flex
-      mt={3}
-      alignItems='center'
-      justifyContent='center'
-      flexDirection="row"
-      rounded="lg"
-      border="1px solid #1a202c"
-      p={5}
-    >
-      <Text>Thank you for your feedback</Text>
-    </Flex>
-  )
-
+  if (feedbackGiven)
+    return (
+      <Flex
+        mt={3}
+        alignItems="center"
+        justifyContent="center"
+        flexDirection="row"
+        rounded="lg"
+        border={
+          colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
+        }
+        p={5}
+      >
+        <Text>Thank you for your feedback</Text>
+      </Flex>
+    );
 
   return (
     <Flex
       mt={3}
       flexDirection="row"
       rounded="lg"
-      border="1px solid #1a202c"
+      border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
       p={5}
     >
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" maxW='50%'>
         <Text>Passive Improvement</Text>
-        <Text fontSize={14} color="gray.400">
+        <Text fontSize={14} color="gray.600">
           How did your model do on your last prompt? This is used to directly
-          improve your model and it's training.
+          improve your model and it's training. This allows your model to be
+          constantly learning as it's being used.
         </Text>
       </Flex>
       <Flex
         flexDirection="row"
-        width="100%"
+        width="50%"
         justifyContent="center"
         alignItems="center"
       >
-        <Button variant="ghost" onClick={handleBadAnswerClick}>
+        <Button width="40%" onClick={handleBadAnswerClick}>
           <FaThumbsDown />
-          <Text ml={2}>Bad</Text>
+          <Text ml={2}>Poor Generation</Text>
         </Button>
         <Button
+          width="40%"
           ml={2}
+          color="white"
           bgGradient="linear(to-r, blue.500, teal.500)"
           onClick={handleGoodAnswerClick}
         >
           <FaThumbsUp />
-          <Text ml={2}>Good</Text>
+          <Text ml={2}>Good Generation</Text>
         </Button>
       </Flex>
     </Flex>

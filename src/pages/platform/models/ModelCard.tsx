@@ -299,15 +299,13 @@ const ModelCard = ({
                   alignSelf="flex-start"
                 >
                   Status:{" "}
-                  {model.output
-                    ? "Retraining Now"
-                    : model.deleted
-                      ? "Deleted"
-                      : trainingFailed
-                        ? "Training failed, retrying"
-                        : !model.output
-                          ? "Queued"
-                          : "Ready for use"}
+                  {model.deleted
+                    ? "Deleted"
+                    : trainingFailed
+                      ? "Training failed, retrying"
+                      : !model.output
+                        ? "Queued"
+                        : "Ready for use"}
                 </Badge>
               </Flex>
 

@@ -65,6 +65,7 @@ import { RiRefreshFill } from "react-icons/ri";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import Stripe from "stripe";
+import DiscordAndGithubButtons from "./DiscordAndGithubButtons";
 
 const Chat = () => {
   // Constants
@@ -208,7 +209,7 @@ const Chat = () => {
   });
 
   // If the user clicks tab, we want to autocomplete the file name
-  const handleKeyDown = (file: any) => {
+  const handleUseTabSuggestion = (file: any) => {
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
     const lastWord = promptArray[promptArray?.length - 1];
@@ -293,6 +294,84 @@ const Chat = () => {
   console.log("here", status?.isOverdue);
   console.log(credits);
 
+  const TrainingStatus = () => {
+    if (status?.isOverdue || credits < 0) return null;
+
+    return initialMessages?.length === 0 ? (
+      <Text mt={4} mb={4}>
+        Your AI model is <Badge>Training</Badge>, until this is done the AI
+        won't be able to access your repos context.
+      </Text>
+    ) : (
+      <Text my={3}>
+        Your trained AI model is{" "}
+        <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
+      </Text>
+    );
+  };
+
+  const PromptAreaAndButton = () => {
+    if (status?.isOverdue || credits < 0) return null;
+
+    return (
+      <Flex flexDirection="row">
+        <Input
+          border="solid 1px #1a202c"
+          className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
+          value={prompt}
+          placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+          onChange={(e: any) => {
+            setPrompt(e.target.value);
+            handleInputChange(e);
+          }}
+          onKeyDown={async (e: any) => {
+            if (prompt.length < 3) {
+              return;
+            }
+
+            if (loading) return;
+
+            // If key equals tab, autocomplete
+            if (e.key === "Tab") {
+              e.preventDefault();
+              handleUseTabSuggestion(selectedFile[0]);
+              return;
+            }
+
+            // If key equals enter, submit
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              const checks = await submitChecks(false);
+              if (!checks) return null;
+              setHasBeenReset(false);
+              handleSubmit(e);
+            }
+          }}
+        />
+
+        <Button
+          bgGradient={"linear(to-r, blue.500, teal.500)"}
+          isDisabled={loading}
+          color="white"
+          ml={4}
+          width="10rem"
+          onClick={async (e: any) => {
+            setLoading(true);
+            const checks = await submitChecks(false);
+            if (!checks) {
+              console.log("checks failed, stopping");
+              return null;
+            }
+            setHasBeenReset(false);
+            handleSubmit(e);
+          }}
+        >
+          {loading ? <Spinner size="sm" /> : "Submit"}
+        </Button>
+      </Flex>
+    );
+  };
+
   return (
     <Template>
       <Flex
@@ -309,6 +388,7 @@ const Chat = () => {
           justifyContent="flex-start"
         >
           <ChatHeader />
+
           {!repo.repo && (
             <>
               <Button width="100%" mt={4}>
@@ -319,21 +399,59 @@ const Chat = () => {
               </Text>
             </>
           )}
-          {!status?.isOverdue &&
-            (initialMessages?.length === 0 && repo.repo ? (
-              <Text mt={4} mb={4}>
-                Your AI model is <Badge>Training</Badge>, until this is done the
-                AI won't be able to access your repos context.
-              </Text>
-            ) : (
-              <Text my={3}>
-                Your trained AI model is{" "}
-                <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-              </Text>
+
+          {status?.isOverdue ||
+            (credits < 0 && (
+              <Flex flexDirection="column" mt={4}>
+                <Text>
+                  Before you continue prompting, we need to get your billing in
+                  order!
+                </Text>
+                <Text mb={3} fontSize={14} color="gray.600">
+                  You're accounts billing is currently overdue, so before you
+                  continue we'll need to help you set up billing correctly. You
+                  can continue using DevGPT and prompting with your trained
+                  models immediately after this.
+                </Text>
+                <Button
+                  bgGradient={"linear(to-r, blue.500, teal.500)"}
+                  onClick={() => {
+                    router.push("/platform/billing");
+                  }}
+                  width="100%"
+                  mb={3}
+                >
+                  <Text color="white" mr={2}>
+                    Upgrade
+                  </Text>
+                  <BiUpArrowAlt color="white" />
+                </Button>
+                <Flex flexDirection="row" gap={3}>
+                  <Link
+                    width="50%"
+                    href="https://discord.com/invite/6GFtwzuvtw"
+                  >
+                    <Button width="100%">
+                      <Text mr={2}>Join Discord</Text>
+                      <BsDiscord />
+                    </Button>
+                  </Link>
+                  <Button
+                    onClick={() => {
+                      router.push("/platform/billing");
+                    }}
+                    width="50%"
+                  >
+                    <Text mr={2}>View Billing</Text>
+                    <AiFillCreditCard />
+                  </Button>
+                </Flex>
+              </Flex>
             ))}
 
           {repo.repo && (
             <Box maxH={"45vh"} overflowY={"auto"}>
+              <TrainingStatus />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>
@@ -350,7 +468,7 @@ const Chat = () => {
                         mb={1}
                         key={file}
                         cursor="pointer"
-                        onClick={() => handleKeyDown(file)}
+                        onClick={() => handleUseTabSuggestion(file)}
                       >
                         {file}
                       </Tag>
@@ -358,6 +476,7 @@ const Chat = () => {
                   })}
                 </SlideFade>
               </Flex>
+
               {loading && !messages[messages.length - 1] ? (
                 <SkeletonText
                   mb={2}
@@ -374,104 +493,7 @@ const Chat = () => {
                 />
               )}
 
-              {status?.isOverdue ? (
-                <Flex flexDirection="column">
-                  <Text>Out of free credit</Text>
-                  <Text mb={3} fontSize={14} color="gray.600">
-                    You're out of credit now, so before you continue we'll need
-                    to charge you, then you can continue using your trained
-                    models & prompting!
-                  </Text>
-                  <Button
-                    bgGradient={"linear(to-r, blue.500, teal.500)"}
-                    onClick={() => {
-                      router.push("/platform/billing");
-                    }}
-                    width="100%"
-                    mb={3}
-                  >
-                    <Text color="white" mr={2}>
-                      Upgrade
-                    </Text>
-                    <BiUpArrowAlt color="white" />
-                  </Button>
-                  <Flex flexDirection="row" gap={3}>
-                    <Link
-                      width="50%"
-                      href="https://discord.com/invite/6GFtwzuvtw"
-                    >
-                      <Button width="100%">
-                        <Text mr={2}>Join Discord</Text>
-                        <BsDiscord />
-                      </Button>
-                    </Link>
-                    <Button
-                      onClick={() => {
-                        router.push("/platform/billing");
-                      }}
-                      width="50%"
-                    >
-                      <Text mr={2}>View Billing</Text>
-                      <AiFillCreditCard />
-                    </Button>
-                  </Flex>
-                </Flex>
-              ) : (
-                <Flex flexDirection="row">
-                  <Input
-                    border="solid 1px #1a202c"
-                    className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
-                    value={prompt}
-                    placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-                    onChange={(e: any) => {
-                      setPrompt(e.target.value);
-                      handleInputChange(e);
-                    }}
-                    onKeyDown={async (e: any) => {
-                      if (prompt.length < 3) {
-                        return;
-                      }
-
-                      if (loading) return;
-
-                      // If key equals tab, autocomplete
-                      if (e.key === "Tab") {
-                        e.preventDefault();
-                        handleKeyDown(selectedFile[0]);
-                        return;
-                      }
-
-                      // If key equals enter, submit
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        const checks = await submitChecks(false);
-                        if (!checks) return null;
-                        setHasBeenReset(false);
-                        handleSubmit(e);
-                      }
-                    }}
-                  />
-                  <Button
-                    bgGradient={"linear(to-r, blue.500, teal.500)"}
-                    isDisabled={loading}
-                    color="white"
-                    ml={4}
-                    width="10rem"
-                    onClick={async (e: any) => {
-                      setLoading(true);
-                      const checks = await submitChecks(false);
-                      if (!checks) {
-                        console.log("checks failed, stopping");
-                        return null;
-                      }
-                      setHasBeenReset(false);
-                      handleSubmit(e);
-                    }}
-                  >
-                    {loading ? <Spinner size="sm" /> : "Submit"}
-                  </Button>
-                </Flex>
-              )}
+              <PromptAreaAndButton />
 
               {failMessage && (
                 <Text mb={3} mt={2} fontSize={14}>
@@ -563,52 +585,9 @@ const Chat = () => {
               </Flex>
             )}
         </Box>
-        {/* <Science
-          models={models}
-        /> */}
+        {!status?.isOverdue || (credits > 0 && <Science models={models} />)}
         <Profile />
-        <Flex mt={3} gap={2}>
-          <Tooltip label="Join Discord" placement="top">
-            <Link href="https://discord.com/invite/6GFtwzuvtw">
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                aria-label="Join Discord"
-                icon={
-                  <Flex flexDirection="row" px={3}>
-                    <BsDiscord />
-                    <Text ml={2} fontSize={14}>
-                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                      Join
-                    </Text>
-                  </Flex>
-                }
-              />
-            </Link>
-          </Tooltip>
-          <Tooltip label="Github Stars" placement="top">
-            <Link href="https://github.com/devgpt-labs/devgpt-releases">
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                aria-label="Github Stars"
-                icon={
-                  <Flex flexDirection="row" px={3}>
-                    <BsGithub />
-                    <BsStars />
-                    <Text ml={2} fontSize={14}>
-                      339
-                    </Text>
-                  </Flex>
-                }
-              />
-            </Link>
-          </Tooltip>
-        </Flex>
+        <DiscordAndGithubButtons />
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

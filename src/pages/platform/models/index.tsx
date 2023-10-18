@@ -44,7 +44,8 @@ import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits }: any = authStore();
+  const { session, user, stripe_customer_id, credits, status }: any =
+    authStore();
   const router = useRouter();
   const {
     isOpen: isConfirmationOpen,
@@ -53,14 +54,10 @@ const Models = ({ onClose }: any) => {
     onToggle: onConfirmationToggle,
   } = useDisclosure();
 
-  const { colorMode }: any = useColorMode();
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
-  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-
-  // Budgets
   const [budget, setBudget] = useState<any>(null);
 
   interface Model {
@@ -100,10 +97,6 @@ const Models = ({ onClose }: any) => {
   // Used to get an estimation of how much the user will spend each month
   const budgetEstimation =
     Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
-
-  const handleBudgetChange = (e: any) => {
-    setBudget(e.target.value);
-  };
 
   const getMonthlyBudget = async () => {
     if (!supabase) return;
@@ -153,10 +146,6 @@ const Models = ({ onClose }: any) => {
   }, [repos, refresh]);
 
   useEffect(() => {
-    console.log({ modelsInTraining });
-  }, [modelsInTraining]);
-
-  useEffect(() => {
     if (!supabase) return;
     const models = supabase
       .channel("custom-all-channel")
@@ -188,11 +177,9 @@ const Models = ({ onClose }: any) => {
 
   const someModelsAreTraining = modelsInTraining.some((model: any) => {
     // find if the model has a training log open
+    if (!model.output) return true;
     if (JSON.parse(model?.output).length === 1) return true;
   });
-
-  console.log({ modelsInTraining });
-
 
   return (
     <Template>
@@ -229,14 +216,17 @@ const Models = ({ onClose }: any) => {
             </Heading>
           </Flex>
           <Flex gap={2}>
-            <Button
-              onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Create
-            </Button>
+            {credits < 0 || status?.isOverdue || (
+              <Button
+                onClick={() => {
+                  setRepoWindowOpen(!repoWindowOpen);
+                }}
+                rightIcon={<SmallAddIcon />}
+              >
+                Create
+              </Button>
+            )}
+
             <Button
               onClick={() => {
                 setRefresh(!refresh);
@@ -279,7 +269,12 @@ const Models = ({ onClose }: any) => {
 
             <AccordionPanel pb={4}>
               {modelsInTraining.length > 0 && (
-                <Grid templateColumns="repeat(3, 1fr)" gap={6} flexWrap="wrap">
+                <Grid
+                  width="100%"
+                  templateColumns={`repeat(3, 1fr)`}
+                  gap={6}
+                  flexWrap="wrap"
+                >
                   {modelsInTraining.map((model: any) => {
                     return (
                       <ModelCard

@@ -243,65 +243,105 @@ const Models = ({ onClose }: any) => {
 
   return (
     <Template>
-      <Box p={5} width="100%" height="100%">
-        <Flex flexDirection="row" alignItems="center" justifyContent='space-between' mb={3}>
-          <Flex flexDirection='row' alignItems="center" >
-            <IconButton
-              mr={3}
-              onClick={() => {
-                router.back();
-              }}
-              aria-label="Close"
-              icon={<ArrowBackIcon />}
-            />
-            <Heading size="md" ml={4}>
-              Billing
-            </Heading></Flex>
-
-          <Link isExternal={true} href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww">
-            <Button>Manage Payments</Button>
-          </Link>
-        </Flex>
-
-        <Flex flexDirection={"column"} mb={3}>
-          <Heading size="md" mb={4} mt={2}>
-            Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
-          </Heading>
-          <Text mb={2}>Monthly Budget</Text>
-          <InputGroup>
-            <InputLeftAddon children="$" />
-            <Input
-              max={10000000}
-              value={budget}
-              type="number"
-              onChange={handleBudgetChange}
-            />
-            <InputRightElement width="4.5rem">
-              <Button
-                color="white"
-                bgGradient={"linear(to-r, blue.500,teal.500)"}
-                h="1.75rem"
-                size="sm"
-                onClick={onConfirmationOpen}
-              >
-                Save
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-          <Badge
-            color={promptingBalance === 0 ? "orange" : "teal"}
-            alignSelf="flex-start"
-            mt={2}
+      <Flex
+        p={5}
+        width="100%"
+        height="100%"
+        justifyContent="space-between"
+        flexDirection="column"
+      >
+        <Box>
+          <Flex
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="space-between"
+            mb={3}
           >
-            This budget give you a monthly balance for prompting of $
-            {promptingBalance.toFixed(2)}
-          </Badge>
-          {promptingBalance === 0 && (
-            <Badge alignSelf="flex-start" mt={2} color="orange">
-              This budget will limit your models from reaching your settings.
-            </Badge>
-          )}
-        </Flex>
+            <Flex flexDirection="row" alignItems="center">
+              <IconButton
+                mr={3}
+                onClick={() => {
+                  router.back();
+                }}
+                aria-label="Close"
+                icon={<ArrowBackIcon />}
+              />
+              <Heading size="md" ml={4}>
+                Billing
+              </Heading>
+            </Flex>
+            <Box gap={2}>
+              <Link
+                isExternal={true}
+                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+              >
+                <Button>Manage Payment Methods</Button>
+              </Link>
+              <Link
+                isExternal={true}
+                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+              >
+                <Button>Manage Payments</Button>
+              </Link>
+            </Box>
+          </Flex>
+
+          <Flex flexDirection={"column"} mb={3}>
+            <Heading size="md" mb={4} mt={2}>
+              Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
+            </Heading>
+            <Text fontSize={14} mb={2}>
+              Monthly Budget
+            </Text>
+            <InputGroup>
+              <InputLeftAddon children="$" />
+              <Input
+                max={10000000}
+                value={budget}
+                type="number"
+                onChange={handleBudgetChange}
+              />
+              <InputRightElement width="4.5rem">
+                <Button
+                  color="white"
+                  bgGradient={"linear(to-r, blue.500,teal.500)"}
+                  h="1.75rem"
+                  size="sm"
+                  onClick={onConfirmationOpen}
+                >
+                  Save
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+            <Text fontSize={14} mt={2} mb={2}>
+              Prompting Budget
+            </Text>
+            <InputGroup>
+              <InputLeftAddon children="$" />
+              <Input
+                isDisabled={true}
+                value={promptingBalance.toFixed(2)}
+                type="number"
+              />
+            </InputGroup>
+
+            {promptingBalance === 0 ? (
+              <Badge alignSelf="flex-start" mt={2} color="orange">
+                This budget will limit your models from reaching your settings
+                and give you $0 budget for prompting.
+              </Badge>
+            ) : (
+              <Badge
+                color={promptingBalance === 0 ? "orange" : "teal"}
+                alignSelf="flex-start"
+                mt={2}
+              >
+                This budget give you a monthly balance for prompting of $
+                {promptingBalance.toFixed(2)}
+              </Badge>
+            )}
+          </Flex>
+        </Box>
         <TableContainer>
           <Table variant="striped">
             <Thead>
@@ -359,7 +399,7 @@ const Models = ({ onClose }: any) => {
             </Tfoot>
           </Table>
         </TableContainer>
-      </Box>
+      </Flex>
     </Template>
   );
 };
