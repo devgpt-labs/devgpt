@@ -17,7 +17,7 @@ const ModelInTraining = (model: any) => {
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    if (model.output === null) {
+    if (model.output === null || !model.output) {
       setStatus("training");
     } else if (JSON.parse(model.output).length === 1) {
       setStatus("failed");
