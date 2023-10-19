@@ -21,31 +21,27 @@ const ModelInTraining = ({ model, trainingLogs }: any) => {
   const { output, frequency, owner, repo, branch }: any = model;
 
   // Check training logs to see if one with this model_id exists, with fulfilled false
-  const trainingLog = trainingLogs.map((log: any) => {
-    if (
-      log.fulfilled === false &&
-      log.model_id === createModelID(model.repo, model.owner, model.branch)
-    ) {
-      return true;
+  const trainingLog = trainingLogs.filter((log: any) => {
+    if (log.model_id === createModelID(model.repo, model.owner, model.branch)) {
+      return log;
     }
-    return false;
   });
 
   // If the training log doesn't include true, then we don't need to render this component
 
   useInterval(() => {
-    // count down from 2m30s updating the slider value every second
+    // update the slider over a course of 150 seconds
 
-    const time = 150000;
-    const interval = 1000;
+    const time = 150000; // 150 seconds
+    const interval = 1000; // 1 second
     const total = time / interval;
     const percent = 100 / total;
 
     setSliderValue((prev) => prev + percent);
-  }, 200);
+  }, 500); // 500 milliseconds
 
-  if (!trainingLog.includes(true)) return null;
   if (!model) return null;
+  if (trainingLog.length === 0) return null;
 
   return (
     <Box

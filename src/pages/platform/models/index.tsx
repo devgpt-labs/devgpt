@@ -2,22 +2,18 @@
 import { useState, useEffect } from "react";
 import {
   Flex,
-  Text,
   Box,
-  Skeleton,
   Heading,
   Grid,
   Button,
   IconButton,
   useDisclosure,
-  useColorMode,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
-import ConfirmationModal from "./ConfirmationModal";
 import Link from "next/link";
 import ModelCard from "./ModelCard";
 import ModelInTraining from "./ModelInTraining";
@@ -28,9 +24,6 @@ import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "next/router";
-
-//utils
-import calculateTotalCost from "@/utils/calculateTotalCost";
 
 //components
 import Template from "@/components/Template";
@@ -44,32 +37,25 @@ import AddAModel from "./AddAModel";
 import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 import createModelID from "@/utils/createModelID";
 
-const Models = ({ onClose }: any) => {
+const Models = () => {
   const {
     session,
     user,
     stripe_customer_id,
     credits,
     status,
-    monthly_budget,
   }: any = authStore();
   const router = useRouter();
-  const {
-    isOpen: isConfirmationOpen,
-    onOpen: onConfirmationOpen,
-    onClose: onConfirmationClose,
-    onToggle: onConfirmationToggle,
-  } = useDisclosure();
+
 
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [budget, setBudget] = useState<any>(null);
   const [someModelsAreTraining, setSomeModelsAreTraining] =
     useState<boolean>(false);
-  const [budgetEstimation, setBudgetEstimation] = useState<number>(0);
+  const [isTraining, setIsTraining] = useState<boolean>(false);
 
   interface Model {
     id: string;
@@ -85,41 +71,6 @@ const Models = ({ onClose }: any) => {
     frequency: number;
   }
 
-  const getMonthlyBudget = async () => {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("customers")
-      .select("monthly_budget")
-      .eq("email_address", user?.email)
-      .single();
-
-    if (error) {
-      console.log(error);
-      setBudget(budgetEstimation);
-      return;
-    }
-
-    if (data) {
-      setBudget(data.monthly_budget);
-    }
-  };
-
-  const saveMonthlyBudget = async () => {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("customers")
-      .update({ monthly_budget: budget })
-      .eq("email_address", user?.email);
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-    if (data) {
-      console.log("new budget saved");
-    }
-  };
-
   const findIfModelsAreTraining = async () => {
     const areModelsTraining = await modelsInTraining.map((model: any) => {
       // If any of the logs in training logs are fulfilled false, return true
@@ -132,26 +83,8 @@ const Models = ({ onClose }: any) => {
         return true;
       }
 
-      // // If the model is output is null, return true
-      // if (!model.output) {
-      //   return true;
-      // }
-
-      // // If the model output is undefined, return true
-      // if (model === null) {
-      //   return true;
-      // }
-
-      // // If the length is 1, meaning training failed, return true
-      // if (JSON.parse(model?.output).length === 1) {
-      //   return true;
-      // }
-
       return false;
     });
-
-    console.log(areModelsTraining);
-
 
     // If areModelsTraining array contains a true value, set someModelsAreTraining to true
     const someModelsAreTraining = areModelsTraining.includes(true);
@@ -196,17 +129,12 @@ const Models = ({ onClose }: any) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "training_log" },
         (payload: any) => {
-          // Add payload.new to trainingLogs, if it doesn't already exist
-          const newTrainingLogs = [...trainingLogs];
-          const newLog = payload.new;
-          const logExists =
-            newTrainingLogs.filter((log: any) => {
-              return log.id === newLog.id;
-            }).length > 0;
-
-          if (!logExists) {
-            newTrainingLogs.push(newLog);
-          }
+          const newTrainingLogs = trainingLogs.map((log: any) => {
+            if (log.id === payload.new.id) {
+              return payload.new;
+            }
+            return log;
+          });
 
           setTrainingLogs(newTrainingLogs);
         }
@@ -215,16 +143,12 @@ const Models = ({ onClose }: any) => {
   }, []);
 
   useEffect(() => {
-    getMonthlyBudget();
     getModels(setModelsInTraining, setLoading, user?.email);
   }, [repos, refresh]);
 
   useEffect(() => {
     // Find if any models are still training
     findIfModelsAreTraining();
-
-    // Set budget estimation
-    setBudgetEstimation(Number(calculateTotalCost(modelsInTraining, 0)) * 1.2);
   }, [modelsInTraining]);
 
   useEffect(() => {
@@ -239,25 +163,12 @@ const Models = ({ onClose }: any) => {
     }
   }, [session, user]);
 
-  modelsInTraining.map((model: any) => {
-    console.log(model.output);
-    console.log(model);
-  })
-
-  if (loading || budget === null) return <ModelLoadingScreen />;
+  if (loading) return <ModelLoadingScreen />;
   if (modelsInTraining.length === 0) return <AddAModel />;
 
   return (
     <Template>
-      <ConfirmationModal
-        header={`Set your monthly budget to $${budget}?`}
-        body="Confirm you would like to change your budget. This can be changed at any time."
-        confirmButtonText="Confirm"
-        isOpen={isConfirmationOpen}
-        onClose={onConfirmationClose}
-        onSubmit={saveMonthlyBudget}
-        setLoadingState={setLoading}
-      />
+
       <Flex
         flex={1}
         w="full"
@@ -304,7 +215,7 @@ const Models = ({ onClose }: any) => {
           </Flex>
         </Flex>
         <Accordion allowMultiple defaultIndex={[0, 1]}>
-          {someModelsAreTraining && (
+          {someModelsAreTraining || isTraining ? (
             <AccordionItem>
               <h2>
                 <AccordionButton>
@@ -327,7 +238,7 @@ const Models = ({ onClose }: any) => {
                 </Flex>
               </AccordionPanel>
             </AccordionItem>
-          )}
+          ) : <Text>Nothing training yet</Text>}
           <AccordionItem>
             <h2>
               <AccordionButton>
@@ -349,6 +260,7 @@ const Models = ({ onClose }: any) => {
                   {modelsInTraining.map((model: any) => {
                     return (
                       <ModelCard
+                        setIsTraining={setIsTraining}
                         trainingLogs={trainingLogs}
                         model={model}
                         modelsInTraining={modelsInTraining}

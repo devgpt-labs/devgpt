@@ -34,6 +34,7 @@ import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
 import Setup from "@/components/repos/Setup";
 import setFulfilledBackToFalseForTrainingLog from "@/utils/setFulfilledBackToFalseForTrainingLog";
@@ -49,8 +50,10 @@ import { BiRefresh } from "react-icons/bi";
 import { MdRefresh } from "react-icons/md";
 import addTrainingLog from "@/utils/addTrainingLog";
 import createModelID from "@/utils/createModelID";
+import trainModel from "@/utils/trainModel";
 
 const ModelCard = ({
+  setIsTraining,
   trainingLogs,
   model,
   modelsInTraining,
@@ -61,6 +64,7 @@ const ModelCard = ({
   modelsInTraining: any;
   setModelsInTraining: any;
 }) => {
+  const { session, user }: any = authStore();
   const { repo, setRepo }: any = repoStore();
   const {
     isOpen: isDeleteOpen,
@@ -94,7 +98,20 @@ const ModelCard = ({
 
   const retrainModel = async () => {
     // Create a new training_log for this model
-    await addTrainingLog(model);
+    // If a training_log already exists, don't add a log
+    if (
+      trainingLogs.filter(
+        (log: any) =>
+          log.model_id === createModelID(model.repo, model.owner, model.branch)
+      ).length < 0
+    ) {
+      await addTrainingLog(model);
+    }
+
+    // Set this model to actively train
+    await trainModel(model, session, user);
+
+    setIsTraining(true);
   };
 
   const updateModel = async () => {
@@ -178,8 +195,6 @@ const ModelCard = ({
   };
 
   if (!model) return null;
-
-  console.log(trainingLogs);
 
   return (
     <Box>
