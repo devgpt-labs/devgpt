@@ -204,8 +204,7 @@ const ModelCard = ({
       />
       <ConfirmationModal
         header="Retrain this model?"
-        body="Confirm you would like to retrain this DevGPT model. This is a
-              action will cost your retraining cost. We like to check that you meant to click this button"
+        body="Confirm you would like to retrain this DevGPT model, this will take a few minutes."
         confirmButtonText="Retrain"
         isOpen={isRetrainOpen}
         onClose={onRetrainClose}
@@ -331,9 +330,7 @@ const ModelCard = ({
                       return false;
                     }).length > 0
                       ? "Training"
-                      : !model.output
-                        ? "Training Failed"
-                        : "Trained"}
+                      : "Trained"}
                 </Badge>
               </Flex>
 

@@ -55,7 +55,9 @@ const Feedback = ({ models, response, messages }: any) => {
   };
 
   const handleGoodAnswerClick = async () => {
-    updateModel();
+    // TODO: Readd this 
+    // updateModel();
+
     setFeedbackGiven(true);
   };
 
@@ -133,45 +135,3 @@ const Feedback = ({ models, response, messages }: any) => {
 };
 
 export default Feedback;
-
-{
-  /* <Flex
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
-          width="100%"
-        >
-          <Flex flexDirection="row" justifyContent="space-between" width="100%">
-            <Stack>
-              <Text>my latest prompt!</Text>
-              <Badge alignSelf="flex-start">{model.training_method}</Badge>
-              <Badge alignSelf="flex-start">
-                Last Trained: {new Date(model.created_at).toDateString()} at{" "}
-                {new Date(model.created_at).toTimeString().slice(0, 5)}
-              </Badge>
-            </Stack>
-            <Stack>
-              <HStack>
-                <FaCrown />
-                <Text>{model.owner}</Text>
-              </HStack>
-              <HStack>
-                <MdLabel />
-                <Text>{model.repo}</Text>
-              </HStack>
-              <HStack>
-                <BiGitBranch />
-                <Text>{model.branch}</Text>
-              </HStack>
-            </Stack>
-            <Stack>
-              <Text>Frequency: {model.frequency}</Text>
-              <Text>Training: {model.sample_size}</Text>
-              <Text>Epochs: {model.epochs}</Text>
-            </Stack>
-          </Flex>
-          <Divider orientation="vertical" mx={10} /> */
-}
-{
-  /* </Flex> */
-}

@@ -44,6 +44,7 @@ import Template from "@/components/Template";
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { RiInformationFill } from "react-icons/ri";
+import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -61,6 +62,7 @@ const Models = ({ onClose }: any) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [spentThisMonth, setSpentThisMonth] = useState<any>(0);
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -78,6 +80,17 @@ const Models = ({ onClose }: any) => {
     sample_size: number;
     frequency: number;
   }
+
+  useEffect(() => {
+    const setMonthlySpend = async () => {
+      if (spentThisMonth != 0) return;
+
+      const spend = await getCustomerSpendThisMonth(stripe_customer_id);
+      setSpentThisMonth(spend || 0);
+    };
+
+    setMonthlySpend();
+  }, [stripe_customer_id]);
 
   useEffect(() => {
     if (!session) {
@@ -257,6 +270,10 @@ const Models = ({ onClose }: any) => {
             <Heading size="md" mb={4} mt={2}>
               Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
             </Heading>
+            <Heading size="md" mb={4} mt={2}>
+              Spend this month so far:{" "}
+              <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
+            </Heading>
             <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
               <Text fontSize={14}>Monthly Budget</Text>
               <Tooltip
@@ -295,7 +312,14 @@ const Models = ({ onClose }: any) => {
               >
                 <>
                   <Text fontSize={14}>Prompting Budget</Text>
-                  <RiInformationFill />
+                  <Tooltip
+                    placement="right"
+                    label="This is our estimation of how much you will have available for prompting this month after your models have been trained."
+                  >
+                    <Box>
+                      <RiInformationFill />
+                    </Box>
+                  </Tooltip>
                 </>
               </Tooltip>
             </Flex>

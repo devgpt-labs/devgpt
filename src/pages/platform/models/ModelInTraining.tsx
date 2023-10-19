@@ -9,13 +9,14 @@ import {
   SliderFilledTrack,
   Spinner,
   useColorMode,
+  useTimeout,
+  useInterval,
 } from "@chakra-ui/react";
 import createModelID from "@/utils/createModelID";
 
 const ModelInTraining = ({ model, trainingLogs }: any) => {
-  const [waitingTime, setWaitingTime] = useState<any>(0); // 0
-  const [status, setStatus] = useState<any>(null); // null
   const { colorMode } = useColorMode();
+  const [sliderValue, setSliderValue] = useState(0);
 
   const { output, frequency, owner, repo, branch }: any = model;
 
@@ -29,12 +30,21 @@ const ModelInTraining = ({ model, trainingLogs }: any) => {
     }
     return false;
   });
-  console.log(trainingLog);
 
   // If the training log doesn't include true, then we don't need to render this component
-  if (!trainingLog.includes(true)) return null;
 
-  // If the training
+  useInterval(() => {
+    // count down from 2m30s updating the slider value every second
+
+    const time = 150000;
+    const interval = 1000;
+    const total = time / interval;
+    const percent = 100 / total;
+
+    setSliderValue((prev) => prev + percent);
+  }, 200);
+
+  if (!trainingLog.includes(true)) return null;
   if (!model) return null;
 
   return (
@@ -47,25 +57,20 @@ const ModelInTraining = ({ model, trainingLogs }: any) => {
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <Badge>Training</Badge>
-          <Text fontSize={14}>Collecting training data...`</Text>
+          <Text fontSize={14}>
+            {sliderValue > 100 ? "Completing Soon" : "Training"}
+          </Text>
           <Spinner size="sm" />
         </Flex>
         <Flex flexDirection="column" alignItems="flex-end">
           <Text fontSize={14}>
             {owner} / {repo} / {branch}
           </Text>
-          {/* <Text fontSize={14}>
-            frequency: {frequency} /
-            sample size:{sample_size} /
-            method: {training_method} /
-            epochs: {epochs}
-          </Text> */}
         </Flex>
       </Flex>
-
       <Slider
         aria-label="slider-ex-2"
-        defaultValue={40}
+        value={sliderValue}
         colorScheme="blue"
         isReadOnly={true}
       >

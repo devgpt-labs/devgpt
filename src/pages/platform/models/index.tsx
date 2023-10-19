@@ -152,9 +152,6 @@ const Models = ({ onClose }: any) => {
       return false;
     });
 
-    console.log(areModelsTraining);
-
-
     // If areModelsTraining array contains a true value, set someModelsAreTraining to true
     const someModelsAreTraining = areModelsTraining.includes(true);
     setSomeModelsAreTraining(someModelsAreTraining);
@@ -241,8 +238,15 @@ const Models = ({ onClose }: any) => {
     }
   }, [session, user]);
 
+  modelsInTraining.map((model: any) => {
+    console.log(model.output);
+    console.log(model);
+  })
+
   if (loading || budget === null) return <ModelLoadingScreen />;
   if (modelsInTraining.length === 0) return <AddAModel />;
+
+
 
   return (
     <Template>
