@@ -224,13 +224,7 @@ const Models = ({ onClose }: any) => {
 
   return (
     <Template>
-      <Flex
-        p={5}
-        width="100%"
-        height="100%"
-        justifyContent="space-between"
-        flexDirection="column"
-      >
+      <Flex p={5} width="100%" height="100%" flexDirection="column">
         <Box>
           <Flex
             flexDirection="row"
@@ -349,6 +343,9 @@ const Models = ({ onClose }: any) => {
             )}
           </Flex>
         </Box>
+        <Heading size="md" mb={2} mt={4} id="billing">
+          Estimated Monthly Cost
+        </Heading>
         <TableContainer>
           <Table variant="striped">
             <Thead>
