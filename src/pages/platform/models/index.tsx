@@ -5,6 +5,7 @@ import {
   Box,
   Heading,
   Grid,
+  Text,
   Button,
   IconButton,
   useDisclosure,
@@ -260,6 +261,7 @@ const Models = () => {
                   {modelsInTraining.map((model: any) => {
                     return (
                       <ModelCard
+                        isTraining={isTraining}
                         setIsTraining={setIsTraining}
                         trainingLogs={trainingLogs}
                         model={model}

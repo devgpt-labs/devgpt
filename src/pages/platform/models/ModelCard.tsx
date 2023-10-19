@@ -53,12 +53,15 @@ import createModelID from "@/utils/createModelID";
 import trainModel from "@/utils/trainModel";
 
 const ModelCard = ({
+  isTraining,
   setIsTraining,
   trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
 }: {
+  isTraining: boolean;
+  setIsTraining: any;
   trainingLogs: any;
   model: any;
   modelsInTraining: any;
@@ -265,15 +268,16 @@ const ModelCard = ({
                   <Tooltip label="Train Model">
                     <IconButton
                       isDisabled={
+                        isTraining ||
                         trainingLogs.filter((log: any) => {
                           if (
                             log.fulfilled === false &&
                             log.model_id ===
-                              createModelID(
-                                model.repo,
-                                model.owner,
-                                model.branch
-                              )
+                            createModelID(
+                              model.repo,
+                              model.owner,
+                              model.branch
+                            )
                           ) {
                             return true;
                           }
@@ -324,23 +328,23 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : JSON.parse(model.output)?.length === 1
-                      ? "orange"
-                      : trainingLogs.filter((log: any) => {
+                        ? "orange"
+                        : trainingLogs.filter((log: any) => {
                           if (
                             log.fulfilled === false &&
                             log.model_id ===
-                              createModelID(
-                                model.repo,
-                                model.owner,
-                                model.branch
-                              )
+                            createModelID(
+                              model.repo,
+                              model.owner,
+                              model.branch
+                            )
                           ) {
                             return true;
                           }
                           return false;
                         }).length > 0
-                      ? "blue"
-                      : "teal"
+                          ? "blue"
+                          : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -348,19 +352,19 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : JSON.parse(model.output)?.length === 1
-                    ? "Training Failed"
-                    : trainingLogs.filter((log: any) => {
+                      ? "Training Failed"
+                      : trainingLogs.filter((log: any) => {
                         if (
                           log.fulfilled === false &&
                           log.model_id ===
-                            createModelID(model.repo, model.owner, model.branch)
+                          createModelID(model.repo, model.owner, model.branch)
                         ) {
                           return true;
                         }
                         return false;
                       }).length > 0
-                    ? "Training"
-                    : "Trained"}
+                        ? "Training"
+                        : "Trained"}
                 </Badge>
               </Flex>
 
@@ -423,14 +427,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-                // setBranch={(e: any) => {
-                //   handleModelInTrainingChange({
-                //     target: {
-                //       name: "branch",
-                //       value: e,
-                //     },
-                //   });
-                // }}
+              // setBranch={(e: any) => {
+              //   handleModelInTrainingChange({
+              //     target: {
+              //       name: "branch",
+              //       value: e,
+              //     },
+              //   });
+              // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
