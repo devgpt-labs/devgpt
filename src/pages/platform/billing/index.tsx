@@ -43,7 +43,6 @@ import Template from "@/components/Template";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import trainModels from "@/utils/trainModels";
 import { RiInformationFill } from "react-icons/ri";
 
 const Models = ({ onClose }: any) => {
@@ -144,9 +143,6 @@ const Models = ({ onClose }: any) => {
   };
 
   useEffect(() => {
-    // Train models
-    trainModels(session, user);
-
     // If the url contains the word billing, open the billing section
     if (router.asPath.includes("billing")) {
       // Show billing section

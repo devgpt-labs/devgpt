@@ -9,7 +9,7 @@ import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 // Stores
 import repoStore from "@/store/Repos";
 
-const Science = ({ models, response, messages }: any) => {
+const Feedback = ({ models, response, messages }: any) => {
   const { repo }: any = repoStore();
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const { colorMode } = useColorMode();
@@ -132,7 +132,7 @@ const Science = ({ models, response, messages }: any) => {
   );
 };
 
-export default Science;
+export default Feedback;
 
 {
   /* <Flex

@@ -51,10 +51,12 @@ import addTrainingLog from "@/utils/addTrainingLog";
 import createModelID from "@/utils/createModelID";
 
 const ModelCard = ({
+  trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
 }: {
+  trainingLogs: any;
   model: any;
   modelsInTraining: any;
   setModelsInTraining: any;
@@ -91,11 +93,8 @@ const ModelCard = ({
   }, [model]);
 
   const retrainModel = async () => {
-    // Create the modelId
-    // const modelId = createModelID(model.repo, model.owner, model.branch);
-
     // Create a new training_log for this model
-    const trainingLog = await addTrainingLog(model);
+    await addTrainingLog(model);
   };
 
   const updateModel = async () => {
@@ -180,6 +179,8 @@ const ModelCard = ({
 
   if (!model) return null;
 
+  console.log(trainingLogs);
+
   return (
     <Box>
       <ConfirmationModal
@@ -249,6 +250,22 @@ const ModelCard = ({
                   </Tooltip>
                   <Tooltip label="Retrain Model">
                     <IconButton
+                      isDisabled={
+                        trainingLogs.filter((log: any) => {
+                          if (
+                            log.fulfilled === false &&
+                            log.model_id ===
+                            createModelID(
+                              model.repo,
+                              model.owner,
+                              model.branch
+                            )
+                          ) {
+                            return true;
+                          }
+                          return false;
+                        }).length > 0
+                      }
                       size="sm"
                       onClick={() => {
                         onRetrainOpen();
@@ -303,11 +320,20 @@ const ModelCard = ({
                   Status:{" "}
                   {model.deleted
                     ? "Deleted"
-                    : trainingFailed
-                      ? "Training failed, retrying"
+                    : trainingLogs.filter((log: any) => {
+                      if (
+                        log.fulfilled === false &&
+                        log.model_id ===
+                        createModelID(model.repo, model.owner, model.branch)
+                      ) {
+                        return true;
+                      }
+                      return false;
+                    }).length > 0
+                      ? "Training"
                       : !model.output
-                        ? "Queued"
-                        : "Ready for use"}
+                        ? "Training Failed"
+                        : "Trained"}
                 </Badge>
               </Flex>
 

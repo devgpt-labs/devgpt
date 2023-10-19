@@ -23,7 +23,7 @@ import {
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import Science from "@/components/repos/Science";
+import Feedback from "@/components/repos/Feedback";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -55,7 +55,6 @@ import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
 import calculateTokenCost from "@/utils/calculateTokenCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
-import trainModels from "@/utils/trainModels";
 import TrainingStatus from "./TrainingStatus";
 
 // Icons
@@ -140,9 +139,6 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    // Train models on load
-    trainModels(session, user);
-
     // Get all models
     getModels(
       (data: any) => {
@@ -507,7 +503,7 @@ const Chat = () => {
         {!workMode && (
           <>
             {status?.isOverdue || credits < 0 ? null : (
-              <Science
+              <Feedback
                 models={models}
                 response={response}
                 messages={messages}

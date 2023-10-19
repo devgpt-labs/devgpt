@@ -7,29 +7,21 @@ import {
   DrawerBody,
   DrawerFooter,
   DrawerHeader,
-  DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  useDisclosure,
-  Badge,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 // icons
 import { MdScience } from "react-icons/md";
-import { GiTick } from "react-icons/gi";
 import { TiTick } from "react-icons/ti";
 
 //stores
 import authStore from "@/store/Auth";
 
-// utils
-import trainModels from "@/utils/trainModels";
-
 // components
 import Setup from "./Setup";
 import calculateTotalCost from "@/utils/calculateTotalCost";
-import { Router } from "next/router";
 
 const RepoSetupModal = ({
   isOpen,
@@ -130,9 +122,6 @@ const RepoSetupModal = ({
                     epochs,
                     trainingMethod,
                   });
-
-                  // Begin model training
-                  trainModels(session, user);
 
                   // Close the modal
                   onClose();

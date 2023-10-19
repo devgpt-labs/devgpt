@@ -39,12 +39,10 @@ import RepoDrawer from "@/components/repos/RepoDrawer";
 //icons
 import { SmallAddIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { BiRefresh } from "react-icons/bi";
-import trainModels from "@/utils/trainModels";
 import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
-import createModelID from "@/utils/createModelID";
 import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
-import getCustomerChargeLimits from "@/utils/stripe/getCustomerChargeLimits";
+import createModelID from "@/utils/createModelID";
 
 const Models = ({ onClose }: any) => {
   const {
@@ -124,30 +122,38 @@ const Models = ({ onClose }: any) => {
 
   const findIfModelsAreTraining = async () => {
     const areModelsTraining = await modelsInTraining.map((model: any) => {
-
-      console.log(trainingLogs.filter((log: any) => {
-        return log.model_id === model.id && log.fulfilled === false;
-      }).length > 0);
+      // If any of the logs in training logs are fulfilled false, return true
 
 
-      // If this model is in the training logs, return true
-      if (trainingLogs.filter((log: any) => {
-        return log.model_id === model.id && log.fulfilled === false;
-      }).length > 0) {
+
+      if (
+        trainingLogs.filter(
+          (log: any) => log.fulfilled === false && log.model_id === createModelID(model.repo, model.owner, model.branch)
+        ).length > 0
+      ) {
         return true;
       }
 
       // If the model is output is null, return true
-      if (!model.output) return true;
+      if (!model.output) {
+        return true;
+      }
 
       // If the model output is undefined, return true
-      if (model === null) return true;
+      if (model === null) {
+        return true;
+      }
 
       // If the length is 1, meaning training failed, return true
-      if (JSON.parse(model?.output).length === 1) return true;
+      if (JSON.parse(model?.output).length === 1) {
+        return true;
+      }
 
       return false;
     });
+
+    console.log(areModelsTraining);
+
 
     // If areModelsTraining array contains a true value, set someModelsAreTraining to true
     const someModelsAreTraining = areModelsTraining.includes(true);
@@ -155,13 +161,10 @@ const Models = ({ onClose }: any) => {
   };
 
   useEffect(() => {
-    // Train models
-    trainModels(session, user);
-
     // get data from training_log table
     modelsInTraining.map((model: any) => {
       getTrainingLogsForModel(setTrainingLogs, model);
-    })
+    });
 
     // Subscribe to output changes
     if (!supabase) return;
@@ -198,21 +201,19 @@ const Models = ({ onClose }: any) => {
           // Add payload.new to trainingLogs, if it doesn't already exist
           const newTrainingLogs = [...trainingLogs];
           const newLog = payload.new;
-          const logExists = newTrainingLogs.filter((log: any) => {
-            return log.id === newLog.id;
-          }).length > 0;
+          const logExists =
+            newTrainingLogs.filter((log: any) => {
+              return log.id === newLog.id;
+            }).length > 0;
 
           if (!logExists) {
             newTrainingLogs.push(newLog);
           }
 
           setTrainingLogs(newTrainingLogs);
-
         }
       )
       .subscribe();
-
-
   }, []);
 
   useEffect(() => {
@@ -313,7 +314,12 @@ const Models = ({ onClose }: any) => {
               <AccordionPanel pb={4}>
                 <Flex width="100%" flexDirection="column" mb={4}>
                   {modelsInTraining.map((model: any) => {
-                    return <ModelInTraining model={model} />;
+                    return (
+                      <ModelInTraining
+                        model={model}
+                        trainingLogs={trainingLogs}
+                      />
+                    );
                   })}
                 </Flex>
               </AccordionPanel>
@@ -340,6 +346,7 @@ const Models = ({ onClose }: any) => {
                   {modelsInTraining.map((model: any) => {
                     return (
                       <ModelCard
+                        trainingLogs={trainingLogs}
                         model={model}
                         modelsInTraining={modelsInTraining}
                         setModelsInTraining={setModelsInTraining}

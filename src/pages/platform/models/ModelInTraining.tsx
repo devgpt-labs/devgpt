@@ -10,33 +10,32 @@ import {
   Spinner,
   useColorMode,
 } from "@chakra-ui/react";
+import createModelID from "@/utils/createModelID";
 
-const ModelInTraining = (model: any) => {
+const ModelInTraining = ({ model, trainingLogs }: any) => {
   const [waitingTime, setWaitingTime] = useState<any>(0); // 0
   const [status, setStatus] = useState<any>(null); // null
   const { colorMode } = useColorMode();
 
-  useEffect(() => {
-    if (model.output === null || !model.output) {
-      setStatus("training");
-    } else if (JSON.parse(model.output).length === 1) {
-      setStatus("failed");
-    } else if (JSON.parse(model.output).length > 1) {
-      setStatus("complete");
-    } else {
-      setStatus("complete")
-    }
+  const { output, frequency, owner, repo, branch }: any = model;
 
-    if (model.modelfrequency < 5) {
-      setWaitingTime("1:30 minutes");
-    } else if (model.modelfrequency < 10) {
-      setWaitingTime("2:30 minutes");
-    } else {
-      setWaitingTime("3:30 minutes");
+  // Check training logs to see if one with this model_id exists, with fulfilled false
+  const trainingLog = trainingLogs.map((log: any) => {
+    if (
+      log.fulfilled === false &&
+      log.model_id === createModelID(model.repo, model.owner, model.branch)
+    ) {
+      return true;
     }
-  }, []);
+    return false;
+  });
+  console.log(trainingLog);
 
-  if (status === 'complete') return null
+  // If the training log doesn't include true, then we don't need to render this component
+  if (!trainingLog.includes(true)) return null;
+
+  // If the training
+  if (!model) return null;
 
   return (
     <Box
@@ -47,19 +46,13 @@ const ModelInTraining = (model: any) => {
     >
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex flexDirection="row" alignItems="center" gap={2}>
-          <Badge>
-            {status === "training" ? `Training` : `Failed Training`}
-          </Badge>
-          <Text fontSize={14}>
-            {status === "training"
-              ? `Collecting training data...`
-              : `Retrying now... Estimated time: ${waitingTime}.`}
-          </Text>
+          <Badge>Training</Badge>
+          <Text fontSize={14}>Collecting training data...`</Text>
           <Spinner size="sm" />
         </Flex>
         <Flex flexDirection="column" alignItems="flex-end">
           <Text fontSize={14}>
-            {model.owner} / {model.repo} / {model.branch}
+            {owner} / {repo} / {branch}
           </Text>
           {/* <Text fontSize={14}>
             frequency: {frequency} /
@@ -72,7 +65,7 @@ const ModelInTraining = (model: any) => {
 
       <Slider
         aria-label="slider-ex-2"
-        defaultValue={status === "training" ? 60 : 10}
+        defaultValue={40}
         colorScheme="blue"
         isReadOnly={true}
       >
