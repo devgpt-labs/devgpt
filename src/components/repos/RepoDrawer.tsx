@@ -279,7 +279,7 @@ const RepoDrawer = () => {
                   })}
               </>
             ) : (
-              <Stack mt={4} spacing={2}>
+              <Stack spacing={2}>
                 <Text fontSize={14} mb={2}>
                   Is this taking too long? Try logging out and logging back in.
                 </Text>
