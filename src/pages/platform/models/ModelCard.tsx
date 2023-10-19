@@ -78,19 +78,19 @@ const ModelCard = ({
   const [trainingFailed, setTrainingFailed] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
-  useEffect(() => {
-    // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
-    if (!model.output || JSON?.parse?.(model?.output)?.length === 1) {
-      // Show training failed on this model
-      setTrainingFailed(true);
+  // useEffect(() => {
+  //   // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
+  //   if (!model.output || JSON?.parse?.(model?.output)?.length === 1) {
+  //     // Show training failed on this model
+  //     setTrainingFailed(true);
 
-      // Get the training_id
-      const modelId = createModelID(model.repo, model.owner, model.branch);
+  //     // Get the training_id
+  //     const modelId = createModelID(model.repo, model.owner, model.branch);
 
-      // Set the fulfilled value back to false so retraining will take place
-      setFulfilledBackToFalseForTrainingLog(modelId);
-    }
-  }, [model]);
+  //     // Set the fulfilled value back to false so retraining will take place
+  //     setFulfilledBackToFalseForTrainingLog(modelId);
+  //   }
+  // }, [model]);
 
   const retrainModel = async () => {
     // Create a new training_log for this model
@@ -308,10 +308,23 @@ const ModelCard = ({
                   colorScheme={
                     model.deleted
                       ? "red"
-                      : trainingFailed
+                      : JSON.parse(model.output)?.length === 1
                         ? "orange"
-                        : !model.output
-                          ? "orange"
+                        : trainingLogs.filter((log: any) => {
+                          if (
+                            log.fulfilled === false &&
+                            log.model_id ===
+                            createModelID(
+                              model.repo,
+                              model.owner,
+                              model.branch
+                            )
+                          ) {
+                            return true;
+                          }
+                          return false;
+                        }).length > 0
+                          ? "blue"
                           : "teal"
                   }
                   alignSelf="flex-start"
@@ -319,18 +332,20 @@ const ModelCard = ({
                   Status:{" "}
                   {model.deleted
                     ? "Deleted"
-                    : trainingLogs.filter((log: any) => {
-                      if (
-                        log.fulfilled === false &&
-                        log.model_id ===
-                        createModelID(model.repo, model.owner, model.branch)
-                      ) {
-                        return true;
-                      }
-                      return false;
-                    }).length > 0
-                      ? "Training"
-                      : "Trained"}
+                    : JSON.parse(model.output)?.length === 1
+                      ? "Training Failed"
+                      : trainingLogs.filter((log: any) => {
+                        if (
+                          log.fulfilled === false &&
+                          log.model_id ===
+                          createModelID(model.repo, model.owner, model.branch)
+                        ) {
+                          return true;
+                        }
+                        return false;
+                      }).length > 0
+                        ? "Training"
+                        : "Trained"}
                 </Badge>
               </Flex>
 
