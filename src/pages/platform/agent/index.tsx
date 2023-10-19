@@ -38,11 +38,9 @@ import Template from "@/components/Template";
 import Response from "@/components/Response";
 import Profile from "@/components/repos/Profile";
 import RateConversation from "./RateConversation";
-import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import Models from "../models";
 import PromptAreaAndButton from "./PromptAreaAndButton";
-import DiscordAndGithubButtons from "./DiscordAndGithubButtons";
 
 //utils
 import { supabase } from "@/utils/supabase";
@@ -88,7 +86,6 @@ const Chat = () => {
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
-  const [workMode, setWorkMode] = useState<boolean>(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -297,9 +294,9 @@ const Chat = () => {
     <Template>
       <Flex
         direction="column"
-        overflowY="scroll"
         flex={1}
-        w="full"
+        w="80%"
+        maxW="full"
         justifyContent={"center"}
         p={5}
       >
@@ -308,7 +305,6 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-          <ChatHeader />
           {!repo.repo && (
             <>
               <Button width="100%" mt={4}>
@@ -500,34 +496,11 @@ const Chat = () => {
               </Flex>
             )}
         </Box>
-        {!workMode && (
-          <>
-            {status?.isOverdue || credits < 0 ? null : (
-              <Feedback
-                models={models}
-                response={response}
-                messages={messages}
-              />
-            )}
-            <Profile />
-            <DiscordAndGithubButtons />
-          </>
-        )}
-        {/* 
-        <Tooltip label={workMode ? "Break Mode" : "Work Mode"} placement="top">
-          <IconButton
-            alignSelf='flex-end'
-            _hover={{
-              transform: "translateY(-4px)",
-              transition: "all 0.2s ease-in-out",
-            }}
-            onClick={() => {
-              setWorkMode(!workMode);
-            }}
-            aria-label={workMode ? "Break Mode" : "Work Mode"}
-            icon={workMode ? <GiIsland size={18} /> : <MdWork size={18} />}
-          />
-        </Tooltip> */}
+        <>
+          {status?.isOverdue || credits < 0 ? null : (
+            <Feedback models={models} response={response} messages={messages} />
+          )}
+        </>
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

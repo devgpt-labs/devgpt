@@ -22,6 +22,7 @@ import { MdMoney, MdScience, MdWork } from "react-icons/md";
 // Components
 import Repos from "./Settings";
 import UpgradeModal from "./UpgradeModal";
+import DiscordAndGithubButtons from "@/pages/platform/agent/DiscordAndGithubButtons";
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
@@ -160,10 +161,13 @@ const Profile = () => {
   return (
     <>
       <Flex
+        w="full"
         mt={3}
         flexDirection="column"
         rounded="lg"
-        border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
+        border={
+          colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
+        }
         p={5}
       >
         {/* <CreditsModal
@@ -187,7 +191,7 @@ const Profile = () => {
           justifyContent="space-between"
           width="100%"
         >
-          <Flex flexDirection="row" alignItems='center'>
+          <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
               <Image
                 _hover={{
@@ -207,10 +211,13 @@ const Profile = () => {
               />
             )}
             <Box ml={15} flexDirection="column">
-              <Flex flexDirection="row" alignItems="center">
-                <Text onClick={onCreditsOpen}>{identity?.name}</Text>
+              <Flex flexDirection={"row"} alignItems={"center"}>
+                <Flex flexDirection="column" mr={3}>
+                  <Text onClick={onCreditsOpen}>{identity?.name}</Text>
+                  <Text>{identity?.email}</Text>
+                </Flex>
+                <DiscordAndGithubButtons />
               </Flex>
-              <Text>{identity?.email}</Text>
             </Box>
           </Flex>
           <Flex flexDirection="row">

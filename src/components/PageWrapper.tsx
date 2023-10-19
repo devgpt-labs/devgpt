@@ -1,5 +1,7 @@
 import React from "react";
 import { Tag, Text, Flex, useColorMode } from "@chakra-ui/react";
+import Profile from "@/components/repos/Profile";
+import ChatHeader from "@/pages/platform/agent/ChatHeader";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();
@@ -29,20 +31,18 @@ const Home = ({ children }: any) => {
           gap={3}
           color="white"
         >
-          <Text>
-            DevGPT is now accessible via the web! 🎉 Improved desktop app coming
-            soon.
-          </Text>
+          <Text>Desktop app returning soon. 🎉</Text>
         </Tag>
 
         <Flex
-          // mx={20}
-          height="95vh"
+          height="100vh"
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
+          <ChatHeader />
           {children}
+          <Profile />
         </Flex>
       </Flex>
     </Flex>
