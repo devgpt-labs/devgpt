@@ -44,10 +44,17 @@ import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
 import createModelID from "@/utils/createModelID";
 import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
+import getCustomerChargeLimits from "@/utils/stripe/getCustomerChargeLimits";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits, status }: any =
-    authStore();
+  const {
+    session,
+    user,
+    stripe_customer_id,
+    credits,
+    status,
+    monthly_budget,
+  }: any = authStore();
   const router = useRouter();
   const {
     isOpen: isConfirmationOpen,
@@ -120,7 +127,7 @@ const Models = ({ onClose }: any) => {
       if (!model.output) return true;
       if (JSON.parse(model?.output).length === 1) return true;
 
-      return false
+      return false;
     });
 
     // If areModelsTraining array contains a true value, set someModelsAreTraining to true
@@ -128,8 +135,15 @@ const Models = ({ onClose }: any) => {
     setSomeModelsAreTraining(someModelsAreTraining);
   };
 
-  console.log(someModelsAreTraining);
+  const chargeLimits = async () => {
+    const { maxWeCanChargeCustomer }: any = await getCustomerChargeLimits(
+      stripe_customer_id,
+      monthly_budget
+    );
 
+    console.log("maxWeCanChargeCustomer", maxWeCanChargeCustomer);
+    return maxWeCanChargeCustomer;
+  };
 
   useEffect(() => {
     // Train models
@@ -137,6 +151,8 @@ const Models = ({ onClose }: any) => {
 
     // get data from training_log table
     getTrainingLogsForModel(setTrainingLogs, user);
+
+    chargeLimits();
 
     // Subscribe to output changes
     if (!supabase) return;

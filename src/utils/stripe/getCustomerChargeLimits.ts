@@ -1,7 +1,7 @@
 import { supabase } from "@/utils/supabase";
 
 const getCustomerChargeLimits = async (
-  customer: any,
+  stripe_customer_id: any,
   monthly_budget: number
 ) => {
   if (!supabase) return;
@@ -9,9 +9,14 @@ const getCustomerChargeLimits = async (
   const { data, error } = await supabase
     .from("payments")
     .select("*")
-    .eq("email_address", customer.email_address);
+    .eq("stripe_id", stripe_customer_id);
   if (error) return error;
   const payments = data;
+
+  console.log({data})
+
+  console.log(error);
+  
 
   //filter to payments that have been created_at this month
   const now = Date.now();

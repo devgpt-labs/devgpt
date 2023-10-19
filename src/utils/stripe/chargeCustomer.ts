@@ -17,14 +17,18 @@ const minimum_charge = 10; //10 dollars
 const setUserToPaymentOverdue = async (email: string) => {
 	if (!supabase) return;
 
+	const newStatus = {
+		isOverdue: true,
+	};
+
 	const { data: overdueData, error: overdueError } = await supabase
 		.from("customers")
-		.update({ isOverdue: true })
+		.update({ status: JSON.stringify(newStatus) })
 		.eq("email_address", email)
 		.select();
 
 	if (overdueError) {
-		console.log(overdueError);
+		console.log({ overdueError });
 		return;
 	}
 };
@@ -67,7 +71,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 	}
 
 	const { maxWeCanChargeCustomer, canChargeCustomer }: any =
-		await getCustomerChargeLimits(customer, monthly_budget);
+		await getCustomerChargeLimits(customer.stripe_customer_id, monthly_budget);
 
 	console.log(maxWeCanChargeCustomer);
 

@@ -17,7 +17,7 @@ import {
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { MdMoney, MdScience } from "react-icons/md";
+import { MdMoney, MdScience, MdWork } from "react-icons/md";
 
 // Components
 import Repos from "./Settings";
@@ -32,6 +32,7 @@ import {
   GiBattery75,
   GiBattery50,
   GiBattery0,
+  GiIsland,
 } from "react-icons/gi";
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
@@ -97,7 +98,6 @@ const Profile = () => {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { user, isPro, signOut }: any = authStore();
   const { colorMode, toggleColorMode } = useColorMode();
-  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const router = useRouter();
 
   const {

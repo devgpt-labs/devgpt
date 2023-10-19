@@ -41,10 +41,11 @@ import RateConversation from "./RateConversation";
 import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import Models from "../models";
-import { supabase } from "@/utils/supabase";
-import Calculator from "@/components/repos/Calculator";
+import PromptAreaAndButton from "./PromptAreaAndButton";
+import DiscordAndGithubButtons from "./DiscordAndGithubButtons";
 
 //utils
+import { supabase } from "@/utils/supabase";
 import { savePrompt } from "@/utils/savePrompt";
 import { checkIfPro } from "@/utils/checkIfPro";
 import getTokenLimit from "@/utils/getTokenLimit";
@@ -55,6 +56,7 @@ import getTokensFromString from "@/utils/getTokensFromString";
 import calculateTokenCost from "@/utils/calculateTokenCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
 import trainModels from "@/utils/trainModels";
+import TrainingStatus from "./TrainingStatus";
 
 // Icons
 import { BsDiscord, BsGithub, BsGraphUpArrow, BsStars } from "react-icons/bs";
@@ -65,7 +67,8 @@ import { RiRefreshFill } from "react-icons/ri";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import Stripe from "stripe";
-import DiscordAndGithubButtons from "./DiscordAndGithubButtons";
+import { MdWork } from "react-icons/md";
+import { GiIsland } from "react-icons/gi";
 
 const Chat = () => {
   // Constants
@@ -86,6 +89,7 @@ const Chat = () => {
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
+  const [workMode, setWorkMode] = useState<boolean>(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -109,7 +113,9 @@ const Chat = () => {
         user?.email
       );
 
+      hasBeenReset && setHasBeenReset(false);
       savePrompt(user?.email, prompt, data.content, usage);
+      setResponse(data.content);
     },
   });
 
@@ -291,83 +297,7 @@ const Chat = () => {
     return true;
   };
 
-  const TrainingStatus = () => {
-    if (status?.isOverdue || credits < 0) return null;
-
-    return initialMessages?.length === 0 ? (
-      <Text mt={4} mb={4}>
-        Your AI model is <Badge>Training</Badge>, until this is done the AI
-        won't be able to access your repos context.
-      </Text>
-    ) : (
-      <Text my={3}>
-        Your trained AI model is{" "}
-        <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-      </Text>
-    );
-  };
-
-  const PromptAreaAndButton = () => {
-    if (status?.isOverdue || credits < 0) return null;
-
-    return (
-      <Flex flexDirection="row">
-        <Input
-          border="solid 1px #1a202c"
-          className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
-          value={prompt}
-          placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-          onChange={(e: any) => {
-            setPrompt(e.target.value);
-            handleInputChange(e);
-          }}
-          onKeyDown={async (e: any) => {
-            if (prompt.length < 3) {
-              return;
-            }
-
-            if (loading) return;
-
-            // If key equals tab, autocomplete
-            if (e.key === "Tab") {
-              e.preventDefault();
-              handleUseTabSuggestion(selectedFile[0]);
-              return;
-            }
-
-            // If key equals enter, submit
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              const checks = await submitChecks(false);
-              if (!checks) return null;
-              setHasBeenReset(false);
-              handleSubmit(e);
-            }
-          }}
-        />
-
-        <Button
-          bgGradient={"linear(to-r, blue.500, teal.500)"}
-          isDisabled={loading}
-          color="white"
-          ml={4}
-          width="10rem"
-          onClick={async (e: any) => {
-            setLoading(true);
-            const checks = await submitChecks(false);
-            if (!checks) {
-              console.log("checks failed, stopping");
-              return null;
-            }
-            setHasBeenReset(false);
-            handleSubmit(e);
-          }}
-        >
-          {loading ? <Spinner size="sm" /> : "Submit"}
-        </Button>
-      </Flex>
-    );
-  };
+  console.log({ response });
 
   return (
     <Template>
@@ -384,7 +314,6 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-          <ChatHeader />
 
           {!repo.repo && (
             <>
@@ -447,8 +376,10 @@ const Chat = () => {
             ))}
 
           {repo.repo && (
-            <Box maxH={"45vh"} overflowY={"auto"}>
-              <TrainingStatus />
+            <Box maxH={"100vh"} overflowY={"auto"}>
+              <ChatHeader />
+
+              <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>
@@ -474,6 +405,33 @@ const Chat = () => {
                 </SlideFade>
               </Flex>
 
+              <PromptAreaAndButton
+                prompt={prompt}
+                selectedFile={selectedFile}
+                loading={loading}
+                setLoading={setLoading}
+                handleUseTabSuggestion={handleUseTabSuggestion}
+                setPrompt={setPrompt}
+                handleInputChange={handleInputChange}
+                submitChecks={submitChecks}
+                setHasBeenReset={setHasBeenReset}
+                handleSubmit={handleSubmit}
+              />
+
+              {failMessage && (
+                <Text mb={3} mt={2} fontSize={14}>
+                  {failMessage}
+                </Text>
+              )}
+
+              {previousPrompt && (
+                <SlideFade in={hasSentAMessage}>
+                  <Text mb={3} color="gray" fontSize={12} mt={1}>
+                    {previousPrompt}
+                  </Text>
+                </SlideFade>
+              )}
+
               {loading && !messages[messages.length - 1] ? (
                 <SkeletonText
                   mb={2}
@@ -489,26 +447,11 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-
-              <PromptAreaAndButton />
-
-              {failMessage && (
-                <Text mb={3} mt={2} fontSize={14}>
-                  {failMessage}
-                </Text>
-              )}
-
-              {previousPrompt && (
-                <SlideFade in={hasSentAMessage}>
-                  <Text mb={3} color="gray" fontSize={12} mt={1}>
-                    {previousPrompt}
-                  </Text>
-                </SlideFade>
-              )}
             </Box>
           )}
 
           {!loading &&
+            !hasBeenReset &&
             messages[messages.length - 1] &&
             !initialMessages?.find(
               (message: any) =>
@@ -520,6 +463,7 @@ const Chat = () => {
                 justifyContent="center"
                 alignItems="center"
                 gap={2}
+                my={2}
               >
                 <IconButton
                   _hover={{
@@ -563,28 +507,37 @@ const Chat = () => {
                     </Flex>
                   }
                 />
-                <IconButton
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                  aria-label="Join Discord"
-                  icon={
-                    <Flex flexDirection="row" px={3}>
-                      <FaThumbsUp />
-                      <Text ml={2} fontSize={14}>
-                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                        Add This Response To Model Memory
-                      </Text>
-                    </Flex>
-                  }
-                />
               </Flex>
             )}
         </Box>
-        {!status?.isOverdue || (credits > 0 && <Science models={models} />)}
-        <Profile />
-        <DiscordAndGithubButtons />
+        {!workMode && (
+          <>
+            {status?.isOverdue || credits < 0 ? null : (
+              <Science
+                models={models}
+                response={response}
+                messages={messages}
+              />
+            )}
+            <Profile />
+            <DiscordAndGithubButtons />
+          </>
+        )}
+        {/* 
+        <Tooltip label={workMode ? "Break Mode" : "Work Mode"} placement="top">
+          <IconButton
+            alignSelf='flex-end'
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            onClick={() => {
+              setWorkMode(!workMode);
+            }}
+            aria-label={workMode ? "Break Mode" : "Work Mode"}
+            icon={workMode ? <GiIsland size={18} /> : <MdWork size={18} />}
+          />
+        </Tooltip> */}
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

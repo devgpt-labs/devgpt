@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Flex, Text, useColorMode, Skeleton, Button } from "@chakra-ui/react";
+import { supabase } from "@/utils/supabase";
 
 // Icons
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
@@ -8,31 +9,62 @@ import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 // Stores
 import repoStore from "@/store/Repos";
 
-const Science = ({ models }: any) => {
+const Science = ({ models, response, messages }: any) => {
   const { repo }: any = repoStore();
-  const [sliderValue, setSliderValue] = useState(5);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const { colorMode } = useColorMode();
 
   // Find the model in models that matches repo
-  const model = models.find(
+  const model = models?.find(
     (model: any) => model.repo === repo.repo && model.owner === repo.owner
   );
 
+  useEffect(() => {
+    setFeedbackGiven(false);
+  }, [response, messages]);
+
+  if (!model) return null;
+
+
+  // Slice the last two messages and remove the id and created_at. We can then add this to supabase.
+  const newestMessages = messages
+    .slice(messages.length - 2, messages.length)
+    .map((message: any) => {
+      const { id, createdAt, ...rest } = message;
+      return rest;
+    });
+
+  const existingMessages = JSON?.parse(model?.output);
+  const newMessages = [...existingMessages, ...newestMessages];
+
+  // Update the model in supabase with the new messages
+  const updateModel = async () => {
+    if (!supabase) return;
+
+    const { data, error } = await supabase
+      .from("models")
+      .update({
+        improvements: JSON.stringify(newestMessages),
+        output: JSON.stringify(newMessages),
+      })
+      .match({
+        id: model.id,
+      });
+
+    if (error) console.log(error);
+    console.log(data);
+  };
+
   const handleGoodAnswerClick = async () => {
-    console.log("hi");
+    updateModel();
     setFeedbackGiven(true);
   };
 
   const handleBadAnswerClick = async () => {
-    console.log("hi");
     setFeedbackGiven(true);
   };
 
-  if (!model) return <Skeleton height="20px" />;
-
-  if (feedbackGiven)
+  if (feedbackGiven) {
     return (
       <Flex
         mt={3}
@@ -43,11 +75,16 @@ const Science = ({ models }: any) => {
         border={
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
-        p={5}
+        p={2}
       >
         <Text>Thank you for your feedback</Text>
       </Flex>
     );
+  }
+
+  if (response === "") {
+    return null;
+  }
 
   return (
     <Flex
@@ -56,34 +93,40 @@ const Science = ({ models }: any) => {
       rounded="lg"
       border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
       p={5}
+      justifyContent='space-between'
     >
-      <Flex flexDirection="column" maxW='50%'>
-        <Text>Passive Improvement</Text>
-        <Text fontSize={14} color="gray.600">
-          How did your model do on your last prompt? This is used to directly
-          improve your model and it's training. This allows your model to be
-          constantly learning as it's being used.
+      <Flex flexDirection="column" >
+        <Text>
+          How did your model do on your last prompt for{" "}
+          <strong>
+            {repo.repo} / {repo.owner}
+          </strong>
+          ?
+        </Text>
+        <Text fontSize={14} color="gray.500">
+          Passive Improvement is used to directly improve your model and it's
+          training. This allows your model to be constantly learning as it's
+          being used.
         </Text>
       </Flex>
       <Flex
         flexDirection="row"
-        width="50%"
         justifyContent="center"
         alignItems="center"
       >
-        <Button width="40%" onClick={handleBadAnswerClick}>
+        <Button onClick={handleBadAnswerClick}>
           <FaThumbsDown />
-          <Text ml={2}>Poor Generation</Text>
+          <Text ml={2}>Poor</Text>
         </Button>
         <Button
-          width="40%"
+
           ml={2}
           color="white"
           bgGradient="linear(to-r, blue.500, teal.500)"
           onClick={handleGoodAnswerClick}
         >
           <FaThumbsUp />
-          <Text ml={2}>Good Generation</Text>
+          <Text ml={2}>Good</Text>
         </Button>
       </Flex>
     </Flex>
