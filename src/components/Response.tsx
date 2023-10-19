@@ -54,7 +54,7 @@ const Response = ({
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <>
-                <Box maxW="full" pb={2}>
+                <Box maxW="full" pb={2} maxH={"xl"}>
                   <SyntaxHighlighter
                     {...props}
                     lineProps={{ style: { paddingBottom: 8, fontSize: 14 } }}

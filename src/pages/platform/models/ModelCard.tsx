@@ -203,8 +203,7 @@ const ModelCard = ({
       />
       <ConfirmationModal
         header="Retrain this model?"
-        body="Confirm you would like to retrain this DevGPT model. This is a
-              action will cost your retraining cost. We like to check that you meant to click this button"
+        body="Confirm you would like to retrain this DevGPT model, this will take a few minutes."
         confirmButtonText="Retrain"
         isOpen={isRetrainOpen}
         onClose={onRetrainClose}
@@ -293,10 +292,10 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : trainingFailed
-                        ? "orange"
-                        : !model.output
-                          ? "orange"
-                          : "teal"
+                      ? "orange"
+                      : !model.output
+                      ? "orange"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -304,10 +303,10 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : trainingFailed
-                      ? "Training failed, retrying"
-                      : !model.output
-                        ? "Queued"
-                        : "Ready for use"}
+                    ? "Training failed, retrying"
+                    : !model.output
+                    ? "Queued"
+                    : "Ready for use"}
                 </Badge>
               </Flex>
 
@@ -370,14 +369,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>

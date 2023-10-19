@@ -148,7 +148,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       user?.email
     );
 
@@ -312,6 +312,7 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
+          <ChatHeader />
           {!repo.repo && (
             <>
               <Button width="100%" mt={4}>
@@ -324,19 +325,18 @@ const Chat = () => {
           )}
           {repo.repo && (
             <Box maxH={"100vh"} overflowY={"auto"}>
-              <ChatHeader />
               {status?.isOverdue ||
                 (credits < 0 && (
                   <Flex flexDirection="column" mt={4}>
                     <Text>
-                      Before you continue prompting, we need to get your billing in
-                      order!
+                      Before you continue prompting, we need to get your billing
+                      in order!
                     </Text>
                     <Text mb={3} fontSize={14} color="gray.600">
-                      You're accounts billing is currently overdue, so before you
-                      continue we'll need to help you set up billing correctly. You
-                      can continue using DevGPT and prompting with your trained
-                      models immediately after this.
+                      You're accounts billing is currently overdue, so before
+                      you continue we'll need to help you set up billing
+                      correctly. You can continue using DevGPT and prompting
+                      with your trained models immediately after this.
                     </Text>
                     <Button
                       bgGradient={"linear(to-r, blue.500, teal.500)"}
