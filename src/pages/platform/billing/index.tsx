@@ -261,6 +261,9 @@ const Models = ({ onClose }: any) => {
             <Heading size="md" mb={4} mt={2}>
               Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
             </Heading>
+            <Heading size="md" mb={4} mt={2}>
+              Spend this month so far: <Tag>${credits?.toFixed(2) || 0}</Tag>
+            </Heading>
             <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
               <Text fontSize={14}>Monthly Budget</Text>
               <Tooltip
