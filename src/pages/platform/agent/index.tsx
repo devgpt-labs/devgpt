@@ -297,8 +297,6 @@ const Chat = () => {
     return true;
   };
 
-  console.log({ response });
-
   return (
     <Template>
       <Flex

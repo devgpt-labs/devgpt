@@ -268,8 +268,6 @@ const RepoDrawer = () => {
                         <Button
                           size="sm"
                           onClick={() => {
-                            console.log({});
-
                             setSelectedRepo(repoOption);
                             onRepoSetupOpen();
                           }}

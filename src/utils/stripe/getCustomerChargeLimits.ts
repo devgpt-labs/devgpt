@@ -13,11 +13,6 @@ const getCustomerChargeLimits = async (
   if (error) return error;
   const payments = data;
 
-  console.log({data})
-
-  console.log(error);
-  
-
   //filter to payments that have been created_at this month
   const now = Date.now();
   const thisMonth = new Date(now).getMonth();

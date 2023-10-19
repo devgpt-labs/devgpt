@@ -52,7 +52,6 @@ const Science = ({ models, response, messages }: any) => {
       });
 
     if (error) console.log(error);
-    console.log(data);
   };
 
   const handleGoodAnswerClick = async () => {

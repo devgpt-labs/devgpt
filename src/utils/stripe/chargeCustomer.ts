@@ -73,8 +73,6 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 	const { maxWeCanChargeCustomer, canChargeCustomer }: any =
 		await getCustomerChargeLimits(customer.stripe_customer_id, monthly_budget);
 
-	console.log(maxWeCanChargeCustomer);
-
 	if (!canChargeCustomer) {
 		setUserToPaymentOverdue(email);
 		return;
