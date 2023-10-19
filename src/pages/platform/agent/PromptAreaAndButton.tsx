@@ -27,6 +27,7 @@ const PromptAreaAndButton = ({
   setHasBeenReset,
   handleSubmit,
 }: PromptAreaAndButtonProps) => {
+
   const { status, credits }: any = authStore();
 
   if (status?.isOverdue || credits < 0) return null;
@@ -71,7 +72,8 @@ const PromptAreaAndButton = ({
       />
 
       <Button
-        bgGradient={"linear(to-r, blue.500, teal.500)"}
+        bg='blue.500'
+        // bgGradient="linear(to-r, blue.500, teal.500)"
         isDisabled={loading}
         color="white"
         ml={4}

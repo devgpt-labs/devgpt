@@ -11,30 +11,25 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 
-const ModelInTraining = ({ model }: any) => {
-  const { owner, repo, branch, output, frequency }: any = model;
-
-  const [trainingLogs, setTrainingLogs] = useState<any>([]); // [
+const ModelInTraining = (model: any) => {
   const [waitingTime, setWaitingTime] = useState<any>(0); // 0
   const [status, setStatus] = useState<any>(null); // null
   const { colorMode } = useColorMode();
 
-  // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, return nothing
-
   useEffect(() => {
-    if (output === null) {
+    if (model.output === null) {
       setStatus("training");
-    } else if (JSON.parse(output).length === 1) {
+    } else if (JSON.parse(model.output).length === 1) {
       setStatus("failed");
-    } else if (JSON.parse(output).length > 1) {
+    } else if (JSON.parse(model.output).length > 1) {
       setStatus("complete");
     } else {
       setStatus("complete")
     }
 
-    if (frequency < 5) {
+    if (model.modelfrequency < 5) {
       setWaitingTime("1:30 minutes");
-    } else if (frequency < 10) {
+    } else if (model.modelfrequency < 10) {
       setWaitingTime("2:30 minutes");
     } else {
       setWaitingTime("3:30 minutes");
@@ -64,7 +59,7 @@ const ModelInTraining = ({ model }: any) => {
         </Flex>
         <Flex flexDirection="column" alignItems="flex-end">
           <Text fontSize={14}>
-            {owner} / {repo} / {branch}
+            {model.owner} / {model.repo} / {model.branch}
           </Text>
           {/* <Text fontSize={14}>
             frequency: {frequency} /

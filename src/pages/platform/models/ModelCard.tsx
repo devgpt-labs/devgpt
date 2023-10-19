@@ -77,10 +77,8 @@ const ModelCard = ({
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-
     // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
     if (!model.output || JSON?.parse?.(model?.output)?.length === 1) {
-
       // Show training failed on this model
       setTrainingFailed(true);
 
@@ -91,6 +89,14 @@ const ModelCard = ({
       setFulfilledBackToFalseForTrainingLog(modelId);
     }
   }, [model]);
+
+  const retrainModel = async () => {
+    // Create the modelId
+    // const modelId = createModelID(model.repo, model.owner, model.branch);
+
+    // Create a new training_log for this model
+    const trainingLog = await addTrainingLog(model);
+  };
 
   const updateModel = async () => {
     if (!supabase) {
@@ -203,7 +209,7 @@ const ModelCard = ({
         isOpen={isRetrainOpen}
         onClose={onRetrainClose}
         onSubmit={() => {
-          // create new training log
+          retrainModel();
         }}
         setLoadingState={setRetrainingModel}
       />

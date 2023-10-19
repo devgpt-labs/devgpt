@@ -259,7 +259,6 @@ const Profile = () => {
                     _hover={{
                       transform: "translateY(-4px)",
                       transition: "all 0.2s ease-in-out",
-                      color: "blue.500",
                     }}
                     bgGradient="linear(to-tr, teal.500, blue.500)"
                     onClick={onUpgradeOpen}

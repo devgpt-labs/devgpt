@@ -312,7 +312,6 @@ const Chat = () => {
           className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-
           {!repo.repo && (
             <>
               <Button width="100%" mt={4}>
@@ -323,60 +322,57 @@ const Chat = () => {
               </Text>
             </>
           )}
-
-          {status?.isOverdue ||
-            (credits < 0 && (
-              <Flex flexDirection="column" mt={4}>
-                <Text>
-                  Before you continue prompting, we need to get your billing in
-                  order!
-                </Text>
-                <Text mb={3} fontSize={14} color="gray.600">
-                  You're accounts billing is currently overdue, so before you
-                  continue we'll need to help you set up billing correctly. You
-                  can continue using DevGPT and prompting with your trained
-                  models immediately after this.
-                </Text>
-                <Button
-                  bgGradient={"linear(to-r, blue.500, teal.500)"}
-                  onClick={() => {
-                    router.push("/platform/billing");
-                  }}
-                  width="100%"
-                  mb={3}
-                >
-                  <Text color="white" mr={2}>
-                    Upgrade
-                  </Text>
-                  <BiUpArrowAlt color="white" />
-                </Button>
-                <Flex flexDirection="row" gap={3}>
-                  <Link
-                    width="50%"
-                    href="https://discord.com/invite/6GFtwzuvtw"
-                  >
-                    <Button width="100%">
-                      <Text mr={2}>Join Discord</Text>
-                      <BsDiscord />
-                    </Button>
-                  </Link>
-                  <Button
-                    onClick={() => {
-                      router.push("/platform/billing");
-                    }}
-                    width="50%"
-                  >
-                    <Text mr={2}>View Billing</Text>
-                    <AiFillCreditCard />
-                  </Button>
-                </Flex>
-              </Flex>
-            ))}
-
           {repo.repo && (
             <Box maxH={"100vh"} overflowY={"auto"}>
               <ChatHeader />
-
+              {status?.isOverdue ||
+                (credits < 0 && (
+                  <Flex flexDirection="column" mt={4}>
+                    <Text>
+                      Before you continue prompting, we need to get your billing in
+                      order!
+                    </Text>
+                    <Text mb={3} fontSize={14} color="gray.600">
+                      You're accounts billing is currently overdue, so before you
+                      continue we'll need to help you set up billing correctly. You
+                      can continue using DevGPT and prompting with your trained
+                      models immediately after this.
+                    </Text>
+                    <Button
+                      bgGradient={"linear(to-r, blue.500, teal.500)"}
+                      onClick={() => {
+                        router.push("/platform/billing");
+                      }}
+                      width="100%"
+                      mb={3}
+                    >
+                      <Text color="white" mr={2}>
+                        Upgrade
+                      </Text>
+                      <BiUpArrowAlt color="white" />
+                    </Button>
+                    <Flex flexDirection="row" gap={3}>
+                      <Link
+                        width="50%"
+                        href="https://discord.com/invite/6GFtwzuvtw"
+                      >
+                        <Button width="100%">
+                          <Text mr={2}>Join Discord</Text>
+                          <BsDiscord />
+                        </Button>
+                      </Link>
+                      <Button
+                        onClick={() => {
+                          router.push("/platform/billing");
+                        }}
+                        width="50%"
+                      >
+                        <Text mr={2}>View Billing</Text>
+                        <AiFillCreditCard />
+                      </Button>
+                    </Flex>
+                  </Flex>
+                ))}
               <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>

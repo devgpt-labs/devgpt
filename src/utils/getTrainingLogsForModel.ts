@@ -3,6 +3,7 @@ import createModelID from "./createModelID";
 
 const getTrainingLogsForModel = async (setState: any, model: any) => {
 	if (!supabase) return;
+	if(!model) return;
 
 	const { data, error } = await supabase
 		.from("training_log")

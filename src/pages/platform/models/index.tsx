@@ -124,7 +124,26 @@ const Models = ({ onClose }: any) => {
 
   const findIfModelsAreTraining = async () => {
     const areModelsTraining = await modelsInTraining.map((model: any) => {
+
+      console.log(trainingLogs.filter((log: any) => {
+        return log.model_id === model.id && log.fulfilled === false;
+      }).length > 0);
+
+
+      // If this model is in the training logs, return true
+      if (trainingLogs.filter((log: any) => {
+        return log.model_id === model.id && log.fulfilled === false;
+      }).length > 0) {
+        return true;
+      }
+
+      // If the model is output is null, return true
       if (!model.output) return true;
+
+      // If the model output is undefined, return true
+      if (model === null) return true;
+
+      // If the length is 1, meaning training failed, return true
       if (JSON.parse(model?.output).length === 1) return true;
 
       return false;
@@ -135,24 +154,14 @@ const Models = ({ onClose }: any) => {
     setSomeModelsAreTraining(someModelsAreTraining);
   };
 
-  const chargeLimits = async () => {
-    const { maxWeCanChargeCustomer }: any = await getCustomerChargeLimits(
-      stripe_customer_id,
-      monthly_budget
-    );
-
-    console.log("maxWeCanChargeCustomer", maxWeCanChargeCustomer);
-    return maxWeCanChargeCustomer;
-  };
-
   useEffect(() => {
     // Train models
     trainModels(session, user);
 
     // get data from training_log table
-    getTrainingLogsForModel(setTrainingLogs, user);
-
-    chargeLimits();
+    modelsInTraining.map((model: any) => {
+      getTrainingLogsForModel(setTrainingLogs, model);
+    })
 
     // Subscribe to output changes
     if (!supabase) return;
@@ -179,6 +188,31 @@ const Models = ({ onClose }: any) => {
         }
       )
       .subscribe();
+
+    const training = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "training_log" },
+        (payload: any) => {
+          // Add payload.new to trainingLogs, if it doesn't already exist
+          const newTrainingLogs = [...trainingLogs];
+          const newLog = payload.new;
+          const logExists = newTrainingLogs.filter((log: any) => {
+            return log.id === newLog.id;
+          }).length > 0;
+
+          if (!logExists) {
+            newTrainingLogs.push(newLog);
+          }
+
+          setTrainingLogs(newTrainingLogs);
+
+        }
+      )
+      .subscribe();
+
+
   }, []);
 
   useEffect(() => {
