@@ -68,30 +68,28 @@ const Auth = () => {
           <Text ml={3}>Just getting started...</Text>
         </Flex>
       </Template>
-
     );
 
   return (
     <>
       <Template>
         <Box
+          h="100vh"
           w="40%"
           rounded="lg"
           overflow="hidden"
           p={5}
           flexDirection="column"
           boxShadow="blue"
-          border="1px solid #1a202c"
           shadow="2xl"
         >
-          <AuthHeader />
           <VStack spacing={2} mt={3} width="100%" alignItems="center">
             <GitConnectorButton
               color="black"
               provider="Sign In With Github"
               handle={signInWithGithub}
               Icon={<BsGithub />}
-              tooltip=''
+              tooltip=""
             />
             <GitConnectorButton
               color="#0c61db"
@@ -103,7 +101,7 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => { }}
+              handle={() => {}}
               Icon={<AiFillGitlab />}
               tooltip="Coming soon!"
             />

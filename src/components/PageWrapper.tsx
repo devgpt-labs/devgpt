@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, Text, Flex, useColorMode } from "@chakra-ui/react";
+import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
 import Profile from "@/components/repos/Profile";
 import ChatHeader from "@/pages/platform/agent/ChatHeader";
 
@@ -22,8 +22,7 @@ const Home = ({ children }: any) => {
         overflowY="scroll"
       >
         <Tag
-          p={2}
-          py={3}
+          p={4}
           colorScheme="blue"
           alignItems="center"
           justifyContent="center"
