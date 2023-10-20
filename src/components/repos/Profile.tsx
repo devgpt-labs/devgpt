@@ -165,7 +165,7 @@ const Profile = () => {
         mt={3}
         flexDirection="column"
         rounded="lg"
-        border={
+        borderTop={
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
         p={4}

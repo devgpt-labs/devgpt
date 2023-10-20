@@ -28,26 +28,19 @@ interface Model {
 }
 
 async function trainModel(model: any, session: any, user: any) {
-  console.log("7");
   if (!supabase) {
     console.log("No supabase client found");
     return;
   }
 
-  console.log("8");
-
-  console.log("9");
-
   switch (model.training_method.toLowerCase()) {
     case "encoding":
-      console.log("5");
       return await trainRepoWithEncoding(model, session, user);
       break;
     case "embeddings":
       return await trainRepoWithEmbeddings(model, session, user);
       break;
     default:
-      console.log("4");
       return await trainRepoWithEncoding(model, session, user);
       break;
   }
@@ -59,7 +52,6 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   const name = model.repo;
   const owner = model.owner;
 
-  console.log("1");
 
   if (!owner || !name || !session.provider_token) {
     console.error("Missing owner, name, or provider_token");
@@ -79,7 +71,7 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   // Join the lofaf together
   const lofafString = lofafArray.join(",");
 
-  console.log("2");
+  
 
   // Create training data
   let trainingData = await createTrainingData(
@@ -95,7 +87,7 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
 
   setModelOutput(model, JSON.stringify(trainingData), user.email);
 
-  console.log("3");
+  
 
   console.log({ trainingData });
 

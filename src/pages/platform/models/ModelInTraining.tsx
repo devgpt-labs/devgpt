@@ -18,8 +18,6 @@ const ModelInTraining = ({ model }: any) => {
   const { colorMode } = useColorMode();
   const [sliderValue, setSliderValue] = useState(0);
 
-  console.log({ model });
-
   const { output, frequency, owner, repo, branch }: any = model;
 
   useInterval(() => {
@@ -43,17 +41,19 @@ const ModelInTraining = ({ model }: any) => {
       bg={colorMode === "light" ? "white" : "black"}
     >
       <Flex flexDirection="row" justifyContent="space-between">
-        <Flex flexDirection="row" alignItems="center" gap={2}>
-          <Badge>Training</Badge>
-          <Text fontSize={14}>
-            {sliderValue > 100 ? "Completing Soon" : "Training"}
-          </Text>
-          <Spinner size="sm" />
+        <Flex flexDirection="column" alignItems="center" gap={2}>
+          <Flex flexDirection='row' alignItems='center' gap={2}>
+            <Badge fontSize={14}>
+              {sliderValue > 100 ? "Completing Soon" : "Training"}
+            </Badge>
+            <Spinner size="sm" />
+          </Flex>
+
         </Flex>
         <Flex flexDirection="column" alignItems="flex-end">
-          <Text fontSize={14}>
-            {owner} / {repo} / {branch}
-          </Text>
+          <Text fontSize={14}>{owner}</Text>
+          <Text fontSize={14}>{repo}</Text>
+          <Text fontSize={14}>{branch}</Text>
         </Flex>
       </Flex>
       <Slider

@@ -7,15 +7,15 @@ const TrainingStatus = (initialMessages: any) => {
   if (status?.isOverdue || credits < 0) return null;
 
   return initialMessages?.length === 0 ? (
-    <Text mt={4} mb={4}>
+    <Text mb={1}>
       Your AI model is <Badge>Training</Badge>, until this is done the AI
       won't be able to access your repos context.
     </Text>
   ) : (
-    <Text my={3}>
-      Your trained AI model is{" "}
+    <Text mb={1}>
+      Your trained model is{" "}
       <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-    </Text>
+    </Text >
   );
 };
 

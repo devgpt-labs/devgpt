@@ -74,7 +74,7 @@ const Models = () => {
           (log: any) =>
             log.fulfilled === false &&
             log.model_id ===
-              createModelID(model.repo, model.owner, model.branch)
+            createModelID(model.repo, model.owner, model.branch)
         ).length > 0
       ) {
         return true;
@@ -210,64 +210,25 @@ const Models = () => {
             </Button>
           </Flex>
         </Flex>
-        <Accordion allowMultiple defaultIndex={[0, 1]}>
-          {/* {someModelsAreTraining || isTraining ? (
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box as="span" flex="1" textAlign="left" mt={2}>
-                    Models Being Trained
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <Flex width="100%" flexDirection="column" mb={4}>
-                  {modelsInTraining.map((model: any) => {
-                    return (
-                      <ModelInTraining
-                        model={model}
-                        trainingLogs={trainingLogs}
-                      />
-                    );
-                  })}
-                </Flex>
-              </AccordionPanel>
-            </AccordionItem>
-          ) : null} */}
-          <AccordionItem>
-            <h2>
-              <AccordionButton>
-                <Box as="span" flex="1" textAlign="left" mt={2}>
-                  Trained Models
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </h2>
-
-            <AccordionPanel pb={4}>
-              {modelsInTraining.length > 0 && (
-                <Grid
-                  width="100%"
-                  templateColumns={`repeat(3, 1fr)`}
-                  gap={6}
-                  flexWrap="wrap"
-                >
-                  {modelsInTraining.map((model: any) => {
-                    return (
-                      <ModelCard
-                        trainingLogs={trainingLogs}
-                        model={model}
-                        modelsInTraining={modelsInTraining}
-                        setModelsInTraining={setModelsInTraining}
-                      />
-                    );
-                  })}
-                </Grid>
-              )}
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
+        {modelsInTraining.length > 0 && (
+          <Grid
+            width="100%"
+            templateColumns={`repeat(3, 1fr)`}
+            gap={6}
+            flexWrap="wrap"
+          >
+            {modelsInTraining.map((model: any) => {
+              return (
+                <ModelCard
+                  trainingLogs={trainingLogs}
+                  model={model}
+                  modelsInTraining={modelsInTraining}
+                  setModelsInTraining={setModelsInTraining}
+                />
+              );
+            })}
+          </Grid>
+        )}
       </Flex>
       <RepoDrawer />
     </Template>

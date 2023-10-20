@@ -5,30 +5,31 @@ import {
   Flex,
   Text,
   SkeletonText,
-  Input,
   Button,
-  useColorMode,
   SlideFade,
   Kbd,
   Tag,
   useDisclosure,
-  Heading,
-  Spinner,
-  Tooltip,
   IconButton,
-  Badge,
   Link,
-  StatUpArrow,
+  Stat,
+  StatLabel,
+  Switch,
+  StatNumber,
+  StatHelpText,
+  Grid,
+  Tooltip,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import Feedback from "@/components/repos/Feedback";
+import moment from "moment";
 
 //stores
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
 
 //prompts
 import userPrompt from "@/prompts/user";
@@ -36,14 +37,10 @@ import userPrompt from "@/prompts/user";
 //components
 import Template from "@/components/Template";
 import Response from "@/components/Response";
-import Profile from "@/components/repos/Profile";
-import RateConversation from "./RateConversation";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
-import Models from "../models";
 import PromptAreaAndButton from "./PromptAreaAndButton";
 
 //utils
-import { supabase } from "@/utils/supabase";
 import { savePrompt } from "@/utils/savePrompt";
 import { checkIfPro } from "@/utils/checkIfPro";
 import getTokenLimit from "@/utils/getTokenLimit";
@@ -56,16 +53,15 @@ import chargeCustomer from "@/utils/stripe/chargeCustomer";
 import TrainingStatus from "./TrainingStatus";
 
 // Icons
-import { BsDiscord, BsGithub, BsGraphUpArrow, BsStars } from "react-icons/bs";
+import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { RiRefreshFill } from "react-icons/ri";
+import { BiSolidBrain } from "react-icons/bi";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
-import Stripe from "stripe";
-import { MdWork } from "react-icons/md";
-import { GiIsland } from "react-icons/gi";
+import { MdScience } from "react-icons/md";
+import { useColorMode } from "@chakra-ui/react";
+import { RiInformationFill } from "react-icons/ri";
 
 const Chat = () => {
   // Constants
@@ -83,12 +79,15 @@ const Chat = () => {
   // Active state
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
+  const [showModelAssessment, setShowModelAssessment] =
+    useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
+  const { colorMode } = useColorMode();
   const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
   const { user, session, stripe_customer_id, signOut, status, credits }: any =
     authStore();
@@ -169,7 +168,6 @@ const Chat = () => {
     if (initialMessages.length !== 0) return;
 
     // Update the model to the newest selected one
-    const model = models?.find((model: any) => model?.repo === repo?.repo);
 
     if (model?.output) {
       setInitialMessages(JSON.parse(model?.output));
@@ -211,7 +209,7 @@ const Chat = () => {
   const handleUseTabSuggestion = (file: any) => {
     if (!file) {
       setFailMessage(`Couldn't find a file containing ${withAt?.[0]}`);
-      return null
+      return null;
     }
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
@@ -293,6 +291,32 @@ const Chat = () => {
       return false;
     }
     return true;
+  };
+
+  const model = models?.find((model: any) => model?.repo === repo?.repo);
+
+  const ModelStat = ({ label, number, tooltip }: any) => {
+    return (
+      <Stat
+        border={
+          colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
+        }
+        p={4}
+        borderRadius={10}
+      >
+        <Tooltip label={tooltip} placement="top">
+          <Flex flexDirection="row" alignItems="center" gap={1}>
+            <StatLabel>{label}</StatLabel>
+            <RiInformationFill />
+          </Flex>
+        </Tooltip>
+
+        <StatNumber>{number}</StatNumber>
+        <StatHelpText mb={2} fontSize={14} color="gray">
+          {moment(Date.now()).format("MMMM Do YYYY")}
+        </StatHelpText>
+      </Stat>
+    );
   };
 
   return (
@@ -408,6 +432,64 @@ const Chat = () => {
                 setHasBeenReset={setHasBeenReset}
                 handleSubmit={handleSubmit}
               />
+
+              {!loading && !status?.isOverdue && credits > 0 && (
+                <Box mt={4}>
+                  <Flex
+                    flexDirection="row"
+                    gap={2}
+                    alignItems="center"
+                    justifyContent="flex-start"
+                  >
+                    <Flex flexDirection="row" alignItems="center">
+                      <BiSolidBrain />
+                      <Text ml={1} mr={2}>
+                        Model Empirical Assessment
+                      </Text>
+                      <Switch
+                        id="isChecked"
+                        isChecked={showModelAssessment}
+                        onChange={() =>
+                          setShowModelAssessment(!showModelAssessment)
+                        }
+                      />
+                    </Flex>
+                  </Flex>
+                  {showModelAssessment && (
+                    <>
+                      <Text
+                        fontSize="sm"
+                        mb={3}
+                        color={colorMode === "light" ? "#CBD5E0" : "gray"}
+                      >
+                        Hover over each one to learn more.
+                      </Text>
+                      <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                        <ModelStat
+                          label="Training Size Target"
+                          number={model?.sample_size}
+                          tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
+                        />
+                        <ModelStat
+                          label="Actual Sample Size"
+                          number={(initialMessages.length - 1) / 2}
+                          tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
+                        />
+                        <ModelStat
+                          label="Training Accuracy"
+                          number={`${(
+                            ((initialMessages.length - 1) /
+                              2 /
+                              model?.sample_size) *
+                            100
+                          ).toFixed(2)}%`}
+                          tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
+                        />
+                      </Grid>
+                    </>
+                  )}
+                </Box>
+              )}
 
               {failMessage && (
                 <Text mb={3} mt={2} fontSize={14}>

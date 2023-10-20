@@ -82,21 +82,8 @@ const ModelCard = ({
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
   const [trainingFailed, setTrainingFailed] = useState<boolean>(false);
   const [isTraining, setIsTraining] = useState<boolean>(false);
+  const [isErrored, setIsErrored] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   // If the output is null, set value to 0, if the length of it is 1, set the value to 40, if the length is more than 1, set the value to 100
-  //   if (!model.output || JSON?.parse?.(model?.output)?.length === 1) {
-  //     // Show training failed on this model
-  //     setTrainingFailed(true);
-
-  //     // Get the training_id
-  //     const modelId = createModelID(model.repo, model.owner, model.branch);
-
-  //     // Set the fulfilled value back to false so retraining will take place
-  //     setFulfilledBackToFalseForTrainingLog(modelId);
-  //   }
-  // }, [model]);
 
   const retrainModel = async () => {
     setIsTraining(true);
@@ -107,7 +94,7 @@ const ModelCard = ({
       trainingLogs.filter((log: any) => {
         return (
           log.model_id ===
-            createModelID(model.repo, model.owner, model.branch) &&
+          createModelID(model.repo, model.owner, model.branch) &&
           log.fulfilled === false
         );
       }).length < 0
@@ -118,10 +105,11 @@ const ModelCard = ({
     // Set this model to actively train
     const trainingOutput = await trainModel(model, session, user);
 
-    console.log({ trainingOutput });
-
     //validate the output
     if (trainingOutput?.length) {
+      setIsTraining(false);
+    } else {
+      setIsErrored(true);
       setIsTraining(false);
     }
   };
@@ -229,7 +217,6 @@ const ModelCard = ({
             },
           });
         }}
-        setLoadingState={setDeletingModel}
       />
       <ConfirmationModal
         header="Retrain this model?"
@@ -277,23 +264,7 @@ const ModelCard = ({
                   </Tooltip>
                   <Tooltip label="Train Model">
                     <IconButton
-                      isDisabled={
-                        isTraining ||
-                        trainingLogs.filter((log: any) => {
-                          if (
-                            log.fulfilled === false &&
-                            log.model_id ===
-                              createModelID(
-                                model.repo,
-                                model.owner,
-                                model.branch
-                              )
-                          ) {
-                            return true;
-                          }
-                          return false;
-                        }).length > 0
-                      }
+                      isDisabled={isTraining}
                       size="sm"
                       onClick={() => {
                         onRetrainOpen();
@@ -329,52 +300,45 @@ const ModelCard = ({
                   </Tooltip>
                 </Flex>
               </Flex>
-              <Flex flexDirection="column" gap={1} mb={3}>
+              <Flex flexDirection="column" gap={1} mb={1}>
                 <Badge
                   colorScheme={
                     model.deleted
                       ? "red"
-                      : JSON.parse(model.output)?.length === 1
-                      ? "orange"
-                      : trainingLogs.filter((log: any) => {
-                          if (
-                            log.fulfilled === false &&
-                            log.model_id ===
-                              createModelID(
-                                model.repo,
-                                model.owner,
-                                model.branch
-                              )
-                          ) {
-                            return true;
-                          }
-                          return false;
-                        }).length > 0
-                      ? "blue"
-                      : "teal"
+                      : isErrored
+                        ? "orange"
+                        : JSON.parse(model.output)?.length === 1
+                          ? "orange"
+                          : isTraining
+                            ? "blue"
+                            : "teal"
                   }
                   alignSelf="flex-start"
                 >
                   Status:{" "}
                   {model.deleted
                     ? "Deleted"
-                    : JSON.parse(model.output)?.length === 1
-                    ? "Training Failed"
-                    : trainingLogs.filter((log: any) => {
-                        if (
-                          log.fulfilled === false &&
-                          log.model_id ===
-                            createModelID(model.repo, model.owner, model.branch)
-                        ) {
-                          return true;
-                        }
-                        return false;
-                      }).length > 0
-                    ? "Training"
-                    : "Trained"}
+                    : isErrored
+                      ? "Training Failed"
+                      : JSON.parse(model.output)?.length === 1
+                        ? "Training Failed"
+                        : isTraining
+                          ? "Training"
+                          : "Trained"}
                 </Badge>
+                {isErrored && (
+                  <Text fontSize={14}>
+                    We're sorry this model has failed training. LLM's can be
+                    tempermental, please try again. You will not be charged.
+                  </Text>
+                )}
+                {isTraining && (
+                  <Text fontSize={14}>
+                    During training, avoid leaving the models page as this may
+                    cause the training to fail.
+                  </Text>
+                )}
               </Flex>
-
               <Text fontSize={14}>
                 {model.owner} - {model.branch}
               </Text>
@@ -435,14 +399,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-                // setBranch={(e: any) => {
-                //   handleModelInTrainingChange({
-                //     target: {
-                //       name: "branch",
-                //       value: e,
-                //     },
-                //   });
-                // }}
+              // setBranch={(e: any) => {
+              //   handleModelInTrainingChange({
+              //     target: {
+              //       name: "branch",
+              //       value: e,
+              //     },
+              //   });
+              // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
