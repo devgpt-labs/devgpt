@@ -109,7 +109,7 @@ const ModelCard = ({
 
     //validate the output
     if (trainingOutput?.length) {
-      setIsErrored(false)
+      setIsErrored(false);
       setIsTraining(false);
     } else {
       setIsErrored(true);
@@ -308,7 +308,8 @@ const ModelCard = ({
                       ? "red"
                       : isErrored
                       ? "orange"
-                      : JSON.parse(model.output)?.length === 1
+                      : !JSON.parse(model.output) ||
+                        JSON.parse(model.output)?.length < 2
                       ? "orange"
                       : isTraining
                       ? "blue"
@@ -321,7 +322,8 @@ const ModelCard = ({
                     ? "Deleted"
                     : isErrored
                     ? "Training Failed"
-                    : JSON.parse(model.output)?.length === 1
+                    : !JSON.parse(model.output) ||
+                      JSON.parse(model.output)?.length < 2
                     ? "Training Failed"
                     : isTraining
                     ? "Training"
