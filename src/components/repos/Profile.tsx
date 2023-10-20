@@ -168,7 +168,7 @@ const Profile = () => {
         border={
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
-        p={5}
+        p={4}
       >
         {/* <CreditsModal
           isCreditsOpen={isCreditsOpen}

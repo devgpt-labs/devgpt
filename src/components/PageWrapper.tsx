@@ -8,6 +8,7 @@ const Home = ({ children }: any) => {
 
   return (
     <Flex
+      maxH="100vh"
       flex={{ md: "initial", base: 1 }}
       direction="column"
       alignItems="flex-start"
@@ -19,7 +20,6 @@ const Home = ({ children }: any) => {
         bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
         width="100vw"
         height="100vh"
-        overflowY="scroll"
       >
         <Tag
           p={4}

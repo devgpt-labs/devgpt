@@ -27,7 +27,6 @@ const PromptAreaAndButton = ({
   setHasBeenReset,
   handleSubmit,
 }: PromptAreaAndButtonProps) => {
-
   const { status, credits }: any = authStore();
 
   if (status?.isOverdue || credits < 0) return null;
@@ -41,7 +40,7 @@ const PromptAreaAndButton = ({
         autoFocus
         className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
         value={prompt}
-        placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
+        placeholder="Enter your task, e.g. Create a login page, or use @ to reference a file from your repo."
         onChange={(e: any) => {
           setPrompt(e.target.value);
           handleInputChange(e);
@@ -72,7 +71,7 @@ const PromptAreaAndButton = ({
       />
 
       <Button
-        bg='blue.500'
+        bg="blue.500"
         // bgGradient="linear(to-r, blue.500, teal.500)"
         isDisabled={loading}
         color="white"
