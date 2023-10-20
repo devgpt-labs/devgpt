@@ -52,7 +52,6 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   const name = model.repo;
   const owner = model.owner;
 
-
   if (!owner || !name || !session.provider_token) {
     console.error("Missing owner, name, or provider_token");
     return;
@@ -71,8 +70,6 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   // Join the lofaf together
   const lofafString = lofafArray.join(",");
 
-  
-
   // Create training data
   let trainingData = await createTrainingData(
     sample_size,
@@ -86,10 +83,6 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   );
 
   setModelOutput(model, JSON.stringify(trainingData), user.email);
-
-  
-
-  console.log({ trainingData });
 
   //return the output
   return JSON.stringify(trainingData);
