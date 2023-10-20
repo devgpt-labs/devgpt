@@ -8,14 +8,14 @@ const TrainingStatus = (initialMessages: any) => {
 
   return initialMessages?.length < 2 ? (
     <Text mb={1}>
-      Your AI model is <Badge>Training</Badge>, until this is done the AI
-      won't be able to access your repos context.
+      Your model didn't complete training, until this is done the AI won't be
+      able to access your repos context. Go to the models page for more info.
     </Text>
   ) : (
     <Text mb={1}>
       Your trained model is{" "}
       <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-    </Text >
+    </Text>
   );
 };
 
