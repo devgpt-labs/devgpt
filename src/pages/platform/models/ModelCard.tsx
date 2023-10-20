@@ -88,16 +88,12 @@ const ModelCard = ({
     setIsTraining(true);
     setIsErrored(false);
 
-    // Create a new training_log for this model
-    // If a training_log already exists with fulfilled false, don't add a log
+    // if training log fulfilled is false, don't do anything
+    // if output.length < 2, don't do anything
     if (
-      trainingLogs.filter((log: any) => {
-        return (
-          log.model_id ===
-          createModelID(model.repo, model.owner, model.branch) &&
-          log.fulfilled === false
-        );
-      }).length < 0
+      !trainingLogs.filter((t: any) => t.model_id === model.id)[0]
+        ?.fulfilled === false ||
+      JSON.parse(model.output)?.length > 2
     ) {
       await addTrainingLog(model);
     }

@@ -21,6 +21,7 @@ import {
   Tooltip,
   Alert,
   AlertIcon,
+  Fade,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -84,7 +85,6 @@ const Chat = () => {
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const { colorMode } = useColorMode();
@@ -289,30 +289,6 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
-  const ModelStat = ({ label, number, tip, tooltip }: any) => {
-    return (
-      <Stat
-        border={
-          colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
-        }
-        p={4}
-        borderRadius={10}
-      >
-        <Tooltip label={tooltip} placement="top">
-          <Flex flexDirection="row" alignItems="center" gap={1}>
-            <StatLabel>{label}</StatLabel>
-            <RiInformationFill />
-          </Flex>
-        </Tooltip>
-
-        <StatNumber>{number}</StatNumber>
-        <StatHelpText mb={2} fontSize={14} color="gray">
-          {tip}
-        </StatHelpText>
-      </Stat>
-    );
-  };
-
   return (
     <Template>
       <Flex
@@ -455,7 +431,6 @@ const Chat = () => {
               )}
               {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
                 <Box mt={4}>
-
                   <Flex
                     flexDirection="row"
                     gap={2}
@@ -630,3 +605,45 @@ const Chat = () => {
 };
 
 export default Chat;
+
+const ModelStat = ({ label, number, tip, tooltip }: any) => {
+  const {
+    isOpen: isShowDetailsOpen,
+    onOpen: onShowDetailsOpen,
+    onClose: onShowDetailsClose,
+  } = useDisclosure();
+
+  const { colorMode } = useColorMode();
+
+  return (
+    <Stat
+      onMouseEnter={onShowDetailsOpen}
+      onMouseLeave={onShowDetailsClose}
+      border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
+      p={4}
+      borderRadius={10}
+    >
+      <Tooltip label={tooltip} placement="top">
+        <Flex flexDirection="row" alignItems="center" gap={1}>
+          <StatLabel>{label}</StatLabel>
+          <RiInformationFill />
+        </Flex>
+      </Tooltip>
+
+      {isShowDetailsOpen ? (
+        <SlideFade in={isShowDetailsOpen}>
+          <Text mt={2} fontSize={14}>
+            {tooltip}
+          </Text>
+        </SlideFade>
+      ) : (
+        <>
+          <StatNumber>{number}</StatNumber>
+          <StatHelpText mb={2} fontSize={14} color="gray">
+            {tip}
+          </StatHelpText>
+        </>
+      )}
+    </Stat>
+  );
+};
