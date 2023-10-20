@@ -1,5 +1,4 @@
 const LLMTokens = [
-  process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_0"],
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_1"],
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_2"],
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_3"],
@@ -30,6 +29,7 @@ const LLMTokens = [
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_28"],
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_29"],
   process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_30"],
+  process?.env?.["NEXT_PUBLIC_OPEN_AI_ORG_31"],
 ];
 
 export default LLMTokens;
