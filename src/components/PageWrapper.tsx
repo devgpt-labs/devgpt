@@ -18,18 +18,18 @@ const Home = ({ children }: any) => {
         flexDirection="column"
         bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
         width="100vw"
+        minH="100vh"
       >
+        <ChatHeader />
         <Flex
-          minH="100vh"
+          minH='80vh'
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
-          <ChatHeader />
           {children}
-
-          <Profile />
         </Flex>
+        <Profile />
       </Flex>
     </Flex>
   );
