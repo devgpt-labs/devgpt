@@ -607,43 +607,27 @@ const Chat = () => {
 export default Chat;
 
 const ModelStat = ({ label, number, tip, tooltip }: any) => {
-  const {
-    isOpen: isShowDetailsOpen,
-    onOpen: onShowDetailsOpen,
-    onClose: onShowDetailsClose,
-  } = useDisclosure();
-
   const { colorMode } = useColorMode();
 
   return (
     <Stat
-      onMouseEnter={onShowDetailsOpen}
-      onMouseLeave={onShowDetailsClose}
       border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
       p={4}
       borderRadius={10}
     >
-      <Tooltip label={tooltip} placement="top">
+      <Tooltip label={tooltip} placement="bottom">
         <Flex flexDirection="row" alignItems="center" gap={1}>
           <StatLabel>{label}</StatLabel>
           <RiInformationFill />
         </Flex>
       </Tooltip>
 
-      {isShowDetailsOpen ? (
-        <SlideFade in={isShowDetailsOpen}>
-          <Text mt={2} fontSize={14}>
-            {tooltip}
-          </Text>
-        </SlideFade>
-      ) : (
-        <>
-          <StatNumber>{number}</StatNumber>
-          <StatHelpText mb={2} fontSize={14} color="gray">
-            {tip}
-          </StatHelpText>
-        </>
-      )}
+      <>
+        <StatNumber>{number}</StatNumber>
+        <StatHelpText mb={2} fontSize={14} color="gray">
+          {tip}
+        </StatHelpText>
+      </>
     </Stat>
   );
 };
