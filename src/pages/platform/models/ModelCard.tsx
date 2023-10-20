@@ -109,6 +109,7 @@ const ModelCard = ({
 
     //validate the output
     if (trainingOutput?.length) {
+      setIsErrored(false)
       setIsTraining(false);
     } else {
       setIsErrored(true);

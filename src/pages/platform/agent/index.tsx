@@ -77,7 +77,7 @@ const Chat = () => {
   const [response, setResponse] = useState<string>("");
 
   // Active state
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [showModelAssessment, setShowModelAssessment] =
     useState<boolean>(false);
@@ -109,6 +109,7 @@ const Chat = () => {
       );
 
       hasBeenReset && setHasBeenReset(false);
+      setFailMessage("");
       savePrompt(user?.email, prompt, data.content, usage);
       setResponse(data.content);
     },
@@ -295,7 +296,7 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
-  const ModelStat = ({ label, number, tooltip }: any) => {
+  const ModelStat = ({ label, number, tip, tooltip }: any) => {
     return (
       <Stat
         border={
@@ -313,7 +314,7 @@ const Chat = () => {
 
         <StatNumber>{number}</StatNumber>
         <StatHelpText mb={2} fontSize={14} color="gray">
-          {moment(Date.now()).format("MMMM Do YYYY")}
+          {tip}
         </StatHelpText>
       </Stat>
     );
@@ -433,7 +434,21 @@ const Chat = () => {
                 handleSubmit={handleSubmit}
               />
 
-              {!loading && !status?.isOverdue && credits > 0 && (
+              {failMessage && (
+                <Text mb={3} mt={2} fontSize={14}>
+                  {failMessage}
+                </Text>
+              )}
+
+              {previousPrompt && (
+                <SlideFade in={hasSentAMessage}>
+                  <Text mb={3} color="gray" fontSize={12} mt={1}>
+                    {previousPrompt}
+                  </Text>
+                </SlideFade>
+              )}
+
+              {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
                 <Box mt={4}>
                   <Flex
                     flexDirection="row"
@@ -468,11 +483,13 @@ const Chat = () => {
                         <ModelStat
                           label="Training Size Target"
                           number={model?.sample_size}
+                          tip={moment(Date.now()).format("MMMM Do YYYY")}
                           tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
                         />
                         <ModelStat
                           label="Actual Sample Size"
                           number={(initialMessages.length - 1) / 2}
+                          tip={moment(Date.now()).format("MMMM Do YYYY")}
                           tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
                         />
                         <ModelStat
@@ -483,6 +500,15 @@ const Chat = () => {
                               model?.sample_size) *
                             100
                           ).toFixed(2)}%`}
+                          tip={
+                            ((initialMessages.length - 1) /
+                              2 /
+                              model?.sample_size) *
+                              100 <
+                              40
+                              ? "Retraining recommended"
+                              : moment(Date.now()).format("MMMM Do YYYY")
+                          }
                           tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
                         />
                       </Grid>
@@ -491,21 +517,7 @@ const Chat = () => {
                 </Box>
               )}
 
-              {failMessage && (
-                <Text mb={3} mt={2} fontSize={14}>
-                  {failMessage}
-                </Text>
-              )}
-
-              {previousPrompt && (
-                <SlideFade in={hasSentAMessage}>
-                  <Text mb={3} color="gray" fontSize={12} mt={1}>
-                    {previousPrompt}
-                  </Text>
-                </SlideFade>
-              )}
-
-              {loading && !messages[messages.length - 1] ? (
+              {loading ? (
                 <SkeletonText
                   mb={2}
                   mt={4}
@@ -523,65 +535,59 @@ const Chat = () => {
             </Box>
           )}
 
-          {!loading &&
-            !hasBeenReset &&
-            messages[messages.length - 1] &&
-            !initialMessages?.find(
-              (message: any) =>
-                message?.content === messages[messages.length - 1]?.content
-            ) && (
-              <Flex
-                width="100%"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                gap={2}
-                my={2}
-              >
-                <IconButton
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                  aria-label="Join Discord"
-                  onClick={() => {
-                    setHasBeenReset(true);
-                    setLoading(false);
-                    setResponse("");
-                    setFailMessage("");
-                  }}
-                  icon={
-                    <Flex flexDirection="row" px={3}>
-                      <PlusSquareIcon />
-                      <Text ml={2} fontSize={14}>
-                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                        New
-                      </Text>
-                    </Flex>
-                  }
-                />
-                <IconButton
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                  onClick={() => {
-                    reload();
-                    setLoading(true);
-                  }}
-                  aria-label="Join Discord"
-                  icon={
-                    <Flex flexDirection="row" px={3}>
-                      <BiRefresh />
-                      <Text ml={2} fontSize={14}>
-                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                        Regenerate
-                      </Text>
-                    </Flex>
-                  }
-                />
-              </Flex>
-            )}
+          {response && !hasBeenReset && (
+            <Flex
+              width="100%"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              gap={2}
+              my={2}
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                aria-label="Join Discord"
+                onClick={() => {
+                  setHasBeenReset(true);
+                  setLoading(false);
+                  setResponse("");
+                  setFailMessage("");
+                }}
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <PlusSquareIcon />
+                    <Text ml={2} fontSize={14}>
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      New
+                    </Text>
+                  </Flex>
+                }
+              />
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={() => {
+                  reload();
+                  setLoading(true);
+                }}
+                aria-label="Join Discord"
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <BiRefresh />
+                    <Text ml={2} fontSize={14}>
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      Regenerate
+                    </Text>
+                  </Flex>
+                }
+              />
+            </Flex>
+          )}
         </Box>
         {/* <>
           {status?.isOverdue || credits < 0 ? null : (
