@@ -88,7 +88,7 @@ const PromptAreaAndButton = ({
           handleSubmit(e);
         }}
       >
-        {loading ? <Spinner size="sm" /> : "Submit"}
+        {loading ? <Spinner size="sm" /> : "Generate Code"}
       </Button>
     </Flex>
   );
