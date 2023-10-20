@@ -48,7 +48,7 @@ const DiscordAndGithubButtons = () => {
                 <BsGithub />
                 <BsStars />
                 <Text ml={2} fontSize={14}>
-                  360
+                  364
                 </Text>
               </Flex>
             }
