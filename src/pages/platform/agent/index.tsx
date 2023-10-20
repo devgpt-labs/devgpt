@@ -141,7 +141,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       user?.email
     );
 
@@ -209,6 +209,10 @@ const Chat = () => {
 
   // If the user clicks tab, we want to autocomplete the file name
   const handleUseTabSuggestion = (file: any) => {
+    if (!file) {
+      setFailMessage(`Couldn't find a file containing ${withAt?.[0]}`);
+      return null
+    }
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
     const lastWord = promptArray[promptArray?.length - 1];
@@ -216,6 +220,7 @@ const Chat = () => {
 
     // Set prompts
     setPrompt(newPrompt);
+    setFailMessage("");
 
     // Refocus on input
     const input = document.getElementById("message");
@@ -496,11 +501,11 @@ const Chat = () => {
               </Flex>
             )}
         </Box>
-        <>
+        {/* <>
           {status?.isOverdue || credits < 0 ? null : (
             <Feedback models={models} response={response} messages={messages} />
           )}
-        </>
+        </> */}
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

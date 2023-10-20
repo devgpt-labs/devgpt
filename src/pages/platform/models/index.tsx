@@ -138,6 +138,7 @@ const Models = () => {
           });
 
           setTrainingLogs(newTrainingLogs);
+
         }
       )
       .subscribe();
@@ -239,7 +240,7 @@ const Models = () => {
                 </Flex>
               </AccordionPanel>
             </AccordionItem>
-          ) : <Text>Nothing training yet</Text>}
+          ) : null}
           <AccordionItem>
             <h2>
               <AccordionButton>

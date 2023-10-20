@@ -62,7 +62,6 @@ const Auth = () => {
           justifyContent="center"
           mt={5}
           h="100vh"
-          w="100vw"
         >
           <Spinner height={5} width={5} />
           <Text ml={3}>Just getting started...</Text>
@@ -101,7 +100,7 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => {}}
+              handle={() => { }}
               Icon={<AiFillGitlab />}
               tooltip="Coming soon!"
             />
