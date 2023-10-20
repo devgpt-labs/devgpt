@@ -26,7 +26,7 @@ const ChatHeader = () => {
       <Flex flexDirection={"row"}>
         <Logo />
         <Tag ml={2} colorScheme="purple">
-          Beta version {version}
+          Open Beta {version}
         </Tag>
       </Flex>
       <Text>{repo.repo && <Tag>{repo.repo}</Tag>}</Text>
