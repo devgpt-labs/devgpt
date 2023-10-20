@@ -54,6 +54,7 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { RiInformationFill } from "react-icons/ri";
 import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 import ConfirmationModal from "../models/ConfirmationModal";
+import CreditsModal from "@/components/repos/CreditsModal";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -69,6 +70,12 @@ const Models = ({ onClose }: any) => {
     isOpen: isThankYouOpen,
     onOpen: onThankYouOpen,
     onClose: onThankYouClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isCreditsOpen,
+    onOpen: onCreditsOpen,
+    onClose: onCreditsClose,
   } = useDisclosure();
 
   const { colorMode }: any = useColorMode();
@@ -244,11 +251,6 @@ const Models = ({ onClose }: any) => {
         onClose={onConfirmationClose}
         onSubmit={() => {
           saveMonthlyBudget();
-          chargeCustomer(
-            { stripe_customer_id: stripe_customer_id },
-            budget,
-            user?.email
-          );
           onThankYouOpen();
           onConfirmationClose();
         }}
@@ -261,9 +263,11 @@ const Models = ({ onClose }: any) => {
         onClose={onThankYouClose}
         onSubmit={() => {
           onThankYouClose();
-          router.push("/platform/agent", undefined, { shallow: true })
+          router.push("/platform/agent", undefined, { shallow: true });
         }}
       />
+
+      {/* <CreditsModal isCreditsOpen={isCreditsOpen} onCreditsClose={onCreditsClose} /> */}
 
       <Flex p={5} width="100%" height="100%" flexDirection="column">
         <Box>
@@ -303,7 +307,16 @@ const Models = ({ onClose }: any) => {
           </Flex>
           <Flex flexDirection={"column"} mb={3}>
             <Heading size="sm" mt={2}>
-              Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
+              Current Balance:
+              <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
+              {/* <Tag
+                cursor="pointer"
+                onClick={() => {
+                  onCreditsOpen();
+                }}
+              >
+                Add Credits
+              </Tag> */}
             </Heading>
             <Heading size="sm" mb={4} mt={2}>
               Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
