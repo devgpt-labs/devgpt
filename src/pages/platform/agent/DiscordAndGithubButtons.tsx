@@ -14,7 +14,7 @@ import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
 
 const DiscordAndGithubButtons = () => {
   return (
-    <Flex mt={3} gap={2}>
+    <Flex gap={2}>
       <Tooltip label="Join Discord" placement="top">
         <Link href="https://discord.com/invite/6GFtwzuvtw">
           <IconButton
