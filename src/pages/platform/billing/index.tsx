@@ -251,11 +251,6 @@ const Models = ({ onClose }: any) => {
         onClose={onConfirmationClose}
         onSubmit={() => {
           saveMonthlyBudget();
-          // chargeCustomer(
-          //   { stripe_customer_id: stripe_customer_id },
-          //   budget,
-          //   user?.email
-          // );
           onThankYouOpen();
           onConfirmationClose();
         }}
