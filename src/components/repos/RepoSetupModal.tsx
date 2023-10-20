@@ -139,7 +139,6 @@ const RepoSetupModal = ({
             </Button>
             {monthly_budget < Number(cost) && (
               <Button
-
                 onClick={() => {
                   router.push("/platform/billing")
                 }}
