@@ -140,7 +140,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       user?.email
     );
 

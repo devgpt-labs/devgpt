@@ -94,7 +94,7 @@ const ModelCard = ({
       trainingLogs.filter((log: any) => {
         return (
           log.model_id ===
-          createModelID(model.repo, model.owner, model.branch) &&
+            createModelID(model.repo, model.owner, model.branch) &&
           log.fulfilled === false
         );
       }).length < 0
@@ -104,6 +104,8 @@ const ModelCard = ({
 
     // Set this model to actively train
     const trainingOutput = await trainModel(model, session, user);
+
+    console.log({ trainingOutput });
 
     //validate the output
     if (trainingOutput?.length) {
@@ -196,8 +198,6 @@ const ModelCard = ({
 
   if (!model) return null;
 
-  console.log({ isTraining });
-
   return (
     <Box>
       <ConfirmationModal
@@ -220,7 +220,7 @@ const ModelCard = ({
       />
       <ConfirmationModal
         header="Retrain this model?"
-        body="Confirm you would like to retrain this DevGPT model, this will take a few minutes."
+        body="Confirm you would like to retrain this model, you will not be charged if your model has failed to train."
         confirmButtonText="Retrain"
         isOpen={isRetrainOpen}
         onClose={onRetrainClose}
@@ -306,12 +306,12 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : isErrored
-                        ? "orange"
-                        : JSON.parse(model.output)?.length === 1
-                          ? "orange"
-                          : isTraining
-                            ? "blue"
-                            : "teal"
+                      ? "orange"
+                      : JSON.parse(model.output)?.length === 1
+                      ? "orange"
+                      : isTraining
+                      ? "blue"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -319,12 +319,12 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : isErrored
-                      ? "Training Failed"
-                      : JSON.parse(model.output)?.length === 1
-                        ? "Training Failed"
-                        : isTraining
-                          ? "Training"
-                          : "Trained"}
+                    ? "Training Failed"
+                    : JSON.parse(model.output)?.length === 1
+                    ? "Training Failed"
+                    : isTraining
+                    ? "Training"
+                    : "Trained"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -399,14 +399,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
