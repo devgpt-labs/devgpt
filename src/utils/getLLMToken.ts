@@ -5,7 +5,8 @@ const getLLMToken = () => {
   const tokensNo: any = process?.env?.NEXT_PUBLIC_OPEN_AI_ORGS || 1;
 
   //get random number between 0 and tokensNo
-  return LLMTokens[getRandomInt(1, tokensNo)];
+  //return LLMTokens[getRandomInt(1, tokensNo)];
+  return LLMTokens[getRandomInt(1, 2)];
 };
 export default getLLMToken;
 
