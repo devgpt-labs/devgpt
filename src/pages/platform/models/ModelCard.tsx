@@ -308,12 +308,13 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : isTraining
-                        ? "blue"
-                        : isErrored
-                          ? "orange"
-                          : JSON.parse(model.output)?.length < 2
-                            ? "orange"
-                            : "teal"
+                      ? "blue"
+                      : isErrored
+                      ? "orange"
+                      : !JSON.parse(model.output) ||
+                        JSON.parse(model.output)?.length < 2
+                      ? "orange"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -321,12 +322,13 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : isTraining
-                      ? "Training"
-                      : isErrored
-                        ? "Training Failed"
-                        : JSON.parse(model.output)?.length < 2
-                          ? "Training Failed"
-                          : "Trained"}
+                    ? "Training"
+                    : isErrored
+                    ? "Training Failed"
+                    : !JSON.parse(model.output) ||
+                      JSON.parse(model.output)?.length < 2
+                    ? "Untrained"
+                    : "Trained"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -401,14 +403,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
