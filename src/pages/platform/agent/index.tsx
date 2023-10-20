@@ -77,7 +77,7 @@ const Chat = () => {
   const [response, setResponse] = useState<string>("");
 
   // Active state
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [showModelAssessment, setShowModelAssessment] =
     useState<boolean>(false);
@@ -109,6 +109,7 @@ const Chat = () => {
       );
 
       hasBeenReset && setHasBeenReset(false);
+      setFailMessage("");
       savePrompt(user?.email, prompt, data.content, usage);
       setResponse(data.content);
     },
@@ -433,7 +434,21 @@ const Chat = () => {
                 handleSubmit={handleSubmit}
               />
 
-              {!loading && !status?.isOverdue && credits > 0 && (
+              {failMessage && (
+                <Text mb={3} mt={2} fontSize={14}>
+                  {failMessage}
+                </Text>
+              )}
+
+              {previousPrompt && (
+                <SlideFade in={hasSentAMessage}>
+                  <Text mb={3} color="gray" fontSize={12} mt={1}>
+                    {previousPrompt}
+                  </Text>
+                </SlideFade>
+              )}
+
+              {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
                 <Box mt={4}>
                   <Flex
                     flexDirection="row"
@@ -502,21 +517,7 @@ const Chat = () => {
                 </Box>
               )}
 
-              {failMessage && (
-                <Text mb={3} mt={2} fontSize={14}>
-                  {failMessage}
-                </Text>
-              )}
-
-              {previousPrompt && (
-                <SlideFade in={hasSentAMessage}>
-                  <Text mb={3} color="gray" fontSize={12} mt={1}>
-                    {previousPrompt}
-                  </Text>
-                </SlideFade>
-              )}
-
-              {loading && !messages[messages.length - 1] ? (
+              {loading ? (
                 <SkeletonText
                   mb={2}
                   mt={4}
@@ -534,65 +535,59 @@ const Chat = () => {
             </Box>
           )}
 
-          {!loading &&
-            !hasBeenReset &&
-            messages[messages.length - 1] &&
-            !initialMessages?.find(
-              (message: any) =>
-                message?.content === messages[messages.length - 1]?.content
-            ) && (
-              <Flex
-                width="100%"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                gap={2}
-                my={2}
-              >
-                <IconButton
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                  aria-label="Join Discord"
-                  onClick={() => {
-                    setHasBeenReset(true);
-                    setLoading(false);
-                    setResponse("");
-                    setFailMessage("");
-                  }}
-                  icon={
-                    <Flex flexDirection="row" px={3}>
-                      <PlusSquareIcon />
-                      <Text ml={2} fontSize={14}>
-                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                        New
-                      </Text>
-                    </Flex>
-                  }
-                />
-                <IconButton
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                  onClick={() => {
-                    reload();
-                    setLoading(true);
-                  }}
-                  aria-label="Join Discord"
-                  icon={
-                    <Flex flexDirection="row" px={3}>
-                      <BiRefresh />
-                      <Text ml={2} fontSize={14}>
-                        {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                        Regenerate
-                      </Text>
-                    </Flex>
-                  }
-                />
-              </Flex>
-            )}
+          {response && !hasBeenReset && (
+            <Flex
+              width="100%"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              gap={2}
+              my={2}
+            >
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                aria-label="Join Discord"
+                onClick={() => {
+                  setHasBeenReset(true);
+                  setLoading(false);
+                  setResponse("");
+                  setFailMessage("");
+                }}
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <PlusSquareIcon />
+                    <Text ml={2} fontSize={14}>
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      New
+                    </Text>
+                  </Flex>
+                }
+              />
+              <IconButton
+                _hover={{
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s ease-in-out",
+                }}
+                onClick={() => {
+                  reload();
+                  setLoading(true);
+                }}
+                aria-label="Join Discord"
+                icon={
+                  <Flex flexDirection="row" px={3}>
+                    <BiRefresh />
+                    <Text ml={2} fontSize={14}>
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      Regenerate
+                    </Text>
+                  </Flex>
+                }
+              />
+            </Flex>
+          )}
         </Box>
         {/* <>
           {status?.isOverdue || credits < 0 ? null : (
