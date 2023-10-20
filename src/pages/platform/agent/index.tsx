@@ -146,7 +146,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       user?.email
     );
 
@@ -180,9 +180,13 @@ const Chat = () => {
     }
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
-      if (!data?.tree) return console.log("no data found");
+      // If no data tree, return
+      if (!data?.tree) return null
+
+      // Get files from the data tree
       const files = data?.tree?.map((file: any) => file.path);
-      // set this
+
+      // Set lofaf to the files found
       setLofaf(files);
     });
   }, [repo, models]);
@@ -528,7 +532,7 @@ const Chat = () => {
                           2 /
                           model?.sample_size) *
                           100 <
-                        60
+                          60
                           ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
