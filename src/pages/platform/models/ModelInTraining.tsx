@@ -18,8 +18,6 @@ const ModelInTraining = ({ model }: any) => {
   const { colorMode } = useColorMode();
   const [sliderValue, setSliderValue] = useState(0);
 
-  const { output, frequency, owner, repo, branch }: any = model;
-
   useInterval(() => {
     // update the slider over a course of 150 seconds
 
@@ -42,18 +40,17 @@ const ModelInTraining = ({ model }: any) => {
     >
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex flexDirection="column" alignItems="center" gap={2}>
-          <Flex flexDirection='row' alignItems='center' gap={2}>
+          <Flex flexDirection="row" alignItems="center" gap={2}>
             <Badge fontSize={14}>
               {sliderValue > 100 ? "Completing Soon" : "Training"}
             </Badge>
             <Spinner size="sm" />
           </Flex>
-
         </Flex>
         <Flex flexDirection="column" alignItems="flex-end">
-          <Text fontSize={14}>{owner}</Text>
-          <Text fontSize={14}>{repo}</Text>
-          <Text fontSize={14}>{branch}</Text>
+          <Text fontSize={14}>{model.owner}</Text>
+          <Text fontSize={14}>{model.repo}</Text>
+          <Text fontSize={14}>{model.branch}</Text>
         </Flex>
       </Flex>
       <Slider

@@ -293,9 +293,21 @@ const Chat = () => {
   if (!user) {
     return (
       <Template>
-        <Flex flexDirection='row' width='80%' height='100%' gap={2}>
-          <Skeleton bg="gray.700" height="40px" width='85%' mb={4} borderRadius={10} />
-          <Skeleton bg="gray.700" height="40px" width='15%' mb={4} borderRadius={10} />
+        <Flex flexDirection="row" width="80%" height="100%" gap={2}>
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="85%"
+            mb={4}
+            borderRadius={10}
+          />
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="15%"
+            mb={4}
+            borderRadius={10}
+          />
         </Flex>
       </Template>
     );
@@ -318,8 +330,19 @@ const Chat = () => {
         >
           {!repo.repo && (
             <Box>
-              <Button width="100%" mt={4}>
-                Train a model to get started
+              <Button
+                width="100%"
+                bgGradient="linear(to-r, blue.500, teal.500)"
+                color='white'
+                mt={4}
+                onClick={() => {
+                  router.push("/platform/models", undefined, { shallow: true });
+                }}
+              >
+                <MdScience />
+                <Text ml={1}>
+                  Train or select a model to get started
+                </Text>
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
@@ -506,7 +529,7 @@ const Chat = () => {
                           model?.sample_size) *
                           100 <
                           60
-                          ? "Below 60% accuracy, we recommend retraining.
+                          ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
                       tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."

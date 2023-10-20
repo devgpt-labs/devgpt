@@ -80,8 +80,6 @@ const CreditsModal = ({
 
   const addCredits = async () => {
     if (!supabase) return;
-
-
     // open link 
 
     const newCredits = credits + packets * 115;
@@ -100,17 +98,13 @@ const CreditsModal = ({
   };
 
   const submitToStripe = async () => {
-    // addCredits();
+    addCredits();
     handleStripe()
   };
 
   const identity = user?.identities?.find((identity: { provider: string }) =>
     ["github", "gitlab", "bitbucket", "mock"].includes(identity?.provider)
   )?.identity_data;
-
-  useEffect(() => {
-    // retrieveKey();
-  }, []);
 
   return (
     <Modal isCentered={true} isOpen={isCreditsOpen} onClose={onCreditsClose}>
@@ -130,7 +124,7 @@ const CreditsModal = ({
             rounded="full"
             src={identity?.avatar_url}
           />
-          <Text>{credits + packets * 115} Credits</Text>
+          {/* <Text>{credits + packets * 115} Credits</Text> */}
         </Flex>
 
         {/* <Text fontSize={14} my={2} color="gray.400">
