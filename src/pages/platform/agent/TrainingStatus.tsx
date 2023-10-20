@@ -2,14 +2,14 @@ import React from "react";
 import { Badge, Text } from "@chakra-ui/react";
 import authStore from "@/store/Auth";
 
-const TrainingStatus = (initialMessages: any) => {
+const TrainingStatus = ({ initialMessages }: any) => {
   const { status, credits }: any = authStore();
   if (status?.isOverdue || credits < 0) return null;
 
   return initialMessages?.length < 2 ? (
     <Text mb={1}>
-      Your model didn't complete training, until this is done the AI won't be
-      able to access your repos context. Go to the models page for more info.
+      Your model has <Badge colorScheme="orange">INCOMPLETE TRAINING</Badge>,
+      please re-train your model using the models page.
     </Text>
   ) : (
     <Text mb={1}>
