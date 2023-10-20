@@ -57,12 +57,7 @@ const Auth = () => {
   if (loading)
     return (
       <Template>
-        <Flex
-          height='100%'
-          alignItems="center"
-          justifyContent="center"
-          mt={5}
-        >
+        <Flex height="100%" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
           <Text ml={3}>Just getting started...</Text>
         </Flex>
@@ -73,10 +68,10 @@ const Auth = () => {
     <>
       <Template>
         <Flex
-          justifyContent='center'
-          alignItems='center'
-          width='30%'
-          height='100%'
+          justifyContent="center"
+          alignItems="center"
+          width="30%"
+          height="100%"
           rounded="lg"
           overflow="hidden"
           flexDirection="column"
@@ -99,12 +94,12 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => { }}
+              handle={() => {}}
               Icon={<AiFillGitlab />}
               tooltip="Coming soon!"
             />
             <Heading size="xs" mt="2">
-              New here?
+              Just getting started?
             </Heading>
             <WhatIsDevGPT />
             <AuthOption

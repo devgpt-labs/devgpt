@@ -190,22 +190,21 @@ const Models = () => {
           </Flex>
           <Flex gap={2}>
             <Button
-              isDisabled={credits < 0 || status?.isOverdue}
-              onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Create
-            </Button>
-
-            <Button
               onClick={() => {
                 setRefresh(!refresh);
               }}
               rightIcon={<BiRefresh />}
             >
               Refresh
+            </Button>
+            <Button
+              isDisabled={credits < 0 || status?.isOverdue}
+              onClick={() => {
+                setRepoWindowOpen(!repoWindowOpen);
+              }}
+              rightIcon={<SmallAddIcon />}
+            >
+              Train New Model
             </Button>
           </Flex>
         </Flex>
