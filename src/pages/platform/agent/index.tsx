@@ -23,6 +23,7 @@ import {
   AlertIcon,
   Fade,
   Skeleton,
+  Heading,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -451,9 +452,9 @@ const Chat = () => {
 
               {previousPrompt && (
                 <SlideFade in={hasSentAMessage}>
-                  <Text mb={3} color="gray" fontSize={12} mt={1}>
+                  <Heading mb={3} mt={5} size="lg">
                     {previousPrompt}
-                  </Text>
+                  </Heading>
                 </SlideFade>
               )}
 
