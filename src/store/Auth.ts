@@ -28,6 +28,8 @@ const useStore = create((set) => ({
 		}: any = await supabase.auth.getSession();
 
 		if (error) throw error;
+		if (!session) return null;
+		if (!session?.user?.email) return null;
 
 		const { data: customerData, error: customerError } = await supabase
 			.from("customers")
