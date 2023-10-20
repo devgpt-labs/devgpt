@@ -78,8 +78,7 @@ const Models = ({ onClose }: any) => {
     onClose: onCreditsClose,
   } = useDisclosure();
 
-  const { colorMode }: any = useColorMode();
-  const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const { repos }: any = repoStore();
   const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
@@ -255,6 +254,7 @@ const Models = ({ onClose }: any) => {
           onConfirmationClose();
         }}
       />
+
       <ConfirmationModal
         header={`Budget Updated Successfully`}
         body="Thank you for updating your budget. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
@@ -270,46 +270,45 @@ const Models = ({ onClose }: any) => {
       {/* <CreditsModal isCreditsOpen={isCreditsOpen} onCreditsClose={onCreditsClose} /> */}
 
       <Flex p={5} width="100%" height="100%" flexDirection="column">
-        <Box>
-          <Flex
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="space-between"
-            mb={3}
-          >
-            <Flex flexDirection="row" alignItems="center">
-              <IconButton
-                mr={3}
-                onClick={() => {
-                  router.back();
-                }}
-                aria-label="Close"
-                icon={<ArrowBackIcon />}
-              />
-              <Heading size="md" ml={4}>
-                Billing
-              </Heading>
-            </Flex>
-            <Flex gap={2}>
-              <Link
-                isExternal={true}
-                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
-              >
-                <Button>Manage Payment Methods</Button>
-              </Link>
-              <Link
-                isExternal={true}
-                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
-              >
-                <Button>Manage Payments</Button>
-              </Link>
-            </Flex>
+        <Flex
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={3}
+        >
+          <Flex flexDirection="row" alignItems="center">
+            <IconButton
+              mr={3}
+              onClick={() => {
+                router.back();
+              }}
+              aria-label="Close"
+              icon={<ArrowBackIcon />}
+            />
+            <Heading size="md" ml={4}>
+              Billing
+            </Heading>
           </Flex>
-          <Flex flexDirection={"column"} mb={3}>
-            <Heading size="sm" mt={2}>
-              Current Balance:
-              <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
-              {/* <Tag
+          <Flex gap={2}>
+            <Link
+              isExternal={true}
+              href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+            >
+              <Button>Manage Payment Methods</Button>
+            </Link>
+            <Link
+              isExternal={true}
+              href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+            >
+              <Button>Manage Payments</Button>
+            </Link>
+          </Flex>
+        </Flex>
+        <Flex flexDirection={"column"} mb={3}>
+          <Heading size="sm" mt={2}>
+            Current Balance:
+            <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
+            {/* <Tag
                 cursor="pointer"
                 onClick={() => {
                   onCreditsOpen();
@@ -317,42 +316,42 @@ const Models = ({ onClose }: any) => {
               >
                 Add Credits
               </Tag> */}
-            </Heading>
-            <Heading size="sm" mb={4} mt={2}>
-              Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
-            </Heading>
-            <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
-              <Text fontSize={14}>Monthly Budget</Text>
-              <Tooltip
-                placement="right"
-                label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
+          </Heading>
+          <Heading size="sm" mb={4} mt={2}>
+            Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
+          </Heading>
+          <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
+            <Text fontSize={14}>Monthly Budget</Text>
+            <Tooltip
+              placement="right"
+              label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
+            >
+              <Box>
+                <RiInformationFill />
+              </Box>
+            </Tooltip>
+          </Flex>
+          <InputGroup>
+            <InputLeftAddon children="$" />
+            <Input
+              max={10000000}
+              value={budget}
+              type="number"
+              onChange={handleBudgetChange}
+            />
+            <InputRightElement width="4.5rem">
+              <Button
+                color="white"
+                bgGradient={"linear(to-r, blue.500,teal.500)"}
+                h="1.75rem"
+                size="sm"
+                onClick={onConfirmationOpen}
               >
-                <Box>
-                  <RiInformationFill />
-                </Box>
-              </Tooltip>
-            </Flex>
-            <InputGroup>
-              <InputLeftAddon children="$" />
-              <Input
-                max={10000000}
-                value={budget}
-                type="number"
-                onChange={handleBudgetChange}
-              />
-              <InputRightElement width="4.5rem">
-                <Button
-                  color="white"
-                  bgGradient={"linear(to-r, blue.500,teal.500)"}
-                  h="1.75rem"
-                  size="sm"
-                  onClick={onConfirmationOpen}
-                >
-                  Save
-                </Button>
-              </InputRightElement>
-            </InputGroup>
-            {/* <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
+                Save
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          {/* <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
               <Tooltip
                 placement="right"
                 label="Your prompt budget is decided by your monthly budget, and gives a guess of how much credit you will have for prompting after models have been trained."
@@ -379,23 +378,22 @@ const Models = ({ onClose }: any) => {
               />
             </InputGroup> */}
 
-            {promptingBalance === 0 ? (
-              <Badge alignSelf="flex-start" mt={2} color="orange">
-                This budget will limit your models from reaching your settings
-                and give you $0 budget for prompting.
-              </Badge>
-            ) : (
-              <Badge
-                color={promptingBalance === 0 ? "orange" : "teal"}
-                alignSelf="flex-start"
-                mt={2}
-              >
-                This budget give you a monthly balance for prompting of $
-                {promptingBalance.toFixed(2)}
-              </Badge>
-            )}
-          </Flex>
-        </Box>
+          {promptingBalance === 0 ? (
+            <Badge alignSelf="flex-start" mt={2} color="orange">
+              This budget will limit your models from reaching your settings
+              and give you $0 budget for prompting.
+            </Badge>
+          ) : (
+            <Badge
+              color={promptingBalance === 0 ? "orange" : "teal"}
+              alignSelf="flex-start"
+              mt={2}
+            >
+              This budget give you a monthly balance for prompting of $
+              {promptingBalance.toFixed(2)}
+            </Badge>
+          )}
+        </Flex>
         <Heading size="md" mb={2} mt={4} id="billing">
           Estimated Monthly Cost
         </Heading>

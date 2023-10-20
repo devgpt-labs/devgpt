@@ -1,12 +1,13 @@
 import { Flex, Box, Skeleton, Grid, Text, Button } from "@chakra-ui/react";
 import { SmallAddIcon } from "@chakra-ui/icons";
 import repoStore from "@/store/Repos";
+import RepoDrawer from "@/components/repos/RepoDrawer";
 
 //components
 import Template from "@/components/Template";
 
 const AddAModel = () => {
-  const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
 
   return (
     <Template>
@@ -18,6 +19,7 @@ const AddAModel = () => {
         width="100%"
         height="100%"
       >
+        <RepoDrawer />
         <Text>No models found yet</Text>
         <Button
           onClick={() => {
