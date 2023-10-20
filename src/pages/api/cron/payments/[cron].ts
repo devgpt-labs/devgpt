@@ -56,10 +56,10 @@ async function update(interval: string) {
     customers_with_payments_required.push({ customer, charge });
   }
 
-  //todo - charge customers
-  // for (const customer of customers_with_payments_required) {
-  //   await chargeCustomer(customer.customer, customer.charge, customer.email_address);
-  // }
+  // charge customers
+  for (const customer of customers_with_payments_required) {
+    await chargeCustomer(customer.customer, customer.charge, customer.email_address);
+  }
 
   return { customers_with_payments_required, now };
 }
