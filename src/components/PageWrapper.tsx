@@ -25,7 +25,7 @@ const Home = ({ children }: any) => {
           minH='78vh'
           flexDirection="column"
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
         >
           {children}
         </Flex>
