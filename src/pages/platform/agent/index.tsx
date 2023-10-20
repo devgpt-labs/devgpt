@@ -118,6 +118,8 @@ const Chat = () => {
     },
   });
 
+  const MAX_MESSAGES = 6; //todo - this should come from training status
+
   if (status?.isBanned) {
     return (
       <Template>
@@ -144,7 +146,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => { },
+      () => {},
       user?.email
     );
 
@@ -174,7 +176,7 @@ const Chat = () => {
     // Update the model to the newest selected one
 
     if (model?.output) {
-      setInitialMessages(JSON.parse(model?.output));
+      setInitialMessages(JSON.parse(model?.output).slice(0, MAX_MESSAGES));
     }
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
@@ -333,16 +335,14 @@ const Chat = () => {
               <Button
                 width="100%"
                 bgGradient="linear(to-r, blue.500, teal.500)"
-                color='white'
+                color="white"
                 mt={4}
                 onClick={() => {
                   router.push("/platform/models", undefined, { shallow: true });
                 }}
               >
                 <MdScience />
-                <Text ml={1}>
-                  Train or select a model to get started
-                </Text>
+                <Text ml={1}>Train or select a model to get started</Text>
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
@@ -528,7 +528,7 @@ const Chat = () => {
                           2 /
                           model?.sample_size) *
                           100 <
-                          60
+                        60
                           ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
