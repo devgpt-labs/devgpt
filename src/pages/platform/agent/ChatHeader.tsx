@@ -1,4 +1,4 @@
-import { Text, Flex, useColorMode, Tag } from "@chakra-ui/react";
+import { Text, Flex, useColorMode, Tag, Box } from "@chakra-ui/react";
 
 import packageJson from "../../../../package.json";
 
@@ -29,7 +29,21 @@ const ChatHeader = () => {
           Open Beta {version}
         </Tag>
       </Flex>
-      <Text>{repo.repo && <Tag>{repo.repo}</Tag>}</Text>
+      <Flex flexDirection='row' gap={2}>
+        <Tag
+          colorScheme="blue"
+          alignItems="center"
+          justifyContent="center"
+          flexDirection="row"
+          ml={2}
+          color="white"
+
+        >
+          <Text>Desktop app returning soon. 🎉</Text>
+        </Tag>
+        <Text>{repo.repo && <Tag>{repo.repo}</Tag>}</Text>
+      </Flex>
+
     </Flex>
   );
 };

@@ -8,7 +8,6 @@ const Home = ({ children }: any) => {
 
   return (
     <Flex
-      maxH="100vh"
       flex={{ md: "initial", base: 1 }}
       direction="column"
       alignItems="flex-start"
@@ -19,28 +18,16 @@ const Home = ({ children }: any) => {
         flexDirection="column"
         bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
         width="100vw"
-        height="100vh"
       >
-        <Tag
-          p={4}
-          colorScheme="blue"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="row"
-          gap={3}
-          color="white"
-        >
-          <Text>Desktop app returning soon. 🎉</Text>
-        </Tag>
-
         <Flex
-          height="100vh"
+          minH="100vh"
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
           <ChatHeader />
           {children}
+
           <Profile />
         </Flex>
       </Flex>

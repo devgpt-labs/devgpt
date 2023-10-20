@@ -110,6 +110,7 @@ const Chat = () => {
 
       hasBeenReset && setHasBeenReset(false);
       setFailMessage("");
+      setPrompt("");
       setLoading(false);
       savePrompt(user?.email, prompt, data.content, usage);
       setResponse(data.content);
@@ -324,21 +325,21 @@ const Chat = () => {
       >
         <Box
           rounded="lg"
-          className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+          className="p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
           {!repo.repo && (
-            <>
+            <Box>
               <Button width="100%" mt={4}>
                 Train a model to get started
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
               </Text>
-            </>
+            </Box>
           )}
           {repo.repo && (
-            <Box maxH={"100vh"} overflowY={"auto"}>
+            <Box>
               {status?.isOverdue ||
                 (credits < 0 && (
                   <Flex flexDirection="column" mt={4}>
@@ -440,8 +441,7 @@ const Chat = () => {
 
               {loading ? (
                 <SkeletonText
-                  mb={2}
-                  mt={4}
+                  mb={4}
                   noOfLines={4}
                   spacing={4}
                   skeletonHeight="2"
@@ -518,7 +518,7 @@ const Chat = () => {
                           2 /
                           model?.sample_size) *
                           100 <
-                        40
+                          40
                           ? "Retraining recommended"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
