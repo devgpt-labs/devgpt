@@ -58,10 +58,10 @@ const Auth = () => {
     return (
       <Template>
         <Flex
+          height='100%'
           alignItems="center"
           justifyContent="center"
           mt={5}
-          h="100vh"
         >
           <Spinner height={5} width={5} />
           <Text ml={3}>Just getting started...</Text>
@@ -72,17 +72,16 @@ const Auth = () => {
   return (
     <>
       <Template>
-        <Box
-          h="100vh"
-          w="40%"
+        <Flex
+          justifyContent='center'
+          alignItems='center'
+          width='30%'
+          height='100%'
           rounded="lg"
           overflow="hidden"
-          p={5}
           flexDirection="column"
-          boxShadow="blue"
-          shadow="2xl"
         >
-          <VStack spacing={2} mt={3} width="100%" alignItems="center">
+          <VStack spacing={2} width="100%" alignItems="center">
             <GitConnectorButton
               color="black"
               provider="Sign In With Github"
@@ -135,7 +134,7 @@ const Auth = () => {
               </Tooltip>
             </Flex>
           </VStack>
-        </Box>
+        </Flex>
       </Template>
     </>
   );

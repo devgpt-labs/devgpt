@@ -295,7 +295,7 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
-  const ModelStat = ({ label, number, tooltip }: any) => {
+  const ModelStat = ({ label, number, tip, tooltip }: any) => {
     return (
       <Stat
         border={
@@ -313,7 +313,7 @@ const Chat = () => {
 
         <StatNumber>{number}</StatNumber>
         <StatHelpText mb={2} fontSize={14} color="gray">
-          {moment(Date.now()).format("MMMM Do YYYY")}
+          {tip}
         </StatHelpText>
       </Stat>
     );
@@ -468,11 +468,13 @@ const Chat = () => {
                         <ModelStat
                           label="Training Size Target"
                           number={model?.sample_size}
+                          tip={moment(Date.now()).format("MMMM Do YYYY")}
                           tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
                         />
                         <ModelStat
                           label="Actual Sample Size"
                           number={(initialMessages.length - 1) / 2}
+                          tip={moment(Date.now()).format("MMMM Do YYYY")}
                           tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
                         />
                         <ModelStat
@@ -483,6 +485,15 @@ const Chat = () => {
                               model?.sample_size) *
                             100
                           ).toFixed(2)}%`}
+                          tip={
+                            ((initialMessages.length - 1) /
+                              2 /
+                              model?.sample_size) *
+                              100 <
+                              40
+                              ? "Retraining recommended"
+                              : moment(Date.now()).format("MMMM Do YYYY")
+                          }
                           tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
                         />
                       </Grid>
