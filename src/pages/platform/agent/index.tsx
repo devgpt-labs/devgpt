@@ -506,7 +506,7 @@ const Chat = () => {
                           model?.sample_size) *
                           100 <
                           60
-                          ? "Below 60% accuracy, we recommend retraining.
+                          ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
                       tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
