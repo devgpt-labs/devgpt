@@ -311,7 +311,7 @@ const ModelCard = ({
                         ? "blue"
                         : isErrored
                           ? "orange"
-                          : JSON.parse(model.output)?.length === 1
+                          : JSON.parse(model.output)?.length < 2
                             ? "orange"
                             : "teal"
                   }
@@ -324,7 +324,7 @@ const ModelCard = ({
                       ? "Training"
                       : isErrored
                         ? "Training Failed"
-                        : JSON.parse(model.output)?.length === 1
+                        : JSON.parse(model.output)?.length < 2
                           ? "Training Failed"
                           : "Trained"}
                 </Badge>

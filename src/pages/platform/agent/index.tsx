@@ -505,8 +505,8 @@ const Chat = () => {
                           2 /
                           model?.sample_size) *
                           100 <
-                          40
-                          ? "Retraining recommended"
+                          60
+                          ? "Below 60% accuracy, we recommend retraining.
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }
                       tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
@@ -636,7 +636,7 @@ const ModelStat = ({ label, number, tip, tooltip }: any) => {
 
       <>
         <StatNumber>{number}</StatNumber>
-        <StatHelpText mb={2} fontSize={14} color="gray">
+        <StatHelpText fontSize={14} color="gray">
           {tip}
         </StatHelpText>
       </>
