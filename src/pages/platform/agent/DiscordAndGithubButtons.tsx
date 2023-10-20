@@ -1,16 +1,11 @@
 "use client";
 import { Flex, Text, Tooltip, IconButton, Link } from "@chakra-ui/react";
 
-//stores
-
-//prompts
-
-//components
-
-//utils
-
 // Icons
 import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
+
+// TODO: The discord icon would ideally show people online in discord
+// TODO: The github icon would ideally show the number of stars on the repo
 
 const DiscordAndGithubButtons = () => {
   return (
