@@ -127,11 +127,10 @@ const Profile = () => {
       .from("customers")
       .select("credits")
       .eq("email_address", emailAddress)
-      .single();
 
     if (error) throw error;
     if (data !== null) {
-      setCredits(data.credits);
+      setCredits(data[0].credits);
     }
   };
 
