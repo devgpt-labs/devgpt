@@ -57,7 +57,7 @@ import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
 import { BiSolidBrain } from "react-icons/bi";
-import { PlusSquareIcon } from "@chakra-ui/icons";
+import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
@@ -110,6 +110,7 @@ const Chat = () => {
 
       hasBeenReset && setHasBeenReset(false);
       setFailMessage("");
+      setLoading(false);
       savePrompt(user?.email, prompt, data.content, usage);
       setResponse(data.content);
     },
@@ -141,7 +142,7 @@ const Chat = () => {
       (data: any) => {
         setModels(data);
       },
-      () => {},
+      () => { },
       user?.email
     );
 
@@ -360,7 +361,7 @@ const Chat = () => {
                       correctly. You can continue using DevGPT and prompting
                       with your trained models immediately after this.
                     </Text>
-                    <Button
+                    {/* <Button
                       bgGradient={"linear(to-r, blue.500, teal.500)"}
                       onClick={() => {
                         router.push("/platform/billing");
@@ -372,26 +373,24 @@ const Chat = () => {
                         Upgrade
                       </Text>
                       <BiUpArrowAlt color="white" />
-                    </Button>
-                    <Flex flexDirection="row" gap={3}>
-                      <Link
-                        width="50%"
-                        href="https://discord.com/invite/6GFtwzuvtw"
-                      >
-                        <Button width="100%">
-                          <Text mr={2}>Join Discord</Text>
-                          <BsDiscord />
-                        </Button>
-                      </Link>
+                    </Button> */}
+                    <Flex flexDirection="row" gap={2}>
                       <Button
+                        width="100%"
+                        bgGradient={"linear(to-r, blue.500, teal.500)"}
                         onClick={() => {
                           router.push("/platform/billing");
                         }}
-                        width="50%"
                       >
                         <Text mr={2}>View Billing</Text>
                         <AiFillCreditCard />
                       </Button>
+                      <Link href="mailto:support@devgpt.com">
+                        <Button>
+                          <Text mr={2}>Email Support</Text>
+                          <EmailIcon />
+                        </Button>
+                      </Link>
                     </Flex>
                   </Flex>
                 ))}
@@ -448,8 +447,24 @@ const Chat = () => {
                 </SlideFade>
               )}
 
+              {loading ? (
+                <SkeletonText
+                  mb={2}
+                  mt={4}
+                  noOfLines={4}
+                  spacing={4}
+                  skeletonHeight="2"
+                />
+              ) : (
+                <Response
+                  hasBeenReset={hasBeenReset}
+                  initialMessages={initialMessages}
+                  content={String(messages[messages.length - 1]?.content)}
+                />
+              )}
               {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
                 <Box mt={4}>
+
                   <Flex
                     flexDirection="row"
                     gap={2}
@@ -470,22 +485,6 @@ const Chat = () => {
                       />
                     </Flex>
                   </Flex>
-
-                  {loading ? (
-                    <SkeletonText
-                      mb={2}
-                      mt={4}
-                      noOfLines={4}
-                      spacing={4}
-                      skeletonHeight="2"
-                    />
-                  ) : (
-                    <Response
-                      hasBeenReset={hasBeenReset}
-                      initialMessages={initialMessages}
-                      content={String(messages[messages.length - 1]?.content)}
-                    />
-                  )}
                 </Box>
               )}
 

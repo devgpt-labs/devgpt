@@ -80,13 +80,13 @@ const ModelCard = ({
   } = useDisclosure();
   const [deletingModel, setDeletingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
-  const [trainingFailed, setTrainingFailed] = useState<boolean>(false);
   const [isTraining, setIsTraining] = useState<boolean>(false);
   const [isErrored, setIsErrored] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
   const retrainModel = async () => {
     setIsTraining(true);
+    setIsErrored(false);
 
     // Create a new training_log for this model
     // If a training_log already exists with fulfilled false, don't add a log
@@ -94,7 +94,7 @@ const ModelCard = ({
       trainingLogs.filter((log: any) => {
         return (
           log.model_id ===
-            createModelID(model.repo, model.owner, model.branch) &&
+          createModelID(model.repo, model.owner, model.branch) &&
           log.fulfilled === false
         );
       }).length < 0
@@ -109,9 +109,20 @@ const ModelCard = ({
 
     //validate the output
     if (trainingOutput?.length) {
-      setIsErrored(false)
+      console.log("succeed");
+
+      handleModelInTrainingChange({
+        target: {
+          name: "output",
+          value: JSON.stringify(trainingOutput),
+        },
+      });
+
+      setIsErrored(false);
       setIsTraining(false);
     } else {
+      console.log("failed");
+
       setIsErrored(true);
       setIsTraining(false);
     }
@@ -198,6 +209,9 @@ const ModelCard = ({
   };
 
   if (!model) return null;
+
+  console.log(model.output);
+  console.log(isErrored);
 
   return (
     <Box>
@@ -306,26 +320,26 @@ const ModelCard = ({
                   colorScheme={
                     model.deleted
                       ? "red"
-                      : isErrored
-                      ? "orange"
-                      : JSON.parse(model.output)?.length === 1
-                      ? "orange"
                       : isTraining
-                      ? "blue"
-                      : "teal"
+                        ? "blue"
+                        : isErrored
+                          ? "orange"
+                          : JSON.parse(model.output)?.length === 1
+                            ? "orange"
+                            : "teal"
                   }
                   alignSelf="flex-start"
                 >
                   Status:{" "}
                   {model.deleted
                     ? "Deleted"
-                    : isErrored
-                    ? "Training Failed"
-                    : JSON.parse(model.output)?.length === 1
-                    ? "Training Failed"
                     : isTraining
-                    ? "Training"
-                    : "Trained"}
+                      ? "Training"
+                      : isErrored
+                        ? "Training Failed"
+                        : JSON.parse(model.output)?.length === 1
+                          ? "Training Failed"
+                          : "Trained"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -400,14 +414,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-                // setBranch={(e: any) => {
-                //   handleModelInTrainingChange({
-                //     target: {
-                //       name: "branch",
-                //       value: e,
-                //     },
-                //   });
-                // }}
+              // setBranch={(e: any) => {
+              //   handleModelInTrainingChange({
+              //     target: {
+              //       name: "branch",
+              //       value: e,
+              //     },
+              //   });
+              // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>

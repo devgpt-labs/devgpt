@@ -9,6 +9,12 @@ import {
   Tag,
   Badge,
   Link,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   Button,
   Table,
   Thead,
@@ -26,6 +32,7 @@ import {
   InputLeftAddon,
   InputRightElement,
   Tooltip,
+  Modal,
 } from "@chakra-ui/react";
 
 //stores
@@ -37,6 +44,7 @@ import { useRouter } from "next/router";
 //utils
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import getModels from "@/utils/getModels";
+import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 //components
 import Template from "@/components/Template";
@@ -45,6 +53,7 @@ import Template from "@/components/Template";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { RiInformationFill } from "react-icons/ri";
 import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
+import ConfirmationModal from "../models/ConfirmationModal";
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -54,6 +63,12 @@ const Models = ({ onClose }: any) => {
     onOpen: onConfirmationOpen,
     onClose: onConfirmationClose,
     onToggle: onConfirmationToggle,
+  } = useDisclosure();
+
+  const {
+    isOpen: isThankYouOpen,
+    onOpen: onThankYouOpen,
+    onClose: onThankYouClose,
   } = useDisclosure();
 
   const { colorMode }: any = useColorMode();
@@ -224,6 +239,35 @@ const Models = ({ onClose }: any) => {
 
   return (
     <Template>
+      <ConfirmationModal
+        header={`Change monthly budget to $${budget}?`}
+        body="Changing your monthly budget will affect how much you can spend on models and prompting."
+        confirmButtonText="Confirm"
+        isOpen={isConfirmationOpen}
+        onClose={onConfirmationClose}
+        onSubmit={() => {
+          saveMonthlyBudget();
+          chargeCustomer(
+            { stripe_customer_id: stripe_customer_id },
+            budget,
+            user?.email
+          );
+          onThankYouOpen();
+          onConfirmationClose();
+        }}
+      />
+      <ConfirmationModal
+        header={`Budget Updated Successfully`}
+        body="Thank you for updating your budget. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
+        confirmButtonText="Complete"
+        isOpen={isThankYouOpen}
+        onClose={onThankYouClose}
+        onSubmit={() => {
+          onThankYouClose();
+          router.push("/platform/agent", undefined, { shallow: true })
+        }}
+      />
+
       <Flex p={5} width="100%" height="100%" flexDirection="column">
         <Box>
           <Flex
@@ -261,14 +305,13 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
           <Flex flexDirection={"column"} mb={3}>
-            <Heading size="md" mb={4} mt={2}>
+            <Heading size="sm" mt={2}>
               Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
             </Heading>
-            <Heading size="md" mb={4} mt={2}>
-              Spend this month so far:{" "}
-              <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
+            <Heading size="sm" mb={4} mt={2}>
+              Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
             </Heading>
-            <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
+            <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
               <Text fontSize={14}>Monthly Budget</Text>
               <Tooltip
                 placement="right"
@@ -299,7 +342,7 @@ const Models = ({ onClose }: any) => {
                 </Button>
               </InputRightElement>
             </InputGroup>
-            <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
+            {/* <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
               <Tooltip
                 placement="right"
                 label="Your prompt budget is decided by your monthly budget, and gives a guess of how much credit you will have for prompting after models have been trained."
@@ -324,7 +367,7 @@ const Models = ({ onClose }: any) => {
                 value={promptingBalance.toFixed(2)}
                 type="number"
               />
-            </InputGroup>
+            </InputGroup> */}
 
             {promptingBalance === 0 ? (
               <Badge alignSelf="flex-start" mt={2} color="orange">
