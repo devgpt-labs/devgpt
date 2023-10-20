@@ -470,67 +470,68 @@ const Chat = () => {
                       />
                     </Flex>
                   </Flex>
-                  {showModelAssessment && (
-                    <>
-                      <Text
-                        fontSize="sm"
-                        mb={3}
-                        color={colorMode === "light" ? "#CBD5E0" : "gray"}
-                      >
-                        Hover over each one to learn more.
-                      </Text>
-                      <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-                        <ModelStat
-                          label="Training Size Target"
-                          number={model?.sample_size}
-                          tip={moment(Date.now()).format("MMMM Do YYYY")}
-                          tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
-                        />
-                        <ModelStat
-                          label="Actual Sample Size"
-                          number={(initialMessages.length - 1) / 2}
-                          tip={moment(Date.now()).format("MMMM Do YYYY")}
-                          tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
-                        />
-                        <ModelStat
-                          label="Training Accuracy"
-                          number={`${(
-                            ((initialMessages.length - 1) /
-                              2 /
-                              model?.sample_size) *
-                            100
-                          ).toFixed(2)}%`}
-                          tip={
-                            ((initialMessages.length - 1) /
-                              2 /
-                              model?.sample_size) *
-                              100 <
-                              40
-                              ? "Retraining recommended"
-                              : moment(Date.now()).format("MMMM Do YYYY")
-                          }
-                          tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
-                        />
-                      </Grid>
-                    </>
+
+                  {loading ? (
+                    <SkeletonText
+                      mb={2}
+                      mt={4}
+                      noOfLines={4}
+                      spacing={4}
+                      skeletonHeight="2"
+                    />
+                  ) : (
+                    <Response
+                      hasBeenReset={hasBeenReset}
+                      initialMessages={initialMessages}
+                      content={String(messages[messages.length - 1]?.content)}
+                    />
                   )}
                 </Box>
               )}
 
-              {loading ? (
-                <SkeletonText
-                  mb={2}
-                  mt={4}
-                  noOfLines={4}
-                  spacing={4}
-                  skeletonHeight="2"
-                />
-              ) : (
-                <Response
-                  hasBeenReset={hasBeenReset}
-                  initialMessages={initialMessages}
-                  content={String(messages[messages.length - 1]?.content)}
-                />
+              {showModelAssessment && (
+                <>
+                  <Text
+                    fontSize="sm"
+                    mb={3}
+                    color={colorMode === "light" ? "#CBD5E0" : "gray"}
+                  >
+                    Hover over each one to learn more.
+                  </Text>
+                  <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                    <ModelStat
+                      label="Training Size Target"
+                      number={model?.sample_size}
+                      tip={moment(Date.now()).format("MMMM Do YYYY")}
+                      tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
+                    />
+                    <ModelStat
+                      label="Actual Sample Size"
+                      number={(initialMessages.length - 1) / 2}
+                      tip={moment(Date.now()).format("MMMM Do YYYY")}
+                      tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
+                    />
+                    <ModelStat
+                      label="Training Accuracy"
+                      number={`${(
+                        ((initialMessages.length - 1) /
+                          2 /
+                          model?.sample_size) *
+                        100
+                      ).toFixed(2)}%`}
+                      tip={
+                        ((initialMessages.length - 1) /
+                          2 /
+                          model?.sample_size) *
+                          100 <
+                          40
+                          ? "Retraining recommended"
+                          : moment(Date.now()).format("MMMM Do YYYY")
+                      }
+                      tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
+                    />
+                  </Grid>
+                </>
               )}
             </Box>
           )}
