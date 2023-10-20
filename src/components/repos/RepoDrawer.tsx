@@ -16,27 +16,18 @@ import {
   Stack,
   InputRightElement,
   InputGroup,
-  CardHeader,
-  Box,
 } from "@chakra-ui/react";
 
 //stores
-
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
 
 //utils
-
 import { getPaginatedRepos } from "@/utils/github/getRepos";
-import createTrainingData from "@/utils/createTrainingData";
-import getLofaf from "@/utils/github/getLofaf";
 import { supabase } from "@/utils/supabase";
 import RepoSetupModal from "./RepoSetupModal";
 import getModels from "@/utils/getModels";
-import createModelID from "@/utils/createModelID";
-import calculateTotalCost from "@/utils/calculateTotalCost";
-import chargeCustomer from "@/utils/stripe/chargeCustomer";
+import addTrainingLog from "@/utils/addTrainingLog";
 
 //components
 type PageInfo = {
@@ -47,29 +38,25 @@ type PageInfo = {
 };
 
 const RepoDrawer = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure({
-    defaultIsOpen: false,
-  });
+  const { isOpen, onOpen, onClose } = useDisclosure({});
+
   const {
     isOpen: isRepoSetupOpen,
     onOpen: onRepoSetupOpen,
     onClose: onRepoSetupClose,
   } = useDisclosure();
 
-  const { repo, repoWindowOpen, setRepo, setLofaf }: any = repoStore();
-  const { session, user, signOut, stripe_customer_id, monthly_budget }: any =
-    authStore();
-  const { setMessages }: any = messageStore();
+  const { repoWindowOpen, setRepo, setLofaf }: any = repoStore();
+  const { session, user, signOut, stripe_customer_id }: any = authStore();
 
   const [repos, setRepos] = useState<any[]>([]);
   const [reposCount, setReposCount] = useState<number>(0);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [filter, setFilter] = useState<string>("");
-  const [finetuningId, setFinetuningId] = useState<string>(""); //
   const [loading, setLoading] = useState(false); //
-  const btnRef = useRef<any>();
-  const [trainedModels, setTrainedModels] = useState<any[]>([]); //
+  const [trainedModels, setTrainedModels] = useState<any[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
+  const btnRef = useRef<any>();
 
   if (!user) {
     return null;
@@ -156,54 +143,32 @@ const RepoDrawer = () => {
     // Close the modal, no more user input required
     onClose();
 
-    const name = repo.name;
-    const owner = repo.owner.login;
-
     // Set repo to be the new repo
     setRepo({
-      owner: owner,
-      repo: name,
+      owner: repo.owner.login,
+      repo: repo.name,
     });
 
     // Create a new row in the models table in Supabase
     if (!supabase) return;
 
     const newModel = {
+      created_at: new Date().toISOString(),
       stripe_customer_id: stripe_customer_id,
-      email_address: user?.email,
-      repo: name,
-      owner: owner,
+      repo: repo.name,
+      owner: repo.owner.login,
       branch: "main",
-      training_method: "ENCODING",
-      output: null,
       epochs: repo.epochs,
+      training_method: "ENCODING",
       frequency: repo.frequency,
       sample_size: repo.sampleSize,
+      output: null,
+      deleted: false,
+      email_address: user?.email,
     };
 
     //insert the first training_log
-    const { data: logData, error: logError }: any = await supabase
-      .from("training_log")
-      .insert([
-        {
-          model_id: createModelID(name, owner, "main"),
-          model_settings: JSON.stringify(newModel),
-          fulfilled: false,
-        },
-      ]);
-
-    //calculate cost of training this model
-    const costToTrain = calculateTotalCost([newModel], 0);
-
-    //create a new charge
-    chargeCustomer(
-      {
-        stripe_customer_id: stripe_customer_id,
-        monthly_budget: monthly_budget,
-      },
-      Number(costToTrain),
-      user?.email,
-    );
+    addTrainingLog(newModel);
 
     const { data, error } = await supabase
       .from("models")
@@ -240,7 +205,7 @@ const RepoDrawer = () => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={2} />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
               Train A New Model {reposCount ? ` (${reposCount} repos) ` : ""}
@@ -279,11 +244,7 @@ const RepoDrawer = () => {
                   })
                   .filter((repoOption) => {
                     // Remove any that are found on the models table
-                    return !trainedModels.some(
-                      (model) =>
-                        model.repo === repoOption.name &&
-                        model.owner === repoOption.owner.login
-                    );
+                    return !trainedModels.some((model) => model === repoOption);
                   })
                   ?.map((repoOption) => {
                     return (
@@ -318,7 +279,7 @@ const RepoDrawer = () => {
                   })}
               </>
             ) : (
-              <Stack mt={4} spacing={2}>
+              <Stack spacing={2}>
                 <Text fontSize={14} mb={2}>
                   Is this taking too long? Try logging out and logging back in.
                 </Text>

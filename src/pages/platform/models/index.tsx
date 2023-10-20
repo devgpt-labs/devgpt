@@ -2,98 +2,54 @@
 import { useState, useEffect } from "react";
 import {
   Flex,
-  Text,
   Box,
-  SlideFade,
-  Skeleton,
   Heading,
-  CardBody,
-  Card,
-  Tag,
   Grid,
-  GridItem,
-  Badge,
-  StackDivider,
-  Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
+  Text,
   Button,
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
   IconButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
   useDisclosure,
-  ModalCloseButton,
-  useColorMode,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Spinner,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
-import ConfirmationModal from "./ConfirmationModal";
 import Link from "next/link";
 import ModelCard from "./ModelCard";
+import ModelInTraining from "./ModelInTraining";
+import ModelLoadingScreen from "./ModelLoadingScreen";
 
 //stores
 import authStore from "@/store/Auth";
 import repoStore from "@/store/Repos";
 import { supabase } from "@/utils/supabase";
-import Setup from "@/components/repos/Setup";
 import { useRouter } from "next/router";
-
-//utils
-import moment from "moment";
-import calculateTotalCost from "@/utils/calculateTotalCost";
-import getModels from "@/utils/getModels";
 
 //components
 import Template from "@/components/Template";
 import RepoDrawer from "@/components/repos/RepoDrawer";
 
 //icons
-import {
-  EditIcon,
-  DeleteIcon,
-  SmallAddIcon,
-  ArrowBackIcon,
-} from "@chakra-ui/icons";
-import { BiCircle, BiRefresh, BiSolidDollarCircle } from "react-icons/bi";
-import { PiSelectionBackground } from "react-icons/pi";
-import { AiFillCheckCircle } from "react-icons/ai";
-import { PiCircleLight } from "react-icons/pi";
-import trainModels from "@/utils/trainModels";
+import { SmallAddIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import { BiRefresh } from "react-icons/bi";
+import getModels from "@/utils/getModels";
+import AddAModel from "./AddAModel";
+import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
+import createModelID from "@/utils/createModelID";
 
-const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits }: any = authStore();
+const Models = () => {
+  const { session, user, stripe_customer_id, credits, status }: any =
+    authStore();
   const router = useRouter();
-  const {
-    isOpen: isConfirmationOpen,
-    onOpen: onConfirmationOpen,
-    onClose: onConfirmationClose,
-    onToggle: onConfirmationToggle,
-  } = useDisclosure();
 
-  const { colorMode }: any = useColorMode();
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
-  const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
+  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-
-  // Budgets
-  const [budget, setBudget] = useState<any>(null);
+  const [someModelsAreTraining, setSomeModelsAreTraining] =
+    useState<boolean>(false);
 
   interface Model {
     id: string;
@@ -109,6 +65,89 @@ const Models = ({ onClose }: any) => {
     frequency: number;
   }
 
+  const findIfModelsAreTraining = async () => {
+    const areModelsTraining = await modelsInTraining.map((model: any) => {
+      // If any of the logs in training logs are fulfilled false, return true
+
+      if (
+        trainingLogs.filter(
+          (log: any) =>
+            log.fulfilled === false &&
+            log.model_id ===
+            createModelID(model.repo, model.owner, model.branch)
+        ).length > 0
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    // If areModelsTraining array contains a true value, set someModelsAreTraining to true
+    const someModelsAreTraining = areModelsTraining.includes(true);
+    setSomeModelsAreTraining(someModelsAreTraining);
+  };
+
+  useEffect(() => {
+    // get data from training_log table
+    modelsInTraining.map((model: any) => {
+      getTrainingLogsForModel(setTrainingLogs, model);
+    });
+
+    // Subscribe to output changes
+    if (!supabase) return;
+    const models = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "models" },
+        (payload: any) => {
+          if (payload.new.stripe_customer_id === stripe_customer_id) {
+            // Update modelsInTraining ith the payload.new of the corresponding model
+            setModelsInTraining((modelsInTraining: any) => {
+              const newModelsInTraining = modelsInTraining.map(
+                (model: Model) => {
+                  if (model.id === payload.new.id) {
+                    return payload.new;
+                  }
+                  return model;
+                }
+              );
+              return newModelsInTraining;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    const training = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "training_log" },
+        (payload: any) => {
+          const newTrainingLogs = trainingLogs.map((log: any) => {
+            if (log.id === payload.new.id) {
+              return payload.new;
+            }
+            return log;
+          });
+
+          setTrainingLogs(newTrainingLogs);
+        }
+      )
+      .subscribe();
+  }, []);
+
+  useEffect(() => {
+    getModels(setModelsInTraining, setLoading, user?.email);
+  }, [repos, refresh]);
+
+  useEffect(() => {
+    // Find if any models are still training
+    findIfModelsAreTraining();
+  }, [modelsInTraining]);
+
   useEffect(() => {
     if (!session) {
       console.log("no session found, returning to home");
@@ -121,161 +160,11 @@ const Models = ({ onClose }: any) => {
     }
   }, [session, user]);
 
-  // Used to show how much the user will have available for prompting
-  const balanceCalculation =
-    Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));
-  let promptingBalance = balanceCalculation;
-  if (promptingBalance < 0) {
-    promptingBalance = 0;
-  }
-
-  // Used to get an estimation of how much the user will spend each month
-  const budgetEstimation =
-    Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
-
-
-  const handleBudgetChange = (e: any) => {
-    setBudget(e.target.value);
-  };
-
-  const getMonthlyBudget = async () => {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("customers")
-      .select("monthly_budget")
-      .eq("email_address", user?.email)
-      .single();
-
-    if (error) {
-      console.log(error);
-      setBudget(budgetEstimation);
-      return;
-    }
-
-    if (data) {
-      setBudget(data.monthly_budget);
-    };
-  };
-
-  const saveMonthlyBudget = async () => {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("customers")
-      .update({ monthly_budget: budget })
-      .eq("email_address", user?.email);
-
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-    if (data) {
-      console.log('new budget saved');
-    };
-  };
-
-  useEffect(() => {
-    // Train models
-    trainModels(session, user);
-
-    // If the url contains the word billing, open the billing section
-    if (router.asPath.includes("billing")) {
-      // Show billing section
-      setShowBilling(true);
-
-      // TODO: This is a hacky fix to scroll to billing after render
-      setTimeout(() => {
-        const element = document.getElementById("billing");
-        element?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
-  }, []);
-
-  useEffect(() => {
-    getMonthlyBudget()
-    getModels(setModelsInTraining, setLoading, user?.email);
-
-    if (modelsInTraining.length > 0) {
-      // Get the current budget from supabase
-      if (!supabase) return;
-    }
-
-    // set budget to a
-  }, [repos, refresh]);
-
-  const calculateStatSum = (stat: string) => {
-    return modelsInTraining.length > 0 ? (
-      <>
-        {modelsInTraining
-          .map((model: any) => model?.[stat])
-          .reduce((a: any, b: any) => a + b, 0)}
-      </>
-    ) : (
-      0
-    );
-  };
-
-  if (loading || budget === null) {
-    return (
-      <Template>
-        <Box p={6} width="100vw" height="100vh">
-          <Flex width="100%" mb={6} justifyContent="space-between">
-            <Skeleton
-              bg="gray.700"
-              height="35px"
-              width="250px"
-              borderRadius={10}
-            />
-            <Flex flexDirection="row" gap={4}>
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-              <Skeleton
-                bg="gray.700"
-                height="35px"
-                width="150px"
-                borderRadius={10}
-              />
-            </Flex>
-          </Flex>
-          <Grid
-            templateColumns="repeat(3, 1fr)"
-            gap={8}
-            flexWrap="wrap"
-            width="100%"
-          >
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-            <Skeleton bg="gray.700" height="250px" borderRadius={10} />
-          </Grid>
-        </Box>
-      </Template>
-    );
-  }
+  if (loading || !user) return <ModelLoadingScreen />;
+  if (modelsInTraining.length === 0) return <AddAModel />;
 
   return (
     <Template>
-      <ConfirmationModal
-        header={`Set your monthly budget to $${budget}?`}
-        body="Confirm you would like to change your budget. This can be changed at any time."
-        confirmButtonText="Confirm"
-        isOpen={isConfirmationOpen}
-        onClose={onConfirmationClose}
-        onSubmit={saveMonthlyBudget}
-        setLoadingState={setLoading}
-        handleModelInTrainingChange={() => { }}
-      />
       <Flex
         flex={1}
         w="full"
@@ -302,14 +191,6 @@ const Models = ({ onClose }: any) => {
           <Flex gap={2}>
             <Button
               onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Create
-            </Button>
-            <Button
-              onClick={() => {
                 setRefresh(!refresh);
               }}
               rightIcon={<BiRefresh />}
@@ -317,25 +198,27 @@ const Models = ({ onClose }: any) => {
               Refresh
             </Button>
             <Button
+              isDisabled={credits < 0 || status?.isOverdue}
               onClick={() => {
-                if (showBilling) return setShowBilling(false);
-
-                setShowBilling(true);
-                const element = document.getElementById("billing");
-                element?.scrollIntoView({ behavior: "smooth" });
+                setRepoWindowOpen(!repoWindowOpen);
               }}
-              rightIcon={<BiSolidDollarCircle />}
+              rightIcon={<SmallAddIcon />}
             >
-              Billing
+              Train New Model
             </Button>
           </Flex>
         </Flex>
-
-        {modelsInTraining.length > 0 ? (
-          <Grid templateColumns="repeat(3, 1fr)" gap={6} flexWrap="wrap">
+        {modelsInTraining.length > 0 && (
+          <Grid
+            width="100%"
+            templateColumns={`repeat(3, 1fr)`}
+            gap={6}
+            flexWrap="wrap"
+          >
             {modelsInTraining.map((model: any) => {
               return (
                 <ModelCard
+                  trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}
                   setModelsInTraining={setModelsInTraining}
@@ -343,137 +226,7 @@ const Models = ({ onClose }: any) => {
               );
             })}
           </Grid>
-        ) : (
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            gap={2}
-            width="100%"
-            height="100%"
-          >
-            <Text>No models found yet</Text>
-            <Button
-              onClick={() => {
-                setRepoWindowOpen(!repoWindowOpen);
-              }}
-              rightIcon={<SmallAddIcon />}
-            >
-              Train A New Model
-            </Button>
-          </Flex>
         )}
-        <SlideFade in={showBilling} offsetY="20px" id="billing">
-          <Box p={5} mt={5}>
-            <Heading size="lg" mb={3}>
-              Billing
-            </Heading>
-            <Flex flexDirection={"column"} mb={3}>
-              <Heading size="md" mb={4} mt={2}>
-                Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>
-              </Heading>
-              <Text mb={2}>Monthly Budget</Text>
-              <InputGroup>
-                <InputLeftAddon children="$" />
-                <Input
-                  max={10000000}
-                  value={budget}
-                  type="number"
-                  onChange={handleBudgetChange}
-                />
-                <InputRightElement width="4.5rem">
-                  <Button
-                    color='white'
-                    bgGradient={"linear(to-r, blue.500,teal.500)"}
-                    h="1.75rem"
-                    size="sm"
-                    onClick={onConfirmationOpen}
-                  >
-                    Save
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-              <Badge
-                color={promptingBalance === 0 ? "orange" : "teal"}
-                alignSelf="flex-start"
-                mt={2}
-              >
-                This budget give you a monthly balance for prompting of $
-                {promptingBalance.toFixed(2)}
-              </Badge>
-              {promptingBalance === 0 && (
-                <Badge alignSelf="flex-start" mt={2} color="orange">
-                  This budget will limit your models from reaching your
-                  settings.
-                </Badge>
-              )}
-            </Flex>
-            <TableContainer>
-              <Table variant="striped">
-                <Thead>
-                  <Tr>
-                    <Th>Name</Th>
-                    <Th isNumeric>Epochs</Th>
-                    <Th isNumeric>Sample_Size</Th>
-                    <Th isNumeric>Frequency</Th>
-                    <Th isNumeric>Cost</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {modelsInTraining.length > 0 ? (
-                    <>
-                      {modelsInTraining.map((model: any) => {
-                        return (
-                          <>
-                            <Tr>
-                              <Td>{model.repo}</Td>
-                              <Td isNumeric>{model.epochs}</Td>
-                              <Td isNumeric>{model.sample_size}</Td>
-                              <Td isNumeric>{model.frequency}</Td>
-                              <Td isNumeric>
-                                ${calculateTotalCost([model], 0)}
-                              </Td>
-                            </Tr>
-                          </>
-                        );
-                      })}
-                    </>
-                  ) : (
-                    <Text my={4}>No models have been trained yet.</Text>
-                  )}
-
-                </Tbody>
-                <Tfoot>
-                  <Tr>
-                    <Th>Total</Th>
-                    <Th isNumeric>{calculateStatSum("epochs")}</Th>
-                    <Th isNumeric>{calculateStatSum("sample_size")}</Th>
-                    <Th isNumeric>{calculateStatSum("frequency")}</Th>
-                    <Th isNumeric>
-                      $
-                      {
-                        calculateTotalCost(modelsInTraining, 0)}
-                    </Th>
-                  </Tr>
-                  <Tr>
-                    <Th>Estimated monthly cost</Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric></Th>
-                    <Th isNumeric>
-                      <Heading>
-                        $
-                        {budget < budgetEstimation
-                          ? budget
-                          : budgetEstimation.toFixed(2)}
-                      </Heading>
-                    </Th>
-                  </Tr>
-                </Tfoot>
-              </Table>
-            </TableContainer>
-          </Box>
-        </SlideFade>
       </Flex>
       <RepoDrawer />
     </Template>

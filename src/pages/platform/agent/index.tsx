@@ -5,29 +5,33 @@ import {
   Flex,
   Text,
   SkeletonText,
-  Input,
   Button,
-  useColorMode,
   SlideFade,
   Kbd,
   Tag,
   useDisclosure,
-  Heading,
-  Spinner,
-  Tooltip,
   IconButton,
-  Badge,
+  Link,
+  Stat,
+  StatLabel,
+  Switch,
+  StatNumber,
+  StatHelpText,
+  Grid,
+  Tooltip,
+  Alert,
+  AlertIcon,
+  Fade,
+  Skeleton,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import Science from "@/components/repos/Science";
+import moment from "moment";
 
 //stores
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
 
 //prompts
 import userPrompt from "@/prompts/user";
@@ -35,12 +39,8 @@ import userPrompt from "@/prompts/user";
 //components
 import Template from "@/components/Template";
 import Response from "@/components/Response";
-import Profile from "@/components/repos/Profile";
-import RateConversation from "./RateConversation";
-import ChatHeader from "./ChatHeader";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
-import Models from "../models";
-import Calculator from "@/components/repos/Calculator";
+import PromptAreaAndButton from "./PromptAreaAndButton";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
@@ -52,11 +52,18 @@ import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
 import calculateTokenCost from "@/utils/calculateTokenCost";
 import chargeCustomer from "@/utils/stripe/chargeCustomer";
-import trainModels from "@/utils/trainModels";
+import TrainingStatus from "./TrainingStatus";
 
 // Icons
-import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
+import { BsDiscord } from "react-icons/bs";
+import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
+import { BiSolidBrain } from "react-icons/bi";
+import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
+import { MdScience } from "react-icons/md";
+import { useColorMode } from "@chakra-ui/react";
+import { RiInformationFill } from "react-icons/ri";
 
 const Chat = () => {
   // Constants
@@ -72,22 +79,21 @@ const Chat = () => {
   const [response, setResponse] = useState<string>("");
 
   // Active state
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(true);
+  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
-  const [trainingDataRetrieved, setTrainingDataRetrieved] =
+  const [showModelAssessment, setShowModelAssessment] =
     useState<boolean>(false);
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
-  const [activeOnDiscord, setActiveOnDiscord] = useState<number>(0);
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const { messages: savedMessages }: any = messageStore();
-  const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
   const { colorMode } = useColorMode();
-  const { user, session, stripe_customer_id, fetch, signOut }: any =
+  const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
+  const { user, session, stripe_customer_id, signOut, status, credits }: any =
     authStore();
+
+  // Handles responses, sending prompt, reloading and input.
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
     initialMessages: initialMessages,
     onFinish: (data: any) => {
@@ -103,13 +109,44 @@ const Chat = () => {
         user?.email
       );
 
+      hasBeenReset && setHasBeenReset(false);
+      setFailMessage("");
+      setPrompt("");
+      setLoading(false);
       savePrompt(user?.email, prompt, data.content, usage);
+      setResponse(data.content);
     },
   });
 
+  if (status?.isBanned) {
+    return (
+      <Template>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          mt={5}
+          h="100vh"
+          w="100vw"
+        >
+          <BiConfused />
+          <Text ml={3}>
+            Oops, something went wrong! Please get in touch with the team via
+            Discord.
+          </Text>
+        </Flex>
+      </Template>
+    );
+  }
+
   useEffect(() => {
-    // Train models on load
-    trainModels(session, user);
+    // Get all models
+    getModels(
+      (data: any) => {
+        setModels(data);
+      },
+      () => { },
+      user?.email
+    );
 
     // Get the users last used repo
     const lastUsedRepo = Cookies.get("recentlyUsedRepoKey");
@@ -117,26 +154,7 @@ const Chat = () => {
       const lastUsedRepoObject = JSON.parse(lastUsedRepo);
       setRepo(lastUsedRepoObject);
     }
-  }, []);
 
-  const getDiscordOnline = async () => {
-    try {
-      const response = await fetch(
-        "https://discord.com/api/guilds/931533612313112617/widget.json"
-      );
-
-      const json = await response.json();
-      return json.presence_count;
-    } catch (error) {
-      console.log(error);
-
-      // Handle errors here
-      console.error("Error fetching Discord data:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
     if (!session?.provider_token) {
       signOut();
       router.push("/", undefined, { shallow: true });
@@ -151,21 +169,9 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    // Get all models
-    getModels(
-      (data: any) => {
-        setModels(data);
-      },
-      () => { },
-      user?.email
-    );
-  }, []);
-
-  useEffect(() => {
     if (initialMessages.length !== 0) return;
 
     // Update the model to the newest selected one
-    const model = models?.find((model: any) => model?.repo === repo?.repo);
 
     if (model?.output) {
       setInitialMessages(JSON.parse(model?.output));
@@ -179,14 +185,6 @@ const Chat = () => {
     });
   }, [repo, models]);
 
-  // This logic breaks down the prompt to find @'d files
-  const regex = /@([^ ]+)/g;
-  const withAt: any = [];
-  let match: any;
-  while ((match = regex.exec(prompt))) {
-    withAt.push(match[1]);
-  }
-
   useEffect(() => {
     setLoading(false);
   }, [messages]);
@@ -196,6 +194,14 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
+  // This logic breaks down the prompt to find @'d files
+  const regex = /@([^ ]+)/g;
+  const withAt: any = [];
+  let match: any;
+  while ((match = regex.exec(prompt))) {
+    withAt.push(match[1]);
+  }
+
   // Get the current file being targeted with @
   const selectedFile = lofaf?.filter((file: any) => {
     if (file?.toLowerCase()?.includes(withAt?.[0]?.toLowerCase())) {
@@ -204,14 +210,19 @@ const Chat = () => {
   });
 
   // If the user clicks tab, we want to autocomplete the file name
-  const handleKeyDown = (file: any) => {
+  const handleUseTabSuggestion = (file: any) => {
+    if (!file) {
+      setFailMessage(`Couldn't find a file containing ${withAt?.[0]}`);
+      return null;
+    }
     // Append currentSuggestion to prompt
     const promptArray = prompt.split(" ");
     const lastWord = promptArray[promptArray?.length - 1];
-    const newPrompt = prompt.replace(lastWord, `~${file}`);
+    const newPrompt = prompt.replace(lastWord, `~/${file}`);
 
     // Set prompts
     setPrompt(newPrompt);
+    setFailMessage("");
 
     // Refocus on input
     const input = document.getElementById("message");
@@ -266,15 +277,6 @@ const Chat = () => {
 
     const tokensInString = await getTokensFromString(modifiedPrompt);
     const tokenLimit = await getTokenLimit(user.email);
-    const isPro = await checkIfPro(user.email);
-
-    if (!isPro && promptCount > 16) {
-      setLoading(false);
-      setFailMessage(
-        "You have reached your prompt limit for today, upgrade or check back tomorrow!"
-      );
-      return false;
-    }
 
     if (tokensInString > tokenLimit) {
       setLoading(false);
@@ -286,52 +288,100 @@ const Chat = () => {
     return true;
   };
 
+  const model = models?.find((model: any) => model?.repo === repo?.repo);
+
+  if (!user) {
+    return (
+      <Template>
+        <Flex flexDirection='row' width='80%' height='100%' gap={2}>
+          <Skeleton bg="gray.700" height="40px" width='85%' mb={4} borderRadius={10} />
+          <Skeleton bg="gray.700" height="40px" width='15%' mb={4} borderRadius={10} />
+        </Flex>
+      </Template>
+    );
+  }
+
   return (
     <Template>
       <Flex
         direction="column"
-        overflowY="scroll"
         flex={1}
-        w="full"
+        w="80%"
+        maxW="full"
         justifyContent={"center"}
         p={5}
       >
         <Box
           rounded="lg"
-          className="overflow-hidden p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
+          className="p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="flex-start"
         >
-          <ChatHeader />
           {!repo.repo && (
-            <Link href="/platform/models">
+            <Box>
               <Button width="100%" mt={4}>
                 Train a model to get started
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
               </Text>
-            </Link>
-          )}
-          {initialMessages?.length === 0 && repo.repo ? (
-            <Text mt={4} mb={4}>
-              Your AI model is <Badge>Training</Badge>, until this is done the
-              AI won't be able to access your repos context.
-            </Text>
-          ) : (
-            <Text mt={4} mb={4}>
-              Your trained AI model is{" "}
-              <Badge colorScheme="teal">READY FOR PROMPTING</Badge>
-            </Text>
+            </Box>
           )}
           {repo.repo && (
-            <Box maxH={"45vh"} overflowY={"auto"}>
+            <Box>
+              {status?.isOverdue ||
+                (credits < 0 && (
+                  <Flex flexDirection="column" mt={4}>
+                    <Text>
+                      Before you continue prompting, we need to get your billing
+                      in order!
+                    </Text>
+                    <Text mb={3} fontSize={14} color="gray.600">
+                      You're accounts billing is currently overdue, so before
+                      you continue we'll need to help you set up billing
+                      correctly. You can continue using DevGPT and prompting
+                      with your trained models immediately after this.
+                    </Text>
+                    {/* <Button
+                      bgGradient={"linear(to-r, blue.500, teal.500)"}
+                      onClick={() => {
+                        router.push("/platform/billing");
+                      }}
+                      width="100%"
+                      mb={3}
+                    >
+                      <Text color="white" mr={2}>
+                        Upgrade
+                      </Text>
+                      <BiUpArrowAlt color="white" />
+                    </Button> */}
+                    <Flex flexDirection="row" gap={2}>
+                      <Button
+                        width="100%"
+                        bgGradient={"linear(to-r, blue.500, teal.500)"}
+                        onClick={() => {
+                          router.push("/platform/billing");
+                        }}
+                      >
+                        <Text mr={2}>View Billing</Text>
+                        <AiFillCreditCard />
+                      </Button>
+                      <Link href="mailto:support@devgpt.com">
+                        <Button>
+                          <Text mr={2}>Email Support</Text>
+                          <EmailIcon />
+                        </Button>
+                      </Link>
+                    </Flex>
+                  </Flex>
+                ))}
+              <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>
                   <Text ml={1}> to accept suggestion</Text>
                 </Flex>
               )}
-              <Flex flexDirection="row" flexWrap="wrap">
+              <Flex flexDirection="row" flexWrap="wrap" mb={2}>
                 <SlideFade key={match} in={selectedFile?.[0] ? true : false}>
                   {selectedFile?.map((file: any, index: any) => {
                     if (index > 12) return null;
@@ -341,7 +391,7 @@ const Chat = () => {
                         mb={1}
                         key={file}
                         cursor="pointer"
-                        onClick={() => handleKeyDown(file)}
+                        onClick={() => handleUseTabSuggestion(file)}
                       >
                         {file}
                       </Tag>
@@ -349,10 +399,37 @@ const Chat = () => {
                   })}
                 </SlideFade>
               </Flex>
-              {loading && !messages[messages.length - 1] ? (
+
+              <PromptAreaAndButton
+                prompt={prompt}
+                selectedFile={selectedFile}
+                loading={loading}
+                setLoading={setLoading}
+                handleUseTabSuggestion={handleUseTabSuggestion}
+                setPrompt={setPrompt}
+                handleInputChange={handleInputChange}
+                submitChecks={submitChecks}
+                setHasBeenReset={setHasBeenReset}
+                handleSubmit={handleSubmit}
+              />
+
+              {failMessage && (
+                <Text mb={3} mt={2} fontSize={14}>
+                  {failMessage}
+                </Text>
+              )}
+
+              {previousPrompt && (
+                <SlideFade in={hasSentAMessage}>
+                  <Text mb={3} color="gray" fontSize={12} mt={1}>
+                    {previousPrompt}
+                  </Text>
+                </SlideFade>
+              )}
+
+              {loading ? (
                 <SkeletonText
-                  mb={2}
-                  mt={4}
+                  mb={4}
                   noOfLines={4}
                   spacing={4}
                   skeletonHeight="2"
@@ -364,168 +441,141 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              <Flex flexDirection="row" mt={4}>
-                <Input
-                  className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2 dark:text-black"
-                  value={prompt}
-                  placeholder="Enter your task, e.g. Create a login page, or use @ to select a file from your repo."
-                  onChange={(e: any) => {
-                    setPrompt(e.target.value);
-                    handleInputChange(e);
-                  }}
-                  onKeyDown={async (e: any) => {
-                    if (prompt.length < 3) {
-                      return;
-                    }
+              {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
+                <Box mt={4}>
+                  <Flex
+                    flexDirection="row"
+                    gap={2}
+                    alignItems="center"
+                    justifyContent="flex-start"
+                  >
+                    <Flex flexDirection="row" alignItems="center">
+                      <BiSolidBrain />
+                      <Text ml={1} mr={2}>
+                        Model Empirical Assessment
+                      </Text>
+                      <Switch
+                        id="isChecked"
+                        isChecked={showModelAssessment}
+                        onChange={() =>
+                          setShowModelAssessment(!showModelAssessment)
+                        }
+                      />
+                    </Flex>
+                  </Flex>
+                </Box>
+              )}
 
-                    if (loading) return;
-
-                    // If key equals tab, autocomplete
-                    if (e.key === "Tab") {
-                      e.preventDefault();
-                      handleKeyDown(selectedFile[0]);
-                      return;
-                    }
-
-                    // If key equals enter, submit
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      const checks = await submitChecks(false);
-                      if (!checks) return null;
-                      setHasBeenReset(false);
-                      handleSubmit(e);
-                    }
-                  }}
-                />
-                <Button
-                  bgGradient={"linear(to-r, blue.500, teal.500)"}
-                  isDisabled={loading}
-                  color="white"
-                  ml={4}
-                  width="10rem"
-                  onClick={async (e: any) => {
-                    setLoading(true);
-                    const checks = await submitChecks(false);
-                    if (!checks) {
-                      console.log("checks failed, stopping");
-                      return null;
-                    }
-                    setHasBeenReset(false);
-                    handleSubmit(e);
-                  }}
-                >
-                  {loading ? <Spinner size="sm" /> : "Submit"}
-                </Button>
-              </Flex>
-              <Flex mb={3}>
-                <Text mt={2} fontSize={14}>
-                  {failMessage}
-                </Text>
-                <SlideFade in={hasSentAMessage} offsetY="20px">
-                  <Text color="gray" fontSize={12} mt={1}>
-                    {previousPrompt}
+              {showModelAssessment && (
+                <>
+                  <Text
+                    fontSize="sm"
+                    mb={3}
+                    color={colorMode === "light" ? "#CBD5E0" : "gray"}
+                  >
+                    Hover over each one to learn more.
                   </Text>
-                </SlideFade>
-              </Flex>
+                  <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                    <ModelStat
+                      label="Training Size Target"
+                      number={model?.sample_size > 0 ? model?.sample_size : 0}
+                      tip={moment(Date.now()).format("MMMM Do YYYY")}
+                      tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
+                    />
+                    <ModelStat
+                      label="Actual Sample Size"
+                      number={
+                        (initialMessages.length - 1) / 2 > 0
+                          ? (initialMessages.length - 1) / 2
+                          : 0
+                      }
+                      tip={moment(Date.now()).format("MMMM Do YYYY")}
+                      tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
+                    />
+                    <ModelStat
+                      label="Training Accuracy"
+                      number={`${(
+                        ((initialMessages.length - 1) /
+                          2 /
+                          model?.sample_size) *
+                        100
+                      ).toFixed(2)}%`}
+                      tip={
+                        ((initialMessages.length - 1) /
+                          2 /
+                          model?.sample_size) *
+                          100 <
+                          60
+                          ? "Below 60% accuracy, we recommend retraining"
+                          : moment(Date.now()).format("MMMM Do YYYY")
+                      }
+                      tooltip="This represents the accuracy of your trained model based on the files used for training. A higher accuracy indicates better performance, but remember, real-world scenarios might vary. Use this as an initial metric to gauge your model's effectiveness."
+                    />
+                  </Grid>
+                </>
+              )}
             </Box>
           )}
 
-          {!loading &&
-            messages[messages.length - 1] &&
-            !initialMessages?.find(
-              (message: any) =>
-                message?.content === messages[messages.length - 1]?.content
-            ) && (
-              <Flex
-                width="100%"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                mt={2}
-              >
-                <RateConversation />
-                <Text mx={4}>or</Text>
-                <Button
-                  px={4}
-                  _hover={{
-                    bg: "gray.400",
-                    color: "white",
-                  }}
-                  alignSelf="center"
-                  rounded="full"
-                  onClick={() => {
-                    setHasBeenReset(true);
-                    setLoading(false);
-                    setResponse("");
-                    setFailMessage("");
-                  }}
-                >
-                  Start A New Chat
-                </Button>
-                {/* <Button
-                px={4}
-                _hover={{
-                  bg: colorMode === "light" ? "gray.300" : "black",
-                }}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                alignSelf="center"
-                rounded="full"
-                onClick={() => {
-                  reload();
-                  setLoading(true)
-                }}
-              >
-                Re-run Prompt
-              </Button> */}
-              </Flex>
-            )}
-        </Box>
-        {/* <Science
-          models={models}
-        /> */}
-        <Profile />
-        <Flex mt={2} gap={2}>
-          <Tooltip label="Join Discord" placement="top">
-            <Link href="https://discord.com/invite/6GFtwzuvtw">
+          {response && !hasBeenReset && (
+            <Flex
+              width="100%"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              gap={2}
+              my={2}
+            >
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
                 aria-label="Join Discord"
+                onClick={() => {
+                  setHasBeenReset(true);
+                  setLoading(false);
+                  setResponse("");
+                  setFailMessage("");
+                }}
                 icon={
                   <Flex flexDirection="row" px={3}>
-                    <BsDiscord />
+                    <PlusSquareIcon />
                     <Text ml={2} fontSize={14}>
                       {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                      Join
+                      New
                     </Text>
                   </Flex>
                 }
               />
-            </Link>
-          </Tooltip>
-          <Tooltip label="Github Stars" placement="top">
-            <Link href="https://github.com/devgpt-labs/devgpt-releases">
               <IconButton
                 _hover={{
                   transform: "translateY(-4px)",
                   transition: "all 0.2s ease-in-out",
                 }}
-                aria-label="Github Stars"
+                onClick={() => {
+                  reload();
+                  setLoading(true);
+                }}
+                aria-label="Join Discord"
                 icon={
                   <Flex flexDirection="row" px={3}>
-                    <BsGithub />
-                    <BsStars />
+                    <BiRefresh />
                     <Text ml={2} fontSize={14}>
-                      339
+                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                      Regenerate
                     </Text>
                   </Flex>
                 }
               />
-            </Link>
-          </Tooltip>
-        </Flex>
+            </Flex>
+          )}
+        </Box>
+        {/* <>
+          {status?.isOverdue || credits < 0 ? null : (
+            <Feedback models={models} response={response} messages={messages} />
+          )}
+        </> */}
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}
@@ -567,3 +617,29 @@ const Chat = () => {
 };
 
 export default Chat;
+
+const ModelStat = ({ label, number, tip, tooltip }: any) => {
+  const { colorMode } = useColorMode();
+
+  return (
+    <Stat
+      border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
+      p={4}
+      borderRadius={10}
+    >
+      <Tooltip label={tooltip} placement="bottom">
+        <Flex flexDirection="row" alignItems="center" gap={1}>
+          <StatLabel>{label}</StatLabel>
+          <RiInformationFill />
+        </Flex>
+      </Tooltip>
+
+      <>
+        <StatNumber>{number}</StatNumber>
+        <StatHelpText fontSize={14} color="gray">
+          {tip}
+        </StatHelpText>
+      </>
+    </Stat>
+  );
+};

@@ -11,6 +11,7 @@ const useStore = create((set) => ({
 	monthly_budget: null,
 	credits: null,
 	isPro: false,
+	status: null,
 	setCredits: (credits: number) => set({ credits }),
 	signOut: () => {
 		supabase?.auth.signOut();
@@ -64,6 +65,8 @@ const useStore = create((set) => ({
 			stripe_customer_id: customerData[0]?.stripe_customer_id,
 			monthly_budget: customerData[0]?.monthly_budget,
 			credits: customerData[0]?.credits,
+			status: customerData[0]?.status,
+			customer: customerData[0],
 		});
 	},
 }));

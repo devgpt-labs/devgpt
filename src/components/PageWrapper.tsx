@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Tag, Text, Flex, useColorMode } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-
-//auth store
-import useStore from "@/store/Auth";
+import React from "react";
+import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
+import Profile from "@/components/repos/Profile";
+import AppHeader from "@/pages/platform/agent/AppHeader";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();
@@ -20,34 +18,18 @@ const Home = ({ children }: any) => {
         flexDirection="column"
         bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
         width="100vw"
-        height="100vh"
-        overflowY="scroll"
+        minH="100vh"
       >
-        <Tag
-          p={2}
-          py={3}
-          colorScheme="blue"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="row"
-          gap={3}
-          color="white"
-        >
-          <Text>
-            DevGPT is now accessible via the web! 🎉 Improved desktop app coming
-            soon.
-          </Text>
-        </Tag>
-
+        <AppHeader />
         <Flex
-          // mx={20}
-          height="95vh"
+          minH='78vh'
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
           {children}
         </Flex>
+        <Profile />
       </Flex>
     </Flex>
   );

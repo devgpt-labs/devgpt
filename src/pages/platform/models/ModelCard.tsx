@@ -34,8 +34,13 @@ import Cookies from "js-cookie";
 
 //stores
 import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
+
+//components
+import ModelInTraining from "@/pages/platform/models/ModelInTraining";
 import Setup from "@/components/repos/Setup";
+import setFulfilledBackToFalseForTrainingLog from "@/utils/setFulfilledBackToFalseForTrainingLog";
 
 //utils
 import moment from "moment";
@@ -44,22 +49,102 @@ import moment from "moment";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
+import { BiRefresh } from "react-icons/bi";
+import { MdRefresh } from "react-icons/md";
+import addTrainingLog from "@/utils/addTrainingLog";
+import createModelID from "@/utils/createModelID";
+import trainModel from "@/utils/trainModel";
 
 const ModelCard = ({
+  trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
 }: {
+  trainingLogs: any;
   model: any;
   modelsInTraining: any;
   setModelsInTraining: any;
 }) => {
-  const { repoWindowOpen, setRepoWindowOpen, repo, setRepo }: any = repoStore();
-  const [deletingAModel, setDeletingAModel] = useState<boolean>(false);
+  const { session, user }: any = authStore();
+  const { repo, setRepo }: any = repoStore();
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+  const {
+    isOpen: isRetrainOpen,
+    onOpen: onRetrainOpen,
+    onClose: onRetrainClose,
+  } = useDisclosure();
+  const [deletingModel, setDeletingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
-  const { colorMode } = useColorMode();
+  const [isTraining, setIsTraining] = useState<boolean>(false);
+  const [isErrored, setIsErrored] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const retrainModel = async () => {
+    setIsTraining(true);
+    setIsErrored(false);
+
+    // if training log fulfilled is false, don't do anything
+    // if output.length < 2, don't do anything
+    if (
+      !trainingLogs.filter((t: any) => t.model_id === model.id)[0]
+        ?.fulfilled === false ||
+      JSON.parse(model.output)?.length > 2
+    ) {
+      await addTrainingLog(model);
+    }
+
+    // Set this model to actively train
+    const trainingOutput = await trainModel(model, session, user);
+
+    //validate the output
+    if (trainingOutput?.length) {
+      handleModelInTrainingChange({
+        target: {
+          name: "output",
+          value: JSON.stringify(trainingOutput),
+        },
+      });
+
+      setIsErrored(false);
+      setIsTraining(false);
+    } else {
+      setIsErrored(true);
+      setIsTraining(false);
+    }
+  };
+
+  const updateModel = async () => {
+    if (!supabase) {
+      console.log("Supabase is not initialized.");
+      return;
+    }
+
+    if (!model || !model.id) {
+      console.log("Model is missing required properties.");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("models")
+      .update({
+        frequency: model.frequency,
+        sample_size: model.sample_size,
+        epochs: model.epochs,
+      })
+      .eq("id", model.id)
+      .select();
+
+    if (error) {
+      console.log("Error updating the model:", error);
+    } else {
+      console.log("Model updated successfully.");
+    }
+  };
 
   const deleteModel = async () => {
     if (!supabase) {
@@ -92,7 +177,6 @@ const ModelCard = ({
   };
 
   const saveKeyInCookies = async (repoData: any) => {
-
     const cookieName = "recentlyUsedRepoKey";
     Cookies.set(cookieName, JSON.stringify(repoData), { expires: 14 });
   };
@@ -114,49 +198,37 @@ const ModelCard = ({
     );
   };
 
-  const updateModel = async () => {
-    if (!supabase) {
-      console.log("Supabase is not initialized.");
-      return;
-    }
-
-    if (!model || !model.id) {
-      console.log("Model is missing required properties.");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("models")
-      .update({
-        frequency: model.frequency,
-        sample_size: model.sample_size,
-        epochs: model.epochs,
-      })
-      .eq("id", model.id)
-      .select();
-
-    if (error) {
-      console.log("Error updating the model:", error);
-    } else {
-      console.log("Model updated successfully.");
-    }
-  };
-
   if (!model) return null;
 
   return (
-    <>
+    <Box>
       <ConfirmationModal
         header="Delete this model?"
         body="Confirm you would like to delete this DevGPT model. This is a
               permanent action but you can always re-add a new model for the
               same repository later on."
         confirmButtonText="Delete"
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={deleteModel}
-        setLoadingState={setDeletingAModel}
-        handleModelInTrainingChange={handleModelInTrainingChange}
+        isOpen={isDeleteOpen}
+        onClose={onDeleteClose}
+        onSubmit={() => {
+          deleteModel();
+          handleModelInTrainingChange({
+            target: {
+              name: "deleted",
+              value: true,
+            },
+          });
+        }}
+      />
+      <ConfirmationModal
+        header="Retrain this model?"
+        body="Confirm you would like to retrain this model, you will not be charged if your model has failed to train."
+        confirmButtonText="Retrain"
+        isOpen={isRetrainOpen}
+        onClose={onRetrainClose}
+        onSubmit={() => {
+          retrainModel();
+        }}
       />
       <Card rounded="lg" flexDirection="row">
         <CardBody>
@@ -169,14 +241,15 @@ const ModelCard = ({
                 <Flex flexDirection={"row"} gap={2}>
                   <Tooltip label="Delete Model">
                     <IconButton
+                      size="sm"
                       onClick={() => {
-                        onOpen();
-                        setDeletingAModel(model.repo);
+                        onDeleteOpen();
+                        setDeletingModel(model.repo);
                       }}
                       aria-label="Delete Model"
                       icon={
-                        deletingAModel === model.repo ? (
-                          <Spinner />
+                        deletingModel === model.repo ? (
+                          <Spinner size="sm" />
                         ) : (
                           <DeleteIcon />
                         )
@@ -185,13 +258,26 @@ const ModelCard = ({
                   </Tooltip>
                   <Tooltip label="Edit Model">
                     <IconButton
+                      size="sm"
                       onClick={() => setShow(!show)}
                       aria-label="Edit Model"
                       icon={<EditIcon />}
                     />
                   </Tooltip>
+                  <Tooltip label="Train Model">
+                    <IconButton
+                      isDisabled={isTraining}
+                      size="sm"
+                      onClick={() => {
+                        onRetrainOpen();
+                      }}
+                      aria-label="Train Model"
+                      icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
+                    />
+                  </Tooltip>
                   <Tooltip label="Select Model">
                     <IconButton
+                      size="sm"
                       onClick={() => {
                         // Save this in cookies, and replace it each time it's clicked using js-cookie
                         saveKeyInCookies({
@@ -216,22 +302,47 @@ const ModelCard = ({
                   </Tooltip>
                 </Flex>
               </Flex>
-              <Flex flexDirection="column" gap={1} mb={3}>
+              <Flex flexDirection="column" gap={1} mb={1}>
                 <Badge
                   colorScheme={
-                    model.deleted ? "red" : !model.output ? "orange" : "teal"
+                    model.deleted
+                      ? "red"
+                      : isTraining
+                      ? "blue"
+                      : isErrored
+                      ? "orange"
+                      : !JSON.parse(model.output) ||
+                        JSON.parse(model.output)?.length < 2
+                      ? "orange"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
                   Status:{" "}
                   {model.deleted
                     ? "Deleted"
-                    : !model.output
-                      ? "Queued"
-                      : "Ready for use"}
+                    : isTraining
+                    ? "Training"
+                    : isErrored
+                    ? "Training Failed"
+                    : !JSON.parse(model.output) ||
+                      JSON.parse(model.output)?.length < 2
+                    ? "Untrained"
+                    : "Trained"}
                 </Badge>
+                {isErrored && (
+                  <Text fontSize={14}>
+                    We're sorry this model has failed training. LLM's can be
+                    tempermental, please try again. You will not be charged.
+                  </Text>
+                )}
+                {isTraining && (
+                  <Text fontSize={14}>
+                    During training, avoid leaving the models page as this may
+                    cause the training to fail.
+                  </Text>
+                )}
               </Flex>
-
               <Text fontSize={14}>
                 {model.owner} - {model.branch}
               </Text>
@@ -258,6 +369,7 @@ const ModelCard = ({
               </Grid>
             </Box>
           </Stack>
+          <Box mt={5}>{isTraining && <ModelInTraining model={model} />}</Box>
           {show && (
             <Flex flexDirection="column" mt={4}>
               <Setup
@@ -265,6 +377,7 @@ const ModelCard = ({
                 trainingMethod={model.training_method}
                 sampleSize={model.sample_size}
                 frequency={model.frequency}
+                branch={model.branch}
                 epochs={model.epochs}
                 setSampleSize={(e: any) => {
                   handleModelInTrainingChange({
@@ -290,13 +403,21 @@ const ModelCard = ({
                     },
                   });
                 }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
                 <Button
                   width="100%"
                   bgGradient="linear(to-r, blue.500,teal.500)"
-                  color='white'
+                  color="white"
                   onClick={() => {
                     updateModel();
                     setSavedChanges(true);
@@ -309,7 +430,7 @@ const ModelCard = ({
           )}
         </CardBody>
       </Card>
-    </>
+    </Box>
   );
 };
 

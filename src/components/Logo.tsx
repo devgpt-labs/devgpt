@@ -9,9 +9,9 @@ const Logo = () => {
   return (
     <Image
       src={colorMode === "dark" ? devgpt.src : devgptdark.src}
-      maxH="25px"
+      maxH="35px"
       bgClip="text"
-      alt="Astro says hi!"
+      alt="DevGPT Logo"
     />
   );
 };

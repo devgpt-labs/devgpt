@@ -1,16 +1,19 @@
-import React, { } from "react";
+import React from "react";
 import {
   Text,
   Divider,
   Flex,
   Box,
   Badge,
+  Input,
+  Tooltip,
 } from "@chakra-ui/react";
 import { PhoneIcon } from "@chakra-ui/icons";
 import { FaCrown } from "react-icons/fa";
 import { MdLabel } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
 import SliderInput from "./SliderInput";
+import { IoMdInformationCircle } from "react-icons/io";
 
 //stores
 import calculateTotalCost from "@/utils/calculateTotalCost";
@@ -33,7 +36,7 @@ const Setup = ({
     <>
       <Box
         width="100%"
-        border="1px solid lightgray"
+        border="solid 1px #3d4757"
         rounded="lg"
         p={4}
         mb={2}
@@ -74,8 +77,8 @@ const Setup = ({
       </Box>
       <Flex gap={2} flexDirection="column">
         <SliderInput
-          label="Train on"
-          increment={5}
+          label="Sample Size:"
+          increment={3}
           max={100}
           min={5}
           Icon={PhoneIcon}
@@ -84,8 +87,8 @@ const Setup = ({
           onChange={(e: any) => setSampleSize(e)}
         />
         <SliderInput
-          label="Frequency"
-          increment={10}
+          label="Cycles Frequency:"
+          increment={1}
           max={300}
           min={1}
           Icon={PhoneIcon}
@@ -95,7 +98,7 @@ const Setup = ({
         />
         <SliderInput
           isDisabled={true}
-          label="Run Epochs"
+          label="Run Epochs:"
           increment={1}
           max={5}
           min={2}
@@ -104,6 +107,19 @@ const Setup = ({
           value={1}
           onChange={(e: any) => setEpochs(e)}
         />
+        <>
+          <Tooltip
+            placement="left"
+            label="Coming Soon: Branches will allow you to train on different branches of your repo. This is useful if you have a development branch that you want to train on, that is not your main branch."
+          >
+            <Flex flexDirection="row" alignItems="center" gap={2}>
+              <Text fontSize={14}>Branch name</Text>
+              <Badge>main</Badge>
+              <IoMdInformationCircle />
+            </Flex>
+          </Tooltip>
+          <Input placeholder="main" size="sm" isDisabled={true} />
+        </>
       </Flex>
     </>
   );
