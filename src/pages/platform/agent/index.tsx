@@ -79,6 +79,8 @@ const Chat = () => {
   const [response, setResponse] = useState<string>("");
 
   // Active state
+  const [activeModelFilesTrained, setActiveModelFilesTrained] =
+    useState<number>(0);
   const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [showModelAssessment, setShowModelAssessment] =
@@ -118,7 +120,7 @@ const Chat = () => {
     },
   });
 
-  const MAX_MESSAGES = 6; //todo - this should come from training status
+  const MAX_MESSAGES = 7; //todo - this should come from training status
 
   if (status?.isBanned) {
     return (
@@ -177,6 +179,7 @@ const Chat = () => {
 
     if (model?.output) {
       setInitialMessages(JSON.parse(model?.output).slice(0, MAX_MESSAGES));
+      setActiveModelFilesTrained((JSON.parse(model?.output).length - 1) / 2);
     }
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
@@ -508,8 +511,8 @@ const Chat = () => {
                     <ModelStat
                       label="Actual Sample Size"
                       number={
-                        (initialMessages.length - 1) / 2 > 0
-                          ? (initialMessages.length - 1) / 2
+                        activeModelFilesTrained > 0
+                          ? activeModelFilesTrained
                           : 0
                       }
                       tip={moment(Date.now()).format("MMMM Do YYYY")}
