@@ -1,7 +1,7 @@
 import React from "react";
 import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
 import Profile from "@/components/repos/Profile";
-import ChatHeader from "@/pages/platform/agent/ChatHeader";
+import AppHeader from "@/pages/platform/agent/AppHeader";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();
@@ -20,9 +20,9 @@ const Home = ({ children }: any) => {
         width="100vw"
         minH="100vh"
       >
-        <ChatHeader />
+        <AppHeader />
         <Flex
-          minH='80vh'
+          minH='78vh'
           flexDirection="column"
           alignItems="center"
           justifyContent="center"

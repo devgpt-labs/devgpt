@@ -74,7 +74,7 @@ const Models = () => {
           (log: any) =>
             log.fulfilled === false &&
             log.model_id ===
-              createModelID(model.repo, model.owner, model.branch)
+            createModelID(model.repo, model.owner, model.branch)
         ).length > 0
       ) {
         return true;
@@ -160,7 +160,7 @@ const Models = () => {
     }
   }, [session, user]);
 
-  if (loading) return <ModelLoadingScreen />;
+  if (loading || !user) return <ModelLoadingScreen />;
   if (modelsInTraining.length === 0) return <AddAModel />;
 
   return (

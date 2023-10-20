@@ -25,25 +25,29 @@ const ChatHeader = () => {
     >
       <Flex flexDirection={"row"}>
         <Logo />
-        <Tag ml={2} colorScheme="purple">
+        <Tag ml={3} colorScheme="purple" color='white'>
           Open Beta {version}
         </Tag>
       </Flex>
-      <Flex flexDirection='row' gap={2}>
+      <Flex flexDirection="row" gap={2}>
         <Tag
-          colorScheme="blue"
+          colorScheme="purple"
           alignItems="center"
           justifyContent="center"
           flexDirection="row"
           ml={2}
+          gap={2}
           color="white"
-
         >
-          <Text>Desktop app returning soon. 🎉</Text>
+          <Text>Desktop app returning soon</Text>
+          <Text>🎉</Text>
         </Tag>
-        <Text>{repo.repo && <Tag>{repo.repo}</Tag>}</Text>
+        {repo.repo && (
+          <Tag color="white" colorScheme="purple">
+            {repo.repo}
+          </Tag>
+        )}
       </Flex>
-
     </Flex>
   );
 };

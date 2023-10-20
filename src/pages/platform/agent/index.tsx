@@ -22,6 +22,7 @@ import {
   Alert,
   AlertIcon,
   Fade,
+  Skeleton,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -288,6 +289,17 @@ const Chat = () => {
   };
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
+
+  if (!user) {
+    return (
+      <Template>
+        <Flex flexDirection='row' width='80%' height='100%' gap={2}>
+          <Skeleton bg="gray.700" height="40px" width='85%' mb={4} borderRadius={10} />
+          <Skeleton bg="gray.700" height="40px" width='15%' mb={4} borderRadius={10} />
+        </Flex>
+      </Template>
+    );
+  }
 
   return (
     <Template>

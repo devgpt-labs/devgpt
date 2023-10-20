@@ -208,7 +208,7 @@ const Models = ({ onClose }: any) => {
     );
   };
 
-  if (loading || budget === null) {
+  if (loading || budget === null || !user) {
     return (
       <Template>
         <Box p={6} width="100vw" height="100vh">
