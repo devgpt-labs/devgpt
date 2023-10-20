@@ -121,6 +121,7 @@ const Profile = () => {
 
   const getCredits = async (emailAddress: string) => {
     if (!supabase) return;
+    if (!emailAddress) return;
 
     const { data, error } = await supabase
       .from("customers")
