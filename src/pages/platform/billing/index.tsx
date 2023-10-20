@@ -165,9 +165,6 @@ const Models = ({ onClose }: any) => {
       console.log(error);
       return;
     }
-    if (data) {
-      console.log("new budget saved");
-    }
   };
 
   useEffect(() => {

@@ -200,9 +200,6 @@ const ModelCard = ({
 
   if (!model) return null;
 
-  console.log(model.output);
-  console.log(isErrored);
-
   return (
     <Box>
       <ConfirmationModal
