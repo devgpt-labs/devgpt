@@ -14,20 +14,13 @@ import {
 } from "@chakra-ui/react";
 import createModelID from "@/utils/createModelID";
 
-const ModelInTraining = ({ model, trainingLogs }: any) => {
+const ModelInTraining = ({ model }: any) => {
   const { colorMode } = useColorMode();
   const [sliderValue, setSliderValue] = useState(0);
 
+  console.log({ model });
+
   const { output, frequency, owner, repo, branch }: any = model;
-
-  // Check training logs to see if one with this model_id exists, with fulfilled false
-  const trainingLog = trainingLogs.filter((log: any) => {
-    if (log.model_id === createModelID(model.repo, model.owner, model.branch)) {
-      return log;
-    }
-  });
-
-  // If the training log doesn't include true, then we don't need to render this component
 
   useInterval(() => {
     // update the slider over a course of 150 seconds
@@ -41,7 +34,6 @@ const ModelInTraining = ({ model, trainingLogs }: any) => {
   }, 500); // 500 milliseconds
 
   if (!model) return null;
-  if (trainingLog.length === 0) return null;
 
   return (
     <Box

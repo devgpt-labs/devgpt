@@ -18,7 +18,6 @@ const ConfirmationModal = ({
   isOpen,
   onClose,
   onSubmit,
-  setLoadingState,
 }: {
   header: string;
   body: string;
@@ -26,7 +25,6 @@ const ConfirmationModal = ({
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  setLoadingState: (value: boolean) => void;
 }) => {
   return (
     <Modal
@@ -34,7 +32,6 @@ const ConfirmationModal = ({
       isOpen={isOpen}
       onClose={() => {
         onClose();
-        setLoadingState(false);
       }}
     >
       <ModalOverlay />
@@ -51,7 +48,6 @@ const ConfirmationModal = ({
             mr={3}
             onClick={() => {
               onClose();
-              setLoadingState(false);
             }}
           >
             Close
@@ -59,7 +55,6 @@ const ConfirmationModal = ({
           <Button
             onClick={() => {
               onSubmit();
-              setLoadingState(false);
               onClose();
             }}
             color="white"

@@ -39,15 +39,9 @@ import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 import createModelID from "@/utils/createModelID";
 
 const Models = () => {
-  const {
-    session,
-    user,
-    stripe_customer_id,
-    credits,
-    status,
-  }: any = authStore();
+  const { session, user, stripe_customer_id, credits, status }: any =
+    authStore();
   const router = useRouter();
-
 
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
@@ -56,7 +50,6 @@ const Models = () => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [someModelsAreTraining, setSomeModelsAreTraining] =
     useState<boolean>(false);
-  const [isTraining, setIsTraining] = useState<boolean>(false);
 
   interface Model {
     id: string;
@@ -78,7 +71,10 @@ const Models = () => {
 
       if (
         trainingLogs.filter(
-          (log: any) => log.fulfilled === false && log.model_id === createModelID(model.repo, model.owner, model.branch)
+          (log: any) =>
+            log.fulfilled === false &&
+            log.model_id ===
+              createModelID(model.repo, model.owner, model.branch)
         ).length > 0
       ) {
         return true;
@@ -138,7 +134,6 @@ const Models = () => {
           });
 
           setTrainingLogs(newTrainingLogs);
-
         }
       )
       .subscribe();
@@ -170,7 +165,6 @@ const Models = () => {
 
   return (
     <Template>
-
       <Flex
         flex={1}
         w="full"
@@ -217,7 +211,7 @@ const Models = () => {
           </Flex>
         </Flex>
         <Accordion allowMultiple defaultIndex={[0, 1]}>
-          {someModelsAreTraining || isTraining ? (
+          {/* {someModelsAreTraining || isTraining ? (
             <AccordionItem>
               <h2>
                 <AccordionButton>
@@ -240,7 +234,7 @@ const Models = () => {
                 </Flex>
               </AccordionPanel>
             </AccordionItem>
-          ) : null}
+          ) : null} */}
           <AccordionItem>
             <h2>
               <AccordionButton>
@@ -262,8 +256,6 @@ const Models = () => {
                   {modelsInTraining.map((model: any) => {
                     return (
                       <ModelCard
-                        isTraining={isTraining}
-                        setIsTraining={setIsTraining}
                         trainingLogs={trainingLogs}
                         model={model}
                         modelsInTraining={modelsInTraining}

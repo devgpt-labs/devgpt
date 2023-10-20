@@ -36,6 +36,9 @@ import Cookies from "js-cookie";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
+
+//components
+import ModelInTraining from "@/pages/platform/models/ModelInTraining";
 import Setup from "@/components/repos/Setup";
 import setFulfilledBackToFalseForTrainingLog from "@/utils/setFulfilledBackToFalseForTrainingLog";
 
@@ -53,15 +56,11 @@ import createModelID from "@/utils/createModelID";
 import trainModel from "@/utils/trainModel";
 
 const ModelCard = ({
-  isTraining,
-  setIsTraining,
   trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
 }: {
-  isTraining: boolean;
-  setIsTraining: any;
   trainingLogs: any;
   model: any;
   modelsInTraining: any;
@@ -80,9 +79,9 @@ const ModelCard = ({
     onClose: onRetrainClose,
   } = useDisclosure();
   const [deletingModel, setDeletingModel] = useState<boolean>(false);
-  const [retrainingModel, setRetrainingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
   const [trainingFailed, setTrainingFailed] = useState<boolean>(false);
+  const [isTraining, setIsTraining] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
   // useEffect(() => {
@@ -100,21 +99,31 @@ const ModelCard = ({
   // }, [model]);
 
   const retrainModel = async () => {
+    setIsTraining(true);
+
     // Create a new training_log for this model
-    // If a training_log already exists, don't add a log
+    // If a training_log already exists with fulfilled false, don't add a log
     if (
-      trainingLogs.filter(
-        (log: any) =>
-          log.model_id === createModelID(model.repo, model.owner, model.branch)
-      ).length < 0
+      trainingLogs.filter((log: any) => {
+        return (
+          log.model_id ===
+            createModelID(model.repo, model.owner, model.branch) &&
+          log.fulfilled === false
+        );
+      }).length < 0
     ) {
       await addTrainingLog(model);
     }
 
     // Set this model to actively train
-    await trainModel(model, session, user);
+    const trainingOutput = await trainModel(model, session, user);
 
-    setIsTraining(true);
+    console.log({ trainingOutput });
+
+    //validate the output
+    if (trainingOutput?.length) {
+      setIsTraining(false);
+    }
   };
 
   const updateModel = async () => {
@@ -199,6 +208,8 @@ const ModelCard = ({
 
   if (!model) return null;
 
+  console.log({ isTraining });
+
   return (
     <Box>
       <ConfirmationModal
@@ -229,7 +240,6 @@ const ModelCard = ({
         onSubmit={() => {
           retrainModel();
         }}
-        setLoadingState={setRetrainingModel}
       />
       <Card rounded="lg" flexDirection="row">
         <CardBody>
@@ -273,11 +283,11 @@ const ModelCard = ({
                           if (
                             log.fulfilled === false &&
                             log.model_id ===
-                            createModelID(
-                              model.repo,
-                              model.owner,
-                              model.branch
-                            )
+                              createModelID(
+                                model.repo,
+                                model.owner,
+                                model.branch
+                              )
                           ) {
                             return true;
                           }
@@ -287,12 +297,9 @@ const ModelCard = ({
                       size="sm"
                       onClick={() => {
                         onRetrainOpen();
-                        setRetrainingModel(model.repo);
                       }}
                       aria-label="Train Model"
-                      icon={
-                        retrainingModel ? <Spinner size="sm" /> : <MdRefresh />
-                      }
+                      icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
                     />
                   </Tooltip>
                   <Tooltip label="Select Model">
@@ -328,23 +335,23 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : JSON.parse(model.output)?.length === 1
-                        ? "orange"
-                        : trainingLogs.filter((log: any) => {
+                      ? "orange"
+                      : trainingLogs.filter((log: any) => {
                           if (
                             log.fulfilled === false &&
                             log.model_id ===
-                            createModelID(
-                              model.repo,
-                              model.owner,
-                              model.branch
-                            )
+                              createModelID(
+                                model.repo,
+                                model.owner,
+                                model.branch
+                              )
                           ) {
                             return true;
                           }
                           return false;
                         }).length > 0
-                          ? "blue"
-                          : "teal"
+                      ? "blue"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -352,19 +359,19 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : JSON.parse(model.output)?.length === 1
-                      ? "Training Failed"
-                      : trainingLogs.filter((log: any) => {
+                    ? "Training Failed"
+                    : trainingLogs.filter((log: any) => {
                         if (
                           log.fulfilled === false &&
                           log.model_id ===
-                          createModelID(model.repo, model.owner, model.branch)
+                            createModelID(model.repo, model.owner, model.branch)
                         ) {
                           return true;
                         }
                         return false;
                       }).length > 0
-                        ? "Training"
-                        : "Trained"}
+                    ? "Training"
+                    : "Trained"}
                 </Badge>
               </Flex>
 
@@ -394,6 +401,7 @@ const ModelCard = ({
               </Grid>
             </Box>
           </Stack>
+          <Box mt={5}>{isTraining && <ModelInTraining model={model} />}</Box>
           {show && (
             <Flex flexDirection="column" mt={4}>
               <Setup
@@ -427,14 +435,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
