@@ -105,12 +105,8 @@ const ModelCard = ({
     // Set this model to actively train
     const trainingOutput = await trainModel(model, session, user);
 
-    console.log({ trainingOutput });
-
     //validate the output
     if (trainingOutput?.length) {
-      console.log("succeed");
-
       handleModelInTrainingChange({
         target: {
           name: "output",
@@ -121,8 +117,6 @@ const ModelCard = ({
       setIsErrored(false);
       setIsTraining(false);
     } else {
-      console.log("failed");
-
       setIsErrored(true);
       setIsTraining(false);
     }

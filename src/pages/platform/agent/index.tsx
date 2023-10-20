@@ -275,15 +275,6 @@ const Chat = () => {
 
     const tokensInString = await getTokensFromString(modifiedPrompt);
     const tokenLimit = await getTokenLimit(user.email);
-    const isPro = await checkIfPro(user.email);
-
-    if (!isPro && promptCount > 16) {
-      setLoading(false);
-      setFailMessage(
-        "You have reached your prompt limit for today, upgrade or check back tomorrow!"
-      );
-      return false;
-    }
 
     if (tokensInString > tokenLimit) {
       setLoading(false);
@@ -500,13 +491,17 @@ const Chat = () => {
                   <Grid templateColumns="repeat(3, 1fr)" gap={6}>
                     <ModelStat
                       label="Training Size Target"
-                      number={model?.sample_size}
+                      number={model?.sample_size > 0 ? model?.sample_size : 0}
                       tip={moment(Date.now()).format("MMMM Do YYYY")}
                       tooltip="This is the number of files you've selected for training your model. It serves as an initial target for how many files should be trained. You are only charged for the actual files that were successfully trained."
                     />
                     <ModelStat
                       label="Actual Sample Size"
-                      number={(initialMessages.length - 1) / 2}
+                      number={
+                        (initialMessages.length - 1) / 2 > 0
+                          ? (initialMessages.length - 1) / 2
+                          : 0
+                      }
                       tip={moment(Date.now()).format("MMMM Do YYYY")}
                       tooltip="This is the actual number of files that were used to train your model. This number may be less than the 'Training Size Target' due to file validation, large file size or filtering. You are only charged for the actual files that were successfully trained."
                     />
@@ -523,7 +518,7 @@ const Chat = () => {
                           2 /
                           model?.sample_size) *
                           100 <
-                          40
+                        40
                           ? "Retraining recommended"
                           : moment(Date.now()).format("MMMM Do YYYY")
                       }

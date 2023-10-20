@@ -74,7 +74,7 @@ const Models = () => {
           (log: any) =>
             log.fulfilled === false &&
             log.model_id ===
-            createModelID(model.repo, model.owner, model.branch)
+              createModelID(model.repo, model.owner, model.branch)
         ).length > 0
       ) {
         return true;
@@ -189,16 +189,15 @@ const Models = () => {
             </Heading>
           </Flex>
           <Flex gap={2}>
-            {credits < 0 || status?.isOverdue || (
-              <Button
-                onClick={() => {
-                  setRepoWindowOpen(!repoWindowOpen);
-                }}
-                rightIcon={<SmallAddIcon />}
-              >
-                Create
-              </Button>
-            )}
+            <Button
+              isDisabled={credits < 0 || status?.isOverdue}
+              onClick={() => {
+                setRepoWindowOpen(!repoWindowOpen);
+              }}
+              rightIcon={<SmallAddIcon />}
+            >
+              Create
+            </Button>
 
             <Button
               onClick={() => {

@@ -56,16 +56,17 @@ async function update(interval: string) {
     customers_with_payments_required.push({ customer, charge });
   }
 
-  for (const customer of customers_with_payments_required) {
-    await chargeCustomer(customer.customer, customer.charge, customer.email_address);
-  }
+  //todo - charge customers
+  // for (const customer of customers_with_payments_required) {
+  //   await chargeCustomer(customer.customer, customer.charge, customer.email_address);
+  // }
 
   return { customers_with_payments_required, now };
 }
 
 const calculateCharge = async (customer: any) => {
   if (!supabase) return;
-  
+
   //calculate the amount to charge this customer based on their estimated spend from models + prompts.
   const { data: modelData, error: modelError } = await supabase
     .from("models")
