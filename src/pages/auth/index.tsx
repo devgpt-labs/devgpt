@@ -57,41 +57,32 @@ const Auth = () => {
   if (loading)
     return (
       <Template>
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          mt={5}
-          h="100vh"
-          w="100vw"
-        >
+        <Flex height="100%" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
           <Text ml={3}>Just getting started...</Text>
         </Flex>
       </Template>
-
     );
 
   return (
     <>
       <Template>
-        <Box
-          w="40%"
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          width="30%"
+          height="100%"
           rounded="lg"
           overflow="hidden"
-          p={5}
           flexDirection="column"
-          boxShadow="blue"
-          border="1px solid #1a202c"
-          shadow="2xl"
         >
-          <AuthHeader />
-          <VStack spacing={2} mt={3} width="100%" alignItems="center">
+          <VStack spacing={2} width="100%" alignItems="center">
             <GitConnectorButton
               color="black"
               provider="Sign In With Github"
               handle={signInWithGithub}
               Icon={<BsGithub />}
-              tooltip=''
+              tooltip=""
             />
             <GitConnectorButton
               color="#0c61db"
@@ -103,12 +94,12 @@ const Auth = () => {
             <GitConnectorButton
               color="#FC6D27"
               provider="Sign In With GitLab"
-              handle={() => { }}
+              handle={() => {}}
               Icon={<AiFillGitlab />}
               tooltip="Coming soon!"
             />
             <Heading size="xs" mt="2">
-              New here?
+              Just getting started?
             </Heading>
             <WhatIsDevGPT />
             <AuthOption
@@ -138,7 +129,7 @@ const Auth = () => {
               </Tooltip>
             </Flex>
           </VStack>
-        </Box>
+        </Flex>
       </Template>
     </>
   );

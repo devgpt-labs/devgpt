@@ -1,67 +1,63 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Input,
   Text,
-  Divider,
   Flex,
   Drawer,
   DrawerBody,
   DrawerFooter,
   DrawerHeader,
-  DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  InputGroup,
-  InputLeftElement,
-  Tooltip,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderMark,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
-  Box,
 } from "@chakra-ui/react";
-import { PhoneIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { FaCrown } from "react-icons/fa";
-import { MdLabel } from "react-icons/md";
-import { BiGitBranch } from "react-icons/bi";
-import trainModels from "@/utils/trainModels";
+import { useRouter } from "next/router";
+
+// icons
+import { MdScience } from "react-icons/md";
+import { TiTick } from "react-icons/ti";
 
 //stores
-import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
-import useStore from "@/store/Auth";
-import messageStore from "@/store/Messages";
-import { IoMdInformationCircle } from "react-icons/io";
-import calculateTotalCost from "@/utils/calculateTotalCost";
+
+// components
 import Setup from "./Setup";
+import calculateTotalCost from "@/utils/calculateTotalCost";
 
-const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
-  const { fetch, user, session }: any = useStore();
+const RepoSetupModal = ({
+  isOpen,
+  onClose,
+  onOpen,
+  repo,
+  onSubmit,
+  estimatedPrice,
+}: any) => {
+  const router = useRouter();
+  const { session, user, monthly_budget }: any = authStore();
 
-  const [sampleSize, setSampleSize] = useState(5);
-  const [frequency, setFrequency] = useState(1);
+  const [sampleSize, setSampleSize] = useState<any>(8);
+  const [frequency, setFrequency] = useState<any>(3);
+  const [branch, setBranch] = useState<any>("main");
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
+  const [confirmation, setConfirmation] = useState(false);
   const btnRef: any = useRef();
 
+  useEffect(() => {
+    setConfirmation(false);
+  }, [isOpen]);
+
   if (!repo) return null;
+
+  const cost = calculateTotalCost(
+    [
+      {
+        frequency: frequency,
+        epochs: epochs,
+        sample_size: sampleSize,
+      },
+    ],
+    0
+  );
 
   return (
     <Drawer
@@ -71,14 +67,12 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
       onClose={onClose}
       finalFocusRef={btnRef}
     >
-      <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader maxW="90%">
-          Configure Model for repo: {repo.name}
-        </DrawerHeader>
+        <DrawerCloseButton mt={2} />
+        <DrawerHeader maxW="90%">AI Model for: {repo.name}</DrawerHeader>
         <DrawerBody>
           <Setup
+            branch={branch}
             repo={repo}
             trainingMethod={trainingMethod}
             sampleSize={sampleSize}
@@ -87,6 +81,9 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
             setSampleSize={(e: any) => {
               setSampleSize(e);
             }}
+            setBranch={(e: any) => {
+              setBranch(e);
+            }}
             setFrequency={(e: any) => {
               setFrequency(e);
             }}
@@ -94,32 +91,62 @@ const RepoSetupModal = ({ isOpen, onClose, onOpen, repo, onSubmit }: any) => {
         </DrawerBody>
 
         <DrawerFooter>
-          <Button variant="outline" mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            width="100%"
-            bgGradient={"linear(to-r, blue.500,teal.500)"}
-            color="white"
-            onClick={() => {
-              // Add new model to database
-              onSubmit({
-                ...repo,
-                sampleSize,
-                frequency,
-                epochs,
-                trainingMethod,
-              });
+          <Flex flexDirection="column">
+            {monthly_budget < Number(cost) ? (
+              <Text fontSize={14}>
+                Current training settings exceed your monthly budget. You can change your
+                budget in billing. We will block you from training this model
+                until you increase your budget incase this is an accident.
+              </Text>
+            ) : (
+              <Flex flexDirection="column" gap={2}>
+                <Text fontSize={14}>
+                  Training a model does cost, pay attention to the estimated
+                  monthly price shown above if you are going to begin training.
+                </Text>
+              </Flex>
+            )}
+            <Button
+              isDisabled={monthly_budget < Number(cost)}
+              mt={2}
+              width="100%"
+              bgGradient={"linear(to-r, blue.500,teal.500)"}
+              color="white"
+              onClick={() => {
+                if (confirmation) {
+                  // Add new model to database
+                  onSubmit({
+                    ...repo,
+                    sampleSize,
+                    frequency,
+                    epochs,
+                    trainingMethod,
+                  });
 
-              // Begin model training
-              trainModels(session, user);
+                  // Close the modal
+                  onClose();
+                  return;
+                }
 
-              // Close the modal
-              onClose();
-            }}
-          >
-            Train
-          </Button>
+                if (!confirmation) {
+                  setConfirmation(true);
+                  return;
+                }
+              }}
+            >
+              <Text mr={1}>{confirmation ? "Confirm" : "Train"}</Text>
+              {confirmation ? <TiTick /> : <MdScience />}
+            </Button>
+            {monthly_budget < Number(cost) && (
+              <Button
+                onClick={() => {
+                  router.push("/platform/billing")
+                }}
+
+                mt={2}>View Billing</Button>
+
+            )}
+          </Flex>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

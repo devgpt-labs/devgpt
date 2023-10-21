@@ -11,7 +11,7 @@ const signInWithGithub = async () => {
   await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      scopes: "repo",
+      scopes: "repo read:org",
     },
   });
 };

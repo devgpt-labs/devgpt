@@ -1,15 +1,10 @@
-import React, { useState } from "react";
-import Auth from "@/pages/auth";
-import { CloseIcon } from "@chakra-ui/icons";
+import React from "react";
 import { ChakraProvider } from "@chakra-ui/provider";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import Head from "next/head";
-import { useRouter } from "next/router";
-import useStore from "@/store/Auth";
 
 //configs
-import styles from "@/styles/Home.module.css";
 import theme from "@/configs/theme";
 
 //components

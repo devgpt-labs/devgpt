@@ -13,22 +13,29 @@ import {
   Flex,
   UnorderedList,
   ListItem,
+  useColorMode
 } from "@chakra-ui/react";
 
 import { FaUserAstronaut } from "react-icons/fa";
 
 const GitConnectorButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   return (
     <>
-      <Button onClick={onOpen} width="100%" justifyContent="space-between">
+      <Button
+        onClick={onOpen}
+        width="100%"
+        justifyContent="space-between"
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <Text fontWeight={"normal"} mr={2}>
           What is DevGPT?
         </Text>
         <FaUserAstronaut />
       </Button>
-      <Modal size='sm' isOpen={isOpen} onClose={onClose} isCentered={true}>
+      <Modal size="sm" isOpen={isOpen} onClose={onClose} isCentered={true}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>What is DevGPT?</ModalHeader>
@@ -46,14 +53,16 @@ const GitConnectorButton = () => {
                 <ListItem>Refactoring Code</ListItem>
                 <ListItem>Writing Unit Tests</ListItem>
               </UnorderedList>
-              <Link href="https://discord.com/invite/6GFtwzuvtw" cursor='pointer'>
+              <Link
+                href="https://discord.com/invite/6GFtwzuvtw"
+                cursor="pointer"
+              >
                 <Text mb={4} fontSize={14}>
                   DevGPT is updated weekly, with our sole purpose of creating a
-                  useful tool for developers and product owners. We have an active
-                  discord community for all.
+                  useful tool for developers and product owners. We have an
+                  active discord community for all.
                 </Text>
               </Link>
-
             </Flex>
           </ModalBody>
         </ModalContent>

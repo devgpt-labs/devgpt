@@ -8,8 +8,6 @@ export async function savePrompt(
   tokens: number
 ) {
 
-  console.log("savePrompt", email, prompt, response, tokens);
-  
   if (!email || !prompt || !response) {
     throw new Error("Missing required fields");
   }

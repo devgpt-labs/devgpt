@@ -93,7 +93,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   color={"white"}
                   bgGradient={"linear(to-r, blue.500, teal.500)"}
                   _hover={{
-                    bgGradient: "linear(to-r, blue.400, teal.400)",
+                    bgGradient: "linear(to-r, blue.500, teal.500)",
                   }}
                   mb={2}
                 >

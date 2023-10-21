@@ -27,75 +27,35 @@ interface Model {
   output?: string;
 }
 
-async function trainModels(session: any, user: any) {
+async function trainModel(model: any, session: any, user: any) {
   if (!supabase) {
     console.log("No supabase client found");
     return;
   }
 
-  if (!user) {
-    console.log("No user found");
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("models")
-    .select("*")
-    .eq("email_address", user.email);
-
-  if (!data) return;
-
-  // filter out models that have deleted:true
-  const filteredData = data.filter((model: any) => !model.deleted);
-
-  if (error) {
-    console.log(error);
-    return null;
-  }
-
-  const models = filteredData;
-
-  //go through each model and see if it's latest training_log has been fulfilled
-  for (const model of models) {
-    //get latest training log for this model from supabase training_log table
-    const { data: trainingLogData, error: trainingLogError } = await supabase
-      .from("training_log")
-      .select("*")
-      .eq("model_id", createModelID(model.repo, model.owner, model.branch))
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    const latest_training_log = trainingLogData?.[0];
-
-    if (!latest_training_log) {
-      console.log("No training log found, stopping.");
-      return;
-    }
-
-    //if the latest training_log has not been fulfilled, train the model
-    if (!latest_training_log.fulfilled) {
-      switch (model.training_method.toLowerCase()) {
-        case "ENCODING":
-          return await trainRepoWithEncoding(model, session, user);
-          break;
-        case "EMBEDDINGS":
-          return await trainRepoWithEmbeddings(model, session, user);
-          break;
-        default:
-          return await trainRepoWithEncoding(model, session, user);
-          break;
-      }
-    }
+  switch (model.training_method.toLowerCase()) {
+    case "encoding":
+      return await trainRepoWithEncoding(model, session, user);
+      break;
+    case "embeddings":
+      return await trainRepoWithEmbeddings(model, session, user);
+      break;
+    default:
+      return await trainRepoWithEncoding(model, session, user);
+      break;
   }
 }
 
-export default trainModels;
+export default trainModel;
 
 const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   const name = model.repo;
   const owner = model.owner;
 
-  if (!owner || !name || !session.provider_token) return;
+  if (!owner || !name || !session.provider_token) {
+    console.error("Missing owner, name, or provider_token");
+    return;
+  }
 
   // Get Lofaf
   const lofaf = await getLofaf(owner, name, session);
@@ -123,7 +83,9 @@ const trainRepoWithEncoding = async (model: Model, session: any, user: any) => {
   );
 
   setModelOutput(model, JSON.stringify(trainingData), user.email);
-  return;
+
+  //return the output
+  return JSON.stringify(trainingData);
 };
 
 const trainRepoWithEmbeddings = async (
@@ -175,6 +137,9 @@ const trainRepoWithEmbeddings = async (
   });
 
   setModelOutput(model, finetune.id, user);
+
+  //return the output
+  return finetune.id;
 };
 
 const setModelOutput = async (model: Model, output: string, user: any) => {
@@ -190,7 +155,7 @@ const setModelOutput = async (model: Model, output: string, user: any) => {
     .select();
 
   if (error) {
-    console.log('Error:', error);
+    console.log("Error:", error);
     return null;
   }
 
