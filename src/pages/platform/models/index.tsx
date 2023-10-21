@@ -14,6 +14,7 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Spinner,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import ModelCard from "./ModelCard";
@@ -65,6 +66,13 @@ const Models = () => {
     frequency: number;
   }
 
+  const handleRefreshClick = () => {
+    setRefresh(true);
+    setTimeout(() => {
+      setRefresh(false);
+    }, 3000); // 3-second debounce
+  };
+
   const findIfModelsAreTraining = async () => {
     const areModelsTraining = await modelsInTraining.map((model: any) => {
       // If any of the logs in training logs are fulfilled false, return true
@@ -74,7 +82,7 @@ const Models = () => {
           (log: any) =>
             log.fulfilled === false &&
             log.model_id ===
-            createModelID(model.repo, model.owner, model.branch)
+              createModelID(model.repo, model.owner, model.branch)
         ).length > 0
       ) {
         return true;
@@ -190,12 +198,14 @@ const Models = () => {
           </Flex>
           <Flex gap={2}>
             <Button
-              onClick={() => {
-                setRefresh(!refresh);
-              }}
-              rightIcon={<BiRefresh />}
+              onClick={handleRefreshClick}
+              rightIcon={
+                refresh ? <Spinner size="sm" color="white" /> : <BiRefresh />
+              }
+              isLoading={refresh}
+              loadingText="Refreshing..."
             >
-              Refresh
+              {refresh ? "Refreshing..." : "Refresh"}
             </Button>
             <Button
               isDisabled={credits < 0 || status?.isOverdue}
