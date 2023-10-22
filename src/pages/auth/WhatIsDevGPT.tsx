@@ -13,7 +13,7 @@ import {
   Flex,
   UnorderedList,
   ListItem,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/react";
 
 import { FaUserAstronaut } from "react-icons/fa";
@@ -56,6 +56,7 @@ const GitConnectorButton = () => {
               <Link
                 href="https://discord.com/invite/6GFtwzuvtw"
                 cursor="pointer"
+                target="_blank"
               >
                 <Text mb={4} fontSize={14}>
                   DevGPT is updated weekly, with our sole purpose of creating a
