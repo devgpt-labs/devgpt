@@ -11,7 +11,7 @@ const DiscordAndGithubButtons = () => {
   return (
     <Flex gap={2}>
       <Tooltip label="Join Discord" placement="top">
-        <Link href="https://discord.com/invite/6GFtwzuvtw">
+        <Link href="https://discord.com/invite/6GFtwzuvtw" target="_blank">
           <IconButton
             _hover={{
               transform: "translateY(-4px)",
@@ -31,7 +31,10 @@ const DiscordAndGithubButtons = () => {
         </Link>
       </Tooltip>
       <Tooltip label="Github Stars" placement="top">
-        <Link href="https://github.com/devgpt-labs/devgpt-releases">
+        <Link
+          href="https://github.com/devgpt-labs/devgpt-releases"
+          target="_blank"
+        >
           <IconButton
             _hover={{
               transform: "translateY(-4px)",
