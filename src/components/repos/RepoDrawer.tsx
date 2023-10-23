@@ -37,8 +37,8 @@ type PageInfo = {
   endCursor: string;
 };
 
-const RepoDrawer = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure({});
+const RepoDrawer = ({ setRefresh, refresh }: any) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     isOpen: isRepoSetupOpen,
@@ -173,6 +173,8 @@ const RepoDrawer = () => {
     const { data, error } = await supabase
       .from("models")
       .insert([{ ...newModel }]);
+
+    setRefresh(!refresh);
 
     if (error) {
       console.log(error);
