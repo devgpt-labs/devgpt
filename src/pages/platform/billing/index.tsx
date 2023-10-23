@@ -213,7 +213,8 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const sections = ["Credit", "Models", "Plans"];
+  const sections = ["Credit", "Models"];
+  // const sections = ["Credit", "Models", "Plans"];
 
   if (loading || budget === null || !user) {
     return (
