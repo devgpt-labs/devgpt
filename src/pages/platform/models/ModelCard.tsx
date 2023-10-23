@@ -54,6 +54,7 @@ import { MdRefresh } from "react-icons/md";
 import addTrainingLog from "@/utils/addTrainingLog";
 import createModelID from "@/utils/createModelID";
 import trainModel from "@/utils/trainModel";
+import { useRouter } from "next/router";
 
 const ModelCard = ({
   trainingLogs,
@@ -67,7 +68,8 @@ const ModelCard = ({
   setModelsInTraining: any;
 }) => {
   const { session, user }: any = authStore();
-  const { repo, setRepo }: any = repoStore();
+  const { repo, setRepo }: any = repoStore()
+  const router = useRouter();
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
@@ -270,6 +272,10 @@ const ModelCard = ({
                       size="sm"
                       onClick={() => {
                         onTrainOpen();
+                        setRepo({
+                          owner: model.owner,
+                          repo: model.repo,
+                        });
                       }}
                       aria-label="Train Model"
                       icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
@@ -288,6 +294,10 @@ const ModelCard = ({
                         setRepo({
                           owner: model.owner,
                           repo: model.repo,
+                        });
+
+                        router.push("/platform/agent", undefined, {
+                          shallow: true,
                         });
                       }}
                       aria-label="Select Model"

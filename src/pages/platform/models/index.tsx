@@ -175,7 +175,7 @@ const Models = () => {
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">
-            <Link href="/platform/agent">
+            {/* <Link href="/platform/agent">
               <IconButton
                 onClick={() => {
                   router.back();
@@ -183,8 +183,8 @@ const Models = () => {
                 aria-label="Close"
                 icon={<ArrowBackIcon />}
               />
-            </Link>
-            <Heading size="md" ml={4}>
+            </Link> */}
+            <Heading size="md">
               Trained Models
             </Heading>
           </Flex>
@@ -198,7 +198,7 @@ const Models = () => {
               Refresh
             </Button>
             <Button
-              isDisabled={credits < 0 || status?.isOverdue}
+              isDisabled={credits < 0}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}

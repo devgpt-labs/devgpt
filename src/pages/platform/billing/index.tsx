@@ -33,6 +33,11 @@ import {
   InputRightElement,
   Tooltip,
   Modal,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
 
 //stores
@@ -55,6 +60,18 @@ import { RiInformationFill } from "react-icons/ri";
 import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 import ConfirmationModal from "../models/ConfirmationModal";
 import CreditsModal from "@/components/repos/CreditsModal";
+
+const calculateStatSum = (stat: string, modelsInTraining: any) => {
+  return modelsInTraining.length > 0 ? (
+    <>
+      {modelsInTraining
+        .map((model: any) => model?.[stat])
+        .reduce((a: any, b: any) => a + b, 0)}
+    </>
+  ) : (
+    0
+  );
+};
 
 const Models = ({ onClose }: any) => {
   const { session, user, stripe_customer_id, credits }: any = authStore();
@@ -84,6 +101,7 @@ const Models = ({ onClose }: any) => {
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [spentThisMonth, setSpentThisMonth] = useState<any>(0);
+  const [section, setSection] = useState<string>("Credit");
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -136,10 +154,6 @@ const Models = ({ onClose }: any) => {
   // Used to get an estimation of how much the user will spend each month
   const budgetEstimation =
     Number(calculateTotalCost(modelsInTraining, 0)) * 1.2;
-
-  const handleBudgetChange = (e: any) => {
-    setBudget(e.target.value);
-  };
 
   const getMonthlyBudget = async () => {
     if (!supabase) return;
@@ -199,17 +213,7 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const calculateStatSum = (stat: string) => {
-    return modelsInTraining.length > 0 ? (
-      <>
-        {modelsInTraining
-          .map((model: any) => model?.[stat])
-          .reduce((a: any, b: any) => a + b, 0)}
-      </>
-    ) : (
-      0
-    );
-  };
+  const sections = ["Credit", "Models", "Plans"];
 
   if (loading || budget === null || !user) {
     return (
@@ -268,195 +272,246 @@ const Models = ({ onClose }: any) => {
       />
 
       {/* <CreditsModal isCreditsOpen={isCreditsOpen} onCreditsClose={onCreditsClose} /> */}
-
-      <Flex p={5} width="100%" height="100%" flexDirection="column">
-        <Flex
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={3}
-        >
-          <Flex flexDirection="row" alignItems="center">
-            <IconButton
-              mr={3}
-              onClick={() => {
-                router.back();
-              }}
-              aria-label="Close"
-              icon={<ArrowBackIcon />}
-            />
-            <Heading size="md" ml={4}>
-              Billing
-            </Heading>
-          </Flex>
-          <Flex gap={2}>
-            <Link
-              isExternal={true}
-              href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
-            >
-              <Button>Manage Payment Methods</Button>
-            </Link>
-            <Link
-              isExternal={true}
-              href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
-            >
-              <Button>Manage Payments</Button>
-            </Link>
-          </Flex>
-        </Flex>
-        <Flex flexDirection={"column"} mb={3}>
-          <Heading size="sm" mt={2}>
-            Current Balance:
-            <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
-            {/* <Tag
-                cursor="pointer"
-                onClick={() => {
-                  onCreditsOpen();
-                }}
-              >
-                Add Credits
-              </Tag> */}
-          </Heading>
-          <Heading size="sm" mb={4} mt={2}>
-            Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
-          </Heading>
-          <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
-            <Text fontSize={14}>Monthly Budget</Text>
-            <Tooltip
-              placement="right"
-              label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
-            >
-              <Box>
-                <RiInformationFill />
-              </Box>
-            </Tooltip>
-          </Flex>
-          <InputGroup>
-            <InputLeftAddon children="$" />
-            <Input
-              max={10000000}
-              value={budget}
-              type="number"
-              onChange={handleBudgetChange}
-            />
-            <InputRightElement width="4.5rem">
-              <Button
-                color="white"
-                bgGradient={"linear(to-r, blue.500,teal.500)"}
-                h="1.75rem"
-                size="sm"
-                onClick={onConfirmationOpen}
-              >
-                Save
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-          {/* <Flex flexDirection="row" alignItems="center" gap={2} my={2}>
-              <Tooltip
-                placement="right"
-                label="Your prompt budget is decided by your monthly budget, and gives a guess of how much credit you will have for prompting after models have been trained."
-              >
-                <>
-                  <Text fontSize={14}>Prompting Budget</Text>
-                  <Tooltip
-                    placement="right"
-                    label="This is our estimation of how much you will have available for prompting this month after your models have been trained."
-                  >
-                    <Box>
-                      <RiInformationFill />
-                    </Box>
-                  </Tooltip>
-                </>
-              </Tooltip>
+      {/* <Tag
+        cursor="pointer"
+        onClick={() => {
+          onCreditsOpen();
+        }}
+      >
+        Add Credits
+      </Tag> */}
+      <Flex flexDirection="row" width="100%">
+        <Flex flexDirection="column" px={8} pt={4}>
+          <Text fontWeight="bold" mb={4}>
+            Billing
+          </Text>
+          <Flex flexDirection="row">
+            <Flex flexDirection="column">
+              {sections.map((title) => {
+                return (
+                  <BillingSectionHeader
+                    title={title}
+                    setSection={setSection}
+                    section={section}
+                  />
+                );
+              })}
             </Flex>
-            <InputGroup>
-              <InputLeftAddon children="$" />
-              <Input
-                isDisabled={true}
-                value={promptingBalance.toFixed(2)}
-                type="number"
-              />
-            </InputGroup> */}
-
-          {promptingBalance === 0 ? (
-            <Badge alignSelf="flex-start" mt={2} color="orange">
-              This budget will limit your models from reaching your settings
-              and give you $0 budget for prompting.
-            </Badge>
-          ) : (
-            <Badge
-              color={promptingBalance === 0 ? "orange" : "teal"}
-              alignSelf="flex-start"
-              mt={2}
-            >
-              This budget give you a monthly balance for prompting of $
-              {promptingBalance.toFixed(2)}
-            </Badge>
-          )}
+          </Flex>
         </Flex>
-        <Heading size="md" mb={2} mt={4} id="billing">
-          Estimated Monthly Cost
-        </Heading>
-        <TableContainer>
-          <Table variant="striped">
-            <Thead>
-              <Tr>
-                <Th>Name</Th>
-                <Th isNumeric>Epochs</Th>
-                <Th isNumeric>Sample_Size</Th>
-                <Th isNumeric>Frequency</Th>
-                <Th isNumeric>Cost</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {modelsInTraining.length > 0 ? (
-                <>
-                  {modelsInTraining.map((model: any) => {
-                    return (
-                      <>
-                        <Tr>
-                          <Td>{model.repo}</Td>
-                          <Td isNumeric>{model.epochs}</Td>
-                          <Td isNumeric>{model.sample_size}</Td>
-                          <Td isNumeric>{model.frequency}</Td>
-                          <Td isNumeric>${calculateTotalCost([model], 0)}</Td>
-                        </Tr>
-                      </>
-                    );
-                  })}
-                </>
-              ) : (
-                <Text my={4}>No models have been trained yet.</Text>
-              )}
-            </Tbody>
-            <Tfoot>
-              <Tr>
-                <Th>Total</Th>
-                <Th isNumeric>{calculateStatSum("epochs")}</Th>
-                <Th isNumeric>{calculateStatSum("sample_size")}</Th>
-                <Th isNumeric>{calculateStatSum("frequency")}</Th>
-                <Th isNumeric>${calculateTotalCost(modelsInTraining, 0)}</Th>
-              </Tr>
-              <Tr>
-                <Th>Estimated monthly cost</Th>
-                <Th isNumeric></Th>
-                <Th isNumeric></Th>
-                <Th isNumeric></Th>
-                <Th isNumeric>
-                  <Heading>
-                    $
-                    {budget < budgetEstimation
-                      ? budget
-                      : budgetEstimation.toFixed(2)}
-                  </Heading>
-                </Th>
-              </Tr>
-            </Tfoot>
-          </Table>
-        </TableContainer>
+        <Flex mb={3} width="100%" flexDirection="column" p={4}>
+          <Flex width="100%" justifyContent="space-between">
+            <Flex flexDirection="row" alignItems="center" mb={4}>
+              <Heading size="md">{section}</Heading>
+            </Flex>
+            <Flex gap={2}>
+              <Link
+                isExternal={true}
+                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+              >
+                <Button>Manage Payment Methods</Button>
+              </Link>
+              <Link
+                isExternal={true}
+                href="https://billing.stripe.com/p/login/dR67ww9NDcB2gNO8ww"
+              >
+                <Button>Manage Payments</Button>
+              </Link>
+            </Flex>
+          </Flex>
+
+          {section.toLowerCase() === "credit" && (
+            <BudgetAndCredit
+              budget={budget}
+              setBudget={setBudget}
+              promptingBalance={promptingBalance}
+              spentThisMonth={spentThisMonth}
+              onConfirmationOpen={onConfirmationOpen}
+            />
+          )}
+
+          {section.toLowerCase() === "models" && (
+            <BillingTable
+              modelsInTraining={modelsInTraining}
+              budget={budget}
+              budgetEstimation={budgetEstimation}
+            />
+          )}
+
+          {section.toLowerCase() === "plans" && <Plans />}
+        </Flex>
       </Flex>
     </Template>
   );
 };
 
 export default Models;
+
+const BillingSectionHeader = ({ title, setSection, section }: any) => {
+  return (
+    <Text
+      _hover={{
+        borderLeft: "solid 2px",
+        borderColor: "blue.200",
+      }}
+      py={1}
+      cursor="pointer"
+      borderLeft='2px solid'
+      borderColor={section === title ? "blue.800" : "gray.200"}
+      pl={3}
+      fontSize="sm"
+      onClick={() => {
+        setSection(title);
+      }}
+    >
+      {title}
+    </Text>
+  );
+};
+
+const Plans = () => {
+  return (
+    <>
+      <Text>Plan 1 </Text>
+    </>
+  );
+};
+
+const BudgetAndCredit = ({
+  budget,
+  setBudget,
+  promptingBalance,
+  spentThisMonth,
+  onConfirmationOpen,
+}: any) => {
+  const { credits }: any = authStore();
+
+  const handleBudgetChange = (e: any) => {
+    setBudget(e.target.value);
+  };
+
+  return (
+    <>
+      <Heading size="sm" mt={2}>
+        Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
+      </Heading>
+      <Heading size="sm" mb={4} mt={2}>
+        Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
+      </Heading>
+      <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
+        <Text fontSize={14}>Monthly Budget</Text>
+        <Tooltip
+          placement="right"
+          label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
+        >
+          <Box>
+            <RiInformationFill />
+          </Box>
+        </Tooltip>
+      </Flex>
+      <InputGroup>
+        <InputLeftAddon children="$" />
+        <Input
+          max={10000000}
+          value={budget}
+          type="number"
+          onChange={handleBudgetChange}
+        />
+        <InputRightElement width="4.5rem">
+          <Button
+            color="white"
+            bgGradient={"linear(to-r, blue.500,teal.500)"}
+            h="1.75rem"
+            size="sm"
+            onClick={onConfirmationOpen}
+          >
+            Save
+          </Button>
+        </InputRightElement>
+      </InputGroup>
+      {promptingBalance === 0 ? (
+        <Badge alignSelf="flex-start" mt={2} color="orange">
+          This budget will limit your models from reaching your settings and
+          give you $0 budget for prompting.
+        </Badge>
+      ) : (
+        <Badge
+          color={promptingBalance === 0 ? "orange" : "teal"}
+          alignSelf="flex-start"
+          mt={2}
+        >
+          This budget give you a monthly balance for prompting of $
+          {promptingBalance.toFixed(2)}
+        </Badge>
+      )}
+    </>
+  );
+};
+
+const BillingTable = ({ modelsInTraining, budget, budgetEstimation }: any) => {
+  return (
+    <>
+      <TableContainer>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Name</Th>
+              <Th isNumeric>Epochs</Th>
+              <Th isNumeric>Sample_Size</Th>
+              <Th isNumeric>Frequency</Th>
+              <Th isNumeric>Cost</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {modelsInTraining.length > 0 ? (
+              <>
+                {modelsInTraining.map((model: any) => {
+                  return (
+                    <>
+                      <Tr>
+                        <Td>{model.repo}</Td>
+                        <Td isNumeric>{model.epochs}</Td>
+                        <Td isNumeric>{model.sample_size}</Td>
+                        <Td isNumeric>{model.frequency}</Td>
+                        <Td isNumeric>${calculateTotalCost([model], 0)}</Td>
+                      </Tr>
+                    </>
+                  );
+                })}
+              </>
+            ) : (
+              <Text my={4}>No models have been trained yet.</Text>
+            )}
+          </Tbody>
+          <Tfoot>
+            <Tr>
+              <Th>Total</Th>
+              <Th isNumeric>{calculateStatSum("epochs", modelsInTraining)}</Th>
+              <Th isNumeric>
+                {calculateStatSum("sample_size", modelsInTraining)}
+              </Th>
+              <Th isNumeric>
+                {calculateStatSum("frequency", modelsInTraining)}
+              </Th>
+              <Th isNumeric>${calculateTotalCost(modelsInTraining, 0)}</Th>
+            </Tr>
+            <Tr>
+              <Th>Estimated monthly cost</Th>
+              <Th isNumeric></Th>
+              <Th isNumeric></Th>
+              <Th isNumeric></Th>
+              <Th isNumeric>
+                <Heading>
+                  $
+                  {budget < budgetEstimation
+                    ? budget
+                    : budgetEstimation.toFixed(2)}
+                </Heading>
+              </Th>
+            </Tr>
+          </Tfoot>
+        </Table>
+      </TableContainer>
+    </>
+  );
+};

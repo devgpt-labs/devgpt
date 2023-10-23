@@ -19,7 +19,7 @@ const setUserToPaymentOverdue = async (email: string) => {
 
   const newStatus = {
     isOverdue: true,
-  };
+  };360
 
   const { data: overdueData, error: overdueError } = await supabase
     .from("customers")

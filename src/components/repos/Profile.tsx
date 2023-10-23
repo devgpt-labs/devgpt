@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
 import { MdMoney, MdScience, MdWork } from "react-icons/md";
+import { TbPrompt } from "react-icons/tb";
 
 // Components
 import Repos from "./Settings";
@@ -126,7 +127,7 @@ const Profile = () => {
     const { data, error } = await supabase
       .from("customers")
       .select("credits")
-      .eq("email_address", emailAddress)
+      .eq("email_address", emailAddress);
 
     if (error) throw error;
     if (data !== null) {
@@ -190,6 +191,7 @@ const Profile = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
+          px={4}
         >
           <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
@@ -223,6 +225,36 @@ const Profile = () => {
           {user?.email && (
             <Flex flexDirection="row">
               <Flex gap={2}>
+                <Tooltip label={"Write Prompts"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/agent", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="Write Prompts"
+                    icon={<TbPrompt size={18} />}
+                  />
+                </Tooltip>
+                <Tooltip label={"View Models"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/models", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="View Models"
+                    icon={<MdScience size={18} />}
+                  />
+                </Tooltip>
                 <ProfileOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
@@ -275,21 +307,7 @@ const Profile = () => {
                     />
                   </Tooltip>
                 )}
-                <Tooltip label={"View Models"} placement="top">
-                  <IconButton
-                    _hover={{
-                      transform: "translateY(-4px)",
-                      transition: "all 0.2s ease-in-out",
-                    }}
-                    onClick={() => {
-                      router.push("/platform/models", undefined, {
-                        shallow: true,
-                      });
-                    }}
-                    aria-label="View Models"
-                    icon={<MdScience size={18} />}
-                  />
-                </Tooltip>
+
                 <Tooltip label={"View Billing"} placement="top">
                   <IconButton
                     _hover={{
@@ -305,6 +323,8 @@ const Profile = () => {
                     icon={<AiFillCreditCard size={18} />}
                   />
                 </Tooltip>
+
+
                 <Tooltip label="Signout" placement="top">
                   <IconButton
                     _hover={{
