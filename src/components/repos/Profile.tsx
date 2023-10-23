@@ -225,6 +225,18 @@ const Profile = () => {
           {user?.email && (
             <Flex flexDirection="row">
               <Flex gap={2}>
+                <Tooltip label="Upgrade" placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    bgGradient="linear(to-tr, teal.500, blue.500)"
+                    onClick={onUpgradeOpen}
+                    aria-label="Upgrade"
+                    icon={<StarIcon color="white" />}
+                  />
+                </Tooltip>
                 <Tooltip label={"Write Prompts"} placement="top">
                   <IconButton
                     _hover={{
@@ -255,6 +267,38 @@ const Profile = () => {
                     icon={<MdScience size={18} />}
                   />
                 </Tooltip>
+
+
+                <Tooltip label="Read The Docs" placement="top">
+                  <Link isExternal href="https://docs.devgpt.com">
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Read The Docs"
+                      icon={<BiSolidBookBookmark />}
+                    />
+                  </Link>
+                </Tooltip>
+              </Flex>
+              <Flex gap={2} ml={2}>
+                <Tooltip label={"View Billing"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/billing", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="View Billing"
+                    icon={<AiFillCreditCard size={18} />}
+                  />
+                </Tooltip>
+
                 <ProfileOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
@@ -279,52 +323,6 @@ const Profile = () => {
                     />
                   </Link>
                 </Tooltip>
-                <Tooltip label="Read The Docs" placement="top">
-                  <Link isExternal href="https://docs.devgpt.com">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Read The Docs"
-                      icon={<BiSolidBookBookmark />}
-                    />
-                  </Link>
-                </Tooltip>
-              </Flex>
-              <Flex gap={2} ml={2}>
-                {!isPro && (
-                  <Tooltip label="Upgrade" placement="top">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      bgGradient="linear(to-tr, teal.500, blue.500)"
-                      onClick={onUpgradeOpen}
-                      aria-label="Upgrade"
-                      icon={<StarIcon color="white" />}
-                    />
-                  </Tooltip>
-                )}
-
-                <Tooltip label={"View Billing"} placement="top">
-                  <IconButton
-                    _hover={{
-                      transform: "translateY(-4px)",
-                      transition: "all 0.2s ease-in-out",
-                    }}
-                    onClick={() => {
-                      router.push("/platform/billing", undefined, {
-                        shallow: true,
-                      });
-                    }}
-                    aria-label="View Billing"
-                    icon={<AiFillCreditCard size={18} />}
-                  />
-                </Tooltip>
-
-
                 <Tooltip label="Signout" placement="top">
                   <IconButton
                     _hover={{

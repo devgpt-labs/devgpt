@@ -8,6 +8,7 @@ import {
   Link,
   Modal,
   ModalCloseButton,
+  Box,
   ModalContent,
   ModalOverlay,
   Stack,
@@ -20,6 +21,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import planIntegers from "@/configs/planIntegers";
 
 // stores
 import authStore from "@/store/Auth";
@@ -36,12 +38,10 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
           <CardBody textAlign={"center"}>
             <Stack>
               <Heading size="lg" mb={2}>
-                Pro Plan: Early Bird
+                DevGPT Plans
               </Heading>
               <Text mb={6} fontSize={16}>
-                This is our early bird price, it will be available for a limited
-                time only. This will also include these benefits in our desktop
-                app when it is released.
+                More detail below.
               </Text>
             </Stack>
             <TableContainer>
@@ -49,30 +49,41 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                 <Thead fontWeight={"bold"}>
                   <Tr>
                     <Th>Feature</Th>
-                    <Th>Free</Th>
                     <Th>Pro</Th>
+                    <Th>Team</Th>
+                    <Th>Enterprise</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   <Tr>
-                    <Td>Daily Prompts </Td>
+                    <Td>Trained Models </Td>
+                    <Td>1</Td>
+                    <Td>3</Td>
+                    <Td>∞</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Training Rounds (up to)</Td>
+                    <Td>7</Td>
                     <Td>15</Td>
-                    <Td>Unlimited</Td>
+                    <Td>100</Td>
                   </Tr>
                   <Tr>
-                    <Td>AI Model </Td>
-                    <Td>GPT-4-8K</Td>
-                    <Td>GPT-4-32K</Td>
+                    <Td>Team Seats</Td>
+                    <Td>1</Td>
+                    <Td>12</Td>
+                    <Td>∞</Td>
                   </Tr>
                   <Tr>
-                    <Td>Model Training</Td>
-                    <Td>5 rounds</Td>
-                    <Td>15 rounds</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Priority Support</Td>
+                    <Td>Private Instance</Td>
                     <Td>×</Td>
                     <Td>✓</Td>
+                    <Td>✓</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Price</Td>
+                    <Td>49</Td>
+                    <Td>490</Td>
+                    <Td>Contact</Td>
                   </Tr>
                 </Tbody>
               </Table>
@@ -85,7 +96,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
               flex={1}
               flexDirection={"column"}
             >
-              <Link
+              {/* <Link
                 href={`https://buy.stripe.com/5kA7sB7AMe9xaZ2aFP?client_reference_id=${user?.id}`}
               >
                 <Button
@@ -103,7 +114,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   </Text>{" "}
                   $15.99 /month
                 </Button>
-              </Link>
+              </Link> */}
 
               <Text pt={5} textAlign={"center"}>
                 Cancel anytime. Billing provided by Stripe.

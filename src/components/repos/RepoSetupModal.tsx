@@ -94,9 +94,10 @@ const RepoSetupModal = ({
           <Flex flexDirection="column">
             {monthly_budget < Number(cost) ? (
               <Text fontSize={14}>
-                Current training settings exceed your monthly budget. You can change your
-                budget in billing. We will block you from training this model
-                until you increase your budget incase this is an accident.
+                Current training settings exceed your monthly budget. You can
+                change your budget in billing. We will block you from training
+                this model until you increase your budget incase this is an
+                accident.
               </Text>
             ) : (
               <Flex flexDirection="column" gap={2}>
@@ -140,11 +141,12 @@ const RepoSetupModal = ({
             {monthly_budget < Number(cost) && (
               <Button
                 onClick={() => {
-                  router.push("/platform/billing")
+                  router.push("/platform/billing");
                 }}
-
-                mt={2}>View Billing</Button>
-
+                mt={2}
+              >
+                View Billing
+              </Button>
             )}
           </Flex>
         </DrawerFooter>

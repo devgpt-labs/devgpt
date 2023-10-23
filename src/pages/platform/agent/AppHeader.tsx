@@ -53,6 +53,14 @@ const ChatHeader = () => {
               {repo.repo}
             </Tag>
           )}
+          {/* {isPro && (
+            <Tag colorScheme="blue"
+              color='white'
+
+            >
+              {repo.repo}
+            </Tag>
+          )} */}
         </Flex>
       </Flex>
     </Flex>
