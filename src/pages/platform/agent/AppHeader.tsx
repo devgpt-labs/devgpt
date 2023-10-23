@@ -32,16 +32,7 @@ const ChatHeader = () => {
           <Tag ml={3} colorScheme="teal">
             Open Beta {version}
           </Tag>
-          {user &&
-            (isPro ? (
-              <Tag ml={3} colorScheme="teal">
-                {user?.email} / Paid Plan
-              </Tag>
-            ) : (
-              <Tag ml={3} colorScheme="teal">
-                {user?.email} / No Plan Active
-              </Tag>
-            ))}
+
         </Box>
 
         <Flex gap={2}>

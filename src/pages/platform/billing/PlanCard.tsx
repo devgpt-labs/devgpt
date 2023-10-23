@@ -21,7 +21,7 @@ const PlanCard = ({
   purchased,
 }: any) => {
   return (
-    <Card>
+    <Card maxW='sm'>
       <CardBody>
         <Image
           src={image}
