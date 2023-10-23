@@ -42,6 +42,7 @@ import Template from "@/components/Template";
 import Response from "@/components/Response";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import PromptAreaAndButton from "./PromptAreaAndButton";
+import Feedback from "@/components/repos/Feedback";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
@@ -185,7 +186,7 @@ const Chat = () => {
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
       // If no data tree, return
-      if (!data?.tree) return null
+      if (!data?.tree) return null;
 
       // Get files from the data tree
       const files = data?.tree?.map((file: any) => file.path);
@@ -303,7 +304,14 @@ const Chat = () => {
   if (!user) {
     return (
       <Template>
-        <Flex flexDirection="row" width="80%" height="100%" gap={2}>
+        <Flex
+          flexDirection="row"
+          width="80%"
+          height="70vh"
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
           <Skeleton
             bg="gray.700"
             height="40px"
@@ -333,6 +341,8 @@ const Chat = () => {
         justifyContent={"center"}
         p={5}
       >
+
+
         <Box
           rounded="lg"
           className="p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -359,20 +369,19 @@ const Chat = () => {
           )}
           {repo.repo && (
             <Box>
-              {status?.isOverdue ||
-                (credits < 0 && (
-                  <Flex flexDirection="column" mt={4}>
-                    <Text>
-                      Before you continue prompting, we need to get your billing
-                      in order!
-                    </Text>
-                    <Text mb={3} fontSize={14} color="gray.600">
-                      You're accounts billing is currently overdue, so before
-                      you continue we'll need to help you set up billing
-                      correctly. You can continue using DevGPT and prompting
-                      with your trained models immediately after this.
-                    </Text>
-                    {/* <Button
+              {credits < 0 && (
+                <Flex flexDirection="column" mt={4}>
+                  <Text>
+                    Before you continue prompting, we need to get your billing
+                    in order!
+                  </Text>
+                  <Text mb={3} fontSize={14} color="gray.600">
+                    You're accounts billing is currently overdue, so before you
+                    continue we'll need to help you set up billing correctly.
+                    You can continue using DevGPT and prompting with your
+                    trained models immediately after this.
+                  </Text>
+                  {/* <Button
                       bgGradient={"linear(to-r, blue.500, teal.500)"}
                       onClick={() => {
                         router.push("/platform/billing");
@@ -385,27 +394,27 @@ const Chat = () => {
                       </Text>
                       <BiUpArrowAlt color="white" />
                     </Button> */}
-                    <Flex flexDirection="row" gap={2}>
-                      <Button
-                        width="100%"
-                        bgGradient={"linear(to-r, blue.500, teal.500)"}
-                        color='white'
-                        onClick={() => {
-                          router.push("/platform/billing");
-                        }}
-                      >
-                        <Text mr={2}>View Billing</Text>
-                        <AiFillCreditCard />
+                  <Flex flexDirection="row" gap={2}>
+                    <Button
+                      width="100%"
+                      bgGradient={"linear(to-r, blue.500, teal.500)"}
+                      color="white"
+                      onClick={() => {
+                        router.push("/platform/billing");
+                      }}
+                    >
+                      <Text mr={2}>View Billing</Text>
+                      <AiFillCreditCard />
+                    </Button>
+                    <Link href="mailto:support@devgpt.com">
+                      <Button>
+                        <Text mr={2}>Email Support</Text>
+                        <EmailIcon />
                       </Button>
-                      <Link href="mailto:support@devgpt.com">
-                        <Button>
-                          <Text mr={2}>Email Support</Text>
-                          <EmailIcon />
-                        </Button>
-                      </Link>
-                    </Flex>
+                    </Link>
                   </Flex>
-                ))}
+                </Flex>
+              )}
               <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
@@ -473,7 +482,7 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
+              {!hasSentAMessage && credits > 0 && (
                 <Box mt={4}>
                   <Flex
                     flexDirection="row"
@@ -603,11 +612,11 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        {/* <>
-          {status?.isOverdue || credits < 0 ? null : (
+        <>
+          {credits < 0 ? null : (
             <Feedback models={models} response={response} messages={messages} />
           )}
-        </> */}
+        </>
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

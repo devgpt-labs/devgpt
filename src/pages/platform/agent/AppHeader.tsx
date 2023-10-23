@@ -29,11 +29,11 @@ const ChatHeader = () => {
         width="100%"
         justifyContent="space-between"
       >
-        <Tag ml={3} colorScheme="purple" >
+        <Tag ml={3} colorScheme="teal" >
           Open Beta {version}
         </Tag>
         <Flex gap={2}>
-          <Tag
+          {/* <Tag
             color='white'
             colorScheme="blue"
             alignItems="center"
@@ -44,7 +44,7 @@ const ChatHeader = () => {
           >
             <Text>Desktop app returning soon</Text>
             <Text>🎉</Text>
-          </Tag>
+          </Tag> */}
           {repo.repo && (
             <Tag colorScheme="blue"
               color='white'

@@ -4,7 +4,7 @@ import authStore from "@/store/Auth";
 
 const TrainingStatus = ({ initialMessages }: any) => {
   const { status, credits }: any = authStore();
-  if (status?.isOverdue || credits < 0) return null;
+  if (credits < 0) return null;
 
   return initialMessages?.length < 2 ? (
     <Text mb={1}>
