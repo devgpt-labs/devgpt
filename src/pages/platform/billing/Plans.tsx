@@ -94,7 +94,7 @@ const Plans = () => {
         description="Enterprise allows you to take control. Train more models and run more prompts."
         detail="Allows for more than 12 team members"
         link={`https://www.devgpt.com/arrange-demo`}
-        image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbb3_DALLE%20(1).png"
+        image="https://cdn.openai.com/labs/images/Two%20futuristic%20towers%20with%20a%20skybridge%20covered%20in%20lush%20foliage,%20digital%20art.webp?v=1"
         popular={false}
         purchased={false}
       />
