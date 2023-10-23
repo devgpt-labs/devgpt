@@ -16,7 +16,7 @@ import {
 import calculateTotalCost from "@/utils/calculateTotalCost";
 
 const calculateStatSum = (stat: string, modelsInTraining: any) => {
-  return modelsInTraining.length > 0 ? (
+  return modelsInTraining?.length > 0 ? (
     <>
       {modelsInTraining
         .map((model: any) => model?.[stat])
@@ -42,7 +42,7 @@ const BillingTable = ({ modelsInTraining, budget, budgetEstimation }: any) => {
             </Tr>
           </Thead>
           <Tbody>
-            {modelsInTraining.length > 0 ? (
+            {modelsInTraining?.length > 0 ? (
               <>
                 {modelsInTraining.map((model: any) => {
                   return (

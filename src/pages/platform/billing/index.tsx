@@ -6,17 +6,10 @@ import {
   Box,
   Skeleton,
   Heading,
-  Tag,
-  Badge,
   Link,
   Button,
   IconButton,
   useDisclosure,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Tooltip,
 } from "@chakra-ui/react";
 
 //stores
@@ -34,12 +27,10 @@ import Template from "@/components/Template";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { RiInformationFill } from "react-icons/ri";
 import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 import ConfirmationModal from "../models/ConfirmationModal";
 import BillingTable from "./BillingTable";
 import Plans from "./Plans";
-import BudgetAndCredit from "./BudgetAndCredit";
 import BillingSectionHeader from "./BillingSectionHeader";
 
 const Models = ({ onClose }: any) => {
@@ -289,16 +280,6 @@ const Models = ({ onClose }: any) => {
               </Link>
             </Flex>
           </Flex>
-
-          {/* {section.toLowerCase() === "billing" && (
-            <BudgetAndCredit
-              budget={budget}
-              setBudget={setBudget}
-              promptingBalance={promptingBalance}
-              spentThisMonth={spentThisMonth}
-              onConfirmationOpen={onConfirmationOpen}
-            />
-          )} */}
 
           {section.toLowerCase() === "models" && (
             <BillingTable

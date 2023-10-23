@@ -51,28 +51,28 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                 <Thead fontWeight={"bold"}>
                   <Tr>
                     <Th>Feature</Th>
-                    <Th>Pro</Th>
-                    <Th>Team</Th>
-                    <Th>Enterprise</Th>
+                    <Th>{planIntegers.pro.name}</Th>
+                    <Th>{planIntegers.team.name}</Th>
+                    <Th>{planIntegers.enterprise.name}</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   <Tr>
                     <Td>Trained Models </Td>
-                    <Td>1</Td>
-                    <Td>3</Td>
+                    <Td>{planIntegers.pro.models}</Td>
+                    <Td>{planIntegers.team.models}</Td>
                     <Td>∞</Td>
                   </Tr>
                   <Tr>
                     <Td>Training Rounds (up to)</Td>
-                    <Td>7</Td>
-                    <Td>15</Td>
-                    <Td>100</Td>
+                    <Td>{planIntegers.pro.training_rounds}</Td>
+                    <Td>{planIntegers.team.training_rounds}</Td>
+                    <Td>{planIntegers.enterprise.training_rounds}</Td>
                   </Tr>
                   <Tr>
                     <Td>Team Seats</Td>
-                    <Td>1</Td>
-                    <Td>12</Td>
+                    <Td>{planIntegers.pro.team_members}</Td>
+                    <Td>{planIntegers.team.team_members}</Td>
                     <Td>∞</Td>
                   </Tr>
                   <Tr>
@@ -83,8 +83,8 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   </Tr>
                   <Tr>
                     <Td>Price</Td>
-                    <Td>49</Td>
-                    <Td>490</Td>
+                    <Td>{planIntegers.pro.price}</Td>
+                    <Td>{planIntegers.team.price}</Td>
                     <Td>Contact</Td>
                   </Tr>
                 </Tbody>
