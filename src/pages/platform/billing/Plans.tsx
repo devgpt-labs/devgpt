@@ -61,26 +61,26 @@ import { BsStars } from "react-icons/bs";
 import { PiShootingStarFill } from "react-icons/pi";
 
 const Plans = () => {
-  const { user }: any = authStore();
+  const { user, isPro }: any = authStore();
 
   return (
     <Flex flexDirection="row" gap={4} width="100%">
       <PlanCard
         Icon={<FaStar />}
-        title="Pro"
-        price="49"
-        description="The pro plan allows you to train and maintain 1 model and use of DevGPT prompting."
+        title="Individual"
+        price="$49"
+        description="The individual plan allows you to train and maintain 1 model and use of DevGPT prompting."
         detail="Includes a 7-day free plan"
         link={`https://buy.stripe.com/bIY3clg7i5D10ko5lx?client_reference_id=${user?.id}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbc5_DALL%25C2%25B7E%25202023-07-04%252010.57.46%2520-%2520a%2520renaissance%2520painting%2520of%2520a%2520robot%2520being%2520born%2520in%2520medieval%2520times-p-500.png"
         popular={false}
-        purchased={true}
+        purchased={isPro ? true : false}
       />
       <PlanCard
         Icon={<BsStars />}
-        title="Team"
-        price="499"
-        description="The team plan allows you to train up to 3 models and increased use of DevGPT prompting."
+        title="Business"
+        price="$499"
+        description="The business plan allows you to train up to 3 models and increased use of DevGPT prompting."
         detail="Allows for up to 12 team members"
         link={`https://buy.stripe.com/7sIfZ7dZa1mLffi29m?client_reference_id=${user?.id}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbb3_DALLE%20(1).png"
@@ -90,10 +90,10 @@ const Plans = () => {
       <PlanCard
         Icon={<PiShootingStarFill />}
         title="Enterprise"
-        price=""
-        description="The team plan allows you to train up to 3 models and increased use of DevGPT prompting."
-        detail="Allows for up to 12 team members"
-        link={`https://buy.stripe.com/7sIfZ7dZa1mLffi29m?client_reference_id=${user?.id}`}
+        price="Contact"
+        description="Enterprise allows you to take control. Train more models and run more prompts."
+        detail="Allows for more than 12 team members"
+        link={`https://www.devgpt.com/arrange-demo`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbb3_DALLE%20(1).png"
         popular={false}
         purchased={false}

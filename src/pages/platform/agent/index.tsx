@@ -296,8 +296,7 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
-  if (true) {
-    // if (!isPro) {
+  if (!isPro) {
     return (
       <Template>
         <Flex
@@ -308,13 +307,15 @@ const Chat = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} isCentered={true}>
+          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>It's time to upgrade</ModalHeader>
-              <ModalCloseButton />
               <ModalBody>
-                <Text>To use DevGPT you need a plan</Text>
+                <Text>
+                  To use DevGPT, you need a plan that unlocks its full
+                  potential. This allows you to train models and run prompts.
+                </Text>
               </ModalBody>
 
               <ModalFooter>

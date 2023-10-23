@@ -50,7 +50,7 @@ const PlanCard = ({
           <Text>{detail}</Text>
           {price && (
             <Text color="blue.600" fontSize="2xl">
-              ${price}
+              {price}
             </Text>
           )}
         </Stack>

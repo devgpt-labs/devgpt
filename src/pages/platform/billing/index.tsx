@@ -43,7 +43,8 @@ import BudgetAndCredit from "./BudgetAndCredit";
 import BillingSectionHeader from "./BillingSectionHeader";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits, isPro }: any = authStore();
+  const { session, user, stripe_customer_id, credits, isPro }: any =
+    authStore();
   const router = useRouter();
   const {
     isOpen: isConfirmationOpen,
@@ -99,7 +100,6 @@ const Models = ({ onClose }: any) => {
 
     setMonthlySpend();
   }, [stripe_customer_id]);
-
 
   useEffect(() => {
     if (!session) {
@@ -183,9 +183,7 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const sections = isPro
-    ? ["Billing", "Models"]
-    : ["Plans", "Billing", "Models"];
+  const sections = ["Billing", "Models"];
 
   if (loading || budget === null || !user) {
     return (

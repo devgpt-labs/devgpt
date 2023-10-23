@@ -59,7 +59,7 @@ const BillingTable = ({ modelsInTraining, budget, budgetEstimation }: any) => {
                 })}
               </>
             ) : (
-              <Text my={4}>No models have been trained yet.</Text>
+              <Text my={4}>You have no models trained yet.</Text>
             )}
           </Tbody>
           <Tfoot>
