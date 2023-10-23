@@ -29,7 +29,7 @@ const ChatHeader = () => {
         width="100%"
         justifyContent="space-between"
       >
-        <Tag ml={3} colorScheme="purple" >
+        <Tag ml={3} colorScheme="teal" >
           Open Beta {version}
         </Tag>
         <Flex gap={2}>

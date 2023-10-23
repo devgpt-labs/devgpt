@@ -105,3 +105,13 @@ a {
     color-scheme: dark;
   }
 }
+
+::-moz-selection {
+  background: pink;
+}
+::-webkit-selection {
+  background: pink;
+}
+::selection {
+  background: pink;
+}
