@@ -22,12 +22,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import planIntegers from "@/configs/planIntegers";
+import { useRouter } from "next/router";
 
 // stores
 import authStore from "@/store/Auth";
 
 const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
   const { user }: any = authStore();
+  const router = useRouter();
 
   return (
     <Modal isOpen={isUpgradeOpen} onClose={onUpgradeClose} size="2xl">
@@ -96,25 +98,24 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
               flex={1}
               flexDirection={"column"}
             >
-              {/* <Link
-                href={`https://buy.stripe.com/5kA7sB7AMe9xaZ2aFP?client_reference_id=${user?.id}`}
+              <Button
+                onClick={() => {
+                  router.push("/platform/billing", undefined, {
+                    shallow: true,
+                  });
+                }}
+                size="lg"
+                color={"white"}
+                bgGradient={"linear(to-r, blue.500, teal.500)"}
+                _hover={{
+                  bgGradient: "linear(to-r, blue.500, teal.500)",
+                }}
+                mb={2}
               >
-                <Button
-                  size="lg"
-                  color={"white"}
-                  bgGradient={"linear(to-r, blue.500, teal.500)"}
-                  _hover={{
-                    bgGradient: "linear(to-r, blue.500, teal.500)",
-                  }}
-                  mb={2}
-                >
-                  <Text as="s" mr={2} fontSize={14}>
-                    {" "}
-                    $25.99
-                  </Text>{" "}
-                  $15.99 /month
-                </Button>
-              </Link> */}
+                <Text >
+                  Learn More
+                </Text>{" "}
+              </Button>
 
               <Text pt={5} textAlign={"center"}>
                 Cancel anytime. Billing provided by Stripe.

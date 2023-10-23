@@ -55,7 +55,10 @@ import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth"
 import ConfirmationModal from "../models/ConfirmationModal";
 import { BsFillPersonFill } from "react-icons/bs";
 import PlanCard from "./PlanCard";
-
+import { PiStarBold, PiShootingStarBold } from "react-icons/pi";
+import { FaStar } from "react-icons/fa";
+import { BsStars } from "react-icons/bs";
+import { PiShootingStarFill } from "react-icons/pi";
 
 const Plans = () => {
   const { user }: any = authStore();
@@ -63,7 +66,7 @@ const Plans = () => {
   return (
     <Flex flexDirection="row" gap={4} width="100%">
       <PlanCard
-        Icon={<BsFillPersonFill />}
+        Icon={<FaStar />}
         title="Pro"
         price="49"
         description="The pro plan allows you to train and maintain 1 model and use of DevGPT prompting."
@@ -74,9 +77,9 @@ const Plans = () => {
         purchased={true}
       />
       <PlanCard
-        Icon={<BsFillPersonFill />}
+        Icon={<BsStars />}
         title="Team"
-        price="490"
+        price="499"
         description="The team plan allows you to train up to 3 models and increased use of DevGPT prompting."
         detail="Allows for up to 12 team members"
         link={`https://buy.stripe.com/7sIfZ7dZa1mLffi29m?client_reference_id=${user?.id}`}
@@ -85,7 +88,7 @@ const Plans = () => {
         purchased={false}
       />
       <PlanCard
-        Icon={<BsFillPersonFill />}
+        Icon={<PiShootingStarFill />}
         title="Enterprise"
         price=""
         description="The team plan allows you to train up to 3 models and increased use of DevGPT prompting."

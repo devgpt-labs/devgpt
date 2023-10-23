@@ -308,7 +308,7 @@ const Chat = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} isCentered="true">
+          <Modal isOpen={true} isCentered={true}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>It's time to upgrade</ModalHeader>
