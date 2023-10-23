@@ -35,29 +35,43 @@ import useStore from "@/store/Auth";
 
 //assets
 import astro from "@/assets/astro.png";
+import getModels from "@/utils/getModels";
 
 const Auth = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [models, setModels] = useState<any[]>([]);
 
-  const { fetch, user, session, stripe_customer_id }: any = useStore();
+  const { fetch, user }: any = useStore();
 
   useEffect(() => {
     fetch();
   }, []);
 
-  useEffect(() => {
+  const handleLogin = async () => {
     if (user) {
       setLoading(true);
-      // set user to loading
-      router.push("/platform/agent", undefined, { shallow: true });
+
+      await getModels(setModels, setLoading, user?.email);
+
+      if (models.length > 0) {
+        // Navigate user to the prompting page
+        router.push("/platform/agent", undefined, { shallow: true });
+      } else {
+        // If the user has no models, navigate them to the add a model page
+        router.push("/platform/models", undefined, { shallow: true });
+      }
     }
+  };
+
+  useEffect(() => {
+    handleLogin();
   }, [user]);
 
   if (loading)
     return (
       <Template>
-        <Flex height="100%" alignItems="center" justifyContent="center" mt={5}>
+        <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
           <Text ml={3}>Just getting started...</Text>
         </Flex>
@@ -65,73 +79,71 @@ const Auth = () => {
     );
 
   return (
-    <>
-      <Template>
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          width="30%"
-          height="100%"
-          rounded="lg"
-          overflow="hidden"
-          flexDirection="column"
-        >
-          <VStack spacing={2} width="100%" alignItems="center">
-            <GitConnectorButton
-              color="black"
-              provider="Sign In With Github"
-              handle={signInWithGithub}
-              Icon={<BsGithub />}
-              tooltip=""
-            />
-            <GitConnectorButton
-              color="#0c61db"
-              provider="Sign In With BitBucket"
-              handle={signInWithBitbucket}
-              Icon={<FaBitbucket />}
-              tooltip="Coming soon!"
-            />
-            <GitConnectorButton
-              color="#FC6D27"
-              provider="Sign In With GitLab"
-              handle={() => {}}
-              Icon={<AiFillGitlab />}
-              tooltip="Coming soon!"
-            />
-            <Heading size="xs" mt="2">
-              Just getting started?
-            </Heading>
-            <WhatIsDevGPT />
-            <AuthOption
-              label="Read Our Docs"
-              Icon={<BiSolidBookBookmark />}
-              url="https://docs.devgpt.com"
-            />
-            <AuthOption
-              label="Star Project On GitHub"
-              Icon={<BiSolidStar />}
-              url="https://github.com/devgpt-labs/devgpt-releases/"
-            />
-            <AuthOption
-              label="Join Discord Community"
-              Icon={<BsDiscord />}
-              url="https://discord.com/invite/6GFtwzuvtw"
-            />
-            <Flex
-              flex={1}
-              alignItems="center"
-              justifyContent="center"
-              mt={5}
-              w="full"
-            >
-              <Tooltip label="Hi, I'm Astro!">
-                <Image maxH="80px" src={astro.src} alt="Astro Logo" />
-              </Tooltip>
-            </Flex>
-          </VStack>
-        </Flex>
-      </Template>
-    </>
+    <Template>
+      <Flex
+        justifyContent="center"
+        alignItems="center"
+        width="30%"
+        height="80vh"
+        rounded="lg"
+        overflow="hidden"
+        flexDirection="column"
+      >
+        <VStack spacing={2} width="100%" alignItems="center">
+          <GitConnectorButton
+            color="black"
+            provider="Sign In With Github"
+            handle={signInWithGithub}
+            Icon={<BsGithub />}
+            tooltip=""
+          />
+          <GitConnectorButton
+            color="#0c61db"
+            provider="Sign In With BitBucket"
+            handle={signInWithBitbucket}
+            Icon={<FaBitbucket />}
+            tooltip="Coming soon!"
+          />
+          <GitConnectorButton
+            color="#FC6D27"
+            provider="Sign In With GitLab"
+            handle={() => { }}
+            Icon={<AiFillGitlab />}
+            tooltip="Coming soon!"
+          />
+          <Heading size="xs" mt="2">
+            Just getting started?
+          </Heading>
+          <WhatIsDevGPT />
+          <AuthOption
+            label="Read Our Docs"
+            Icon={<BiSolidBookBookmark />}
+            url="https://docs.devgpt.com"
+          />
+          <AuthOption
+            label="Star Project On GitHub"
+            Icon={<BiSolidStar />}
+            url="https://github.com/devgpt-labs/devgpt-releases/"
+          />
+          <AuthOption
+            label="Join Discord Community"
+            Icon={<BsDiscord />}
+            url="https://discord.com/invite/6GFtwzuvtw"
+          />
+          <Flex
+            flex={1}
+            alignItems="center"
+            justifyContent="center"
+            mt={5}
+            w="full"
+          >
+            <Tooltip label="Hi, I'm Astro!">
+              <Image maxH="80px" src={astro.src} alt="Astro Logo" />
+            </Tooltip>
+          </Flex>
+        </VStack>
+      </Flex>
+    </Template>
   );
 };
 

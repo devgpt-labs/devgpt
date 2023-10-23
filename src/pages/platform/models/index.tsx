@@ -161,7 +161,7 @@ const Models = () => {
   }, [session, user]);
 
   if (loading || !user) return <ModelLoadingScreen />;
-  if (modelsInTraining.length === 0) return <AddAModel />;
+  if (modelsInTraining.length === 0) return <AddAModel setRefresh={setRefresh} refresh={refresh} />;
 
   return (
     <Template>
@@ -228,7 +228,7 @@ const Models = () => {
           </Grid>
         )}
       </Flex>
-      <RepoDrawer />
+      <RepoDrawer setRefresh={setRefresh} refresh={refresh} />
     </Template>
   );
 };

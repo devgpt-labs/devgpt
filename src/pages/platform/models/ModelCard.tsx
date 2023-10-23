@@ -74,9 +74,9 @@ const ModelCard = ({
     onClose: onDeleteClose,
   } = useDisclosure();
   const {
-    isOpen: isRetrainOpen,
-    onOpen: onRetrainOpen,
-    onClose: onRetrainClose,
+    isOpen: isTrainOpen,
+    onOpen: onTrainOpen,
+    onClose: onTrainClose,
   } = useDisclosure();
   const [deletingModel, setDeletingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
@@ -84,7 +84,7 @@ const ModelCard = ({
   const [isErrored, setIsErrored] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
-  const retrainModel = async () => {
+  const handleTrainModel = async () => {
     setIsTraining(true);
     setIsErrored(false);
 
@@ -99,7 +99,7 @@ const ModelCard = ({
     }
 
     // Set this model to actively train
-    const trainingOutput = await trainModel(model, session, user);
+    const trainingOutput: any = await trainModel(model, session, user);
 
     //validate the output
     if (trainingOutput?.length) {
@@ -221,13 +221,13 @@ const ModelCard = ({
         }}
       />
       <ConfirmationModal
-        header="Retrain this model?"
-        body="Confirm you would like to retrain this model, you will not be charged if your model has failed to train."
-        confirmButtonText="Retrain"
-        isOpen={isRetrainOpen}
-        onClose={onRetrainClose}
+        header="Train this model?"
+        body="Confirm you would like to Train this model, you will not be charged if your model has failed to train."
+        confirmButtonText="Train"
+        isOpen={isTrainOpen}
+        onClose={onTrainClose}
         onSubmit={() => {
-          retrainModel();
+          handleTrainModel();
         }}
       />
       <Card rounded="lg" flexDirection="row">
@@ -269,7 +269,7 @@ const ModelCard = ({
                       isDisabled={isTraining}
                       size="sm"
                       onClick={() => {
-                        onRetrainOpen();
+                        onTrainOpen();
                       }}
                       aria-label="Train Model"
                       icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
@@ -308,13 +308,13 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : isTraining
-                      ? "blue"
-                      : isErrored
-                      ? "orange"
-                      : !JSON.parse(model.output) ||
-                        JSON.parse(model.output)?.length < 2
-                      ? "orange"
-                      : "teal"
+                        ? "blue"
+                        : isErrored
+                          ? "orange"
+                          : !JSON.parse(model.output) ||
+                            JSON.parse(model.output)?.length < 2
+                            ? "orange"
+                            : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -322,13 +322,13 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : isTraining
-                    ? "Training"
-                    : isErrored
-                    ? "Training Failed"
-                    : !JSON.parse(model.output) ||
-                      JSON.parse(model.output)?.length < 2
-                    ? "Untrained"
-                    : "Trained"}
+                      ? "Training"
+                      : isErrored
+                        ? "Training Failed"
+                        : !JSON.parse(model.output) ||
+                          JSON.parse(model.output)?.length < 2
+                          ? "Untrained"
+                          : "Trained"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -344,7 +344,7 @@ const ModelCard = ({
                 )}
               </Flex>
               <Text fontSize={14}>
-                {model.owner} - {model.branch}
+                {model.owner} / {model.repo} / {model.branch}
               </Text>
               <Text fontSize={14}>
                 {moment(model.created_at).format("MMMM Do YYYY, h:mm:ss a")}
@@ -403,14 +403,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-                // setBranch={(e: any) => {
-                //   handleModelInTrainingChange({
-                //     target: {
-                //       name: "branch",
-                //       value: e,
-                //     },
-                //   });
-                // }}
+              // setBranch={(e: any) => {
+              //   handleModelInTrainingChange({
+              //     target: {
+              //       name: "branch",
+              //       value: e,
+              //     },
+              //   });
+              // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
