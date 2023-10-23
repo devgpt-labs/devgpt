@@ -111,7 +111,7 @@ const Auth = () => {
             Icon={<AiFillGitlab />}
             tooltip="Coming soon!"
           />
-          <Heading size="xs" mt="2">
+          <Heading size="xs" my={2}>
             Just getting started?
           </Heading>
           <WhatIsDevGPT />

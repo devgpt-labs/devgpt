@@ -24,6 +24,13 @@ import {
   Fade,
   Skeleton,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -60,12 +67,13 @@ import TrainingStatus from "./TrainingStatus";
 import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
-import { BiSolidBrain } from "react-icons/bi";
+import { BiSolidBrain, BiSolidStar } from "react-icons/bi";
 import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
 import { RiInformationFill } from "react-icons/ri";
+import { GiUpgrade } from "react-icons/gi";
 
 const Chat = () => {
   // Constants
@@ -94,8 +102,15 @@ const Chat = () => {
   const router = useRouter();
   const { colorMode } = useColorMode();
   const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
-  const { user, session, stripe_customer_id, signOut, status, credits }: any =
-    authStore();
+  const {
+    user,
+    session,
+    stripe_customer_id,
+    signOut,
+    status,
+    credits,
+    isPro,
+  }: any = authStore();
 
   // Handles responses, sending prompt, reloading and input.
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
@@ -123,26 +138,6 @@ const Chat = () => {
   });
 
   const MAX_MESSAGES = 7; //todo - this should come from training status
-
-  if (status?.isBanned) {
-    return (
-      <Template>
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          mt={5}
-          h="100vh"
-          w="100vw"
-        >
-          <BiConfused />
-          <Text ml={3}>
-            Oops, something went wrong! Please get in touch with the team via
-            Discord.
-          </Text>
-        </Flex>
-      </Template>
-    );
-  }
 
   useEffect(() => {
     // Get all models
@@ -301,6 +296,82 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
+  if (!isPro) {
+    return (
+      <Template>
+        <Flex
+          flexDirection="row"
+          width="80%"
+          height="70vh"
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>It's time to upgrade</ModalHeader>
+              <ModalBody>
+                <Text>
+                  To use DevGPT, you need a plan that unlocks its full
+                  potential. This allows you to train models and run prompts.
+                </Text>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button
+                  width="100%"
+                  bgGradient="linear(to-r, blue.500, teal.500)"
+                  color="white"
+                  onClick={() => {
+                    router.push("/platform/billing");
+                  }}
+                >
+                  <Text mr={2}>Billing</Text>
+                  <AiFillCreditCard />
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="85%"
+            mb={4}
+            borderRadius={10}
+          />
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="15%"
+            mb={4}
+            borderRadius={10}
+          />
+        </Flex>
+      </Template>
+    );
+  }
+
+  if (status?.isBanned) {
+    return (
+      <Template>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          mt={5}
+          h="70vh"
+          w="100vw"
+        >
+          <BiConfused />
+          <Text ml={3}>
+            Oops, something went wrong! Please get in touch with the team via
+            Discord.
+          </Text>
+        </Flex>
+      </Template>
+    );
+  }
+
   if (!user) {
     return (
       <Template>
@@ -341,8 +412,6 @@ const Chat = () => {
         justifyContent={"center"}
         p={5}
       >
-
-
         <Box
           rounded="lg"
           className="p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"

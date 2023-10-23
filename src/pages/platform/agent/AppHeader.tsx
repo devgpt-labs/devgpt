@@ -4,14 +4,17 @@ import packageJson from "../../../../package.json";
 
 //stores
 import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
 
 //components
 import Logo from "@/components/Logo";
 
 const ChatHeader = () => {
   const { repo }: any = repoStore();
+  const { isPro, user }: any = authStore();
   const { colorMode } = useColorMode();
   const version = packageJson?.version;
+
   return (
     <Flex
       justifyContent="space-between"
@@ -24,14 +27,14 @@ const ChatHeader = () => {
       maxH="sm"
     >
       <Logo />
-      <Flex
-        flexDirection={"row"}
-        width="100%"
-        justifyContent="space-between"
-      >
-        <Tag ml={3} colorScheme="teal" >
-          Open Beta {version}
-        </Tag>
+      <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
+        <Box>
+          <Tag ml={3} colorScheme="teal">
+            Open Beta {version}
+          </Tag>
+
+        </Box>
+
         <Flex gap={2}>
           {/* <Tag
             color='white'
@@ -46,13 +49,18 @@ const ChatHeader = () => {
             <Text>🎉</Text>
           </Tag> */}
           {repo.repo && (
+            <Tag colorScheme="blue" color="white">
+              {repo.repo}
+            </Tag>
+          )}
+          {/* {isPro && (
             <Tag colorScheme="blue"
               color='white'
 
             >
               {repo.repo}
             </Tag>
-          )}
+          )} */}
         </Flex>
       </Flex>
     </Flex>

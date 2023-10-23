@@ -6,38 +6,10 @@ import {
   Box,
   Skeleton,
   Heading,
-  Tag,
-  Badge,
   Link,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
   IconButton,
   useDisclosure,
-  useColorMode,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Tooltip,
-  Modal,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
 } from "@chakra-ui/react";
 
 //stores
@@ -49,32 +21,21 @@ import { useRouter } from "next/router";
 //utils
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import getModels from "@/utils/getModels";
-import chargeCustomer from "@/utils/stripe/chargeCustomer";
 
 //components
 import Template from "@/components/Template";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { RiInformationFill } from "react-icons/ri";
 import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 import ConfirmationModal from "../models/ConfirmationModal";
-import CreditsModal from "@/components/repos/CreditsModal";
-
-const calculateStatSum = (stat: string, modelsInTraining: any) => {
-  return modelsInTraining.length > 0 ? (
-    <>
-      {modelsInTraining
-        .map((model: any) => model?.[stat])
-        .reduce((a: any, b: any) => a + b, 0)}
-    </>
-  ) : (
-    0
-  );
-};
+import BillingTable from "./BillingTable";
+import Plans from "./Plans";
+import BillingSectionHeader from "./BillingSectionHeader";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits }: any = authStore();
+  const { session, user, stripe_customer_id, credits, isPro }: any =
+    authStore();
   const router = useRouter();
   const {
     isOpen: isConfirmationOpen,
@@ -101,7 +62,7 @@ const Models = ({ onClose }: any) => {
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [spentThisMonth, setSpentThisMonth] = useState<any>(0);
-  const [section, setSection] = useState<string>("Credit");
+  const [section, setSection] = useState<string>("Billing");
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -213,8 +174,7 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const sections = ["Credit", "Models"];
-  // const sections = ["Credit", "Models", "Plans"];
+  const sections = ["Billing", "Models"];
 
   if (loading || budget === null || !user) {
     return (
@@ -300,8 +260,8 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
         </Flex>
-        <Flex mb={3} width="100%" flexDirection="column" p={4}>
-          <Flex width="100%" justifyContent="space-between">
+        <Flex width="100%" flexDirection="column" p={4}>
+          <Flex width="100%" justifyContent="space-between" mb={4}>
             <Flex flexDirection="row" alignItems="center" mb={4}>
               <Heading size="md">{section}</Heading>
             </Flex>
@@ -321,16 +281,6 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
 
-          {section.toLowerCase() === "credit" && (
-            <BudgetAndCredit
-              budget={budget}
-              setBudget={setBudget}
-              promptingBalance={promptingBalance}
-              spentThisMonth={spentThisMonth}
-              onConfirmationOpen={onConfirmationOpen}
-            />
-          )}
-
           {section.toLowerCase() === "models" && (
             <BillingTable
               modelsInTraining={modelsInTraining}
@@ -338,8 +288,7 @@ const Models = ({ onClose }: any) => {
               budgetEstimation={budgetEstimation}
             />
           )}
-
-          {section.toLowerCase() === "plans" && <Plans />}
+          {section.toLowerCase() === "billing" && <Plans />}
         </Flex>
       </Flex>
     </Template>
@@ -347,172 +296,3 @@ const Models = ({ onClose }: any) => {
 };
 
 export default Models;
-
-const BillingSectionHeader = ({ title, setSection, section }: any) => {
-  return (
-    <Text
-      _hover={{
-        borderLeft: "solid 2px",
-        borderColor: "blue.200",
-      }}
-      py={1}
-      cursor="pointer"
-      borderLeft='2px solid'
-      borderColor={section === title ? "blue.800" : "gray.200"}
-      pl={3}
-      fontSize="sm"
-      onClick={() => {
-        setSection(title);
-      }}
-    >
-      {title}
-    </Text>
-  );
-};
-
-const Plans = () => {
-  return (
-    <>
-      <Text>Plan 1 </Text>
-    </>
-  );
-};
-
-const BudgetAndCredit = ({
-  budget,
-  setBudget,
-  promptingBalance,
-  spentThisMonth,
-  onConfirmationOpen,
-}: any) => {
-  const { credits }: any = authStore();
-
-  const handleBudgetChange = (e: any) => {
-    setBudget(e.target.value);
-  };
-
-  return (
-    <>
-      <Heading size="sm" mt={2}>
-        Current Balance: <Tag>${credits?.toFixed(2) || 0}</Tag>{" "}
-      </Heading>
-      <Heading size="sm" mb={4} mt={2}>
-        Spend this month: <Tag>${spentThisMonth?.toFixed(2) || 0}</Tag>
-      </Heading>
-      <Flex flexDirection="row" alignItems="center" gap={2} mb={2}>
-        <Text fontSize={14}>Monthly Budget</Text>
-        <Tooltip
-          placement="right"
-          label="Your monthly budget is a hard-limit to how much will be allowed to spend on your account of models plus prompting. During automatic recharges or model creation, this budget will be taken into consideration."
-        >
-          <Box>
-            <RiInformationFill />
-          </Box>
-        </Tooltip>
-      </Flex>
-      <InputGroup>
-        <InputLeftAddon children="$" />
-        <Input
-          max={10000000}
-          value={budget}
-          type="number"
-          onChange={handleBudgetChange}
-        />
-        <InputRightElement width="4.5rem">
-          <Button
-            color="white"
-            bgGradient={"linear(to-r, blue.500,teal.500)"}
-            h="1.75rem"
-            size="sm"
-            onClick={onConfirmationOpen}
-          >
-            Save
-          </Button>
-        </InputRightElement>
-      </InputGroup>
-      {promptingBalance === 0 ? (
-        <Badge alignSelf="flex-start" mt={2} color="orange">
-          This budget will limit your models from reaching your settings and
-          give you $0 budget for prompting.
-        </Badge>
-      ) : (
-        <Badge
-          color={promptingBalance === 0 ? "orange" : "teal"}
-          alignSelf="flex-start"
-          mt={2}
-        >
-          This budget give you a monthly balance for prompting of $
-          {promptingBalance.toFixed(2)}
-        </Badge>
-      )}
-    </>
-  );
-};
-
-const BillingTable = ({ modelsInTraining, budget, budgetEstimation }: any) => {
-  return (
-    <>
-      <TableContainer>
-        <Table variant="striped">
-          <Thead>
-            <Tr>
-              <Th>Name</Th>
-              <Th isNumeric>Epochs</Th>
-              <Th isNumeric>Sample_Size</Th>
-              <Th isNumeric>Frequency</Th>
-              <Th isNumeric>Cost</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {modelsInTraining.length > 0 ? (
-              <>
-                {modelsInTraining.map((model: any) => {
-                  return (
-                    <>
-                      <Tr>
-                        <Td>{model.repo}</Td>
-                        <Td isNumeric>{model.epochs}</Td>
-                        <Td isNumeric>{model.sample_size}</Td>
-                        <Td isNumeric>{model.frequency}</Td>
-                        <Td isNumeric>${calculateTotalCost([model], 0)}</Td>
-                      </Tr>
-                    </>
-                  );
-                })}
-              </>
-            ) : (
-              <Text my={4}>No models have been trained yet.</Text>
-            )}
-          </Tbody>
-          <Tfoot>
-            <Tr>
-              <Th>Total</Th>
-              <Th isNumeric>{calculateStatSum("epochs", modelsInTraining)}</Th>
-              <Th isNumeric>
-                {calculateStatSum("sample_size", modelsInTraining)}
-              </Th>
-              <Th isNumeric>
-                {calculateStatSum("frequency", modelsInTraining)}
-              </Th>
-              <Th isNumeric>${calculateTotalCost(modelsInTraining, 0)}</Th>
-            </Tr>
-            <Tr>
-              <Th>Estimated monthly cost</Th>
-              <Th isNumeric></Th>
-              <Th isNumeric></Th>
-              <Th isNumeric></Th>
-              <Th isNumeric>
-                <Heading>
-                  $
-                  {budget < budgetEstimation
-                    ? budget
-                    : budgetEstimation.toFixed(2)}
-                </Heading>
-              </Th>
-            </Tr>
-          </Tfoot>
-        </Table>
-      </TableContainer>
-    </>
-  );
-};
