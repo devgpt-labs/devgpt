@@ -34,8 +34,8 @@ const RepoSetupModal = ({
   const router = useRouter();
   const { session, user, monthly_budget }: any = authStore();
 
-  const [sampleSize, setSampleSize] = useState<any>(8);
-  const [frequency, setFrequency] = useState<any>(3);
+  const [sampleSize, setSampleSize] = useState<any>(5);
+  const [frequency, setFrequency] = useState<any>(1);
   const [branch, setBranch] = useState<any>("main");
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
