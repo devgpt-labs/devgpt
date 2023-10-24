@@ -674,7 +674,7 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        {/* <Feedback models={models} response={response} messages={messages} /> */}
+        <Feedback models={models} response={response} messages={messages} />
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}
