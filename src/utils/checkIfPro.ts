@@ -32,7 +32,7 @@ const checkIfPro = async (emailAddress: string) => {
 		query: `email:'${emailAddress}'`,
 	});
 
-	const { id: stripe_customer_id } = found_customer.data[0];
+	const { id: stripe_customer_id } = found_customer?.data[0];
 
 	if (!stripe_customer_id) {
 		errorHandler("No stripe_customer_id found for this user");
