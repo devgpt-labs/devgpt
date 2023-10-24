@@ -167,6 +167,14 @@ const Chat = () => {
       router.push("/", undefined, { shallow: true });
       console.log("no user found, returning to home");
     }
+
+    console.log("Helpful debugging information, if all of these are true, it's probably working fine.:", {
+      "User is pro": isPro,
+      "User email": user?.email,
+      "Valid Repo": !!lofaf,
+      "Valid Stripe": !!stripe_customer_id,
+      "Valid Github": !!session?.provider_token,
+    });
   }, []);
 
   useEffect(() => {
@@ -438,7 +446,7 @@ const Chat = () => {
           )}
           {repo.repo && (
             <Box>
-              {credits < 0 && (
+              {!isPro && (
                 <Flex flexDirection="column" mt={4}>
                   <Text>
                     Before you continue prompting, we need to get your billing

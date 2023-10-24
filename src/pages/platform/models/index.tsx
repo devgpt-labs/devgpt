@@ -300,6 +300,7 @@ const Models = () => {
             {modelsInTraining.map((model: any) => {
               return (
                 <ModelCard
+                  id={model.id}
                   trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}
