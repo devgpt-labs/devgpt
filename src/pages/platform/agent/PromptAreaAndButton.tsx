@@ -27,10 +27,10 @@ const PromptAreaAndButton = ({
   setHasBeenReset,
   handleSubmit,
 }: PromptAreaAndButtonProps) => {
-  const { status, credits }: any = authStore();
+  const { isPro }: any = authStore();
   const [show, setShow] = useState(false);
 
-  if (credits < 0) return null;
+  if (!isPro) return null;
 
   return (
     <Flex flexDirection='column'>

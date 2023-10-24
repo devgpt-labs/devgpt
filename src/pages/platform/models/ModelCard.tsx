@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Flex,
   Text,
@@ -16,14 +16,6 @@ import {
   StatLabel,
   StatNumber,
   IconButton,
-  useColorMode,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
   Button,
   Spinner,
@@ -40,7 +32,6 @@ import { supabase } from "@/utils/supabase";
 //components
 import ModelInTraining from "@/pages/platform/models/ModelInTraining";
 import Setup from "@/components/repos/Setup";
-import setFulfilledBackToFalseForTrainingLog from "@/utils/setFulfilledBackToFalseForTrainingLog";
 
 //utils
 import moment from "moment";
@@ -49,10 +40,8 @@ import moment from "moment";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
-import { BiRefresh } from "react-icons/bi";
 import { MdRefresh } from "react-icons/md";
 import addTrainingLog from "@/utils/addTrainingLog";
-import createModelID from "@/utils/createModelID";
 import trainModel from "@/utils/trainModel";
 import { useRouter } from "next/router";
 
@@ -61,11 +50,13 @@ const ModelCard = ({
   model,
   modelsInTraining,
   setModelsInTraining,
+  id,
 }: {
   trainingLogs: any;
   model: any;
   modelsInTraining: any;
   setModelsInTraining: any;
+  id: any;
 }) => {
   const { session, user }: any = authStore();
   const { repo, setRepo }: any = repoStore()
@@ -93,7 +84,7 @@ const ModelCard = ({
     // if training log fulfilled is false, don't do anything
     // if output.length < 2, don't do anything
     if (
-      !trainingLogs.filter((t: any) => t.model_id === model.id)[0]
+      !trainingLogs.filter((t: any) => t.model_id === id)[0]
         ?.fulfilled === false ||
       JSON.parse(model.output)?.length > 2
     ) {
@@ -126,7 +117,7 @@ const ModelCard = ({
       return;
     }
 
-    if (!model || !model.id) {
+    if (!model || !id) {
       console.log("Model is missing required properties.");
       return;
     }
@@ -138,7 +129,7 @@ const ModelCard = ({
         sample_size: model.sample_size,
         epochs: model.epochs,
       })
-      .eq("id", model.id)
+      .eq("id", id)
       .select();
 
     if (error) {
@@ -154,7 +145,7 @@ const ModelCard = ({
       return;
     }
 
-    if (!model || !model.id) {
+    if (!model || !id) {
       console.log("Model is missing required properties.");
       return;
     }
@@ -165,7 +156,7 @@ const ModelCard = ({
         .update({
           deleted: "TRUE",
         })
-        .eq("id", model.id)
+        .eq("id", id)
         .select();
 
       if (error) {
@@ -188,7 +179,7 @@ const ModelCard = ({
 
     setModelsInTraining(
       modelsInTraining.map((m: any) => {
-        if (m.id === model.id) {
+        if (m.id === id) {
           return {
             ...m,
             [name]: value,

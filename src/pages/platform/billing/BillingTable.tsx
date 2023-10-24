@@ -47,7 +47,7 @@ const BillingTable = ({ modelsInTraining, budget, budgetEstimation }: any) => {
                 {modelsInTraining.map((model: any) => {
                   return (
                     <>
-                      <Tr>
+                      <Tr key={model}>
                         <Td>{model.repo}</Td>
                         <Td isNumeric>{model.epochs}</Td>
                         <Td isNumeric>{model.sample_size}</Td>

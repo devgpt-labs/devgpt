@@ -280,7 +280,7 @@ const Models = () => {
               Refresh
             </Button>
             <Button
-              isDisabled={credits < 0}
+              isDisabled={!isPro}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}
@@ -300,6 +300,7 @@ const Models = () => {
             {modelsInTraining.map((model: any) => {
               return (
                 <ModelCard
+                  id={model.id}
                   trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}

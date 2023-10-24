@@ -19,7 +19,7 @@ const setUserToPaymentOverdue = async (email: string) => {
 
   const newStatus = {
     isOverdue: true,
-  };360
+  };
 
   const { data: overdueData, error: overdueError } = await supabase
     .from("customers")
@@ -66,7 +66,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
 
   // the user failed credit removal, meaning the user has to make a payment
   if (!customer.stripe_customer_id) {
-    setUserToPaymentOverdue(email);
+    // setUserToPaymentOverdue(email);
     return;
   }
 
@@ -74,7 +74,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
     await getCustomerChargeLimits(customer.stripe_customer_id, monthly_budget);
 
   if (!canChargeCustomer) {
-    setUserToPaymentOverdue(email);
+    // setUserToPaymentOverdue(email);
     return;
   }
 
@@ -91,7 +91,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
     amount > maxWeCanChargeCustomer ? maxWeCanChargeCustomer : amount;
 
   if (amountWithCaps <= 0) {
-    setUserToPaymentOverdue(email);
+    // setUserToPaymentOverdue(email);
     return;
   }
 
@@ -107,20 +107,20 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
   });
 
   //use the paymentIntent to charge the customer
-  const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-    payment_method: payment_method,
-  });
+  // const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
+  //   payment_method: payment_method,
+  // });
 
-  if (
-    confirmation.status === "requires_action" ||
-    confirmation.status === "canceled" ||
-    confirmation.status === "requires_payment_method"
-  ) {
-    setUserToPaymentOverdue(email);
-  }
+  // if (
+  //   confirmation.status === "requires_action" ||
+  //   confirmation.status === "canceled" ||
+  //   confirmation.status === "requires_payment_method"
+  // ) {
+  // setUserToPaymentOverdue(email);
+  // }
 
   if (!paymentIntent) {
-    setUserToPaymentOverdue(email);
+    // setUserToPaymentOverdue(email);
     return;
   }
 };

@@ -167,6 +167,14 @@ const Chat = () => {
       router.push("/", undefined, { shallow: true });
       console.log("no user found, returning to home");
     }
+
+    console.log("Helpful debugging information, if all of these are true, it's probably working fine.:", {
+      "User is pro": isPro,
+      "User email": user?.email,
+      "Valid Repo": !!lofaf,
+      "Valid Stripe": !!stripe_customer_id,
+      "Valid Github": !!session?.provider_token,
+    });
   }, []);
 
   useEffect(() => {
@@ -438,31 +446,16 @@ const Chat = () => {
           )}
           {repo.repo && (
             <Box>
-              {credits < 0 && (
+              {!isPro && (
                 <Flex flexDirection="column" mt={4}>
                   <Text>
                     Before you continue prompting, we need to get your billing
                     in order!
                   </Text>
                   <Text mb={3} fontSize={14} color="gray.600">
-                    You're accounts billing is currently overdue, so before you
-                    continue we'll need to help you set up billing correctly.
                     You can continue using DevGPT and prompting with your
                     trained models immediately after this.
                   </Text>
-                  {/* <Button
-                      bgGradient={"linear(to-r, blue.500, teal.500)"}
-                      onClick={() => {
-                        router.push("/platform/billing");
-                      }}
-                      width="100%"
-                      mb={3}
-                    >
-                      <Text color="white" mr={2}>
-                        Upgrade
-                      </Text>
-                      <BiUpArrowAlt color="white" />
-                    </Button> */}
                   <Flex flexDirection="row" gap={2}>
                     <Button
                       width="100%"
@@ -551,7 +544,7 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              {!hasSentAMessage && credits > 0 && (
+              {!hasSentAMessage && (
                 <Box mt={4}>
                   <Flex
                     flexDirection="row"
@@ -681,11 +674,7 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        <>
-          {credits < 0 ? null : (
-            <Feedback models={models} response={response} messages={messages} />
-          )}
-        </>
+        {/* <Feedback models={models} response={response} messages={messages} /> */}
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}
