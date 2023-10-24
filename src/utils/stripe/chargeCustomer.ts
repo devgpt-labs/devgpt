@@ -107,17 +107,17 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
   });
 
   //use the paymentIntent to charge the customer
-  const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-    payment_method: payment_method,
-  });
+  // const confirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
+  //   payment_method: payment_method,
+  // });
 
-  if (
-    confirmation.status === "requires_action" ||
-    confirmation.status === "canceled" ||
-    confirmation.status === "requires_payment_method"
-  ) {
-    setUserToPaymentOverdue(email);
-  }
+  // if (
+  //   confirmation.status === "requires_action" ||
+  //   confirmation.status === "canceled" ||
+  //   confirmation.status === "requires_payment_method"
+  // ) {
+  //   setUserToPaymentOverdue(email);
+  // }
 
   if (!paymentIntent) {
     setUserToPaymentOverdue(email);
