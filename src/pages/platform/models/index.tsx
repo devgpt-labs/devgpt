@@ -280,7 +280,7 @@ const Models = () => {
               Refresh
             </Button>
             <Button
-              isDisabled={credits < 0}
+              isDisabled={!isPro}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}

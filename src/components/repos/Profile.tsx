@@ -146,7 +146,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isCreditsOpen]); // Empty dependency array means this effect runs once when the component mounts
+  }, [isCreditsOpen]);
 
   useEffect(() => {
     const identity = user?.identities?.find((identity: { provider: string }) =>

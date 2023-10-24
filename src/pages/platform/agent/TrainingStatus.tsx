@@ -3,8 +3,8 @@ import { Badge, Text } from "@chakra-ui/react";
 import authStore from "@/store/Auth";
 
 const TrainingStatus = ({ initialMessages }: any) => {
-  const { status, credits }: any = authStore();
-  if (credits < 0) return null;
+  const { isPro }: any = authStore();
+  if (!isPro) return null;
 
   return initialMessages?.length < 2 ? (
     <Text mb={1}>
