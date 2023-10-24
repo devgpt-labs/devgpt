@@ -65,9 +65,9 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   </Tr>
                   <Tr>
                     <Td>Training Rounds (up to)</Td>
-                    <Td>{planIntegers.individual.training_rounds}</Td>
-                    <Td>{planIntegers.business.training_rounds}</Td>
-                    <Td>{planIntegers.enterprise.training_rounds}</Td>
+                    <Td>{planIntegers.individual.sample_size}</Td>
+                    <Td>{planIntegers.business.sample_size}</Td>
+                    <Td>{planIntegers.enterprise.sample_size}</Td>
                   </Tr>
                   <Tr>
                     <Td>Team Seats</Td>
