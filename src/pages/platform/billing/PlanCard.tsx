@@ -21,7 +21,7 @@ const PlanCard = ({
   purchased,
 }: any) => {
   return (
-    <Card maxW='sm'>
+    <Card maxW='32%'>
       <CardBody>
         <Image
           src={image}
@@ -74,7 +74,7 @@ const PlanCard = ({
           color="white"
           fontWeight="bold"
         >
-          {purchased ? "✓" : `Select ${title}`}
+          {purchased ? `You are on ${title} ✓` : `Select ${title}`}
         </Text>
       </Flex>
     </Card>

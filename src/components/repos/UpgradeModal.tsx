@@ -51,28 +51,28 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                 <Thead fontWeight={"bold"}>
                   <Tr>
                     <Th>Feature</Th>
-                    <Th>{planIntegers.pro.name}</Th>
-                    <Th>{planIntegers.team.name}</Th>
+                    <Th>{planIntegers.individual.name}</Th>
+                    <Th>{planIntegers.business.name}</Th>
                     <Th>{planIntegers.enterprise.name}</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   <Tr>
                     <Td>Trained Models </Td>
-                    <Td>{planIntegers.pro.models}</Td>
-                    <Td>{planIntegers.team.models}</Td>
+                    <Td>{planIntegers.individual.models}</Td>
+                    <Td>{planIntegers.business.models}</Td>
                     <Td>∞</Td>
                   </Tr>
                   <Tr>
                     <Td>Training Rounds (up to)</Td>
-                    <Td>{planIntegers.pro.training_rounds}</Td>
-                    <Td>{planIntegers.team.training_rounds}</Td>
+                    <Td>{planIntegers.individual.training_rounds}</Td>
+                    <Td>{planIntegers.business.training_rounds}</Td>
                     <Td>{planIntegers.enterprise.training_rounds}</Td>
                   </Tr>
                   <Tr>
                     <Td>Team Seats</Td>
-                    <Td>{planIntegers.pro.team_members}</Td>
-                    <Td>{planIntegers.team.team_members}</Td>
+                    <Td>{planIntegers.individual.team_members}</Td>
+                    <Td>{planIntegers.business.team_members}</Td>
                     <Td>∞</Td>
                   </Tr>
                   <Tr>
@@ -83,8 +83,8 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   </Tr>
                   <Tr>
                     <Td>Price</Td>
-                    <Td>{planIntegers.pro.price}</Td>
-                    <Td>{planIntegers.team.price}</Td>
+                    <Td>{planIntegers.individual.price}</Td>
+                    <Td>{planIntegers.business.price}</Td>
                     <Td>Contact</Td>
                   </Tr>
                 </Tbody>
