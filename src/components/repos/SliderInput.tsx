@@ -25,7 +25,7 @@ const SliderInput = ({
   isDisabled
 }: any) => {
   return (
-    <Flex gap={2} flexDirection="column">
+    <Flex gap={2} mb={2} flexDirection="column">
       <Tooltip placement="left" label={tooltip}>
         <Flex flexDirection="row" alignItems="center" gap={2}>
           <Text fontSize={14}>
@@ -47,7 +47,7 @@ const SliderInput = ({
         <SliderTrack>
           <SliderFilledTrack />
         </SliderTrack>
-        <SliderThumb bgGradient="linear(to-r, blue.500,teal.500)" zIndex={1} />
+        {/* <SliderThumb bgGradient="linear(to-r, blue.500,teal.500)" zIndex={1} /> */}
       </Slider>
     </Flex>
   );

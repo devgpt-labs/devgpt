@@ -168,13 +168,16 @@ const Chat = () => {
       console.log("no user found, returning to home");
     }
 
-    console.log("Helpful debugging information, if all of these are true, it's probably working fine.:", {
-      "User is pro": isPro,
-      "User email": user?.email,
-      "Valid Repo": !!lofaf,
-      "Valid Stripe": !!stripe_customer_id,
-      "Valid Github": !!session?.provider_token,
-    });
+    console.log(
+      "Helpful debugging information, if all of these are true, it's probably working fine.:",
+      {
+        "User is pro": isPro,
+        "User email": user?.email,
+        "Valid Repo": !!lofaf,
+        "Valid Stripe": !!stripe_customer_id,
+        "Valid Github": !!session?.provider_token,
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -598,16 +601,11 @@ const Chat = () => {
                     <ModelStat
                       label="Training Accuracy"
                       number={`${(
-                        ((initialMessages.length - 1) /
-                          2 /
-                          model?.sample_size) *
+                        (activeModelFilesTrained / model?.sample_size) *
                         100
                       ).toFixed(2)}%`}
                       tip={
-                        ((initialMessages.length - 1) /
-                          2 /
-                          model?.sample_size) *
-                          100 <
+                        (activeModelFilesTrained / model?.sample_size) * 100 <
                           60
                           ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
@@ -674,7 +672,7 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        {/* <Feedback models={models} response={response} messages={messages} /> */}
+        <Feedback models={models} response={response} messages={messages} />
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}
