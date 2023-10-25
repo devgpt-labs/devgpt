@@ -111,8 +111,6 @@ const ModelCard = ({
     }
   };
 
-  console.log({ model });
-
   const updateModel = async () => {
     if (!supabase) {
       console.log("Supabase is not initialized.");
