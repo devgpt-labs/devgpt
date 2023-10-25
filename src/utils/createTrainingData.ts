@@ -175,8 +175,6 @@ const getUsefulFileContents = async (
 };
 
 const getUsefulFilePrompts = async (user: any, files: any) => {
-  //unicorn
-
   try {
     const promises = files.map(async (file: any) => {
       if (!file.fileContent) {
