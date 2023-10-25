@@ -59,7 +59,7 @@ const ModelCard = ({
   id: any;
 }) => {
   const { session, user }: any = authStore();
-  const { repo, setRepo }: any = repoStore()
+  const { repo, setRepo }: any = repoStore();
   const router = useRouter();
   const {
     isOpen: isDeleteOpen,
@@ -84,8 +84,8 @@ const ModelCard = ({
     // if training log fulfilled is false, don't do anything
     // if output.length < 2, don't do anything
     if (
-      !trainingLogs.filter((t: any) => t.model_id === id)[0]
-        ?.fulfilled === false ||
+      !trainingLogs.filter((t: any) => t.model_id === id)[0]?.fulfilled ===
+        false ||
       JSON.parse(model.output)?.length > 2
     ) {
       await addTrainingLog(model);
@@ -309,13 +309,13 @@ const ModelCard = ({
                     model.deleted
                       ? "red"
                       : isTraining
-                        ? "blue"
-                        : isErrored
-                          ? "orange"
-                          : !JSON.parse(model.output) ||
-                            JSON.parse(model.output)?.length < 2
-                            ? "orange"
-                            : "teal"
+                      ? "blue"
+                      : isErrored
+                      ? "orange"
+                      : !JSON.parse(model.output) ||
+                        JSON.parse(model.output)?.length < 2
+                      ? "orange"
+                      : "teal"
                   }
                   alignSelf="flex-start"
                 >
@@ -323,13 +323,13 @@ const ModelCard = ({
                   {model.deleted
                     ? "Deleted"
                     : isTraining
-                      ? "Training"
-                      : isErrored
-                        ? "Training Failed"
-                        : !JSON.parse(model.output) ||
-                          JSON.parse(model.output)?.length < 2
-                          ? "Untrained"
-                          : "Trained"}
+                    ? "Training"
+                    : isErrored
+                    ? "Training Failed"
+                    : !JSON.parse(model.output) ||
+                      JSON.parse(model.output)?.length < 2
+                    ? "Untrained"
+                    : "Trained"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -404,14 +404,14 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
+                // setBranch={(e: any) => {
+                //   handleModelInTrainingChange({
+                //     target: {
+                //       name: "branch",
+                //       value: e,
+                //     },
+                //   });
+                // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
