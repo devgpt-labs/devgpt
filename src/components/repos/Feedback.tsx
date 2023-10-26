@@ -34,6 +34,8 @@ const Feedback = ({ models, response, messages }: any) => {
       return rest;
     });
 
+  if (!model.output) return null
+
   const existingMessages = JSON?.parse(model?.output);
   const newMessages = [...existingMessages, ...newestMessages];
 
@@ -95,7 +97,7 @@ const Feedback = ({ models, response, messages }: any) => {
       p={5}
       justifyContent='space-between'
     >
-      <Flex flexDirection="column" >
+      <Flex flexDirection="column" maxW='75%' mr={2} >
         <Text>
           How did your model do on your last prompt for{" "}
           <strong>

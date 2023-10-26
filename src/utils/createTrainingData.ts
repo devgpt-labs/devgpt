@@ -17,7 +17,7 @@ const createTrainingData = async (
   lofaf: string,
   repo: any,
   user: any,
-  session: any
+  session: any,
 ) => {
   const emailAddress = user.email;
   const access_token = session?.provider_token;
@@ -92,7 +92,7 @@ const addContext = async (
 
     const systemPrompt = await system();
 
-    const tokenLimit = await getTokenLimit(emailAddress);
+    const tokenLimit = await getTokenLimit();
 
     usefulFilePrompts.forEach((prompt: any) => {
       if (getTokensFromString(prompt.fileContent) < tokenLimit) {
@@ -127,7 +127,7 @@ const getUsefulFiles = async (sample_size: number, lofaf: string, user: any) => 
 
     return usefulFilesArray;
   } catch (error) {
-    console.warn(error);
+    console.warn({error});
     return [];
   }
 };

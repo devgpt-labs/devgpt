@@ -16,24 +16,22 @@ const FooterButtons = () => {
     <Flex gap={2}>
       {isPro && (
         <Tooltip label="Thank you!" placement="top">
-          <Link href="https://discord.com/invite/6GFtwzuvtw">
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Thank you!"
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <StarIcon />
-                  <Text ml={2} fontSize={14}>
-                    {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                    Pro Plan
-                  </Text>
-                </Flex>
-              }
-            />
-          </Link>
+          <IconButton
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            aria-label="Thank you!"
+            icon={
+              <Flex flexDirection="row" px={3}>
+                <StarIcon />
+                <Text ml={2} fontSize={14}>
+                  {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                  Pro Plan
+                </Text>
+              </Flex>
+            }
+          />
         </Tooltip>
       )}
 

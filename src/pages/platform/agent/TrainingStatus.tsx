@@ -9,7 +9,7 @@ const TrainingStatus = ({ initialMessages }: any) => {
   return initialMessages?.length < 2 ? (
     <Text mb={1}>
       Your model has <Badge colorScheme="orange">INCOMPLETE TRAINING</Badge>,
-      please re-train your model using the models page.
+      please train your model using the models page.
     </Text>
   ) : (
     <Text mb={1}>

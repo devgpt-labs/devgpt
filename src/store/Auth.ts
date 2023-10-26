@@ -13,6 +13,7 @@ const useStore = create((set) => ({
 	isPro: false,
 	status: null,
 	setCredits: (credits: number) => set({ credits }),
+	setInvites: (invites: any) => set({ invites }),
 	signOut: () => {
 		supabase?.auth.signOut();
 		set({ user: null, session: null });
@@ -53,12 +54,16 @@ const useStore = create((set) => ({
 		const githubIdentity: any = session?.user?.identities?.find(
 			(identity: any) => identity?.provider === "github"
 		)?.identity_data;
-		const pro = await checkIfPro(githubIdentity?.email);
 
 		if (!customerData) {
 			console.log("Failed to retrieve customer data");
 			return null;
 		}
+
+		const pro = await checkIfPro(
+			githubIdentity?.email,
+			customerData[0]?.invites
+		);
 
 		set({
 			user: session?.user,
@@ -69,6 +74,7 @@ const useStore = create((set) => ({
 			credits: customerData[0]?.credits,
 			status: customerData[0]?.status,
 			customer: customerData[0],
+			invites: customerData[0]?.invites,
 		});
 	},
 }));

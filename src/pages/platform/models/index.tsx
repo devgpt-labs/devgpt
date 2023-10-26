@@ -34,7 +34,6 @@ import { SmallAddIcon } from "@chakra-ui/icons";
 import { BiRefresh } from "react-icons/bi";
 import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
-import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 import createModelID from "@/utils/createModelID";
 
 const Models = () => {
@@ -45,10 +44,7 @@ const Models = () => {
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
-  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [someModelsAreTraining, setSomeModelsAreTraining] =
-    useState<boolean>(false);
 
   interface Model {
     id: string;
@@ -64,35 +60,7 @@ const Models = () => {
     frequency: number;
   }
 
-  const findIfModelsAreTraining = async () => {
-    const areModelsTraining = await modelsInTraining.map((model: any) => {
-      // If any of the logs in training logs are fulfilled false, return true
-
-      if (
-        trainingLogs.filter(
-          (log: any) =>
-            log.fulfilled === false &&
-            log.model_id ===
-            createModelID(model.repo, model.owner, model.branch)
-        ).length > 0
-      ) {
-        return true;
-      }
-
-      return false;
-    });
-
-    // If areModelsTraining array contains a true value, set someModelsAreTraining to true
-    const someModelsAreTraining = areModelsTraining.includes(true);
-    setSomeModelsAreTraining(someModelsAreTraining);
-  };
-
   useEffect(() => {
-    // get data from training_log table
-    modelsInTraining.map((model: any) => {
-      getTrainingLogsForModel(setTrainingLogs, model);
-    });
-
     // Subscribe to output changes
     if (!supabase) return;
     const models = supabase
@@ -118,34 +86,11 @@ const Models = () => {
         }
       )
       .subscribe();
-
-    const training = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "training_log" },
-        (payload: any) => {
-          const newTrainingLogs = trainingLogs.map((log: any) => {
-            if (log.id === payload.new.id) {
-              return payload.new;
-            }
-            return log;
-          });
-
-          setTrainingLogs(newTrainingLogs);
-        }
-      )
-      .subscribe();
   }, []);
 
   useEffect(() => {
     getModels(setModelsInTraining, setLoading, user?.email);
   }, [repos, refresh]);
-
-  useEffect(() => {
-    // Find if any models are still training
-    findIfModelsAreTraining();
-  }, [modelsInTraining]);
 
   useEffect(() => {
     if (!session) {
@@ -301,7 +246,6 @@ const Models = () => {
               return (
                 <ModelCard
                   id={model.id}
-                  trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}
                   setModelsInTraining={setModelsInTraining}

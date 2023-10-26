@@ -41,25 +41,24 @@ import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
 import { MdRefresh } from "react-icons/md";
-import addTrainingLog from "@/utils/addTrainingLog";
+import handleChargeCustomer from "@/utils/handleChargeCustomer";
 import trainModel from "@/utils/trainModel";
 import { useRouter } from "next/router";
+import { BiBrain } from "react-icons/bi";
 
 const ModelCard = ({
-  trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
   id,
 }: {
-  trainingLogs: any;
   model: any;
   modelsInTraining: any;
   setModelsInTraining: any;
   id: any;
 }) => {
-  const { session, user }: any = authStore();
-  const { repo, setRepo }: any = repoStore()
+  const { session, user, isPro }: any = authStore();
+  const { repo, setRepo }: any = repoStore();
   const router = useRouter();
   const {
     isOpen: isDeleteOpen,
@@ -81,18 +80,8 @@ const ModelCard = ({
     setIsTraining(true);
     setIsErrored(false);
 
-    // if training log fulfilled is false, don't do anything
-    // if output.length < 2, don't do anything
-    if (
-      !trainingLogs.filter((t: any) => t.model_id === id)[0]
-        ?.fulfilled === false ||
-      JSON.parse(model.output)?.length > 2
-    ) {
-      await addTrainingLog(model);
-    }
-
     // Set this model to actively train
-    const trainingOutput: any = await trainModel(model, session, user);
+    const trainingOutput: any = await trainModel(model, session, user, isPro);
 
     //validate the output
     if (trainingOutput?.length) {
@@ -223,7 +212,27 @@ const ModelCard = ({
           handleTrainModel();
         }}
       />
-      <Card rounded="lg" flexDirection="row">
+      <Card
+        onClick={() => {
+          saveKeyInCookies({
+            owner: model.owner,
+            repo: model.repo,
+          });
+
+          setRepo({
+            owner: model.owner,
+            repo: model.repo,
+          });
+        }}
+        cursor="pointer"
+        rounded="lg"
+        flexDirection="row"
+        bg="whiteAlpha.300"
+        boxShadow="lg"
+        opacity={repo.repo === model.repo ? "1" : "0.6"}
+        transition="opacity 0.2s ease-in-out"
+        _hover={{ opacity: "1" }}
+      >
         <CardBody>
           <Stack divider={<StackDivider />} spacing="4">
             <Box>
@@ -269,7 +278,7 @@ const ModelCard = ({
                         });
                       }}
                       aria-label="Train Model"
-                      icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
+                      icon={isTraining ? <Spinner size="sm" /> : <BiBrain />}
                     />
                   </Tooltip>
                   <Tooltip label="Select Model">

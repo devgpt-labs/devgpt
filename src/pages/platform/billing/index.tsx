@@ -10,6 +10,7 @@ import {
   Button,
   IconButton,
   useDisclosure,
+  Tag,
 } from "@chakra-ui/react";
 
 //stores
@@ -21,20 +22,24 @@ import { useRouter } from "next/router";
 //utils
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import getModels from "@/utils/getModels";
+import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 
 //components
 import Template from "@/components/Template";
+import BillingSectionHeader from "./BillingSectionHeader";
+import BillingTable from "./BillingTable";
+import Plans from "./Plans";
+import ConfirmationModal from "../models/ConfirmationModal";
+import InviteMembers from "./InviteMembers";
+import Invites from "./Invites";
+import Team from "./Team";
+import getOwnedTeams from "@/utils/getOwnedTeams";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
-import ConfirmationModal from "../models/ConfirmationModal";
-import BillingTable from "./BillingTable";
-import Plans from "./Plans";
-import BillingSectionHeader from "./BillingSectionHeader";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits, isPro }: any =
+  const { session, user, stripe_customer_id, invites, setInvites, isPro }: any =
     authStore();
   const router = useRouter();
   const {
@@ -50,19 +55,17 @@ const Models = ({ onClose }: any) => {
     onClose: onThankYouClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isCreditsOpen,
-    onOpen: onCreditsOpen,
-    onClose: onCreditsClose,
-  } = useDisclosure();
-
   const { repos }: any = repoStore();
-  const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [spentThisMonth, setSpentThisMonth] = useState<any>(0);
-  const [section, setSection] = useState<string>("Billing");
+  const [section, setSection] = useState<any>({
+    name: "Billing",
+    disabled: false,
+  });
+  const [teams, setTeams] = useState<any>([]);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -91,6 +94,10 @@ const Models = ({ onClose }: any) => {
 
     setMonthlySpend();
   }, [stripe_customer_id]);
+
+  useEffect(() => {
+    setSelectedTeam(teams[0]);
+  }, [teams]);
 
   useEffect(() => {
     if (!session) {
@@ -150,17 +157,8 @@ const Models = ({ onClose }: any) => {
 
   useEffect(() => {
     // If the url contains the word billing, open the billing section
-    if (router.asPath.includes("billing")) {
-      // Show billing section
-      setShowBilling(true);
-
-      // TODO: This is a hacky fix to scroll to billing after render
-      setTimeout(() => {
-        const element = document.getElementById("billing");
-        element?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
-  }, []);
+    getOwnedTeams(setTeams, invites, user?.email);
+  }, [setTeams, invites]);
 
   useEffect(() => {
     getMonthlyBudget();
@@ -174,7 +172,11 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const sections = ["Billing", "Models"];
+  const sections = [
+    { name: "Billing", disabled: false },
+    { name: "Models", disabled: false },
+    { name: "Teams", disabled: isPro === "individual" ? true : false },
+  ];
 
   if (loading || budget === null || !user) {
     return (
@@ -222,7 +224,7 @@ const Models = ({ onClose }: any) => {
 
       <ConfirmationModal
         header={`Budget Updated Successfully`}
-        body="Thank you for updating your budget. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
+        body="Thank you for updating your budge@t. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
         confirmButtonText="Complete"
         isOpen={isThankYouOpen}
         onClose={onThankYouClose}
@@ -241,6 +243,7 @@ const Models = ({ onClose }: any) => {
       >
         Add Credits
       </Tag> */}
+
       <Flex flexDirection="row" width="100%">
         <Flex flexDirection="column" px={8} pt={4}>
           <Text fontWeight="bold" mb={4}>
@@ -248,10 +251,11 @@ const Models = ({ onClose }: any) => {
           </Text>
           <Flex flexDirection="row">
             <Flex flexDirection="column">
-              {sections.map((title) => {
+              {sections.map((billingSection: any) => {
                 return (
                   <BillingSectionHeader
-                    title={title}
+                    name={billingSection.name}
+                    disabled={billingSection.disabled}
                     setSection={setSection}
                     section={section}
                   />
@@ -263,7 +267,7 @@ const Models = ({ onClose }: any) => {
         <Flex width="100%" flexDirection="column" p={4}>
           <Flex width="100%" justifyContent="space-between" mb={4}>
             <Flex flexDirection="row" alignItems="center" mb={4}>
-              <Heading size="md">{section}</Heading>
+              <Heading size="md">{section.name}</Heading>
             </Flex>
             <Flex gap={2}>
               <Link
@@ -281,14 +285,52 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
 
-          {section.toLowerCase() === "models" && (
+          {section.name.toLowerCase() === "models" && (
             <BillingTable
               modelsInTraining={modelsInTraining}
               budget={budget}
               budgetEstimation={budgetEstimation}
             />
           )}
-          {section.toLowerCase() === "billing" && <Plans />}
+
+          {section.name.toLowerCase() === "billing" && <Plans />}
+
+          {section.name.toLowerCase() === "teams" && (
+            <Box>
+              {teams.map((team: any) => {
+                return (
+                  <Tag
+                    colorScheme={selectedTeam === team ? "teal" : "white"}
+                    mb={2}
+                  >
+                    {team.name}
+                  </Tag>
+                );
+              })}
+
+              {isPro === "individual" ||
+                (isPro === "member" && (
+                  <Invites
+                    user={user}
+                    team={selectedTeam}
+                    invites={invites}
+                    setTeam={setSelectedTeam}
+                    setInvites={setInvites}
+                  />
+                ))}
+
+              {isPro === "business" && (
+                <>
+                  <InviteMembers
+                    team={selectedTeam}
+                    setTeam={setSelectedTeam}
+                  />
+                </>
+              )}
+
+              <Team team={selectedTeam} />
+            </Box>
+          )}
         </Flex>
       </Flex>
     </Template>

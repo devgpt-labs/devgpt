@@ -1,61 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
 import {
   Flex,
-  Text,
-  Box,
-  Skeleton,
-  Heading,
-  Tag,
-  Badge,
-  Link,
-  Image,
-  Button,
-  Table,
-  Thead,
-  Tbody,
-  ButtonGroup,
-  Stack,
-  Divider,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  Collapse,
-  TableContainer,
-  IconButton,
-  useDisclosure,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Tooltip,
-  Card,
-  CardBody,
-  CardFooter,
 } from "@chakra-ui/react";
 
 //stores
 import authStore from "@/store/Auth";
-import repoStore from "@/store/Repos";
-import { supabase } from "@/utils/supabase";
-import { useRouter } from "next/router";
 
 //utils
-import calculateTotalCost from "@/utils/calculateTotalCost";
-import getModels from "@/utils/getModels";
 
 //components
-import Template from "@/components/Template";
 
 //icons
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import { RiInformationFill } from "react-icons/ri";
-import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
-import ConfirmationModal from "../models/ConfirmationModal";
-import { BsFillPersonFill } from "react-icons/bs";
 import PlanCard from "./PlanCard";
-import { PiStarBold, PiShootingStarBold } from "react-icons/pi";
 import { FaStar } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { PiShootingStarFill } from "react-icons/pi";
