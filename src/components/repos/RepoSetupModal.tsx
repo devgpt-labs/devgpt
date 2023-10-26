@@ -34,8 +34,8 @@ const RepoSetupModal = ({
   const router = useRouter();
   const { session, user, monthly_budget }: any = authStore();
 
-  const [sampleSize, setSampleSize] = useState<any>(8);
-  const [frequency, setFrequency] = useState<any>(3);
+  const [sampleSize, setSampleSize] = useState<any>(5);
+  const [frequency, setFrequency] = useState<any>(1);
   const [branch, setBranch] = useState<any>("main");
   const [epochs, setEpochs] = useState(1);
   const [trainingMethod, setTrainingMethod] = useState("Embedding");
@@ -94,9 +94,10 @@ const RepoSetupModal = ({
           <Flex flexDirection="column">
             {monthly_budget < Number(cost) ? (
               <Text fontSize={14}>
-                Current training settings exceed your monthly budget. You can change your
-                budget in billing. We will block you from training this model
-                until you increase your budget incase this is an accident.
+                Current training settings exceed your monthly budget. You can
+                change your budget in billing. We will block you from training
+                this model until you increase your budget incase this is an
+                accident.
               </Text>
             ) : (
               <Flex flexDirection="column" gap={2}>
@@ -140,11 +141,12 @@ const RepoSetupModal = ({
             {monthly_budget < Number(cost) && (
               <Button
                 onClick={() => {
-                  router.push("/platform/billing")
+                  router.push("/platform/billing");
                 }}
-
-                mt={2}>View Billing</Button>
-
+                mt={2}
+              >
+                View Billing
+              </Button>
             )}
           </Flex>
         </DrawerFooter>

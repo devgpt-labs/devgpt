@@ -57,7 +57,6 @@ const Feedback = ({ models, response, messages }: any) => {
   const handleGoodAnswerClick = async () => {
     // TODO: Readd this 
     // updateModel();
-
     setFeedbackGiven(true);
   };
 

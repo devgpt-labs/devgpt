@@ -28,23 +28,11 @@ const checkIfPro = async (emailAddress: string) => {
     return false;
   }
 
-  //get this user's stripe_customer_id from Supabase
-  const { data, error } = await supabase
-    .from("customers")
-    .select("stripe_customer_id")
-    .eq("email_address", emailAddress);
+  const found_customer = await stripe.customers.search({
+    query: `email:'${emailAddress}'`,
+  });
 
-  if (error) {
-    errorHandler(error);
-    return false;
-  }
-
-  if (data?.length === 0) {
-    errorHandler("No user found with this email address");
-    return false;
-  }
-
-  const stripe_customer_id = data?.[0]?.stripe_customer_id;
+  const stripe_customer_id = found_customer?.data?.[0]?.id;
 
   if (!stripe_customer_id) {
     errorHandler("No stripe_customer_id found for this user");
@@ -60,7 +48,10 @@ const checkIfPro = async (emailAddress: string) => {
     return false;
   }
 
-  if (customer?.subscriptions?.data?.[0]?.status === "active") {
+  if (
+    customer?.subscriptions?.data?.[0]?.status === "active" ||
+    customer?.subscriptions?.data?.[0]?.status === "trialing"
+  ) {
     return true;
   } else {
     return false;

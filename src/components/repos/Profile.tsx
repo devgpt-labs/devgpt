@@ -9,6 +9,7 @@ import {
   useColorMode,
   SlideFade,
   Tooltip,
+  Tag,
   Link,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -18,11 +19,12 @@ import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
 import { MdMoney, MdScience, MdWork } from "react-icons/md";
+import { TbPrompt } from "react-icons/tb";
 
 // Components
 import Repos from "./Settings";
 import UpgradeModal from "./UpgradeModal";
-import DiscordAndGithubButtons from "@/pages/platform/agent/DiscordAndGithubButtons";
+import FooterButtons from "@/pages/platform/agent/FooterButtons";
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
@@ -126,7 +128,7 @@ const Profile = () => {
     const { data, error } = await supabase
       .from("customers")
       .select("credits")
-      .eq("email_address", emailAddress)
+      .eq("email_address", emailAddress);
 
     if (error) throw error;
     if (data !== null) {
@@ -144,7 +146,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isCreditsOpen]); // Empty dependency array means this effect runs once when the component mounts
+  }, [isCreditsOpen]);
 
   useEffect(() => {
     const identity = user?.identities?.find((identity: { provider: string }) =>
@@ -190,6 +192,7 @@ const Profile = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
+          px={4}
         >
           <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
@@ -214,15 +217,93 @@ const Profile = () => {
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
                   <Text onClick={onCreditsOpen}>{identity?.name}</Text>
-                  <Text>{identity?.email}</Text>
+                  <Text>
+                    {identity?.email}
+                  </Text>
                 </Flex>
-                <DiscordAndGithubButtons />
+                <FooterButtons />
               </Flex>
             </Box>
           </Flex>
           {user?.email && (
             <Flex flexDirection="row">
               <Flex gap={2}>
+                {!isPro && (
+                  <Tooltip label="Upgrade" placement="top">
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      bgGradient="linear(to-tr, teal.500, blue.500)"
+                      onClick={onUpgradeOpen}
+                      aria-label="Upgrade"
+                      icon={<StarIcon color="white" />}
+                    />
+                  </Tooltip>
+                )}
+
+                <Tooltip label={"Write Prompts"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/agent", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="Write Prompts"
+                    icon={<TbPrompt size={18} />}
+                  />
+                </Tooltip>
+                <Tooltip label={"View Models"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/models", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="View Models"
+                    icon={<MdScience size={18} />}
+                  />
+                </Tooltip>
+
+                <Tooltip label="Read The Docs" placement="top">
+                  <Link isExternal href="https://docs.devgpt.com">
+                    <IconButton
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Read The Docs"
+                      icon={<BiSolidBookBookmark />}
+                    />
+                  </Link>
+                </Tooltip>
+              </Flex>
+              <Flex gap={2} ml={2}>
+                <Tooltip label={"View Billing"} placement="top">
+                  <IconButton
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                    onClick={() => {
+                      router.push("/platform/billing", undefined, {
+                        shallow: true,
+                      });
+                    }}
+                    aria-label="View Billing"
+                    icon={<AiFillCreditCard size={18} />}
+                  />
+                </Tooltip>
+
                 <ProfileOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
@@ -246,64 +327,6 @@ const Profile = () => {
                       icon={<FaBug />}
                     />
                   </Link>
-                </Tooltip>
-                <Tooltip label="Read The Docs" placement="top">
-                  <Link isExternal href="https://docs.devgpt.com">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Read The Docs"
-                      icon={<BiSolidBookBookmark />}
-                    />
-                  </Link>
-                </Tooltip>
-              </Flex>
-              <Flex gap={2} ml={2}>
-                {!isPro && (
-                  <Tooltip label="Upgrade" placement="top">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      bgGradient="linear(to-tr, teal.500, blue.500)"
-                      onClick={onUpgradeOpen}
-                      aria-label="Upgrade"
-                      icon={<StarIcon color="white" />}
-                    />
-                  </Tooltip>
-                )}
-                <Tooltip label={"View Models"} placement="top">
-                  <IconButton
-                    _hover={{
-                      transform: "translateY(-4px)",
-                      transition: "all 0.2s ease-in-out",
-                    }}
-                    onClick={() => {
-                      router.push("/platform/models", undefined, {
-                        shallow: true,
-                      });
-                    }}
-                    aria-label="View Models"
-                    icon={<MdScience size={18} />}
-                  />
-                </Tooltip>
-                <Tooltip label={"View Billing"} placement="top">
-                  <IconButton
-                    _hover={{
-                      transform: "translateY(-4px)",
-                      transition: "all 0.2s ease-in-out",
-                    }}
-                    onClick={() => {
-                      router.push("/platform/billing", undefined, {
-                        shallow: true,
-                      });
-                    }}
-                    aria-label="View Billing"
-                    icon={<AiFillCreditCard size={18} />}
-                  />
                 </Tooltip>
                 <Tooltip label="Signout" placement="top">
                   <IconButton

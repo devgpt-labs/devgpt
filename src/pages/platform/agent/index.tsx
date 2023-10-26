@@ -24,6 +24,13 @@ import {
   Fade,
   Skeleton,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import { useChat } from "ai/react";
 import Cookies from "js-cookie";
@@ -42,6 +49,7 @@ import Template from "@/components/Template";
 import Response from "@/components/Response";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import PromptAreaAndButton from "./PromptAreaAndButton";
+import Feedback from "@/components/repos/Feedback";
 
 //utils
 import { savePrompt } from "@/utils/savePrompt";
@@ -59,12 +67,13 @@ import TrainingStatus from "./TrainingStatus";
 import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
-import { BiSolidBrain } from "react-icons/bi";
+import { BiSolidBrain, BiSolidStar } from "react-icons/bi";
 import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
 import { RiInformationFill } from "react-icons/ri";
+import { GiUpgrade } from "react-icons/gi";
 
 const Chat = () => {
   // Constants
@@ -93,8 +102,15 @@ const Chat = () => {
   const router = useRouter();
   const { colorMode } = useColorMode();
   const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
-  const { user, session, stripe_customer_id, signOut, status, credits }: any =
-    authStore();
+  const {
+    user,
+    session,
+    stripe_customer_id,
+    signOut,
+    status,
+    credits,
+    isPro,
+  }: any = authStore();
 
   // Handles responses, sending prompt, reloading and input.
   const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
@@ -122,26 +138,6 @@ const Chat = () => {
   });
 
   const MAX_MESSAGES = 7; //todo - this should come from training status
-
-  if (status?.isBanned) {
-    return (
-      <Template>
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          mt={5}
-          h="100vh"
-          w="100vw"
-        >
-          <BiConfused />
-          <Text ml={3}>
-            Oops, something went wrong! Please get in touch with the team via
-            Discord.
-          </Text>
-        </Flex>
-      </Template>
-    );
-  }
 
   useEffect(() => {
     // Get all models
@@ -171,6 +167,17 @@ const Chat = () => {
       router.push("/", undefined, { shallow: true });
       console.log("no user found, returning to home");
     }
+
+    console.log(
+      "Helpful debugging information, if all of these are true, it's probably working fine.:",
+      {
+        "User is pro": isPro,
+        "User email": user?.email,
+        "Valid Repo": !!lofaf,
+        "Valid Stripe": !!stripe_customer_id,
+        "Valid Github": !!session?.provider_token,
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -185,7 +192,7 @@ const Chat = () => {
 
     getLofaf(repo.owner, repo.repo, session).then((data) => {
       // If no data tree, return
-      if (!data?.tree) return null
+      if (!data?.tree) return null;
 
       // Get files from the data tree
       const files = data?.tree?.map((file: any) => file.path);
@@ -300,10 +307,93 @@ const Chat = () => {
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
 
+  if (!isPro) {
+    return (
+      <Template>
+        <Flex
+          flexDirection="row"
+          width="80%"
+          height="70vh"
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>It's time to upgrade</ModalHeader>
+              <ModalBody>
+                <Text>
+                  To use DevGPT, you need a plan that unlocks its full
+                  potential. This allows you to train models and run prompts.
+                </Text>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button
+                  width="100%"
+                  bgGradient="linear(to-r, blue.500, teal.500)"
+                  color="white"
+                  onClick={() => {
+                    router.push("/platform/billing");
+                  }}
+                >
+                  <Text mr={2}>Billing</Text>
+                  <AiFillCreditCard />
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="85%"
+            mb={4}
+            borderRadius={10}
+          />
+          <Skeleton
+            bg="gray.700"
+            height="40px"
+            width="15%"
+            mb={4}
+            borderRadius={10}
+          />
+        </Flex>
+      </Template>
+    );
+  }
+
+  if (status?.isBanned) {
+    return (
+      <Template>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          mt={5}
+          h="70vh"
+          w="100vw"
+        >
+          <BiConfused />
+          <Text ml={3}>
+            Oops, something went wrong! Please get in touch with the team via
+            Discord.
+          </Text>
+        </Flex>
+      </Template>
+    );
+  }
+
   if (!user) {
     return (
       <Template>
-        <Flex flexDirection="row" width="80%" height="100%" gap={2}>
+        <Flex
+          flexDirection="row"
+          width="80%"
+          height="70vh"
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
           <Skeleton
             bg="gray.700"
             height="40px"
@@ -359,53 +449,37 @@ const Chat = () => {
           )}
           {repo.repo && (
             <Box>
-              {status?.isOverdue ||
-                (credits < 0 && (
-                  <Flex flexDirection="column" mt={4}>
-                    <Text>
-                      Before you continue prompting, we need to get your billing
-                      in order!
-                    </Text>
-                    <Text mb={3} fontSize={14} color="gray.600">
-                      You're accounts billing is currently overdue, so before
-                      you continue we'll need to help you set up billing
-                      correctly. You can continue using DevGPT and prompting
-                      with your trained models immediately after this.
-                    </Text>
-                    {/* <Button
+              {!isPro && (
+                <Flex flexDirection="column" mt={4}>
+                  <Text>
+                    Before you continue prompting, we need to get your billing
+                    in order!
+                  </Text>
+                  <Text mb={3} fontSize={14} color="gray.600">
+                    You can continue using DevGPT and prompting with your
+                    trained models immediately after this.
+                  </Text>
+                  <Flex flexDirection="row" gap={2}>
+                    <Button
+                      width="100%"
                       bgGradient={"linear(to-r, blue.500, teal.500)"}
+                      color="white"
                       onClick={() => {
                         router.push("/platform/billing");
                       }}
-                      width="100%"
-                      mb={3}
                     >
-                      <Text color="white" mr={2}>
-                        Upgrade
-                      </Text>
-                      <BiUpArrowAlt color="white" />
-                    </Button> */}
-                    <Flex flexDirection="row" gap={2}>
-                      <Button
-                        width="100%"
-                        bgGradient={"linear(to-r, blue.500, teal.500)"}
-                        color='white'
-                        onClick={() => {
-                          router.push("/platform/billing");
-                        }}
-                      >
-                        <Text mr={2}>View Billing</Text>
-                        <AiFillCreditCard />
+                      <Text mr={2}>View Billing</Text>
+                      <AiFillCreditCard />
+                    </Button>
+                    <Link href="mailto:support@devgpt.com">
+                      <Button>
+                        <Text mr={2}>Email Support</Text>
+                        <EmailIcon />
                       </Button>
-                      <Link href="mailto:support@devgpt.com">
-                        <Button>
-                          <Text mr={2}>Email Support</Text>
-                          <EmailIcon />
-                        </Button>
-                      </Link>
-                    </Flex>
+                    </Link>
                   </Flex>
-                ))}
+                </Flex>
+              )}
               <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
@@ -473,7 +547,7 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              {!hasSentAMessage && !status?.isOverdue && credits > 0 && (
+              {!hasSentAMessage && (
                 <Box mt={4}>
                   <Flex
                     flexDirection="row"
@@ -527,16 +601,11 @@ const Chat = () => {
                     <ModelStat
                       label="Training Accuracy"
                       number={`${(
-                        ((initialMessages.length - 1) /
-                          2 /
-                          model?.sample_size) *
+                        (activeModelFilesTrained / model?.sample_size) *
                         100
                       ).toFixed(2)}%`}
                       tip={
-                        ((initialMessages.length - 1) /
-                          2 /
-                          model?.sample_size) *
-                          100 <
+                        (activeModelFilesTrained / model?.sample_size) * 100 <
                           60
                           ? "Below 60% accuracy, we recommend retraining"
                           : moment(Date.now()).format("MMMM Do YYYY")
@@ -603,11 +672,7 @@ const Chat = () => {
             </Flex>
           )}
         </Box>
-        {/* <>
-          {status?.isOverdue || credits < 0 ? null : (
-            <Feedback models={models} response={response} messages={messages} />
-          )}
-        </> */}
+        <Feedback models={models} response={response} messages={messages} />
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

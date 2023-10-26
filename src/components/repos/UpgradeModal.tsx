@@ -8,6 +8,7 @@ import {
   Link,
   Modal,
   ModalCloseButton,
+  Box,
   ModalContent,
   ModalOverlay,
   Stack,
@@ -20,12 +21,15 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import planIntegers from "@/configs/planIntegers";
+import { useRouter } from "next/router";
 
 // stores
 import authStore from "@/store/Auth";
 
 const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
   const { user }: any = authStore();
+  const router = useRouter();
 
   return (
     <Modal isOpen={isUpgradeOpen} onClose={onUpgradeClose} size="2xl">
@@ -36,12 +40,10 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
           <CardBody textAlign={"center"}>
             <Stack>
               <Heading size="lg" mb={2}>
-                Pro Plan: Early Bird
+                DevGPT Plans
               </Heading>
               <Text mb={6} fontSize={16}>
-                This is our early bird price, it will be available for a limited
-                time only. This will also include these benefits in our desktop
-                app when it is released.
+                More detail below.
               </Text>
             </Stack>
             <TableContainer>
@@ -49,30 +51,41 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                 <Thead fontWeight={"bold"}>
                   <Tr>
                     <Th>Feature</Th>
-                    <Th>Free</Th>
-                    <Th>Pro</Th>
+                    <Th>{planIntegers.individual.name}</Th>
+                    <Th>{planIntegers.business.name}</Th>
+                    <Th>{planIntegers.enterprise.name}</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   <Tr>
-                    <Td>Daily Prompts </Td>
-                    <Td>15</Td>
-                    <Td>Unlimited</Td>
+                    <Td>Trained Models </Td>
+                    <Td>{planIntegers.individual.models}</Td>
+                    <Td>{planIntegers.business.models}</Td>
+                    <Td>∞</Td>
                   </Tr>
                   <Tr>
-                    <Td>AI Model </Td>
-                    <Td>GPT-4-8K</Td>
-                    <Td>GPT-4-32K</Td>
+                    <Td>Training Rounds (up to)</Td>
+                    <Td>{planIntegers.individual.sample_size}</Td>
+                    <Td>{planIntegers.business.sample_size}</Td>
+                    <Td>{planIntegers.enterprise.sample_size}</Td>
                   </Tr>
                   <Tr>
-                    <Td>Model Training</Td>
-                    <Td>5 rounds</Td>
-                    <Td>15 rounds</Td>
+                    <Td>Team Seats</Td>
+                    <Td>{planIntegers.individual.team_members}</Td>
+                    <Td>{planIntegers.business.team_members}</Td>
+                    <Td>∞</Td>
                   </Tr>
                   <Tr>
-                    <Td>Priority Support</Td>
+                    <Td>Private Instance</Td>
                     <Td>×</Td>
                     <Td>✓</Td>
+                    <Td>✓</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Price</Td>
+                    <Td>{planIntegers.individual.price}</Td>
+                    <Td>{planIntegers.business.price}</Td>
+                    <Td>Contact</Td>
                   </Tr>
                 </Tbody>
               </Table>
@@ -85,25 +98,24 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
               flex={1}
               flexDirection={"column"}
             >
-              <Link
-                href={`https://buy.stripe.com/5kA7sB7AMe9xaZ2aFP?client_reference_id=${user?.id}`}
+              <Button
+                onClick={() => {
+                  router.push("/platform/billing", undefined, {
+                    shallow: true,
+                  });
+                }}
+                size="lg"
+                color={"white"}
+                bgGradient={"linear(to-r, blue.500, teal.500)"}
+                _hover={{
+                  bgGradient: "linear(to-r, blue.500, teal.500)",
+                }}
+                mb={2}
               >
-                <Button
-                  size="lg"
-                  color={"white"}
-                  bgGradient={"linear(to-r, blue.500, teal.500)"}
-                  _hover={{
-                    bgGradient: "linear(to-r, blue.500, teal.500)",
-                  }}
-                  mb={2}
-                >
-                  <Text as="s" mr={2} fontSize={14}>
-                    {" "}
-                    $25.99
-                  </Text>{" "}
-                  $15.99 /month
-                </Button>
-              </Link>
+                <Text >
+                  Learn More
+                </Text>{" "}
+              </Button>
 
               <Text pt={5} textAlign={"center"}>
                 Cancel anytime. Billing provided by Stripe.

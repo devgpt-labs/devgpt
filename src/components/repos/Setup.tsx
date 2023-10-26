@@ -17,6 +17,7 @@ import { IoMdInformationCircle } from "react-icons/io";
 
 //stores
 import calculateTotalCost from "@/utils/calculateTotalCost";
+import planIntegers from "@/configs/planIntegers";
 
 const Setup = ({
   repo,
@@ -59,27 +60,12 @@ const Setup = ({
         <Text>Train using {sampleSize} sample files</Text>
         <Text>Train {frequency} time(s) every month</Text>
         <Text>Run {epochs} epochs each cycle</Text>
-        <Divider my={2} />
-        <Text>
-          Estimated Price Per Month: $
-          {/* A 0 is added to this calculation as we have nothing else to add */}
-          {calculateTotalCost(
-            [
-              {
-                frequency: frequency,
-                epochs: epochs,
-                sample_size: sampleSize,
-              },
-            ],
-            0
-          )}
-        </Text>
       </Box>
       <Flex gap={2} flexDirection="column">
         <SliderInput
           label="Sample Size:"
           increment={3}
-          max={100}
+          max={planIntegers.individual.sample_size}
           min={5}
           Icon={PhoneIcon}
           tooltip="Sample Size is the number of files to train on. If this is set to 10, 10 important files will be selected from the repo to train on."
@@ -89,7 +75,7 @@ const Setup = ({
         <SliderInput
           label="Cycles Frequency:"
           increment={1}
-          max={300}
+          max={planIntegers.individual.frequency}
           min={1}
           Icon={PhoneIcon}
           tooltip="Frequency is the number of commits between running a new training cycle. If this is set to 3, a new training cycle will run every 3 commits."

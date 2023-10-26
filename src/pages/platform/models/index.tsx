@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import {
   Flex,
-  Box,
   Heading,
   Grid,
   Text,
@@ -15,10 +14,16 @@ import {
   AccordionPanel,
   AccordionIcon,
   Spinner,
+  Skeleton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  Box,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import ModelCard from "./ModelCard";
-import ModelInTraining from "./ModelInTraining";
 import ModelLoadingScreen from "./ModelLoadingScreen";
 
 //stores
@@ -30,9 +35,10 @@ import { useRouter } from "next/router";
 //components
 import Template from "@/components/Template";
 import RepoDrawer from "@/components/repos/RepoDrawer";
+import { AiFillCreditCard } from "react-icons/ai";
 
 //icons
-import { SmallAddIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import { SmallAddIcon } from "@chakra-ui/icons";
 import { BiRefresh } from "react-icons/bi";
 import getModels from "@/utils/getModels";
 import AddAModel from "./AddAModel";
@@ -40,7 +46,7 @@ import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 import createModelID from "@/utils/createModelID";
 
 const Models = () => {
-  const { session, user, stripe_customer_id, credits, status }: any =
+  const { session, user, stripe_customer_id, credits, isPro }: any =
     authStore();
   const router = useRouter();
 
@@ -169,7 +175,92 @@ const Models = () => {
   }, [session, user]);
 
   if (loading || !user) return <ModelLoadingScreen />;
-  if (modelsInTraining.length === 0) return <AddAModel />;
+  if (modelsInTraining.length === 0 && isPro)
+    return <AddAModel setRefresh={setRefresh} refresh={refresh} />;
+
+  if (!isPro) {
+    return (
+      <Template>
+        <Flex
+          flexDirection="row"
+          width="100%"
+          p={4}
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>It's time to upgrade</ModalHeader>
+              <ModalBody>
+                <Text>
+                  To use DevGPT, you need a plan that unlocks its full
+                  potential. This allows you to train models and run prompts.
+                </Text>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button
+                  width="100%"
+                  bgGradient="linear(to-r, blue.500, teal.500)"
+                  color="white"
+                  onClick={() => {
+                    router.push("/platform/billing");
+                  }}
+                >
+                  <Text mr={2}>Billing</Text>
+                  <AiFillCreditCard />
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          <Box width="100vw">
+            <Flex width="100%" mb={6} justifyContent="space-between">
+              <Skeleton
+                bg="gray.700"
+                height="35px"
+                width="250px"
+                borderRadius={10}
+              />
+              <Flex flexDirection="row" gap={4}>
+                <Skeleton
+                  bg="gray.700"
+                  height="35px"
+                  width="150px"
+                  borderRadius={10}
+                />
+                <Skeleton
+                  bg="gray.700"
+                  height="35px"
+                  width="150px"
+                  borderRadius={10}
+                />
+                <Skeleton
+                  bg="gray.700"
+                  height="35px"
+                  width="150px"
+                  borderRadius={10}
+                />
+              </Flex>
+            </Flex>
+            <Grid
+              templateColumns="repeat(3, 1fr)"
+              gap={8}
+              flexWrap="wrap"
+              width="100%"
+            >
+              <Skeleton bg="gray.700" height="250px" borderRadius={10} />
+              <Skeleton bg="gray.700" height="250px" borderRadius={10} />
+              <Skeleton bg="gray.700" height="250px" borderRadius={10} />
+              <Skeleton bg="gray.700" height="250px" borderRadius={10} />
+              <Skeleton bg="gray.700" height="250px" borderRadius={10} />
+            </Grid>
+          </Box>
+        </Flex>
+      </Template>
+    );
+  }
 
   return (
     <Template>
@@ -183,7 +274,7 @@ const Models = () => {
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">
-            <Link href="/platform/agent">
+            {/* <Link href="/platform/agent">
               <IconButton
                 onClick={() => {
                   router.back();
@@ -191,10 +282,8 @@ const Models = () => {
                 aria-label="Close"
                 icon={<ArrowBackIcon />}
               />
-            </Link>
-            <Heading size="md" ml={4}>
-              Trained Models
-            </Heading>
+            </Link> */}
+            <Heading size="md">Trained Models</Heading>
           </Flex>
           <Flex gap={2}>
             <Button
@@ -208,7 +297,7 @@ const Models = () => {
               {refresh ? "Refreshing..." : "Refresh"}
             </Button>
             <Button
-              isDisabled={credits < 0 || status?.isOverdue}
+              isDisabled={!isPro}
               onClick={() => {
                 setRepoWindowOpen(!repoWindowOpen);
               }}
@@ -228,6 +317,7 @@ const Models = () => {
             {modelsInTraining.map((model: any) => {
               return (
                 <ModelCard
+                  id={model.id}
                   trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}
@@ -238,7 +328,7 @@ const Models = () => {
           </Grid>
         )}
       </Flex>
-      <RepoDrawer />
+      <RepoDrawer setRefresh={setRefresh} refresh={refresh} />
     </Template>
   );
 };

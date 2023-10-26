@@ -40,7 +40,7 @@ const createTrainingData = async (
       repo,
       access_token,
       emailAddress,
-      user,
+      user
     );
 
     if (TRAIN_FOR_ENCODING) {
@@ -76,7 +76,11 @@ const addContext = async (
   user: any
 ) => {
   try {
-    const usefulFiles: UsefulFile[] = await getUsefulFiles(sample_size, lofaf, user);
+    const usefulFiles: UsefulFile[] = await getUsefulFiles(
+      sample_size,
+      lofaf,
+      user
+    );
 
     const usefulFileContents: any = await getUsefulFileContents(
       usefulFiles,
@@ -112,7 +116,11 @@ const addContext = async (
   }
 };
 
-const getUsefulFiles = async (sample_size: number, lofaf: string, user: any) => {
+const getUsefulFiles = async (
+  sample_size: number,
+  lofaf: string,
+  user: any
+) => {
   try {
     const { prompt: filesPrompt, functions: filesFunction } =
       await selectTrainingFiles(lofaf);
@@ -173,19 +181,24 @@ const getUsefulFilePrompts = async (user: any, files: any) => {
         return;
       }
 
-      const { prompt: trainingPrompt } = await generateTrainingPrompts(
-        file.fileContent
-      );
+      try {
+        const { prompt: trainingPrompt } = await generateTrainingPrompts(
+          file.fileContent
+        );
 
-      const response = await sendLLM(user?.email, trainingPrompt);
+        const response = await sendLLM(user?.email, trainingPrompt);
 
-      const prompt = response?.choices?.[0]?.message?.content;
+        const prompt = response?.choices?.[0]?.message?.content;
 
-      return {
-        fileName: file.fileName,
-        fileContent: file.fileContent,
-        userPrompt: prompt,
-      };
+        return {
+          fileName: file.fileName,
+          fileContent: file.fileContent,
+          userPrompt: prompt,
+        };
+      } catch (error) {
+        console.warn(error);
+        return;
+      }
     });
 
     let filesWithPrompts = await Promise.all(promises);

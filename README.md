@@ -1,4 +1,4 @@
-# DevGPT: We're building the world's best open-source dev agent.
+# DevGPT: Autonomous AI that writes code like you; for human review.
 
 ## Table of Contents
 
@@ -28,22 +28,11 @@ Welcome to **DevGPT**, the AI-driven development tool designed to transform the 
 
 ## Key Outcomes
 
+- **Train Models**: Automatically train AI models on your code repositories.
 - **Write Unit Tests**: Automatically generate unit tests for your codebase.
 - **Write Complex Functions**: No need to fret over complex algorithms; let DevGPT handle them.
 - **Create Components**: Create UI/UX components effortlessly.
 - **Debug**: Troubleshoot issues in your code easily.
-
-## Bounty board (For OSS contributors)
-
-| Task                                                                                                                 |
-| -------------------------------------------------------------------------------------------------------------------- |
-| Updating documentation                                                                                               |
-| Add compatibility for Open-AI (repo currently only supports Azure, .env change only, no frontend changes)            |
-| While page is loading it should show a spinner instead of the broken top-bar                                         |
-| Shouldn’t need to re-train models on previously selected repos - save the conversation to local memory, e.g. cookies |
-| Add option to re-train a model manually (calls setupContextMessages)                                                 |
-| Bitbucket and GitLab integrations                                                                                    |
-| Performance increase for local development (high load time and CPU  when running locally?)                           |
 
 ## FAQs
 

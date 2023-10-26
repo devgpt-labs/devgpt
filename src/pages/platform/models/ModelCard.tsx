@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Flex,
   Text,
@@ -16,14 +16,6 @@ import {
   StatLabel,
   StatNumber,
   IconButton,
-  useColorMode,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
   Button,
   Spinner,
@@ -40,7 +32,6 @@ import { supabase } from "@/utils/supabase";
 //components
 import ModelInTraining from "@/pages/platform/models/ModelInTraining";
 import Setup from "@/components/repos/Setup";
-import setFulfilledBackToFalseForTrainingLog from "@/utils/setFulfilledBackToFalseForTrainingLog";
 
 //utils
 import moment from "moment";
@@ -49,34 +40,36 @@ import moment from "moment";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
-import { BiRefresh } from "react-icons/bi";
 import { MdRefresh } from "react-icons/md";
 import addTrainingLog from "@/utils/addTrainingLog";
-import createModelID from "@/utils/createModelID";
 import trainModel from "@/utils/trainModel";
+import { useRouter } from "next/router";
 
 const ModelCard = ({
   trainingLogs,
   model,
   modelsInTraining,
   setModelsInTraining,
+  id,
 }: {
   trainingLogs: any;
   model: any;
   modelsInTraining: any;
   setModelsInTraining: any;
+  id: any;
 }) => {
   const { session, user }: any = authStore();
   const { repo, setRepo }: any = repoStore();
+  const router = useRouter();
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
   const {
-    isOpen: isRetrainOpen,
-    onOpen: onRetrainOpen,
-    onClose: onRetrainClose,
+    isOpen: isTrainOpen,
+    onOpen: onTrainOpen,
+    onClose: onTrainClose,
   } = useDisclosure();
   const [deletingModel, setDeletingModel] = useState<boolean>(false);
   const [savedChanges, setSavedChanges] = useState<boolean>(false);
@@ -84,22 +77,22 @@ const ModelCard = ({
   const [isErrored, setIsErrored] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
-  const retrainModel = async () => {
+  const handleTrainModel = async () => {
     setIsTraining(true);
     setIsErrored(false);
 
     // if training log fulfilled is false, don't do anything
     // if output.length < 2, don't do anything
     if (
-      !trainingLogs.filter((t: any) => t.model_id === model.id)[0]
-        ?.fulfilled === false ||
+      !trainingLogs.filter((t: any) => t.model_id === id)[0]?.fulfilled ===
+        false ||
       JSON.parse(model.output)?.length > 2
     ) {
       await addTrainingLog(model);
     }
 
     // Set this model to actively train
-    const trainingOutput = await trainModel(model, session, user);
+    const trainingOutput: any = await trainModel(model, session, user);
 
     //validate the output
     if (trainingOutput?.length) {
@@ -124,7 +117,7 @@ const ModelCard = ({
       return;
     }
 
-    if (!model || !model.id) {
+    if (!model || !id) {
       console.log("Model is missing required properties.");
       return;
     }
@@ -136,7 +129,7 @@ const ModelCard = ({
         sample_size: model.sample_size,
         epochs: model.epochs,
       })
-      .eq("id", model.id)
+      .eq("id", id)
       .select();
 
     if (error) {
@@ -152,7 +145,7 @@ const ModelCard = ({
       return;
     }
 
-    if (!model || !model.id) {
+    if (!model || !id) {
       console.log("Model is missing required properties.");
       return;
     }
@@ -163,7 +156,7 @@ const ModelCard = ({
         .update({
           deleted: "TRUE",
         })
-        .eq("id", model.id)
+        .eq("id", id)
         .select();
 
       if (error) {
@@ -186,7 +179,7 @@ const ModelCard = ({
 
     setModelsInTraining(
       modelsInTraining.map((m: any) => {
-        if (m.id === model.id) {
+        if (m.id === id) {
           return {
             ...m,
             [name]: value,
@@ -221,13 +214,13 @@ const ModelCard = ({
         }}
       />
       <ConfirmationModal
-        header="Retrain this model?"
-        body="Confirm you would like to retrain this model, you will not be charged if your model has failed to train."
-        confirmButtonText="Retrain"
-        isOpen={isRetrainOpen}
-        onClose={onRetrainClose}
+        header="Train this model?"
+        body="Confirm you would like to Train this model, you will not be charged if your model has failed to train."
+        confirmButtonText="Train"
+        isOpen={isTrainOpen}
+        onClose={onTrainClose}
         onSubmit={() => {
-          retrainModel();
+          handleTrainModel();
         }}
       />
       <Card rounded="lg" flexDirection="row">
@@ -269,7 +262,11 @@ const ModelCard = ({
                       isDisabled={isTraining}
                       size="sm"
                       onClick={() => {
-                        onRetrainOpen();
+                        onTrainOpen();
+                        setRepo({
+                          owner: model.owner,
+                          repo: model.repo,
+                        });
                       }}
                       aria-label="Train Model"
                       icon={isTraining ? <Spinner size="sm" /> : <MdRefresh />}
@@ -288,6 +285,10 @@ const ModelCard = ({
                         setRepo({
                           owner: model.owner,
                           repo: model.repo,
+                        });
+
+                        router.push("/platform/agent", undefined, {
+                          shallow: true,
                         });
                       }}
                       aria-label="Select Model"
@@ -344,7 +345,7 @@ const ModelCard = ({
                 )}
               </Flex>
               <Text fontSize={14}>
-                {model.owner} - {model.branch}
+                {model.owner} / {model.repo} / {model.branch}
               </Text>
               <Text fontSize={14}>
                 {moment(model.created_at).format("MMMM Do YYYY, h:mm:ss a")}
