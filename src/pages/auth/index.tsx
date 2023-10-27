@@ -74,11 +74,6 @@ const Auth = () => {
     }
   }, [loading, user, session, router.asPath]);
 
-  console.log({ loading });
-  console.log({ user });
-  console.log({ session });
-  console.log({ models });
-
   if (loading)
     return (
       <Template>

@@ -13,19 +13,13 @@ const stripe = new Stripe(token, {
 });
 
 const checkIfPro = async (emailAddress: string, invites: any) => {
-	const errorHandler = (error: any) => {
-		console.warn(error);
-	};
-
 	if (!emailAddress) {
-		errorHandler("No email address provided");
+		console.warn("No email address provided");
 		return false;
 	}
 
 	if (!supabase) {
-		errorHandler(
-			"Supabase is not configured correctly. Please check the .env file."
-		);
+		console.warn("Supabase is not configured correctly. Please check the .env file.");
 		return false;
 	}
 
@@ -36,7 +30,7 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 	const stripe_customer_id = found_customer?.data?.[0]?.id;
 
 	if (!stripe_customer_id) {
-		errorHandler("No stripe_customer_id found for this user");
+		console.warn("No stripe_customer_id found for this user");
 		return false;
 	}
 
@@ -46,15 +40,20 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 
 	const subscriptionType = customer?.subscriptions?.data?.[0]?.plan?.id;
 
+	console.log({ subscriptionType });
 	if (!customer) {
-		errorHandler("No customer found with this stripe_customer_id");
+		console.warn("No customer found with this stripe_customer_id");
 		return false;
 	}
 
 	// Check through planIntegers and find which plan has the subscriptionType
 	const activePlan = Object.keys(planIntegers).find((plan: any) => {
+		
 		return planIntegers?.[plan]?.id === subscriptionType;
 	});
+
+	console.log({ activePlan });
+	console.log({ invites });
 
 	if (activePlan === "business") {
 		// Check if a team already exists that was created by this user, if so, return nothing, if not, create a team
@@ -69,32 +68,49 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 
 		if (!teamData || teamData?.length === 0) {
 			// Create a new team
-			const { data: insertTeamData, error: insertTeamError } = await supabase
-				.from("teams")
-				.insert([
-					{
-						owner: customer?.email,
-						name: `${customer?.email}'s Team`,
-						members: [
-							{ name: customer?.email, email: customer?.email, accepted: true },
-						],
-					},
-				])
-				.eq("owner", customer?.email);
+			const { data: insertTeamData, error: insertTeamError }: any =
+				await supabase
+					.from("teams")
+					.insert([
+						{
+							owner: customer?.email,
+							name: `${customer?.email}'s Team`,
+							members: [
+								{
+									name: customer?.email,
+									email: customer?.email,
+									accepted: true,
+								},
+							],
+						},
+					])
+					.eq("owner", customer?.email);
 
 			// Invite the owner of the team to the team
-			const { data: inviteData, error: inviteError } = await supabase
+			const { error: inviteError } = await supabase
 				.from("customers")
-				.update({ invites: [insertTeamData?.[0]?.id] })
+				.update({ invites: { team: insertTeamData?.[0]?.id, accepted: true } })
 				.eq("email_address", customer?.email);
 
 			if (insertTeamError) {
 				console.warn(insertTeamError);
 			}
+
+			if (inviteError) {
+				console.warn(inviteError);
+			}
 		}
+
+		return "business";
 	}
 
 	// If the user has an invite to a team, set their activePlan as 'member'
+	if (invites?.length > 0) {
+		return "member";
+	}
+
+	console.log(invites);
+	
 
 	if (
 		customer?.subscriptions?.data?.[0]?.status === "active" ||
@@ -102,10 +118,7 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 	) {
 		return activePlan;
 	} else {
-		if (invites?.length > 0) {
-			return "member";
-		}
-
+		console.log('no problems')
 		return false;
 	}
 };

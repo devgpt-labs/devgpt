@@ -17,7 +17,6 @@ const getOwnedTeams = async (setState: any, invites: any, email: any) => {
 	}
 
 	if (teamsData) {
-		console.log({teamsData});
 		return setState(teamsData);
 	}
 

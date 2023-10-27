@@ -96,8 +96,10 @@ const Models = ({ onClose }: any) => {
   }, [stripe_customer_id]);
 
   useEffect(() => {
-    setSelectedTeam(teams[0]);
-  }, []);
+    if (teams.length > 0) {
+      setSelectedTeam(teams[0]);
+    }
+  }, [teams]);
 
   useEffect(() => {
     if (!session) {
@@ -160,7 +162,7 @@ const Models = ({ onClose }: any) => {
     getOwnedTeams(setTeams, invites, user?.email);
   }, [setTeams, invites]);
 
-  console.log(teams);
+  console.log({ isPro });
 
   useEffect(() => {
     getMonthlyBudget();
@@ -307,7 +309,7 @@ const Models = ({ onClose }: any) => {
               {teams.map((team: any) => {
                 return (
                   <Tag
-                    color='white'
+                    color="white"
                     bgGradient="linear(to-r, blue.500, teal.500)"
                     mb={2}
                   >
@@ -341,7 +343,6 @@ const Models = ({ onClose }: any) => {
               )}
 
               <Team team={selectedTeam} />
-
             </Box>
           )}
         </Flex>
