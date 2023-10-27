@@ -42,7 +42,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [models, setModels] = useState<any[]>([]);
 
-  const { fetch, user }: any = useStore();
+  const { fetch, user, session }: any = useStore();
 
   useEffect(() => {
     fetch();
@@ -50,9 +50,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     if (user) {
-      setLoading(true);
-
-      await getModels(setModels, setLoading, user?.email);
+      await getModels(setModels, () => { }, user?.email);
 
       if (models.length > 0) {
         // Navigate user to the prompting page
@@ -61,12 +59,25 @@ const Auth = () => {
         // If the user has no models, navigate them to the add a model page
         router.push("/platform/models", undefined, { shallow: true });
       }
+    } else {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     handleLogin();
   }, [user]);
+
+  useEffect(() => {
+    if (loading || user || session || router.asPath.includes("access_token")) {
+      setLoading(true);
+    }
+  }, [loading, user, session, router.asPath]);
+
+  console.log({ loading });
+  console.log({ user });
+  console.log({ session });
+  console.log({ models });
 
   if (loading)
     return (
@@ -93,14 +104,17 @@ const Auth = () => {
           <GitConnectorButton
             color="black"
             provider="Sign In With Github"
-            handle={signInWithGithub}
+            handle={() => {
+              setLoading(true);
+              signInWithGithub();
+            }}
             Icon={<BsGithub />}
             tooltip=""
           />
           <GitConnectorButton
             color="#0c61db"
             provider="Sign In With BitBucket"
-            handle={signInWithBitbucket}
+            handle={() => { }}
             Icon={<FaBitbucket />}
             tooltip="Coming soon!"
           />

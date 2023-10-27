@@ -67,7 +67,7 @@ import TrainingStatus from "./TrainingStatus";
 import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
-import { BiSolidBrain, BiSolidStar } from "react-icons/bi";
+import { FaBrain } from "react-icons/fa";
 import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
@@ -559,7 +559,7 @@ const Chat = () => {
                       justifyContent="flex-start"
                     >
                       <Flex flexDirection="row" alignItems="center">
-                        <BiSolidBrain />
+                        <FaBrain />
                         <Text ml={1} mr={2}>
                           Model Empirical Assessment
                         </Text>

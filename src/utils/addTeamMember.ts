@@ -15,10 +15,9 @@ const addTeamMember = async (
 	};
 
 	console.log(team);
-	
 
-	if(!team) {
-		return null
+	if (!team) {
+		return null;
 	}
 
 	// If team.members already contains the new member, return
@@ -35,10 +34,19 @@ const addTeamMember = async (
 	setTeam({ ...team, members: newTeamMembers });
 
 	// Update supabase with new team
-	const { data, error }: any = await supabase
+	const { error }: any = await supabase
 		.from("teams")
 		.update({ members: newTeamMembers })
 		.eq("id", team.id);
+
+	const { error: insertCustomerTeamError } = await supabase
+		.from("customers")
+		.update({ teams: [team.id] })
+		.eq("email_address", emailOfNewMember);
+
+	if (insertCustomerTeamError) {
+		console.warn({ insertCustomerTeamError });
+	}
 
 	if (error) {
 		console.warn("err", { error });

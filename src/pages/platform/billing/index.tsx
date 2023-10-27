@@ -307,7 +307,8 @@ const Models = ({ onClose }: any) => {
               {teams.map((team: any) => {
                 return (
                   <Tag
-                    colorScheme={selectedTeam === team ? "teal" : "white"}
+                    color='white'
+                    bgGradient="linear(to-r, blue.500, teal.500)"
                     mb={2}
                   >
                     {team.name}

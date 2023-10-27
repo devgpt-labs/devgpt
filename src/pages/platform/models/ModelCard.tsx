@@ -37,14 +37,15 @@ import Setup from "@/components/repos/Setup";
 import moment from "moment";
 
 //icons
-import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { AiFillEdit } from "react-icons/ai";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { PiCircleLight } from "react-icons/pi";
 import { MdRefresh } from "react-icons/md";
 import handleChargeCustomer from "@/utils/handleChargeCustomer";
 import trainModel from "@/utils/trainModel";
 import { useRouter } from "next/router";
-import { BiBrain } from "react-icons/bi";
+import { FaBrain } from "react-icons/fa";
 
 const ModelCard = ({
   model,
@@ -263,7 +264,7 @@ const ModelCard = ({
                       size="sm"
                       onClick={() => setShow(!show)}
                       aria-label="Edit Model"
-                      icon={<EditIcon />}
+                      icon={<AiFillEdit />}
                     />
                   </Tooltip>
                   <Tooltip label="Train Model">
@@ -278,7 +279,7 @@ const ModelCard = ({
                         });
                       }}
                       aria-label="Train Model"
-                      icon={isTraining ? <Spinner size="sm" /> : <BiBrain />}
+                      icon={isTraining ? <Spinner size="sm" /> : <FaBrain />}
                     />
                   </Tooltip>
                   <Tooltip label="Select Model">
@@ -440,7 +441,7 @@ const ModelCard = ({
           )}
         </CardBody>
       </Card>
-    </Box>
+    </Box >
   );
 };
 
