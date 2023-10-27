@@ -14,8 +14,15 @@ const addTeamMember = async (
 		accepted: false,
 	};
 
+	console.log(team);
+	
+
+	if(!team) {
+		return null
+	}
+
 	// If team.members already contains the new member, return
-	if (team.members.find((member: any) => member.email === emailOfNewMember)) {
+	if (team?.members.find((member: any) => member.email === emailOfNewMember)) {
 		return null;
 	}
 

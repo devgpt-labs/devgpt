@@ -1,9 +1,11 @@
 import { supabase } from "./supabase";
 
 const getOwnedTeams = async (setState: any, invites: any, email: any) => {
+	console.log({invites});
 	if (!supabase) return null;
 	if (!invites) return null;
 
+	
 	// Find any teams that the user is the owner of by email
 	const { data: teamsData, error: teamsError } = await supabase
 		.from("teams")
@@ -15,6 +17,7 @@ const getOwnedTeams = async (setState: any, invites: any, email: any) => {
 	}
 
 	if (teamsData) {
+		console.log({teamsData});
 		return setState(teamsData);
 	}
 

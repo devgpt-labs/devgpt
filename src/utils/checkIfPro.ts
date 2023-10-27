@@ -68,6 +68,7 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 		}
 
 		if (!teamData || teamData?.length === 0) {
+			// Create a new team
 			const { data: insertTeamData, error: insertTeamError } = await supabase
 				.from("teams")
 				.insert([
@@ -81,6 +82,12 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 				])
 				.eq("owner", customer?.email);
 
+			// Invite the owner of the team to the team
+			const { data: inviteData, error: inviteError } = await supabase
+				.from("customers")
+				.update({ invites: [insertTeamData?.[0]?.id] })
+				.eq("email_address", customer?.email);
+
 			if (insertTeamError) {
 				console.warn(insertTeamError);
 			}
@@ -88,9 +95,6 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 	}
 
 	// If the user has an invite to a team, set their activePlan as 'member'
-	if (invites?.length > 0) {
-		return "member";
-	}
 
 	if (
 		customer?.subscriptions?.data?.[0]?.status === "active" ||
@@ -98,6 +102,10 @@ const checkIfPro = async (emailAddress: string, invites: any) => {
 	) {
 		return activePlan;
 	} else {
+		if (invites?.length > 0) {
+			return "member";
+		}
+
 		return false;
 	}
 };

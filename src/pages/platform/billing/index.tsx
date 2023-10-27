@@ -97,7 +97,7 @@ const Models = ({ onClose }: any) => {
 
   useEffect(() => {
     setSelectedTeam(teams[0]);
-  }, [teams]);
+  }, []);
 
   useEffect(() => {
     if (!session) {
@@ -160,6 +160,8 @@ const Models = ({ onClose }: any) => {
     getOwnedTeams(setTeams, invites, user?.email);
   }, [setTeams, invites]);
 
+  console.log(teams);
+
   useEffect(() => {
     getMonthlyBudget();
     getModels(setModelsInTraining, setLoading, user?.email);
@@ -175,8 +177,13 @@ const Models = ({ onClose }: any) => {
   const sections = [
     { name: "Billing", disabled: false },
     { name: "Models", disabled: !isPro ? true : false },
-    { name: "Teams", disabled: !isPro ? true : isPro === "individual" ? true : false },
+    {
+      name: "Teams",
+      disabled: !isPro ? true : isPro === "individual" ? true : false,
+    },
   ];
+
+  console.log(isPro);
 
   if (loading || budget === null || !user) {
     return (
@@ -308,27 +315,32 @@ const Models = ({ onClose }: any) => {
                 );
               })}
 
-              {isPro === "individual" ||
-                (isPro === "member" && (
-                  <Invites
-                    user={user}
-                    team={selectedTeam}
-                    invites={invites}
-                    setTeam={setSelectedTeam}
-                    setInvites={setInvites}
-                  />
-                ))}
+              {isPro === "individual" && (
+                <Invites
+                  user={user}
+                  team={selectedTeam}
+                  invites={invites}
+                  setTeam={setSelectedTeam}
+                  setInvites={setInvites}
+                />
+              )}
+
+              {isPro === "member" && (
+                <Invites
+                  user={user}
+                  team={selectedTeam}
+                  invites={invites}
+                  setTeam={setSelectedTeam}
+                  setInvites={setInvites}
+                />
+              )}
 
               {isPro === "business" && (
-                <>
-                  <InviteMembers
-                    team={selectedTeam}
-                    setTeam={setSelectedTeam}
-                  />
-                </>
+                <InviteMembers team={selectedTeam} setTeam={setSelectedTeam} />
               )}
 
               <Team team={selectedTeam} />
+
             </Box>
           )}
         </Flex>

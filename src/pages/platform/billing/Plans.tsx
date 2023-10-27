@@ -31,7 +31,7 @@ const Plans = () => {
         link={`${planIntegers.individual.link}?client_reference_id=${user?.id}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbc5_DALL%25C2%25B7E%25202023-07-04%252010.57.46%2520-%2520a%2520renaissance%2520painting%2520of%2520a%2520robot%2520being%2520born%2520in%2520medieval%2520times-p-500.png"
         popular={false}
-        purchased={isPro ? true : false}
+        purchased={isPro === 'individual'}
       />
       <PlanCard
         Icon={<BsStars />}
@@ -42,7 +42,7 @@ const Plans = () => {
         link={`${planIntegers.business.link}?client_reference_id=${user?.id}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbb3_DALLE%20(1).png"
         popular={true}
-        purchased={false}
+        purchased={isPro === 'business'}
       />
       <PlanCard
         Icon={<PiShootingStarFill />}
@@ -53,7 +53,7 @@ const Plans = () => {
         link={planIntegers.enterprise.link}
         image="https://cdn.openai.com/labs/images/Two%20futuristic%20towers%20with%20a%20skybridge%20covered%20in%20lush%20foliage,%20digital%20art.webp?v=1"
         popular={false}
-        purchased={false}
+        purchased={isPro === 'enteprise'}
       />
     </Flex>
   );
