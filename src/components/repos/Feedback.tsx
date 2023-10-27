@@ -53,7 +53,7 @@ const Feedback = ({ models, response, messages }: any) => {
         id: model.id,
       });
 
-    if (error) console.log(error);
+    if (error) console.warn({ error });
   };
 
   const handleGoodAnswerClick = async () => {

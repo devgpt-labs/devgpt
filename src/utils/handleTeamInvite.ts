@@ -31,11 +31,7 @@ const handleTeamInvite = (
 			.eq("id", team.id);
 
 		if (error) {
-			console.log({ error });
-		}
-
-		if (data) {
-			console.log({ data });
+			console.warn({ error });
 		}
 	} else {
 		// Delete the invite from the users customer row 'invites' in supabase
@@ -49,11 +45,7 @@ const handleTeamInvite = (
 			.eq("email_address", emailOfNewMember);
 
 		if (error) {
-			console.log({ error });
-		}
-
-		if (data) {
-			console.log({ data });
+			console.warn({ error });
 		}
 	}
 };

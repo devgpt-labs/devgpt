@@ -11,7 +11,7 @@ const getOwnedTeams = async (setState: any, invites: any, email: any) => {
 		.eq("owner", email);
 
 	if (teamsError) {
-		console.log({ teamsError });
+		console.warn({ teamsError });
 	}
 
 	if (teamsData) {
@@ -28,7 +28,7 @@ const getOwnedTeams = async (setState: any, invites: any, email: any) => {
 		);
 
 	if (invitedTeamsError) {
-		console.log({ invitedTeamsError });
+		console.warn({ invitedTeamsError });
 		return null;
 	}
 

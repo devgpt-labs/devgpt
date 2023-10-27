@@ -132,7 +132,7 @@ const Models = ({ onClose }: any) => {
       .single();
 
     if (error) {
-      console.log(error);
+      console.warn({ error });
       setBudget(budgetEstimation);
       return;
     }
@@ -150,7 +150,7 @@ const Models = ({ onClose }: any) => {
       .eq("email_address", user?.email);
 
     if (error) {
-      console.log(error);
+      console.warn({ error });
       return;
     }
   };
@@ -174,8 +174,8 @@ const Models = ({ onClose }: any) => {
 
   const sections = [
     { name: "Billing", disabled: false },
-    { name: "Models", disabled: false },
-    { name: "Teams", disabled: isPro === "individual" ? true : false },
+    { name: "Models", disabled: !isPro ? true : false },
+    { name: "Teams", disabled: !isPro ? true : isPro === "individual" ? true : false },
   ];
 
   if (loading || budget === null || !user) {

@@ -527,7 +527,7 @@ const Chat = () => {
 
               {previousPrompt && (
                 <SlideFade in={!!previousPrompt}>
-                  <Heading mb={3} mt={5} size="lg">
+                  <Heading mb={3} size="lg">
                     {previousPrompt}
                   </Heading>
                 </SlideFade>

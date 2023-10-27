@@ -99,7 +99,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
         }
       })
       .catch((err: any) => {
-        console.log("Failed to get repos:", { err });
+        console.warn("Failed to get repos:", { err });
       });
   };
 
@@ -122,7 +122,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
         }
       })
       .catch((err) => {
-        console.log("Failed to get repos:", { err });
+        console.warn("Failed to get repos:", { err });
       });
 
   const onNextPage = async () => {

@@ -8,17 +8,13 @@ const BillingSectionHeader = ({
   section,
 }: any) => {
 
-  console.log({ section });
-  console.log({ name });
-
-
   return (
     <Text
       _hover={{
         borderLeft: "solid 2px",
         borderColor: "blue.200",
       }}
-      color={disabled ? "gray.400" : "gray.900"}
+      color={disabled ? "GrayText" : 'Text'}
       py={1}
       cursor="pointer"
       borderLeft="2px solid"

@@ -34,11 +34,7 @@ const addTeamMember = async (
 		.eq("id", team.id);
 
 	if (error) {
-		console.log("err", { error });
-	}
-
-	if (data) {
-		console.log("data", { data });
+		console.warn("err", { error });
 	}
 };
 
