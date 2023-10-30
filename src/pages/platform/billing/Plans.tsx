@@ -28,7 +28,7 @@ const Plans = () => {
         price={`$${planIntegers.individual.price} /mo`}
         description={`The individual plan allows you to train and maintain ${planIntegers.individual.models} model and use of DevGPT prompting.`}
         detail="Includes a 7-day free plan"
-        link={`${planIntegers.individual.link}?client_reference_id=${user?.id}`}
+        link={`${planIntegers.individual.link}?prefilled_email=${user?.email}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbc5_DALL%25C2%25B7E%25202023-07-04%252010.57.46%2520-%2520a%2520renaissance%2520painting%2520of%2520a%2520robot%2520being%2520born%2520in%2520medieval%2520times-p-500.png"
         popular={false}
         purchased={isPro === 'individual'}
@@ -39,7 +39,7 @@ const Plans = () => {
         price={`$${planIntegers.business.price} /mo`}
         description={`The business plan allows you to train up to ${planIntegers.business.models} models and increased use of DevGPT prompting.`}
         detail={`Allows for up to ${planIntegers.business.team_members} team members`}
-        link={`${planIntegers.business.link}?client_reference_id=${user?.id}`}
+        link={`${planIntegers.business.link}?prefilled_email=${user?.email}`}
         image="https://assets-global.website-files.com/64b68d0793d2d75fa6defaa5/64b68d0793d2d75fa6defbb3_DALLE%20(1).png"
         popular={true}
         purchased={isPro === 'business'}
