@@ -79,7 +79,7 @@ const Auth = () => {
       <Template>
         <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
-          <Text ml={3}>Logging you in via Github...</Text>
+          <Text ml={3}>Waiting for GitHub...</Text>
         </Flex>
       </Template>
     );
@@ -98,7 +98,7 @@ const Auth = () => {
         <VStack spacing={2} width="100%" alignItems="center">
           <GitConnectorButton
             color="black"
-            provider="Sign In With Github"
+            provider="Sign In With GitHub"
             handle={() => {
               setLoading(true);
               signInWithGithub();

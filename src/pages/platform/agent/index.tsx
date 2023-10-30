@@ -175,7 +175,7 @@ const Chat = () => {
         "User email": user?.email,
         "Valid Repo": !!lofaf,
         "Valid Stripe": !!stripe_customer_id,
-        "Valid Github": !!session?.provider_token,
+        "Valid GitHub": !!session?.provider_token,
       }
     );
   }, []);

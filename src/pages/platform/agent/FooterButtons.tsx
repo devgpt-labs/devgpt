@@ -55,20 +55,20 @@ const FooterButtons = () => {
           />
         </Link>
       </Tooltip>
-      <Tooltip label="Github Stars" placement="top">
+      <Tooltip label="GitHub Stars" placement="top">
         <Link href="https://github.com/devgpt-labs/devgpt-releases">
           <IconButton
             _hover={{
               transform: "translateY(-4px)",
               transition: "all 0.2s ease-in-out",
             }}
-            aria-label="Github Stars"
+            aria-label="GitHub Stars"
             icon={
               <Flex flexDirection="row" px={3}>
                 <BsGithub />
                 <BsStars />
                 <Text ml={2} fontSize={14}>
-                  365
+                  371
                 </Text>
               </Flex>
             }
