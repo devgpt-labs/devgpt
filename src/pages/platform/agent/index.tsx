@@ -549,30 +549,30 @@ const Chat = () => {
               )}
 
 
+              <Box mt={4}>
+                <Flex
+                  flexDirection="row"
+                  gap={2}
+                  alignItems="center"
+                  justifyContent="flex-start"
+                >
+                  <Flex flexDirection="row" alignItems="center">
+                    <FaBrain />
+                    <Text ml={1} mr={2}>
+                      Model Empirical Assessment
+                    </Text>
+                    <Switch
+                      id="isChecked"
+                      isChecked={showModelAssessment}
+                      onChange={() =>
+                        setShowModelAssessment(!showModelAssessment)
+                      }
+                    />
+                  </Flex>
+                </Flex>
+              </Box>
               {showModelAssessment && (
                 <>
-                  <Box mt={4}>
-                    <Flex
-                      flexDirection="row"
-                      gap={2}
-                      alignItems="center"
-                      justifyContent="flex-start"
-                    >
-                      <Flex flexDirection="row" alignItems="center">
-                        <FaBrain />
-                        <Text ml={1} mr={2}>
-                          Model Empirical Assessment
-                        </Text>
-                        <Switch
-                          id="isChecked"
-                          isChecked={showModelAssessment}
-                          onChange={() =>
-                            setShowModelAssessment(!showModelAssessment)
-                          }
-                        />
-                      </Flex>
-                    </Flex>
-                  </Box>
                   <Text
                     fontSize="sm"
                     mb={3}

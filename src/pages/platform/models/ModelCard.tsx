@@ -82,7 +82,7 @@ const ModelCard = ({
     setIsErrored(false);
 
     // Set this model to actively train
-    const trainingOutput: any = await trainModel(model, session, user, isPro);
+    const trainingOutput: any = await trainModel(model, session, user);
 
     //validate the output
     if (trainingOutput?.length) {
