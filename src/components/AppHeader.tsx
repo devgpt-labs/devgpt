@@ -1,6 +1,6 @@
 import { Text, Flex, useColorMode, Tag, Box } from "@chakra-ui/react";
 
-import packageJson from "../../../../package.json";
+import packageJson from "../../package.json";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -52,7 +52,7 @@ const ChatHeader = () => {
             <Text>🎉</Text>
           </Tag> */}
           {repo.repo && (
-            <Tag bgGradient="linear(to-r, blue.500, teal.500)" color="white">
+            <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
               {repo.repo}
             </Tag>
           )}

@@ -35,9 +35,6 @@ const theme = extendTheme({
     global: () => ({
       body: {
         bg: "black",
-        // bg: "gray.800",
-        //bg: "blue.900",
-        //bg: "#111111",
       },
     }),
   },

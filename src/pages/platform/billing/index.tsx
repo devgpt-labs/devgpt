@@ -26,11 +26,11 @@ import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth"
 
 //components
 import Template from "@/components/Template";
-import BillingSectionHeader from "./BillingSectionHeader";
+import BillingSectionHeader from "../../../components/BillingSectionHeader";
 import BillingTable from "./BillingTable";
 import Plans from "./Plans";
 import ConfirmationModal from "../models/ConfirmationModal";
-import InviteMembers from "./InviteMembers";
+import InviteMembers from "../../../components/InviteMembers";
 import Invites from "./Invites";
 import Team from "./Team";
 import getTeam from "@/utils/getTeam";

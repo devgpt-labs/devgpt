@@ -39,7 +39,7 @@ const InviteMembers = ({ team, setTeam }: any) => {
             size="sm"
             onClick={() => addTeamMember(email, name, team, setTeam)}
             color="white"
-            bgGradient="linear(to-r, blue.500,teal.500)"
+            bgGradient="linear(to-r, blue.500, teal.500)"
           >
             Send Invite
           </Button>

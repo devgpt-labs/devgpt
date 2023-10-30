@@ -1,4 +1,4 @@
-const planIntegers = {
+const planIntegers: any = {
 	individual: {
 		id: "price_1O4NHdEVCRmBJR39peOCXNrA",
 		name: "Individual",
