@@ -33,7 +33,7 @@ import ConfirmationModal from "../models/ConfirmationModal";
 import InviteMembers from "./InviteMembers";
 import Invites from "./Invites";
 import Team from "./Team";
-import getOwnedTeams from "@/utils/getOwnedTeams";
+import getTeam from "@/utils/getTeam";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -64,8 +64,8 @@ const Models = ({ onClose }: any) => {
     name: "Billing",
     disabled: false,
   });
-  const [teams, setTeams] = useState<any>([]);
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+
+  const [team, setTeam] = useState<any>(null);
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -94,12 +94,6 @@ const Models = ({ onClose }: any) => {
 
     setMonthlySpend();
   }, [stripe_customer_id]);
-
-  useEffect(() => {
-    if (teams.length > 0) {
-      setSelectedTeam(teams[0]);
-    }
-  }, [teams]);
 
   useEffect(() => {
     if (!session) {
@@ -157,12 +151,22 @@ const Models = ({ onClose }: any) => {
     }
   };
 
+  const handleGetTeam = async () => {
+    const team = await getTeam(user?.email);
+
+    if (team) {
+      setTeam(team);
+    }
+  };
+
   useEffect(() => {
     // If the url contains the word billing, open the billing section
-    getOwnedTeams(setTeams, invites, user?.email);
-  }, [setTeams, invites]);
+    handleGetTeam();
+  }, [setTeam]);
 
-  console.log({ isPro });
+  useEffect(() => {
+    if (isPro === "member") setSection({ name: "Teams", disabled: false });
+  }, [isPro]);
 
   useEffect(() => {
     getMonthlyBudget();
@@ -177,15 +181,13 @@ const Models = ({ onClose }: any) => {
   }, [repos, refresh]);
 
   const sections = [
-    { name: "Billing", disabled: false },
+    { name: "Billing", disabled: isPro === "member" ? true : false },
     { name: "Models", disabled: !isPro ? true : false },
     {
       name: "Teams",
       disabled: !isPro ? true : isPro === "individual" ? true : false,
     },
   ];
-
-  console.log(isPro);
 
   if (loading || budget === null || !user) {
     return (
@@ -275,8 +277,16 @@ const Models = ({ onClose }: any) => {
         </Flex>
         <Flex width="100%" flexDirection="column" p={4}>
           <Flex width="100%" justifyContent="space-between" mb={4}>
-            <Flex flexDirection="row" alignItems="center" mb={4}>
+            <Flex flexDirection="row" alignItems="center" mb={2} gap={2}>
               <Heading size="md">{section.name}</Heading>
+              {section.name.toLowerCase() === "teams" && (
+                <Tag
+                  color="white"
+                  bgGradient="linear(to-r, blue.500, teal.500)"
+                >
+                  {team.name}
+                </Tag>
+              )}
             </Flex>
             <Flex gap={2}>
               <Link
@@ -306,24 +316,12 @@ const Models = ({ onClose }: any) => {
 
           {section.name.toLowerCase() === "teams" && (
             <Box>
-              {teams.map((team: any) => {
-                return (
-                  <Tag
-                    color="white"
-                    bgGradient="linear(to-r, blue.500, teal.500)"
-                    mb={2}
-                  >
-                    {team.name}
-                  </Tag>
-                );
-              })}
-
               {isPro === "individual" && (
                 <Invites
                   user={user}
-                  team={selectedTeam}
+                  team={team}
+                  setTeam={setTeam}
                   invites={invites}
-                  setTeam={setSelectedTeam}
                   setInvites={setInvites}
                 />
               )}
@@ -331,18 +329,18 @@ const Models = ({ onClose }: any) => {
               {isPro === "member" && (
                 <Invites
                   user={user}
-                  team={selectedTeam}
+                  team={team}
+                  setTeam={setTeam}
                   invites={invites}
-                  setTeam={setSelectedTeam}
                   setInvites={setInvites}
                 />
               )}
 
               {isPro === "business" && (
-                <InviteMembers team={selectedTeam} setTeam={setSelectedTeam} />
+                <InviteMembers team={team} setTeam={setTeam} />
               )}
 
-              <Team team={selectedTeam} />
+              <Team team={team} />
             </Box>
           )}
         </Flex>

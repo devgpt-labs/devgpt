@@ -79,7 +79,7 @@ const Auth = () => {
       <Template>
         <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
-          <Text ml={3}>Just getting started...</Text>
+          <Text ml={3}>Logging you in via Github...</Text>
         </Flex>
       </Template>
     );

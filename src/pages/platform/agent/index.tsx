@@ -292,7 +292,7 @@ const Chat = () => {
     handleInputChange(target);
 
     const tokensInString = await getTokensFromString(modifiedPrompt);
-    const tokenLimit = await getTokenLimit();
+    const tokenLimit = getTokenLimit();
 
     if (tokensInString > tokenLimit) {
       setLoading(false);

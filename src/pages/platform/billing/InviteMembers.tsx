@@ -27,7 +27,7 @@ const InviteMembers = ({ team, setTeam }: any) => {
         />
         <Input
           pr="8rem"
-          placeholder="member@myteam.com"
+          placeholder="henry@myteam.com"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -44,7 +44,7 @@ const InviteMembers = ({ team, setTeam }: any) => {
             Send Invite
           </Button>
         </InputRightElement>
-      </InputGroup>
+      </InputGroup >
       <Text fontSize={14} mb={4}>
         Use the email your teammate uses for their git provider.
       </Text>

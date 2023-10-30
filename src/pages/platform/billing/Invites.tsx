@@ -23,15 +23,15 @@ const Invites = ({ user, team, invites, setTeam, setInvites }: any) => {
   if (invites.length === 0) return null;
 
   // If the invite is accepted: true, return null
-  if (invites.find((invite: any) => invite.accepted === true)) return null;
+  // if (invites.find((invite: any) => invite.accepted === true)) return null;
 
-  // If the invite id is not the same as the team id, return null
-  if (
-    !invites.find((invite: any) => {
-      return invite.team === team.id;
-    })
-  )
-    return null;
+  // TODO: Replace this with if you're in a team from teams: If the invite id is not the same as the team id, return null
+  // if (
+  //   !invites.find((invite: any) => {
+  //     return invite.team === team.id;
+  //   })
+  // )
+  //   return null;
 
   return (
     <>

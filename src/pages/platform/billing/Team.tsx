@@ -3,6 +3,8 @@ import { Text, Tr, Th, TableCaption, Table, Tbody, Td, TableContainer, Thead } f
 const Team = ({ team }: any) => {
   if (!team) return null;
 
+  console.log(team);
+
   return (
     <>
       <Text>Team members</Text>
@@ -25,7 +27,7 @@ const Team = ({ team }: any) => {
                 <Tr>
                   <Td>{member.name}</Td>
                   <Td>{member.email}</Td>
-                  <Td>{member.accepted ? "Accepted" : "Awaiting"}</Td>
+                  <Td>Accepted</Td>
                   {/* <Td>
                     <IconButton
                       aria-label="Cancel"

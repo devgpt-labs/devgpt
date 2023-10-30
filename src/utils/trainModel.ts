@@ -2,14 +2,13 @@ import { supabase } from "@/utils/supabase";
 import OpenAI from "openai";
 
 //utils
-import getLLMToken from "@/utils/getLLMToken";
 import getLofaf from "@/utils/github/getLofaf";
 import createTrainingData from "@/utils/createTrainingData";
 import createModelID from "./createModelID";
 
 const openai = new OpenAI({
 	apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-	organization: getLLMToken(),
+	organization: process?.env?.NEXT_PUBLIC_OPEN_AI_ORG_2,
 	dangerouslyAllowBrowser: true,
 });
 

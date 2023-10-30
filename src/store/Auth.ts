@@ -62,7 +62,6 @@ const useStore = create((set) => ({
 
 		const pro = await checkIfPro(
 			githubIdentity?.email,
-			customerData[0]?.invites
 		);
 
 		set({
