@@ -1,15 +1,7 @@
-import { checkIfPro } from "./checkIfPro";
 
-const getTokenLimit = async (email_address: string) => {
-  const free_limit = 4000;
-  const pro_limit = 18000;
-
-  const isPro: any = await checkIfPro(email_address);
-
-  if (isPro) {
-    return pro_limit;
-  } else {
-    return free_limit;
-  }
+const getTokenLimit = () => {
+  // This previously checked if the user was pro, or free. Now, we're just going to return 18,000 tokens.
+	return 18000;
 };
+
 export default getTokenLimit;

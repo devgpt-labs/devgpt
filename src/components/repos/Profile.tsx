@@ -131,8 +131,8 @@ const Profile = () => {
       .eq("email_address", emailAddress);
 
     if (error) throw error;
-    if (data !== null) {
-      setCredits(data[0].credits);
+    if (data) {
+      setCredits(data?.[0]?.credits);
     }
   };
 
@@ -217,9 +217,7 @@ const Profile = () => {
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
                   <Text onClick={onCreditsOpen}>{identity?.name}</Text>
-                  <Text>
-                    {identity?.email}
-                  </Text>
+                  <Text>{identity?.email}</Text>
                 </Flex>
                 <FooterButtons />
               </Flex>

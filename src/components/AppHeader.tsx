@@ -1,6 +1,6 @@
 import { Text, Flex, useColorMode, Tag, Box } from "@chakra-ui/react";
 
-import packageJson from "../../../../package.json";
+import packageJson from "../../package.json";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -29,10 +29,13 @@ const ChatHeader = () => {
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
         <Box>
-          <Tag ml={3} colorScheme="teal">
+          <Tag
+            ml={3}
+            bgGradient="linear(to-r, blue.500, teal.500)"
+            color="white"
+          >
             Open Beta {version}
           </Tag>
-
         </Box>
 
         <Flex gap={2}>
@@ -49,7 +52,7 @@ const ChatHeader = () => {
             <Text>🎉</Text>
           </Tag> */}
           {repo.repo && (
-            <Tag colorScheme="blue" color="white">
+            <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
               {repo.repo}
             </Tag>
           )}

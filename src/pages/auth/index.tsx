@@ -42,7 +42,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [models, setModels] = useState<any[]>([]);
 
-  const { fetch, user }: any = useStore();
+  const { fetch, user, session }: any = useStore();
 
   useEffect(() => {
     fetch();
@@ -50,9 +50,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     if (user) {
-      setLoading(true);
-
-      await getModels(setModels, setLoading, user?.email);
+      await getModels(setModels, () => { }, user?.email);
 
       if (models.length > 0) {
         // Navigate user to the prompting page
@@ -61,6 +59,8 @@ const Auth = () => {
         // If the user has no models, navigate them to the add a model page
         router.push("/platform/models", undefined, { shallow: true });
       }
+    } else {
+      setLoading(false);
     }
   };
 
@@ -68,12 +68,18 @@ const Auth = () => {
     handleLogin();
   }, [user]);
 
+  useEffect(() => {
+    if (loading || user || session || router.asPath.includes("access_token")) {
+      setLoading(true);
+    }
+  }, [loading, user, session, router.asPath]);
+
   if (loading)
     return (
       <Template>
         <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
           <Spinner height={5} width={5} />
-          <Text ml={3}>Just getting started...</Text>
+          <Text ml={3}>Waiting for GitHub...</Text>
         </Flex>
       </Template>
     );
@@ -92,15 +98,18 @@ const Auth = () => {
         <VStack spacing={2} width="100%" alignItems="center">
           <GitConnectorButton
             color="black"
-            provider="Sign In With Github"
-            handle={signInWithGithub}
+            provider="Sign In With GitHub"
+            handle={() => {
+              setLoading(true);
+              signInWithGithub();
+            }}
             Icon={<BsGithub />}
             tooltip=""
           />
           <GitConnectorButton
             color="#0c61db"
             provider="Sign In With BitBucket"
-            handle={signInWithBitbucket}
+            handle={() => { }}
             Icon={<FaBitbucket />}
             tooltip="Coming soon!"
           />

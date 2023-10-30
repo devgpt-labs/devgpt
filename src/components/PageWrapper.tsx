@@ -1,7 +1,7 @@
 import React from "react";
 import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
 import Profile from "@/components/repos/Profile";
-import AppHeader from "@/pages/platform/agent/AppHeader";
+import AppHeader from "@/components/AppHeader";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();

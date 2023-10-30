@@ -10,6 +10,7 @@ import {
   Button,
   IconButton,
   useDisclosure,
+  Tag,
 } from "@chakra-ui/react";
 
 //stores
@@ -21,20 +22,24 @@ import { useRouter } from "next/router";
 //utils
 import calculateTotalCost from "@/utils/calculateTotalCost";
 import getModels from "@/utils/getModels";
+import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
 
 //components
 import Template from "@/components/Template";
+import BillingSectionHeader from "../../../components/BillingSectionHeader";
+import BillingTable from "./BillingTable";
+import Plans from "./Plans";
+import ConfirmationModal from "../models/ConfirmationModal";
+import InviteMembers from "../../../components/InviteMembers";
+import Invites from "./Invites";
+import Team from "./Team";
+import getTeam from "@/utils/getTeam";
 
 //icons
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import getCustomerSpendThisMonth from "@/utils/stripe/getCustomerSpendThisMonth";
-import ConfirmationModal from "../models/ConfirmationModal";
-import BillingTable from "./BillingTable";
-import Plans from "./Plans";
-import BillingSectionHeader from "./BillingSectionHeader";
 
 const Models = ({ onClose }: any) => {
-  const { session, user, stripe_customer_id, credits, isPro }: any =
+  const { session, user, stripe_customer_id, invites, setInvites, isPro }: any =
     authStore();
   const router = useRouter();
   const {
@@ -50,19 +55,17 @@ const Models = ({ onClose }: any) => {
     onClose: onThankYouClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isCreditsOpen,
-    onOpen: onCreditsOpen,
-    onClose: onCreditsClose,
-  } = useDisclosure();
-
   const { repos }: any = repoStore();
-  const [showBilling, setShowBilling] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [spentThisMonth, setSpentThisMonth] = useState<any>(0);
-  const [section, setSection] = useState<string>("Billing");
+  const [section, setSection] = useState<any>({
+    name: "Billing",
+    disabled: false,
+  });
+
+  const [team, setTeam] = useState<any>(null);
 
   // Budgets
   const [budget, setBudget] = useState<any>(null);
@@ -125,7 +128,7 @@ const Models = ({ onClose }: any) => {
       .single();
 
     if (error) {
-      console.log(error);
+      console.warn({ error });
       setBudget(budgetEstimation);
       return;
     }
@@ -143,24 +146,27 @@ const Models = ({ onClose }: any) => {
       .eq("email_address", user?.email);
 
     if (error) {
-      console.log(error);
+      console.warn({ error });
       return;
+    }
+  };
+
+  const handleGetTeam = async () => {
+    const team = await getTeam(user?.email);
+
+    if (team) {
+      setTeam(team);
     }
   };
 
   useEffect(() => {
     // If the url contains the word billing, open the billing section
-    if (router.asPath.includes("billing")) {
-      // Show billing section
-      setShowBilling(true);
+    handleGetTeam();
+  }, [setTeam]);
 
-      // TODO: This is a hacky fix to scroll to billing after render
-      setTimeout(() => {
-        const element = document.getElementById("billing");
-        element?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
-  }, []);
+  useEffect(() => {
+    if (isPro === "member") setSection({ name: "Teams", disabled: false });
+  }, [isPro]);
 
   useEffect(() => {
     getMonthlyBudget();
@@ -174,7 +180,14 @@ const Models = ({ onClose }: any) => {
     // set budget to a
   }, [repos, refresh]);
 
-  const sections = ["Billing", "Models"];
+  const sections = [
+    { name: "Billing", disabled: isPro === "member" ? true : false },
+    { name: "Models", disabled: !isPro ? true : false },
+    {
+      name: "Teams",
+      disabled: !isPro ? true : isPro === "individual" ? true : false,
+    },
+  ];
 
   if (loading || budget === null || !user) {
     return (
@@ -222,7 +235,7 @@ const Models = ({ onClose }: any) => {
 
       <ConfirmationModal
         header={`Budget Updated Successfully`}
-        body="Thank you for updating your budget. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
+        body="Thank you for updating your budge@t. You can now continue prompting, if this doesn't update immediately, make sure the payment has processed and / or refresh the page."
         confirmButtonText="Complete"
         isOpen={isThankYouOpen}
         onClose={onThankYouClose}
@@ -241,6 +254,7 @@ const Models = ({ onClose }: any) => {
       >
         Add Credits
       </Tag> */}
+
       <Flex flexDirection="row" width="100%">
         <Flex flexDirection="column" px={8} pt={4}>
           <Text fontWeight="bold" mb={4}>
@@ -248,10 +262,11 @@ const Models = ({ onClose }: any) => {
           </Text>
           <Flex flexDirection="row">
             <Flex flexDirection="column">
-              {sections.map((title) => {
+              {sections.map((billingSection: any) => {
                 return (
                   <BillingSectionHeader
-                    title={title}
+                    name={billingSection.name}
+                    disabled={billingSection.disabled}
                     setSection={setSection}
                     section={section}
                   />
@@ -262,8 +277,16 @@ const Models = ({ onClose }: any) => {
         </Flex>
         <Flex width="100%" flexDirection="column" p={4}>
           <Flex width="100%" justifyContent="space-between" mb={4}>
-            <Flex flexDirection="row" alignItems="center" mb={4}>
-              <Heading size="md">{section}</Heading>
+            <Flex flexDirection="row" alignItems="center" mb={2} gap={2}>
+              <Heading size="md">{section.name}</Heading>
+              {section.name.toLowerCase() === "teams" && (
+                <Tag
+                  color="white"
+                  bgGradient="linear(to-r, blue.500, teal.500)"
+                >
+                  {team.name}
+                </Tag>
+              )}
             </Flex>
             <Flex gap={2}>
               <Link
@@ -281,14 +304,45 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
 
-          {section.toLowerCase() === "models" && (
+          {section.name.toLowerCase() === "models" && (
             <BillingTable
               modelsInTraining={modelsInTraining}
               budget={budget}
               budgetEstimation={budgetEstimation}
             />
           )}
-          {section.toLowerCase() === "billing" && <Plans />}
+
+          {section.name.toLowerCase() === "billing" && <Plans />}
+
+          {section.name.toLowerCase() === "teams" && (
+            <Box>
+              {isPro === "individual" && (
+                <Invites
+                  user={user}
+                  team={team}
+                  setTeam={setTeam}
+                  invites={invites}
+                  setInvites={setInvites}
+                />
+              )}
+
+              {isPro === "member" && (
+                <Invites
+                  user={user}
+                  team={team}
+                  setTeam={setTeam}
+                  invites={invites}
+                  setInvites={setInvites}
+                />
+              )}
+
+              {isPro === "business" && (
+                <InviteMembers team={team} setTeam={setTeam} />
+              )}
+
+              <Team team={team} />
+            </Box>
+          )}
         </Flex>
       </Flex>
     </Template>
