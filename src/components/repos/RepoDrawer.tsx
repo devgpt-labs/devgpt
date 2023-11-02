@@ -37,7 +37,7 @@ type PageInfo = {
   endCursor: string;
 };
 
-const RepoDrawer = ({ setRefresh, refresh }: any) => {
+const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
@@ -152,33 +152,33 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
     // Create a new row in the models table in Supabase
     if (!supabase) return;
 
-    const newModel = {
-      created_at: new Date().toISOString(),
-      stripe_customer_id: stripe_customer_id,
-      repo: repo.name,
-      owner: repo.owner.login,
-      branch: "main",
-      epochs: repo.epochs,
-      training_method: "ENCODING",
-      frequency: repo.frequency,
-      sample_size: repo.sampleSize,
-      output: null,
-      deleted: false,
-      email_address: user?.email,
-    };
+    // const newModel = {
+    //   created_at: new Date().toISOString(),
+    //   stripe_customer_id: stripe_customer_id,
+    //   repo: repo.name,
+    //   owner: repo.owner.login,
+    //   branch: "main",
+    //   epochs: repo.epochs,
+    //   training_method: "ENCODING",
+    //   frequency: repo.frequency,
+    //   sample_size: repo.sampleSize,
+    //   output: null,
+    //   deleted: false,
+    //   email_address: user?.email,
+    // };
 
     // charge
-    handleChargeCustomer(newModel);
+    // handleChargeCustomer(newModel);
 
-    const { data, error } = await supabase
-      .from("models")
-      .insert([{ ...newModel }]);
+    // const { data, error } = await supabase
+    //   .from("models")
+    //   .insert([{ ...newModel }]);
 
-    setRefresh(!refresh);
+    // setRefresh(!refresh);
 
-    if (error) {
-      console.log(error);
-    }
+    // if (error) {
+    // console.log(error);
+    // }
   };
 
   useEffect(() => {
@@ -210,7 +210,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
           <DrawerCloseButton mt={2} />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
-              Train A New Model {reposCount ? ` (${reposCount} repos) ` : ""}
+              Select A Repo {reposCount ? ` (${reposCount} repos) ` : ""}
             </Flex>
           </DrawerHeader>
           <DrawerBody>
@@ -270,11 +270,15 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
                         <Button
                           size="sm"
                           onClick={() => {
+                            onClose()
                             setSelectedRepo(repoOption);
-                            onRepoSetupOpen();
+                            setRepo({
+                              owner: repoOption.owner.login,
+                              repo: repoOption.name,
+                            });
                           }}
                         >
-                          Train
+                          Select
                         </Button>
                       </Flex>
                     );

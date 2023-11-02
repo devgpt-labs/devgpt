@@ -170,7 +170,7 @@ const CreditsModal = ({
           <Button onClick={onCreditsClose}>Cancel</Button>
           {/* <Link href='https://buy.stripe.com/5kA0094oAaXl7MQ5lw'> */}
           <Button width="100%" onClick={submitToStripe}>
-            Add
+            Select
           </Button>
           {/* </Link> */}
         </Flex>

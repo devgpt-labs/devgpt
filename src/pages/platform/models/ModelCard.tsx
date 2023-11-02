@@ -259,7 +259,7 @@ const ModelCard = ({
                       }
                     />
                   </Tooltip>
-                  <Tooltip label="Edit Model">
+                  {/* <Tooltip label="Edit Model">
                     <IconButton
                       size="sm"
                       onClick={() => setShow(!show)}
@@ -281,7 +281,7 @@ const ModelCard = ({
                       aria-label="Train Model"
                       icon={isTraining ? <Spinner size="sm" /> : <FaBrain />}
                     />
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip label="Select Model">
                     <IconButton
                       size="sm"
@@ -330,16 +330,7 @@ const ModelCard = ({
                   alignSelf="flex-start"
                 >
                   Status:{" "}
-                  {model.deleted
-                    ? "Deleted"
-                    : isTraining
-                      ? "Training"
-                      : isErrored
-                        ? "Training Failed"
-                        : !JSON.parse(model.output) ||
-                          JSON.parse(model.output)?.length < 2
-                          ? "Untrained"
-                          : "Trained"}
+                  In Use
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -361,7 +352,7 @@ const ModelCard = ({
                 {moment(model.created_at).format("MMMM Do YYYY, h:mm:ss a")}
               </Text>
             </Box>
-            <Box>
+            {/* <Box>
               <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 <GridItem>
                   <Stat>
@@ -378,7 +369,7 @@ const ModelCard = ({
                   </Stat>
                 </GridItem>
               </Grid>
-            </Box>
+            </Box> */}
           </Stack>
           <Box mt={5}>{isTraining && <ModelInTraining model={model} />}</Box>
           {show && (

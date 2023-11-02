@@ -7,36 +7,34 @@ import {
   Image,
   Text,
   useColorMode,
-  SlideFade,
   Tooltip,
-  Tag,
   Link,
   useDisclosure,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 
 // Utils
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { MdMoney, MdScience, MdWork } from "react-icons/md";
+import { MdScience } from "react-icons/md";
 import { TbPrompt } from "react-icons/tb";
-
+import createBranch from "@/utils/github/createBranch";
+import { FiExternalLink } from "react-icons/fi";
 // Components
-import Repos from "./Settings";
 import UpgradeModal from "./UpgradeModal";
 import FooterButtons from "@/pages/platform/agent/FooterButtons";
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
-import { BiSolidBookBookmark } from "react-icons/bi";
-import { AiFillCreditCard } from "react-icons/ai";
 import {
-  GiBattery100,
-  GiBattery75,
-  GiBattery50,
-  GiBattery0,
-  GiIsland,
-} from "react-icons/gi";
+  BiCopy,
+  BiGitBranch,
+  BiGitPullRequest,
+  BiSolidBookBookmark,
+} from "react-icons/bi";
+import { AiFillCreditCard } from "react-icons/ai";
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
 
@@ -44,8 +42,6 @@ import { FaBug } from "react-icons/fa";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
-import CreditsModal from "./CreditsModal";
-import Models from "@/pages/platform/models";
 
 interface ProfileOptionIconButtonProps {
   tooltip?: any;
@@ -99,7 +95,8 @@ const Profile = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const [credits, setCredits] = useState<number>(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
-  const { user, isPro, signOut }: any = authStore();
+  const { user, isPro, signOut, session }: any = authStore();
+  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
 
@@ -143,6 +140,8 @@ const Profile = () => {
       setCredits(credits);
     }
   };
+
+  // Raise a bra
 
   useEffect(() => {
     fetchData();
@@ -256,21 +255,21 @@ const Profile = () => {
                     icon={<TbPrompt size={18} />}
                   />
                 </Tooltip>
-                <Tooltip label={"View Models"} placement="top">
+                <Tooltip label={"Select A Repo"} placement="top">
                   <IconButton
                     _hover={{
                       transform: "translateY(-4px)",
                       transition: "all 0.2s ease-in-out",
                     }}
                     onClick={() => {
-                      router.push("/platform/models", undefined, {
-                        shallow: true,
-                      });
+                      setRepoWindowOpen(!repoWindowOpen);
                     }}
-                    aria-label="View Models"
+                    aria-label="Select A Repo"
                     icon={<MdScience size={18} />}
                   />
                 </Tooltip>
+
+
 
                 <Tooltip label="Read The Docs" placement="top">
                   <Link isExternal href="https://docs.devgpt.com">

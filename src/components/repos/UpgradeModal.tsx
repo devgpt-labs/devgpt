@@ -58,7 +58,7 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                 </Thead>
                 <Tbody>
                   <Tr>
-                    <Td>Trained Models </Td>
+                    <Td>Repos </Td>
                     <Td>{planIntegers.individual.models}</Td>
                     <Td>{planIntegers.business.models}</Td>
                     <Td>∞</Td>

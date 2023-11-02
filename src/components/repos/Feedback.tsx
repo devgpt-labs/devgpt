@@ -1,17 +1,59 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Flex, Text, useColorMode, Skeleton, Button } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  useColorMode,
+  IconButton,
+  Button,
+  Tag,
+  TagLabel,
+  Tooltip,
+} from "@chakra-ui/react";
+
 import { supabase } from "@/utils/supabase";
+import {
+  BiGitBranch,
+  BiGitPullRequest,
+  BiRefresh,
+  BiCopy,
+} from "react-icons/bi";
+import { FiExternalLink } from "react-icons/fi";
+import createBranch from "@/utils/github/createBranch";
+import { PlusSquareIcon } from "@chakra-ui/icons";
 
 // Icons
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import {
+  FaRegThumbsDown,
+  FaRegThumbsUp,
+  FaThumbsDown,
+  FaThumbsUp,
+} from "react-icons/fa";
 
 // Stores
 import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
 
-const Feedback = ({ models, response, messages }: any) => {
-  const { repo }: any = repoStore();
+interface FeedbackProps {
+  models: any;
+  response: string;
+  messages: any;
+  handleRegenerate: () => void;
+  handleNew: () => void;
+}
+
+const Feedback = ({
+  models,
+  response,
+  messages,
+  handleRegenerate,
+  handleNew,
+}: FeedbackProps) => {
   const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [branchName, setBranchName] = useState<string>("");
+  const [pullRequest, setPullRequest] = useState<string>("");
+  const { repo }: any = repoStore();
+  const { user, session }: any = authStore();
   const { colorMode } = useColorMode();
 
   // Find the model in models that matches repo
@@ -25,7 +67,6 @@ const Feedback = ({ models, response, messages }: any) => {
 
   if (!model) return null;
 
-
   // Slice the last two messages and remove the id and created_at. We can then add this to supabase.
   const newestMessages = messages
     .slice(messages.length - 2, messages.length)
@@ -34,30 +75,10 @@ const Feedback = ({ models, response, messages }: any) => {
       return rest;
     });
 
-  if (!model.output) return null
-
-  const existingMessages = JSON?.parse(model?.output);
-  const newMessages = [...existingMessages, ...newestMessages];
-
-  // Update the model in supabase with the new messages
-  const updateModel = async () => {
-    if (!supabase) return;
-
-    const { data, error } = await supabase
-      .from("models")
-      .update({
-        improvements: JSON.stringify(newestMessages),
-        output: JSON.stringify(newMessages),
-      })
-      .match({
-        id: model.id,
-      });
-
-    if (error) console.warn({ error });
-  };
+  if (!model.output) return null;
 
   const handleGoodAnswerClick = async () => {
-    // TODO: Readd this 
+    // TODO: Readd this
     // updateModel();
     setFeedbackGiven(true);
   };
@@ -95,41 +116,124 @@ const Feedback = ({ models, response, messages }: any) => {
       rounded="lg"
       border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
       p={5}
-      justifyContent='space-between'
+      justifyContent="space-between"
     >
-      <Flex flexDirection="column" maxW='75%' mr={2} >
+      <Flex flexDirection="column" maxW="75%" mr={2}>
         <Text>
-          How did your model do on your last prompt for{" "}
+          What would you like to do next on repo{" "}
           <strong>
             {repo.repo} / {repo.owner}
           </strong>
           ?
         </Text>
         <Text fontSize={14} color="gray.500">
-          Passive Improvement is used to directly improve your model and it's
-          training. This allows your model to be constantly learning as it's
-          being used.
+          tip goes here
         </Text>
       </Flex>
-      <Flex
-        flexDirection="row"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Button onClick={handleBadAnswerClick}>
-          <FaThumbsDown />
-          <Text ml={2}>Poor</Text>
-        </Button>
-        <Button
+      <Flex flexDirection="row" justifyContent="center" alignItems="center">
+        <Flex width="100%" flexDirection="row" gap={2} bg="red">
+          <Tooltip label="Thumbs Down" placement="top">
+            <IconButton
+              aria-label="Thumbs Down"
+              icon={<FaRegThumbsDown />}
+              onClick={handleBadAnswerClick}
+            />
+          </Tooltip>
+          <Tooltip label="Thumbs Up" placement="top">
+            <IconButton
+              aria-label="Thumbs Up"
+              icon={<FaRegThumbsUp />}
+              onClick={handleGoodAnswerClick}
+            />
+          </Tooltip>
 
-          ml={2}
-          color="white"
-          bgGradient="linear(to-r, blue.500, teal.500)"
-          onClick={handleGoodAnswerClick}
-        >
-          <FaThumbsUp />
-          <Text ml={2}>Good</Text>
-        </Button>
+          <Tooltip
+            label={pullRequest ? "Copy Git Command" : "Raise Branch"}
+            placement="top"
+          >
+            <IconButton
+              onClick={() => {
+                pullRequest
+                  ? window.open(pullRequest)
+                  : createBranch(
+                    session.provider_token,
+                    false,
+                    setBranchName,
+                    setPullRequest
+                  );
+              }}
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              aria-label="Join Discord"
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  {pullRequest ? <BiCopy /> : <BiGitBranch />}
+                  {branchName &&
+                    `git checkout ${branchName.substring(0, 10)}...`}
+                </Flex>
+              }
+            />
+          </Tooltip>
+          <Tooltip label={pullRequest ? "Open PR" : "Raise PR"} placement="top">
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              aria-label="Join Discord"
+              onClick={() => {
+                pullRequest
+                  ? window.open(pullRequest)
+                  : createBranch(
+                    session.provider_token,
+                    false,
+                    setBranchName,
+                    setPullRequest
+                  );
+              }}
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  {pullRequest ? <FiExternalLink /> : <BiGitPullRequest />}
+                  {pullRequest && (
+                    <Text ml={2}>{pullRequest.substring(0, 10)}...</Text>
+                  )}
+                </Flex>
+              }
+            />
+          </Tooltip>
+          <Tooltip label="New Prompt" placement="top">
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              aria-label="Join Discord"
+              onClick={handleNew}
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  <PlusSquareIcon />
+                </Flex>
+              }
+            />
+          </Tooltip>
+          <Tooltip label="Regenerate" placement="top">
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              onClick={handleRegenerate}
+              aria-label="Join Discord"
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  <BiRefresh />
+                </Flex>
+              }
+            />
+          </Tooltip>
+        </Flex>
       </Flex>
     </Flex>
   );

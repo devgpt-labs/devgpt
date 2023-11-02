@@ -74,6 +74,19 @@ const Auth = () => {
     }
   }, [loading, user, session, router.asPath]);
 
+  // If the user is on mobile, show them a message saying that this is a desktop app
+  // if (typeof window !== "undefined" && window.innerWidth < 768) {
+  //   return (
+  //     <Template>
+  //       <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
+  //         <Text ml={3}>Sorry, DevGPT is not available on mobile devices.</Text>
+  //       </Flex>
+  //     </Template>
+  //   );
+  // } else {
+  //   console.log("Not mobile");
+  // }
+
   if (loading)
     return (
       <Template>

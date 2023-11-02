@@ -69,7 +69,7 @@ const AddAModel = ({ setRefresh, refresh }: any) => {
             }}
             rightIcon={<SmallAddIcon />}
           >
-            Train A New Model
+            Select Model
           </Button>
         </Flex>
       </Flex>

@@ -36,6 +36,7 @@ import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import moment from "moment";
+import RepoDrawer from "@/components/repos/RepoDrawer";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -43,6 +44,7 @@ import authStore from "@/store/Auth";
 
 //prompts
 import userPrompt from "@/prompts/user";
+import Editor from "@monaco-editor/react";
 
 //components
 import Template from "@/components/Template";
@@ -69,7 +71,12 @@ import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
 import { FaBrain } from "react-icons/fa";
 import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
+import {
+  BiConfused,
+  BiGitBranch,
+  BiRefresh,
+  BiUpArrowAlt,
+} from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
 import { RiInformationFill } from "react-icons/ri";
@@ -412,8 +419,13 @@ const Chat = () => {
     );
   }
 
+  console.log(String(messages[messages.length - 1]?.content).split("```"));
+  const content = String(messages[messages.length - 1]?.content).split("```");
+
   return (
     <Template>
+      <RepoDrawer />
+
       <Flex
         direction="column"
         flex={1}
@@ -480,7 +492,7 @@ const Chat = () => {
                 </Flex>
               )}
 
-              <TrainingStatus initialMessages={initialMessages} />
+              {/* <TrainingStatus initialMessages={initialMessages} /> */}
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>
@@ -520,14 +532,14 @@ const Chat = () => {
               />
 
               {failMessage && (
-                <Text mb={3} mt={2} fontSize={14}>
+                <Text mb={2} mt={2} fontSize={14}>
                   {failMessage}
                 </Text>
               )}
 
               {previousPrompt && (
                 <SlideFade in={!!previousPrompt}>
-                  <Heading mb={3} size="lg">
+                  <Heading mt={2} mb={4} size="md">
                     {previousPrompt}
                   </Heading>
                 </SlideFade>
@@ -541,15 +553,73 @@ const Chat = () => {
                   skeletonHeight="2"
                 />
               ) : (
-                <Response
-                  hasBeenReset={hasBeenReset}
-                  initialMessages={initialMessages}
-                  content={String(messages[messages.length - 1]?.content)}
-                />
+                // <Response
+                //   hasBeenReset={hasBeenReset}
+                //   initialMessages={initialMessages}
+                //   content={String(messages[messages.length - 1]?.content)}
+                // />
+                <Box mt={2}>
+                  {String(messages[messages.length - 1]?.content).split("```")
+                    .length > 1 ? (
+                    <>
+                      {content.map((section, index) => {
+                        return (
+                          <>
+                            {index % 2 === 0 ? (
+                              <Box my={4}>{section}</Box>
+                            ) : (
+                              <Box my={4}>
+                                <Editor
+                                  theme="vs-dark"
+                                  height="90vh"
+                                  defaultLanguage="javascript"
+                                  value={section}
+                                  defaultValue={section}
+                                />
+                              </Box>
+                            )}
+                          </>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    // <>
+                    //   {
+                    //     String(messages[messages.length - 1]?.content).split(
+                    //       "```"
+                    //     )[0]
+                    //   }
+                    //   <Box my={4}>
+                    //     <Editor
+
+                    //       theme='vs-dark'
+                    //       height="90vh"
+                    //       defaultLanguage="javascript"
+                    //       value={
+                    //         String(messages[messages.length - 1]?.content).split(
+                    //           "```"
+                    //         )[1]
+                    //       }
+                    //       defaultValue={
+                    //         String(messages[messages.length - 1]?.content).split(
+                    //           "```"
+                    //         )[1]
+                    //       }
+                    //     />
+                    //   </Box>
+
+                    //   {
+                    //     String(messages[messages.length - 1]?.content).split(
+                    //       "```"
+                    //     )[2]
+                    //   }
+                    // </>
+                    String(messages[messages.length - 1]?.content)
+                  )}
+                </Box>
               )}
 
-
-              <Box mt={4}>
+              {/* <Box mt={4}>
                 <Flex
                   flexDirection="row"
                   gap={2}
@@ -570,7 +640,8 @@ const Chat = () => {
                     />
                   </Flex>
                 </Flex>
-              </Box>
+              </Box> */}
+
               {showModelAssessment && (
                 <>
                   <Text
@@ -616,62 +687,24 @@ const Chat = () => {
               )}
             </Box>
           )}
-
         </Box>
-        <Feedback models={models} response={response} messages={messages} />
-        {response && !hasBeenReset && (
-          <Flex
-            width="100%"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            gap={2}
-            mt={4}
-          >
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Join Discord"
-              onClick={() => {
-                setHasBeenReset(true);
-                setLoading(false);
-                setResponse("");
-                setFailMessage("");
-              }}
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <PlusSquareIcon />
-                  <Text ml={2} fontSize={14}>
-                    {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                    New
-                  </Text>
-                </Flex>
-              }
-            />
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              onClick={() => {
-                reload();
-                setLoading(true);
-              }}
-              aria-label="Join Discord"
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <BiRefresh />
-                  <Text ml={2} fontSize={14}>
-                    {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                    Regenerate
-                  </Text>
-                </Flex>
-              }
-            />
-          </Flex>
-        )}
+
+        <Feedback
+          models={models}
+          response={response}
+          messages={messages}
+          handleRegenerate={() => {
+            reload();
+            setLoading(true);
+          }}
+          handleNew={() => {
+            setHasBeenReset(true);
+            setLoading(false);
+            setResponse("");
+            setFailMessage("");
+          }}
+        />
+
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

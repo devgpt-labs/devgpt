@@ -7,6 +7,7 @@ const selectTrainingFiles = async (lofaf: string) => {
 	`,
     functions: [
       {
+        
         name: "process_useful_files_array",
         description: "Processes an array of useful files.",
         parameters: {

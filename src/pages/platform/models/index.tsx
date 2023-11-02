@@ -204,16 +204,7 @@ const Models = () => {
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">
-            {/* <Link href="/platform/agent">
-              <IconButton
-                onClick={() => {
-                  router.back();
-                }}
-                aria-label="Close"
-                icon={<ArrowBackIcon />}
-              />
-            </Link> */}
-            <Heading size="md">Trained Models</Heading>
+            <Heading size="md">Repos</Heading>
           </Flex>
           <Flex gap={2}>
             <Button
@@ -255,7 +246,6 @@ const Models = () => {
           </Grid>
         )}
       </Flex>
-      <RepoDrawer setRefresh={setRefresh} refresh={refresh} />
     </Template>
   );
 };
