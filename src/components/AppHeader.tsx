@@ -51,6 +51,14 @@ const ChatHeader = () => {
             <Text>Desktop app returning soon</Text>
             <Text>🎉</Text>
           </Tag> */}
+          <Tag
+            ml={3}
+            bgGradient="linear(to-r, blue.500, teal.500)"
+            color="white"
+          >
+            We're currently investigating issues with training. Join our discord
+            to stay updated!
+          </Tag>
           {repo.repo && (
             <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
               {repo.repo}
