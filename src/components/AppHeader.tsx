@@ -56,8 +56,8 @@ const ChatHeader = () => {
             bgGradient="linear(to-r, blue.500, teal.500)"
             color="white"
           >
-            We're currently investigating issues with training. Join our discord
-            to stay updated!
+            We're currently investigating issues with training, join our discord
+            to stay updated.
           </Tag>
           {repo.repo && (
             <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
