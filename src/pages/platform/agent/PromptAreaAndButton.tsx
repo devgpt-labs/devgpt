@@ -9,10 +9,9 @@ interface PromptAreaAndButtonProps {
   setLoading: (loading: boolean) => void;
   handleUseTabSuggestion: (file: any) => void;
   setPrompt: (prompt: string) => void;
-  handleInputChange: (e: any) => void;
   submitChecks: (isReset: boolean) => Promise<boolean>;
   setHasBeenReset: (hasBeenReset: boolean) => void;
-  handleSubmit: (e: any) => void;
+  handleSubmit: (prompt: any) => void;
 }
 
 const PromptAreaAndButton = ({
@@ -22,7 +21,6 @@ const PromptAreaAndButton = ({
   setLoading,
   handleUseTabSuggestion,
   setPrompt,
-  handleInputChange,
   submitChecks,
   setHasBeenReset,
   handleSubmit,
@@ -53,7 +51,6 @@ const PromptAreaAndButton = ({
           placeholder="Enter your task, e.g. Create a login page, or use @ to reference a file from your repo."
           onChange={(e: any) => {
             setPrompt(e.target.value);
-            handleInputChange(e);
           }}
           onKeyDown={async (e: any) => {
             if (prompt.length < 3) {
@@ -75,7 +72,7 @@ const PromptAreaAndButton = ({
               const checks = await submitChecks(false);
               if (!checks) return null;
               setHasBeenReset(false);
-              handleSubmit(e);
+              handleSubmit(prompt);
             }
           }}
         />
@@ -98,7 +95,7 @@ const PromptAreaAndButton = ({
               return null;
             }
             setHasBeenReset(false);
-            handleSubmit(e);
+            handleSubmit(prompt);
           }}
         >
           {loading ? <Spinner size="sm" /> : hoveringButton ? 'Ready?' : "Generate Code"}

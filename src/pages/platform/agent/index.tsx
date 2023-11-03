@@ -10,18 +10,8 @@ import {
   Kbd,
   Tag,
   useDisclosure,
-  IconButton,
   Link,
-  Stat,
-  StatLabel,
-  Switch,
-  StatNumber,
-  StatHelpText,
   Grid,
-  Tooltip,
-  Alert,
-  AlertIcon,
-  Fade,
   Skeleton,
   Heading,
   Modal,
@@ -30,14 +20,13 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
 } from "@chakra-ui/react";
-import { useChat } from "ai/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import moment from "moment";
 import RepoDrawer from "@/components/repos/RepoDrawer";
-import { test, getCode } from "git-connectors";
+import ModelStat from "@/components/ModelStat";
+import { getLofaf } from "git-connectors";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -45,43 +34,26 @@ import authStore from "@/store/Auth";
 
 //prompts
 import userPrompt from "@/prompts/user";
-import Editor from "@monaco-editor/react";
 
 //components
 import Template from "@/components/Template";
-import Response from "@/components/Response";
 import PromptCorrectionModal from "@/components/PromptCorrectionModal";
 import PromptAreaAndButton from "./PromptAreaAndButton";
 import Feedback from "@/components/repos/Feedback";
 
 //utils
-import { savePrompt } from "@/utils/savePrompt";
-import { checkIfPro } from "@/utils/checkIfPro";
 import getTokenLimit from "@/utils/getTokenLimit";
 import getPromptCount from "@/utils/getPromptCount";
 import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
-import calculateTokenCost from "@/utils/calculateTokenCost";
-import chargeCustomer from "@/utils/stripe/chargeCustomer";
-import TrainingStatus from "./TrainingStatus";
 
 // Icons
-import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
-import getLofaf from "@/utils/github/getLofaf";
-import { FaBrain } from "react-icons/fa";
-import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import {
-  BiConfused,
-  BiGitBranch,
-  BiRefresh,
-  BiUpArrowAlt,
-} from "react-icons/bi";
+import { EmailIcon } from "@chakra-ui/icons";
+import { BiConfused } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
-import { RiInformationFill } from "react-icons/ri";
-import { GiUpgrade } from "react-icons/gi";
 
 const Chat = () => {
   // Constants
@@ -100,9 +72,9 @@ const Chat = () => {
   const [activeModelFilesTrained, setActiveModelFilesTrained] =
     useState<number>(0);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
+  const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [showModelAssessment, setShowModelAssessment] =
     useState<boolean>(false);
-  const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
   const [showCodeResponse, setShowCodeResponse] = useState<boolean>(false);
@@ -127,25 +99,25 @@ const Chat = () => {
     isPro,
   }: any = authStore();
 
-  // Handles responses, sending prompt, reloading and input.
-  const { messages, handleInputChange, handleSubmit, input, reload } = useChat({
-    initialMessages: initialMessages,
-    onFinish: (data: any) => {
-      const inputTokens = getTokensFromString(input);
-      const responseTokens = getTokensFromString(String(data.content));
+  //   onFinish: (data: any) => {
+  //     const inputTokens = getTokensFromString(input);
+  //     const responseTokens = getTokensFromString(String(data.content));
 
-      const usage = inputTokens + responseTokens;
-      const cost = calculateTokenCost(usage);
+  //     const usage = inputTokens + responseTokens;
+  //     const cost = calculateTokenCost(usage);
 
-      hasBeenReset && setHasBeenReset(false);
-      setFailMessage("");
-      setPrompt("");
-      setLoading(false);
-      savePrompt(user?.email, prompt, data.content, usage);
-      setResponse(data.content);
-      setShowModelAssessment(false);
-    },
-  });
+  //     hasBeenReset && setHasBeenReset(false);
+  //     setFailMessage("");
+  //     setPrompt("");
+  //     setLoading(false);
+  //     savePrompt(user?.email, prompt, data.content, usage);
+  //     setResponse(data.content);
+  //     setShowModelAssessment(false);
+  //   },
+
+  const handleSubmit = async (prompt: string) => {
+    console.log(prompt);
+  };
 
   const MAX_MESSAGES = 7; //todo - this should come from training status
 
@@ -190,50 +162,36 @@ const Chat = () => {
     );
   }, []);
 
-  useEffect(() => {
-    if (!session?.provider_token) return;
+  const handleGetLofaf = async (repo: any, session: any) => {
+    await getLofaf(
+      repo.owner,
+      repo.repo,
+      session?.provider_token
+    ).then((data: any) => {
+      console.log({ data });
 
-    test('hello')
+      if (!data) return;
 
-    getCode(
-      "tom-lewis-code",
-      "toms-public-sand-pit",
-      "README.md",
-      session.provider_token
-    )
-      .then((code: any) => {
-        console.log({ code });
-      })
-      .catch((err: any) => {
-        console.log({ err });
-      });
-  }, [session]);
-
-  useEffect(() => {
-    if (initialMessages.length !== 0) return;
-
-    // Update the model to the newest selected one
-
-    if (model?.output) {
-      setInitialMessages(JSON.parse(model?.output).slice(0, MAX_MESSAGES));
-      setActiveModelFilesTrained((JSON.parse(model?.output).length - 1) / 2);
-    }
-
-    getLofaf(repo.owner, repo.repo, session).then((data) => {
-      // If no data tree, return
-      if (!data?.tree) return null;
-
-      // Get files from the data tree
-      const files = data?.tree?.map((file: any) => file.path);
+      // Convert data from csv to array of strings
+      const files = data.split(",");
 
       // Set lofaf to the files found
       setLofaf(files);
     });
-  }, [repo, models]);
+  };
 
   useEffect(() => {
-    setLoading(false);
-  }, [messages]);
+    // if (initialMessages.length !== 0) return;
+
+    // Update the model to the newest selected one
+
+    // if (model?.output) {
+    //   setInitialMessages(JSON.parse(model?.output).slice(0, MAX_MESSAGES));
+    //   setActiveModelFilesTrained((JSON.parse(model?.output).length - 1) / 2);
+    // }
+
+    handleGetLofaf(repo, session);
+  }, [repo]);
 
   useEffect(() => {
     if (promptCount != 0) return;
@@ -293,7 +251,7 @@ const Chat = () => {
 
       if (promptFeedback?.changes) {
         //display promptCorrection modal
-        setCorrectedPrompt(promptFeedback?.correctedPrompt);
+        setPrompt(promptFeedback?.correctedPrompt);
         onOpen();
         return false;
       }
@@ -306,7 +264,7 @@ const Chat = () => {
       target: { value: newPrompt },
     };
 
-    handleInputChange(target);
+    setPrompt(target);
     setPreviousPrompt(newPrompt);
 
     const modifiedPrompt = await userPrompt(
@@ -317,8 +275,7 @@ const Chat = () => {
     );
 
     target = { target: { value: modifiedPrompt } };
-
-    handleInputChange(target);
+    setPrompt(target);
 
     const tokensInString = await getTokensFromString(modifiedPrompt);
     const tokenLimit = getTokenLimit();
@@ -336,11 +293,13 @@ const Chat = () => {
   const model = models?.find((model: any) => model?.repo === repo?.repo);
   // show code response if any of the messages in the messages array have an id
 
-  useEffect(() => {
-    messages?.some((message: any) => message?.id)
-      ? setShowCodeResponse(true)
-      : setShowCodeResponse(false);
-  }, [messages]);
+  // useEffect(() => {
+  //   messages?.some((message: any) => message?.id)
+  //     ? setShowCodeResponse(true)
+  //     : setShowCodeResponse(false);
+
+  //   setLoading(false);
+  // }, [messages]);
 
   if (!isPro) {
     return (
@@ -448,7 +407,7 @@ const Chat = () => {
     );
   }
 
-  const content = String(messages[messages.length - 1]?.content).split("```");
+  // const content = String(messages[messages.length - 1]?.content).split("```");
 
   return (
     <Template>
@@ -553,10 +512,9 @@ const Chat = () => {
                 setLoading={setLoading}
                 handleUseTabSuggestion={handleUseTabSuggestion}
                 setPrompt={setPrompt}
-                handleInputChange={handleInputChange}
                 submitChecks={submitChecks}
                 setHasBeenReset={setHasBeenReset}
-                handleSubmit={handleSubmit}
+                handleSubmit={(prompt: any) => handleSubmit(prompt)}
               />
 
               {failMessage && (
@@ -575,6 +533,7 @@ const Chat = () => {
 
               {loading ? (
                 <SkeletonText
+                  mt={4}
                   mb={4}
                   noOfLines={4}
                   spacing={4}
@@ -587,7 +546,7 @@ const Chat = () => {
                 //   content={String(messages[messages.length - 1]?.content)}
                 // />
                 <Box mt={2}>
-                  {showCodeResponse &&
+                  {/* {showCodeResponse &&
                     (String(messages[messages.length - 1]?.content).split("```")
                       .length > 1 ? (
                       <>
@@ -616,7 +575,7 @@ const Chat = () => {
                       </>
                     ) : (
                       String(messages[messages.length - 1]?.content)
-                    ))}
+                    ))} */}
                 </Box>
               )}
 
@@ -693,9 +652,8 @@ const Chat = () => {
         <Feedback
           models={models}
           response={response}
-          messages={messages}
           handleRegenerate={() => {
-            reload();
+            // reload();
             setLoading(true);
           }}
           handleNew={() => {
@@ -709,27 +667,11 @@ const Chat = () => {
 
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
-          setCorrectedPrompt={setCorrectedPrompt}
           prompt={previousPrompt}
           setPrompt={setPrompt}
           isOpen={isOpen}
           onClose={onClose}
-          onReject={async (e: any) => {
-            e.preventDefault();
-
-            // Run checks
-            const checks = await submitChecks(true, true);
-            if (!checks) return null;
-
-            // Show that we haven't reset
-            setHasBeenReset(false);
-
-            // Submit to useChat
-            handleSubmit(e);
-          }}
-          onSubmit={async (e: any) => {
-            e.preventDefault();
-
+          onSubmit={async (prompt: any) => {
             // Run checks
             const checks = await submitChecks(true, false);
             if (!checks) return null;
@@ -738,7 +680,7 @@ const Chat = () => {
             setHasBeenReset(false);
 
             // Submit to useChat
-            handleSubmit(e);
+            handleSubmit(prompt);
           }}
           setLoading={setLoading}
         />
@@ -748,29 +690,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
-const ModelStat = ({ label, number, tip, tooltip }: any) => {
-  const { colorMode } = useColorMode();
-
-  return (
-    <Stat
-      border={colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"}
-      p={4}
-      borderRadius={10}
-    >
-      <Tooltip label={tooltip} placement="bottom">
-        <Flex flexDirection="row" alignItems="center" gap={1}>
-          <StatLabel>{label}</StatLabel>
-          <RiInformationFill />
-        </Flex>
-      </Tooltip>
-
-      <>
-        <StatNumber>{number}</StatNumber>
-        <StatHelpText fontSize={14} color="gray">
-          {tip}
-        </StatHelpText>
-      </>
-    </Stat>
-  );
-};

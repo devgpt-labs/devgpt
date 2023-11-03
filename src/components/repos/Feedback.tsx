@@ -38,7 +38,6 @@ import authStore from "@/store/Auth";
 interface FeedbackProps {
   models: any;
   response: string;
-  messages: any;
   handleRegenerate: () => void;
   handleNew: () => void;
 }
@@ -46,7 +45,6 @@ interface FeedbackProps {
 const Feedback = ({
   models,
   response,
-  messages,
   handleRegenerate,
   handleNew,
 }: FeedbackProps) => {
@@ -66,7 +64,7 @@ const Feedback = ({
 
   useEffect(() => {
     setFeedbackGiven(false);
-  }, [response, messages]);
+  }, [response]);
 
   // if (!model) return null;
 
@@ -112,13 +110,8 @@ const Feedback = ({
             onClick={() => {
               branchName
                 ? window.open(pullRequest)
-                : createBranch(
-                  session.provider_token,
-                  false,
-                  setBranchName,
-                  setPullRequest,
-                  setBranchLoading
-                );
+                : null // remake create branch
+
             }}
             _hover={{
               transform: "translateY(-4px)",
@@ -158,13 +151,7 @@ const Feedback = ({
               // If pull request, window.open, if not, set loading to true and create a branch
               pullRequest
                 ? window.open(pullRequest)
-                : createBranch(
-                  session.provider_token,
-                  true,
-                  setBranchName,
-                  setPullRequest,
-                  setPullRequestLoading
-                );
+                : null //remake create branch
             }}
             icon={
               <>

@@ -251,7 +251,7 @@ const RepoDrawer = () => {
                   ?.map((repoOption) => {
                     return (
                       <Flex
-                        key={repoOption.name + repoOption.owner.login}
+                        key={repoOption.name + Math.random()}
                         mb={2}
                         flexDirection="row"
                         justifyContent={"space-between"}
@@ -270,7 +270,7 @@ const RepoDrawer = () => {
                         <Button
                           size="sm"
                           onClick={() => {
-                            onClose()
+                            onClose();
                             setSelectedRepo(repoOption);
                             setRepo({
                               owner: repoOption.owner.login,

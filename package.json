@@ -25,7 +25,7 @@
     "axios": "^1.6.0",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
-    "git-connectors": "^2.1.7",
+    "git-connectors": "^2.2.5",
     "gpt-tokenizer": "^2.1.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
