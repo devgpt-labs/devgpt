@@ -37,6 +37,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import moment from "moment";
 import RepoDrawer from "@/components/repos/RepoDrawer";
+import { test, getCode } from "git-connectors";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -104,10 +105,18 @@ const Chat = () => {
   const [correctedPrompt, setCorrectedPrompt] = useState<string>("");
   const [hasBeenReset, setHasBeenReset] = useState<boolean>(false);
   const [models, setModels] = useState<any>([]);
+  const [showCodeResponse, setShowCodeResponse] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const { colorMode } = useColorMode();
-  const { repo, lofaf, setLofaf, setRepo }: any = repoStore();
+  const {
+    repo,
+    lofaf,
+    setLofaf,
+    setRepo,
+    repoWindowOpen,
+    setRepoWindowOpen,
+  }: any = repoStore();
   const {
     user,
     session,
@@ -127,12 +136,6 @@ const Chat = () => {
 
       const usage = inputTokens + responseTokens;
       const cost = calculateTokenCost(usage);
-
-      chargeCustomer(
-        { stripe_customer_id: stripe_customer_id },
-        cost,
-        user?.email
-      );
 
       hasBeenReset && setHasBeenReset(false);
       setFailMessage("");
@@ -186,6 +189,25 @@ const Chat = () => {
       }
     );
   }, []);
+
+  useEffect(() => {
+    if (!session?.provider_token) return;
+
+    test('hello')
+
+    getCode(
+      "tom-lewis-code",
+      "toms-public-sand-pit",
+      "README.md",
+      session.provider_token
+    )
+      .then((code: any) => {
+        console.log({ code });
+      })
+      .catch((err: any) => {
+        console.log({ err });
+      });
+  }, [session]);
 
   useEffect(() => {
     if (initialMessages.length !== 0) return;
@@ -312,6 +334,13 @@ const Chat = () => {
   };
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
+  // show code response if any of the messages in the messages array have an id
+
+  useEffect(() => {
+    messages?.some((message: any) => message?.id)
+      ? setShowCodeResponse(true)
+      : setShowCodeResponse(false);
+  }, [messages]);
 
   if (!isPro) {
     return (
@@ -419,7 +448,6 @@ const Chat = () => {
     );
   }
 
-  console.log(String(messages[messages.length - 1]?.content).split("```"));
   const content = String(messages[messages.length - 1]?.content).split("```");
 
   return (
@@ -447,11 +475,11 @@ const Chat = () => {
                 color="white"
                 mt={4}
                 onClick={() => {
-                  router.push("/platform/models", undefined, { shallow: true });
+                  setRepoWindowOpen(!repoWindowOpen);
                 }}
               >
                 <MdScience />
-                <Text ml={1}>Train or select a model to get started</Text>
+                <Text ml={1}>Select a model to get started</Text>
               </Button>
               <Text fontSize={12} mt={2}>
                 {failMessage}
@@ -559,63 +587,36 @@ const Chat = () => {
                 //   content={String(messages[messages.length - 1]?.content)}
                 // />
                 <Box mt={2}>
-                  {String(messages[messages.length - 1]?.content).split("```")
-                    .length > 1 ? (
-                    <>
-                      {content.map((section, index) => {
-                        return (
-                          <>
-                            {index % 2 === 0 ? (
-                              <Box my={4}>{section}</Box>
-                            ) : (
-                              <Box my={4}>
-                                <Editor
-                                  theme="vs-dark"
-                                  height="90vh"
-                                  defaultLanguage="javascript"
-                                  value={section}
-                                  defaultValue={section}
-                                />
-                              </Box>
-                            )}
-                          </>
-                        );
-                      })}
-                    </>
-                  ) : (
-                    // <>
-                    //   {
-                    //     String(messages[messages.length - 1]?.content).split(
-                    //       "```"
-                    //     )[0]
-                    //   }
-                    //   <Box my={4}>
-                    //     <Editor
-
-                    //       theme='vs-dark'
-                    //       height="90vh"
-                    //       defaultLanguage="javascript"
-                    //       value={
-                    //         String(messages[messages.length - 1]?.content).split(
-                    //           "```"
-                    //         )[1]
-                    //       }
-                    //       defaultValue={
-                    //         String(messages[messages.length - 1]?.content).split(
-                    //           "```"
-                    //         )[1]
-                    //       }
-                    //     />
-                    //   </Box>
-
-                    //   {
-                    //     String(messages[messages.length - 1]?.content).split(
-                    //       "```"
-                    //     )[2]
-                    //   }
-                    // </>
-                    String(messages[messages.length - 1]?.content)
-                  )}
+                  {showCodeResponse &&
+                    (String(messages[messages.length - 1]?.content).split("```")
+                      .length > 1 ? (
+                      <>
+                        {content.map((section, index) => {
+                          return (
+                            <>
+                              {index % 2 === 0 ? (
+                                <Box my={4}>{section}</Box>
+                              ) : (
+                                <Box my={4}>
+                                  <Editor
+                                    theme="vs-dark"
+                                    defaultLanguage="javascript"
+                                    value={section}
+                                    height="400px"
+                                    // Fit the editor height to the content
+                                    options={{
+                                      scrollBeyondLastLine: false,
+                                    }}
+                                  />
+                                </Box>
+                              )}
+                            </>
+                          );
+                        })}
+                      </>
+                    ) : (
+                      String(messages[messages.length - 1]?.content)
+                    ))}
                 </Box>
               )}
 
@@ -698,6 +699,7 @@ const Chat = () => {
             setLoading(true);
           }}
           handleNew={() => {
+            setShowCodeResponse(false);
             setHasBeenReset(true);
             setLoading(false);
             setResponse("");

@@ -31,39 +31,18 @@ const ChatHeader = () => {
         <Box>
           <Tag
             ml={3}
-            bgGradient="linear(to-r, blue.500, teal.500)"
+            bg='blue.500'
             color="white"
           >
             Open Beta {version}
           </Tag>
         </Box>
-
         <Flex gap={2}>
-          {/* <Tag
-            color='white'
-            colorScheme="blue"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="row"
-            ml={2}
-            gap={2}
-          >
-            <Text>Desktop app returning soon</Text>
-            <Text>🎉</Text>
-          </Tag> */}
           {repo.repo && (
-            <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
+            <Tag bg='blue.500' color="white">
               {repo.repo}
             </Tag>
           )}
-          {/* {isPro && (
-            <Tag colorScheme="blue"
-              color='white'
-
-            >
-              {repo.repo}
-            </Tag>
-          )} */}
         </Flex>
       </Flex>
     </Flex>

@@ -57,7 +57,7 @@ const Auth = () => {
         router.push("/platform/agent", undefined, { shallow: true });
       } else {
         // If the user has no models, navigate them to the add a model page
-        router.push("/platform/models", undefined, { shallow: true });
+        router.push("/platform/agent", undefined, { shallow: true });
       }
     } else {
       setLoading(false);

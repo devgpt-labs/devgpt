@@ -29,6 +29,7 @@ const PromptAreaAndButton = ({
 }: PromptAreaAndButtonProps) => {
   const { isPro }: any = authStore();
   const [show, setShow] = useState(false);
+  const [hoveringButton, setHoveringButton] = useState(false);
 
   if (!isPro) return null;
 
@@ -36,9 +37,16 @@ const PromptAreaAndButton = ({
     <Flex flexDirection='column'>
       <Flex flexDirection="row" my={2}>
         <Input
-          // border="solid 1px #3e68ff"
-          // borderColor='#3e68ff'
-          // shadow="0px 0px 5px 5px #3e68ff"
+          // On focus, add a glow
+          _focus={{
+            boxShadow: "0 0 0 0.5rem rgba(0, 123, 255, .22)",
+            borderColor: "blue.500",
+          }}
+          // On hover, add a glow 
+          _hover={{
+            boxShadow: "0 0 0 1.0rem rgba(0, 123, 255, .12)",
+            borderColor: "blue.500",
+          }}
           autoFocus
           className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
           value={prompt}
@@ -73,9 +81,13 @@ const PromptAreaAndButton = ({
         />
 
         <Button
+          // On hover, change the text to 'Ready?'
           bg="blue.500"
+          // On hover, animate the width to 0
           // bgGradient="linear(to-r, blue.500, teal.500)"
           isDisabled={loading}
+          onMouseOver={() => setHoveringButton(true)}
+          onMouseLeave={() => setHoveringButton(false)}
           color="white"
           ml={4}
           width="10rem"
@@ -89,7 +101,7 @@ const PromptAreaAndButton = ({
             handleSubmit(e);
           }}
         >
-          {loading ? <Spinner size="sm" /> : "Generate Code"}
+          {loading ? <Spinner size="sm" /> : hoveringButton ? 'Ready?' : "Generate Code"}
         </Button>
       </Flex>
       {/* <Text

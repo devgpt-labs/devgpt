@@ -9,6 +9,7 @@ import {
   Tag,
   TagLabel,
   Tooltip,
+  Spinner,
 } from "@chakra-ui/react";
 
 import { supabase } from "@/utils/supabase";
@@ -52,6 +53,8 @@ const Feedback = ({
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [branchName, setBranchName] = useState<string>("");
   const [pullRequest, setPullRequest] = useState<string>("");
+  const [pullRequestLoading, setPullRequestLoading] = useState<boolean>(false);
+  const [branchLoading, setBranchLoading] = useState<boolean>(false);
   const { repo }: any = repoStore();
   const { user, session }: any = authStore();
   const { colorMode } = useColorMode();
@@ -65,17 +68,17 @@ const Feedback = ({
     setFeedbackGiven(false);
   }, [response, messages]);
 
-  if (!model) return null;
+  // if (!model) return null;
 
-  // Slice the last two messages and remove the id and created_at. We can then add this to supabase.
-  const newestMessages = messages
-    .slice(messages.length - 2, messages.length)
-    .map((message: any) => {
-      const { id, createdAt, ...rest } = message;
-      return rest;
-    });
+  // // Slice the last two messages and remove the id and created_at. We can then add this to supabase.
+  // const newestMessages = messages
+  //   .slice(messages.length - 2, messages.length)
+  //   .map((message: any) => {
+  //     const { id, createdAt, ...rest } = message;
+  //     return rest;
+  //   });
 
-  if (!model.output) return null;
+  // if (!model.output) return null;
 
   const handleGoodAnswerClick = async () => {
     // TODO: Readd this
@@ -99,8 +102,120 @@ const Feedback = ({
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
         p={2}
+        gap={2}
       >
-        <Text>Thank you for your feedback</Text>
+        <Tooltip
+          label={branchName ? "Copy Git Command" : "Raise Branch"}
+          placement="top"
+        >
+          <IconButton
+            onClick={() => {
+              branchName
+                ? window.open(pullRequest)
+                : createBranch(
+                  session.provider_token,
+                  false,
+                  setBranchName,
+                  setPullRequest,
+                  setBranchLoading
+                );
+            }}
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            aria-label="Join Discord"
+            icon={
+              <>
+                {branchLoading ? (
+                  <Spinner size='sm' />
+                ) : (
+                  <Flex flexDirection="row" px={3}>
+                    {branchName ? <BiCopy /> : <BiGitBranch />}
+
+                    {branchName ? (
+                      <Text ml={2}>git checkout {branchName}</Text>
+                    ) : (
+                      <Text ml={2}>Create Branch</Text>
+                    )}
+                  </Flex>
+                )}
+              </>
+            }
+          />
+        </Tooltip>
+        <Tooltip
+          label={pullRequest ? "Open Pull Request" : "Raise Pull Request"}
+          placement="top"
+        >
+          <IconButton
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            aria-label="Join Discord"
+            onClick={() => {
+              // If pull request, window.open, if not, set loading to true and create a branch
+              pullRequest
+                ? window.open(pullRequest)
+                : createBranch(
+                  session.provider_token,
+                  true,
+                  setBranchName,
+                  setPullRequest,
+                  setPullRequestLoading
+                );
+            }}
+            icon={
+              <>
+                {pullRequestLoading ? (
+                  <Spinner size='sm' />
+                ) : (
+                  <Flex flexDirection="row" px={3}>
+                    {pullRequest ? <FiExternalLink /> : <BiGitPullRequest />}
+                    {pullRequest ? (
+                      <Text ml={2}>{pullRequest.substring(0, 50)}...</Text>
+                    ) : (
+                      <Text ml={2}>Raise Pull Request</Text>
+                    )}
+                  </Flex>
+                )}
+              </>
+            }
+          />
+        </Tooltip>
+        <Tooltip label="New Prompt" placement="top">
+          <IconButton
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            aria-label="Join Discord"
+            onClick={handleNew}
+            icon={
+              <Flex flexDirection="row" px={3}>
+                <PlusSquareIcon />
+                <Text ml={2}>New</Text>
+              </Flex>
+            }
+          />
+        </Tooltip>
+        <Tooltip label="Regenerate" placement="top">
+          <IconButton
+            _hover={{
+              transform: "translateY(-4px)",
+              transition: "all 0.2s ease-in-out",
+            }}
+            onClick={handleRegenerate}
+            aria-label="Join Discord"
+            icon={
+              <Flex flexDirection="row" px={3}>
+                <BiRefresh />
+                <Text ml={2}>Regenerate</Text>
+              </Flex>
+            }
+          />
+        </Tooltip>
       </Flex>
     );
   }
@@ -118,7 +233,7 @@ const Feedback = ({
       p={5}
       justifyContent="space-between"
     >
-      <Flex flexDirection="column" maxW="75%" mr={2}>
+      <Flex flex={0.7} flexDirection="column" maxW="75%" mr={2}>
         <Text>
           What would you like to do next on repo{" "}
           <strong>
@@ -127,113 +242,30 @@ const Feedback = ({
           ?
         </Text>
         <Text fontSize={14} color="gray.500">
-          tip goes here
+          After you've rated the generation, more options will appear here.
         </Text>
       </Flex>
-      <Flex flexDirection="row" justifyContent="center" alignItems="center">
-        <Flex width="100%" flexDirection="row" gap={2} bg="red">
-          <Tooltip label="Thumbs Down" placement="top">
-            <IconButton
-              aria-label="Thumbs Down"
-              icon={<FaRegThumbsDown />}
-              onClick={handleBadAnswerClick}
-            />
-          </Tooltip>
-          <Tooltip label="Thumbs Up" placement="top">
-            <IconButton
-              aria-label="Thumbs Up"
-              icon={<FaRegThumbsUp />}
-              onClick={handleGoodAnswerClick}
-            />
-          </Tooltip>
-
-          <Tooltip
-            label={pullRequest ? "Copy Git Command" : "Raise Branch"}
-            placement="top"
-          >
-            <IconButton
-              onClick={() => {
-                pullRequest
-                  ? window.open(pullRequest)
-                  : createBranch(
-                    session.provider_token,
-                    false,
-                    setBranchName,
-                    setPullRequest
-                  );
-              }}
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Join Discord"
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  {pullRequest ? <BiCopy /> : <BiGitBranch />}
-                  {branchName &&
-                    `git checkout ${branchName.substring(0, 10)}...`}
-                </Flex>
-              }
-            />
-          </Tooltip>
-          <Tooltip label={pullRequest ? "Open PR" : "Raise PR"} placement="top">
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Join Discord"
-              onClick={() => {
-                pullRequest
-                  ? window.open(pullRequest)
-                  : createBranch(
-                    session.provider_token,
-                    false,
-                    setBranchName,
-                    setPullRequest
-                  );
-              }}
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  {pullRequest ? <FiExternalLink /> : <BiGitPullRequest />}
-                  {pullRequest && (
-                    <Text ml={2}>{pullRequest.substring(0, 10)}...</Text>
-                  )}
-                </Flex>
-              }
-            />
-          </Tooltip>
-          <Tooltip label="New Prompt" placement="top">
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              aria-label="Join Discord"
-              onClick={handleNew}
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <PlusSquareIcon />
-                </Flex>
-              }
-            />
-          </Tooltip>
-          <Tooltip label="Regenerate" placement="top">
-            <IconButton
-              _hover={{
-                transform: "translateY(-4px)",
-                transition: "all 0.2s ease-in-out",
-              }}
-              onClick={handleRegenerate}
-              aria-label="Join Discord"
-              icon={
-                <Flex flexDirection="row" px={3}>
-                  <BiRefresh />
-                </Flex>
-              }
-            />
-          </Tooltip>
-        </Flex>
+      <Flex
+        flex={0.3}
+        flexDirection="row"
+        justifyContent="center"
+        alignItems="center"
+        gap={2}
+      >
+        <Tooltip label="Thumbs Up" placement="top">
+          <IconButton
+            aria-label="Thumbs Up"
+            icon={<FaRegThumbsUp />}
+            onClick={handleGoodAnswerClick}
+          />
+        </Tooltip>
+        <Tooltip label="Thumbs Down" placement="top">
+          <IconButton
+            aria-label="Thumbs Down"
+            icon={<FaRegThumbsDown />}
+            onClick={handleBadAnswerClick}
+          />
+        </Tooltip>
       </Flex>
     </Flex>
   );

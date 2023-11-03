@@ -268,10 +268,7 @@ const Profile = () => {
                     icon={<MdScience size={18} />}
                   />
                 </Tooltip>
-
-
-
-                <Tooltip label="Read The Docs" placement="top">
+                {/* <Tooltip label="Read The Docs" placement="top">
                   <Link isExternal href="https://docs.devgpt.com">
                     <IconButton
                       _hover={{
@@ -282,7 +279,7 @@ const Profile = () => {
                       icon={<BiSolidBookBookmark />}
                     />
                   </Link>
-                </Tooltip>
+                </Tooltip> */}
               </Flex>
               <Flex gap={2} ml={2}>
                 <Tooltip label={"View Billing"} placement="top">

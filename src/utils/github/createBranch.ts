@@ -1,44 +1,74 @@
 import { Octokit } from "@octokit/rest";
 
-const createBranch = async (
-	access_token: any,
-	pr: boolean,
-	setBranchName: (branch_name: any) => void,
-	setPullRequest: (pull_request_url: any) => void
-) => {
+interface Blob {
+	filePath: string;
+	content: string;
+	comments: string;
+	examples: string[];
+}
+
+interface Auth {
+	owner: string;
+	editor: string;
+	repo: string;
+}
+
+interface Branch {
+	base_branch: string;
+	branch_name: string;
+	pr_title: string;
+	pr_body: string;
+	randomly_generated_5_digit_number: number;
+}
+
+interface createBranchProps {
+	blobs: Blob[];
+	auth: Auth;
+	branch: Branch;
+	access_token: string;
+	pr: boolean;
+}
+
+const createBranch = async ({
+	blobs,
+	auth,
+	branch,
+	access_token,
+	pr,
+}: createBranchProps) => {
 	if (!access_token) {
 		console.warn("no access token");
 		return;
 	}
 
-  // fileName
-  // originalContent
-  // newContent
-  // tasksCompletedPreviously
-  // similarFiles
+	// fileName
+	// originalContent
+	// newContent
+	// tasksCompletedPreviously
+	// similarFiles
 
-  //results
-	const blobs = [
-		{
-			filePath: "app2.js",
-			content: "const a = b",
-			comments: "i did this",
-			examples: ["app.js"],
-		},
-	];
+	//results
+	// const blobs = [
+	// 	{
+	// 		filePath: "app2.js",
+	// 		content: "const a = b",
+	// 		comments: "i did this",
+	// 		examples: ["app.js"],
+	// 	},
+	// ];
 
-  //auth
-	const owner = "tom-lewis-code";
-	const editor = "tom";
-	const repo = "toms-public-sand-pit";
+	//auth
+	// const owner = "tom-lewis-code";
+	// const editor = "tom";
+	// const repo = "toms-public-sand-pit";
 
-  //branch
-	const branch_name = "test-branch";
-	const pr_title = "my title";
-	const pr_body: any = "my body";
-	const randomly_generated_5_digit_number = Math.floor(
-		10000 + Math.random() * 90000
-	);
+	//branch
+	// const branch_name = "test-branch";
+	// const pr_title = "my title";
+	// const pr_body: any = "my body";
+	// const randomly_generated_5_digit_number = Math.floor(
+	// 	10000 + Math.random() * 90000
+	// );
 
 	const octokit = new Octokit({
 		auth: access_token,
@@ -46,8 +76,8 @@ const createBranch = async (
 
 	// get base
 	const base = await octokit.git.getRef({
-		owner: owner,
-		repo: repo,
+		owner: auth.owner,
+		repo: auth.repo,
 		ref: "heads/main",
 	});
 
@@ -55,8 +85,8 @@ const createBranch = async (
 		blobs.map(async (blob) => {
 			const octoBlob = await octokit
 				.request("POST /repos/{owner}/{repo}/git/blobs", {
-					owner: owner,
-					repo: repo,
+					owner: auth.owner,
+					repo: auth.repo,
 					content: blob.content,
 					encoding: "utf-8",
 					headers: {
@@ -65,7 +95,7 @@ const createBranch = async (
 				})
 				.then((octoBlob: { data: { sha: any } }) => {
 					return {
-						path: blob.path,
+						path: blob.filePath,
 						mode: "100644",
 						type: "blob",
 						sha: octoBlob.data.sha,
@@ -76,10 +106,12 @@ const createBranch = async (
 		})
 	);
 
+	if (!blobTree) return {}
+
 	// create tree
 	const tree = await octokit.request("POST /repos/{owner}/{repo}/git/trees", {
-		owner: owner,
-		repo: repo,
+		owner: auth.owner,
+		repo: auth.repo,
 		base_tree: base.data.object.sha,
 		tree: blobTree,
 		headers: {
@@ -87,12 +119,14 @@ const createBranch = async (
 		},
 	});
 
+	if (!tree) return {}
+
 	// //create commit
 	const commit = await octokit.request(
 		"POST /repos/{owner}/{repo}/git/commits",
 		{
-			owner: owner,
-			repo: repo,
+			owner: auth.owner,
+			repo: auth.repo,
 			message: "hello, world!",
 			author: {
 				name: "Tom",
@@ -107,32 +141,33 @@ const createBranch = async (
 		}
 	);
 
+	if (!commit) return {}
+
 	// generate ref
 	const ref = await octokit.request("POST /repos/{owner}/{repo}/git/refs", {
-		owner: owner,
-		repo: repo,
-		ref: `refs/heads/${editor}/${randomly_generated_5_digit_number}/${branch_name}`,
+		owner: auth.owner,
+		repo: auth.repo,
+		ref: `refs/heads/${auth.editor}/${branch.randomly_generated_5_digit_number}/${branch.branch_name}`,
 		sha: commit.data.sha,
 		headers: {
 			"X-GitHub-Api-Version": "2022-11-28",
 		},
 	});
 
-	setBranchName(
-		`${editor}/${randomly_generated_5_digit_number}/${branch_name}`
-	);
+	if (!ref) return {}
 
-	// //create PR
-	// if (!pr) return;
+	if (!pr) return {
+		branch_name: `${auth.editor}/${branch.randomly_generated_5_digit_number}/${branch.branch_name}`,
+	}
 
 	const pullRequest = await octokit.request(
 		"POST /repos/{owner}/{repo}/pulls",
 		{
-			owner: owner,
-			repo: repo,
-			title: pr_title,
-			body: pr_body,
-			head: `${editor}/${randomly_generated_5_digit_number}/${branch_name}`,
+			owner: auth.owner,
+			repo: auth.repo,
+			title: branch.pr_title,
+			body: branch.pr_body,
+			head: `${auth.editor}/${branch.randomly_generated_5_digit_number}/${branch.branch_name}`,
 			base: "main",
 			headers: {
 				"X-GitHub-Api-Version": "2022-11-28",
@@ -140,76 +175,12 @@ const createBranch = async (
 		}
 	);
 
-	console.log({ pullRequest });
-	setPullRequest(pullRequest.data.html_url);
+	if(!pullRequest) return {}
 
-	return;
-
-	// const baseTree = await octokit.request(
-	// 	"GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
-	// 	{
-	// 		owner: owner,
-	// 		repo: repo,
-	// 		tree_sha: "main",
-	// 		headers: {
-	// 			"X-GitHub-Api-Version": "2022-11-28",
-	// 		},
-	// 	}
-	// );
-
-	// //generate ref
-	// await octokit.request("POST /repos/{owner}/{repo}/git/refs", {
-	// 	owner: owner,
-	// 	repo: repo,
-	// 	ref: `refs/heads/abc`,
-	// 	sha: commit.data.sha,
-	// 	headers: {
-	// 		"X-GitHub-Api-Version": "2022-11-28",
-	// 	},
-	// });
-
-	// //create PR
-	// const pullRequest = await octokit.request(
-	// 	"POST /repos/{owner}/{repo}/pulls",
-	// 	{
-	// 		owner: owner,
-	// 		repo: repo,
-	// 		title: "my title",
-	// 		body: "my body",
-	// 		head: `${owner}:abc`,
-	// 		base: "main",
-	// 		headers: {
-	// 			"X-GitHub-Api-Version": "2022-11-28",
-	// 		},
-	// 	}
-	// );
-
-	// const final = await octokit.request("POST /repos/{owner}/{repo}/git/trees", {
-	// 	owner: owner,
-	// 	repo: repo,
-	// 	base_tree: baseTree.data.sha,
-	// 	tree: [
-	// 		{
-	// 			path: "App.js",
-	// 			mode: "100644",
-	// 			type: "blob",
-	// 			sha: blobSha.data.sha,
-	// 		},
-	// 	],
-	// 	headers: {
-	// 		"X-GitHub-Api-Version": "2022-11-28",
-	// 	},
-	// });
-
-	// const branch = await octokit.request("POST /repos/{owner}/{repo}/git/refs", {
-	// 	owner: owner,
-	// 	repo: repo,
-	// 	ref: "refs/heads/featureA",
-	// 	sha: tree.data.sha,
-	// 	headers: {
-	// 		"X-GitHub-Api-Version": "2022-11-28",
-	// 	},
-	// });
+	return {
+		branch_name: `${auth.editor}/${branch.randomly_generated_5_digit_number}/${branch.branch_name}`,
+		pull_request: pullRequest.data.html_url,
+	}
 };
 
 export default createBranch;

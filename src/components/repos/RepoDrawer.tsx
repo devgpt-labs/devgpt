@@ -63,7 +63,7 @@ const RepoDrawer = () => {
   }
 
   useEffect(() => {
-    if (repoWindowOpen === null || !repoWindowOpen) return;
+    if (repoWindowOpen === null) return;
     onOpen();
   }, [repoWindowOpen]);
 
