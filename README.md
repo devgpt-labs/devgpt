@@ -36,7 +36,7 @@ Welcome to **DevGPT**, the AI-driven development tool designed to transform the 
 
 ## FAQs
 
-1. **Is this similar to Github Copilot?**
+1. **Is this similar to GitHub Copilot?**
    - No, we are not an autocomplete tool. We handle entire tasks, acting as your co-developer.
 1. **How much time will this save me?**
    - Our average user saves 1.5 hours every day, allowing you to focus on more complex and fulfilling tasks.

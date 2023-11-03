@@ -83,7 +83,6 @@ const PromptAreaAndButton = ({
             setLoading(true);
             const checks = await submitChecks(false);
             if (!checks) {
-              console.log("checks failed, stopping");
               return null;
             }
             setHasBeenReset(false);

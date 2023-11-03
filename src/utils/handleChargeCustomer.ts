@@ -18,19 +18,8 @@ interface Model {
 	email_address: string;
 }
 
-const addTrainingLog = async (model: Model) => {
+const handleChargeCustomer = async (model: Model) => {
 	if (!supabase) return "No supabase client found";
-
-	//add training log for this model
-	const { data: logData, error: logError }: any = await supabase
-		.from("training_log")
-		.insert([
-			{
-				model_id: createModelID(model.repo, model.owner, model.branch),
-				model_settings: JSON.stringify(model),
-				fulfilled: false,
-			},
-		]);
 
 	//calculate cost of training this model
 	const costToTrain = calculateTotalCost([model], 0);
@@ -45,4 +34,4 @@ const addTrainingLog = async (model: Model) => {
 	);
 };
 
-export default addTrainingLog;
+export default handleChargeCustomer;

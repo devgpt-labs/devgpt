@@ -41,8 +41,6 @@ import { AiFillCreditCard } from "react-icons/ai";
 import { SmallAddIcon } from "@chakra-ui/icons";
 import { BiRefresh } from "react-icons/bi";
 import getModels from "@/utils/getModels";
-import AddAModel from "./AddAModel";
-import getTrainingLogsForModel from "@/utils/getTrainingLogsForModel";
 import createModelID from "@/utils/createModelID";
 
 const Models = () => {
@@ -53,10 +51,10 @@ const Models = () => {
   const { repos, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [modelsInTraining, setModelsInTraining] = useState<any>([]);
-  const [trainingLogs, setTrainingLogs] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [someModelsAreTraining, setSomeModelsAreTraining] =
-    useState<boolean>(false);
+  const [someModelsAreTraining, setSomeModelsAreTraining] = useState<boolean>(
+    false
+  );
 
   interface Model {
     id: string;
@@ -82,7 +80,6 @@ const Models = () => {
   const findIfModelsAreTraining = async () => {
     const areModelsTraining = await modelsInTraining.map((model: any) => {
       // If any of the logs in training logs are fulfilled false, return true
-
       if (
         trainingLogs.filter(
           (log: any) =>
@@ -93,7 +90,6 @@ const Models = () => {
       ) {
         return true;
       }
-
       return false;
     });
 
@@ -103,11 +99,6 @@ const Models = () => {
   };
 
   useEffect(() => {
-    // get data from training_log table
-    modelsInTraining.map((model: any) => {
-      getTrainingLogsForModel(setTrainingLogs, model);
-    });
-
     // Subscribe to output changes
     if (!supabase) return;
     const models = supabase
@@ -117,7 +108,7 @@ const Models = () => {
         { event: "*", schema: "public", table: "models" },
         (payload: any) => {
           if (payload.new.stripe_customer_id === stripe_customer_id) {
-            // Update modelsInTraining ith the payload.new of the corresponding model
+            // Update modelsInTraining with the payload.new of the corresponding model
             setModelsInTraining((modelsInTraining: any) => {
               const newModelsInTraining = modelsInTraining.map(
                 (model: Model) => {
@@ -133,34 +124,11 @@ const Models = () => {
         }
       )
       .subscribe();
-
-    const training = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "training_log" },
-        (payload: any) => {
-          const newTrainingLogs = trainingLogs.map((log: any) => {
-            if (log.id === payload.new.id) {
-              return payload.new;
-            }
-            return log;
-          });
-
-          setTrainingLogs(newTrainingLogs);
-        }
-      )
-      .subscribe();
   }, []);
 
   useEffect(() => {
     getModels(setModelsInTraining, setLoading, user?.email);
   }, [repos, refresh]);
-
-  useEffect(() => {
-    // Find if any models are still training
-    findIfModelsAreTraining();
-  }, [modelsInTraining]);
 
   useEffect(() => {
     if (!session) {
@@ -274,15 +242,6 @@ const Models = () => {
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">
-            {/* <Link href="/platform/agent">
-              <IconButton
-                onClick={() => {
-                  router.back();
-                }}
-                aria-label="Close"
-                icon={<ArrowBackIcon />}
-              />
-            </Link> */}
             <Heading size="md">Trained Models</Heading>
           </Flex>
           <Flex gap={2}>
@@ -318,7 +277,6 @@ const Models = () => {
               return (
                 <ModelCard
                   id={model.id}
-                  trainingLogs={trainingLogs}
                   model={model}
                   modelsInTraining={modelsInTraining}
                   setModelsInTraining={setModelsInTraining}

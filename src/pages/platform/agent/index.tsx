@@ -67,7 +67,7 @@ import TrainingStatus from "./TrainingStatus";
 import { BsDiscord } from "react-icons/bs";
 import { AiFillCreditCard } from "react-icons/ai";
 import getLofaf from "@/utils/github/getLofaf";
-import { BiSolidBrain, BiSolidStar } from "react-icons/bi";
+import { FaBrain } from "react-icons/fa";
 import { EmailIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { BiConfused, BiRefresh, BiUpArrowAlt } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
@@ -91,7 +91,6 @@ const Chat = () => {
   // Active state
   const [activeModelFilesTrained, setActiveModelFilesTrained] =
     useState<number>(0);
-  const [hasSentAMessage, setHasSentAMessage] = useState<boolean>(false);
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [showModelAssessment, setShowModelAssessment] =
     useState<boolean>(false);
@@ -134,6 +133,7 @@ const Chat = () => {
       setLoading(false);
       savePrompt(user?.email, prompt, data.content, usage);
       setResponse(data.content);
+      setShowModelAssessment(false);
     },
   });
 
@@ -175,7 +175,7 @@ const Chat = () => {
         "User email": user?.email,
         "Valid Repo": !!lofaf,
         "Valid Stripe": !!stripe_customer_id,
-        "Valid Github": !!session?.provider_token,
+        "Valid GitHub": !!session?.provider_token,
       }
     );
   }, []);
@@ -277,7 +277,6 @@ const Chat = () => {
       target: { value: newPrompt },
     };
 
-    setHasSentAMessage(true);
     handleInputChange(target);
     setPreviousPrompt(newPrompt);
 
@@ -293,7 +292,7 @@ const Chat = () => {
     handleInputChange(target);
 
     const tokensInString = await getTokensFromString(modifiedPrompt);
-    const tokenLimit = await getTokenLimit(user.email);
+    const tokenLimit = getTokenLimit();
 
     if (tokensInString > tokenLimit) {
       setLoading(false);
@@ -480,6 +479,7 @@ const Chat = () => {
                   </Flex>
                 </Flex>
               )}
+
               <TrainingStatus initialMessages={initialMessages} />
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
@@ -526,8 +526,8 @@ const Chat = () => {
               )}
 
               {previousPrompt && (
-                <SlideFade in={hasSentAMessage}>
-                  <Heading mb={3} mt={5} size="lg">
+                <SlideFade in={!!previousPrompt}>
+                  <Heading mb={3} size="lg">
                     {previousPrompt}
                   </Heading>
                 </SlideFade>
@@ -547,31 +547,30 @@ const Chat = () => {
                   content={String(messages[messages.length - 1]?.content)}
                 />
               )}
-              {!hasSentAMessage && (
-                <Box mt={4}>
-                  <Flex
-                    flexDirection="row"
-                    gap={2}
-                    alignItems="center"
-                    justifyContent="flex-start"
-                  >
-                    <Flex flexDirection="row" alignItems="center">
-                      <BiSolidBrain />
-                      <Text ml={1} mr={2}>
-                        Model Empirical Assessment
-                      </Text>
-                      <Switch
-                        id="isChecked"
-                        isChecked={showModelAssessment}
-                        onChange={() =>
-                          setShowModelAssessment(!showModelAssessment)
-                        }
-                      />
-                    </Flex>
-                  </Flex>
-                </Box>
-              )}
 
+
+              <Box mt={4}>
+                <Flex
+                  flexDirection="row"
+                  gap={2}
+                  alignItems="center"
+                  justifyContent="flex-start"
+                >
+                  <Flex flexDirection="row" alignItems="center">
+                    <FaBrain />
+                    <Text ml={1} mr={2}>
+                      Model Empirical Assessment
+                    </Text>
+                    <Switch
+                      id="isChecked"
+                      isChecked={showModelAssessment}
+                      onChange={() =>
+                        setShowModelAssessment(!showModelAssessment)
+                      }
+                    />
+                  </Flex>
+                </Flex>
+              </Box>
               {showModelAssessment && (
                 <>
                   <Text
@@ -618,61 +617,61 @@ const Chat = () => {
             </Box>
           )}
 
-          {response && !hasBeenReset && (
-            <Flex
-              width="100%"
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
-              gap={2}
-              my={2}
-            >
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                aria-label="Join Discord"
-                onClick={() => {
-                  setHasBeenReset(true);
-                  setLoading(false);
-                  setResponse("");
-                  setFailMessage("");
-                }}
-                icon={
-                  <Flex flexDirection="row" px={3}>
-                    <PlusSquareIcon />
-                    <Text ml={2} fontSize={14}>
-                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                      New
-                    </Text>
-                  </Flex>
-                }
-              />
-              <IconButton
-                _hover={{
-                  transform: "translateY(-4px)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onClick={() => {
-                  reload();
-                  setLoading(true);
-                }}
-                aria-label="Join Discord"
-                icon={
-                  <Flex flexDirection="row" px={3}>
-                    <BiRefresh />
-                    <Text ml={2} fontSize={14}>
-                      {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
-                      Regenerate
-                    </Text>
-                  </Flex>
-                }
-              />
-            </Flex>
-          )}
         </Box>
         <Feedback models={models} response={response} messages={messages} />
+        {response && !hasBeenReset && (
+          <Flex
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            gap={2}
+            mt={4}
+          >
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              aria-label="Join Discord"
+              onClick={() => {
+                setHasBeenReset(true);
+                setLoading(false);
+                setResponse("");
+                setFailMessage("");
+              }}
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  <PlusSquareIcon />
+                  <Text ml={2} fontSize={14}>
+                    {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                    New
+                  </Text>
+                </Flex>
+              }
+            />
+            <IconButton
+              _hover={{
+                transform: "translateY(-4px)",
+                transition: "all 0.2s ease-in-out",
+              }}
+              onClick={() => {
+                reload();
+                setLoading(true);
+              }}
+              aria-label="Join Discord"
+              icon={
+                <Flex flexDirection="row" px={3}>
+                  <BiRefresh />
+                  <Text ml={2} fontSize={14}>
+                    {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                    Regenerate
+                  </Text>
+                </Flex>
+              }
+            />
+          </Flex>
+        )}
         <PromptCorrectionModal
           correctedPrompt={correctedPrompt}
           setCorrectedPrompt={setCorrectedPrompt}

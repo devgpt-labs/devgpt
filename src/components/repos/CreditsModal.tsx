@@ -90,7 +90,7 @@ const CreditsModal = ({
       .eq("email_address", user.email);
 
     if (error) {
-      console.log(error);
+      console.warn({ error });
       return null
     }
 

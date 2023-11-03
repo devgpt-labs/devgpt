@@ -103,6 +103,8 @@ const UpgradeModal = ({ isUpgradeOpen, onUpgradeClose }: any) => {
                   router.push("/platform/billing", undefined, {
                     shallow: true,
                   });
+
+                  onUpgradeClose()
                 }}
                 size="lg"
                 color={"white"}

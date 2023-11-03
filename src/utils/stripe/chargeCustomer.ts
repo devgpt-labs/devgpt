@@ -28,7 +28,7 @@ const setUserToPaymentOverdue = async (email: string) => {
     .select();
 
   if (overdueError) {
-    console.log({ overdueError });
+    console.warn({ overdueError });
     return;
   }
 };
@@ -46,7 +46,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
     .single();
 
   if (creditsError) {
-    console.log({ creditsError });
+    console.warn({ creditsError });
     return;
   }
 
@@ -60,7 +60,7 @@ const chargeCustomer = async (customer: any, amount: number, email: any) => {
     .select();
 
   if (removeCreditsError) {
-    console.log({ removeCreditsError });
+    console.warn({ removeCreditsError });
     return;
   }
 

@@ -27,7 +27,7 @@ import { getPaginatedRepos } from "@/utils/github/getRepos";
 import { supabase } from "@/utils/supabase";
 import RepoSetupModal from "./RepoSetupModal";
 import getModels from "@/utils/getModels";
-import addTrainingLog from "@/utils/addTrainingLog";
+import handleChargeCustomer from "@/utils/handleChargeCustomer";
 
 //components
 type PageInfo = {
@@ -99,7 +99,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
         }
       })
       .catch((err: any) => {
-        console.log("Failed to get repos:", { err });
+        console.warn("Failed to get repos:", { err });
       });
   };
 
@@ -122,7 +122,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
         }
       })
       .catch((err) => {
-        console.log("Failed to get repos:", { err });
+        console.warn("Failed to get repos:", { err });
       });
 
   const onNextPage = async () => {
@@ -167,8 +167,8 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
       email_address: user?.email,
     };
 
-    //insert the first training_log
-    addTrainingLog(newModel);
+    // charge
+    handleChargeCustomer(newModel);
 
     const { data, error } = await supabase
       .from("models")
