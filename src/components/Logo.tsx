@@ -9,21 +9,18 @@ const Logo = () => {
   const router = useRouter();
 
   return (
-    <Tooltip label='Happy Halloween! 🦇'>
-      <Image
-        cursor='pointer'
-        onClick={() => {
-          router.push("/platform/agent", undefined, {
-            shallow: true,
-          });
-        }}
-        src={colorMode === "dark" ? devgpt.src : devgptdark.src}
-        maxH="35px"
-        bgClip="text"
-        alt="DevGPT Logo"
-      />
-    </Tooltip>
-
+    <Image
+      cursor="pointer"
+      onClick={() => {
+        router.push("/platform/agent", undefined, {
+          shallow: true,
+        });
+      }}
+      src={colorMode === "dark" ? devgpt.src : devgptdark.src}
+      maxH="23px"
+      bgClip="text"
+      alt="DevGPT Logo"
+    />
   );
 };
 

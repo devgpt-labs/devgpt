@@ -19,12 +19,20 @@ import {
   ModalFooter,
   ModalBody,
   Badge,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuItemOption,
+  MenuGroup,
+  MenuOptionGroup,
+  MenuDivider,
 } from "@chakra-ui/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import RepoDrawer from "@/components/repos/RepoDrawer";
 import Editor, { DiffEditor } from "@monaco-editor/react";
-import TrainingStatus from "@/pages/platform/agent/TrainingStatus";
+
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -32,7 +40,6 @@ import authStore from "@/store/Auth";
 
 //components
 import Template from "@/components/Template";
-import PromptAreaAndButton from "./PromptAreaAndButton";
 import Feedback from "@/components/repos/Feedback";
 
 //utils
@@ -272,7 +279,6 @@ const Branch = () => {
 
   return (
     <Template>
-      <RepoDrawer />
       <Flex
         direction="column"
         flex={1}
@@ -336,19 +342,26 @@ const Branch = () => {
                 </Flex>
               )}
 
-              <PromptAreaAndButton
-                prompt={prompt}
-                loading={loading}
-                setLoading={setLoading}
-                setPrompt={setPrompt}
-                handleSubmit={(prompt: any) => handleSubmit(prompt)}
-              />
-
               <SlideFade in={!!result.branchName}>
                 <Heading mt={2} mb={4} size="lg">
                   {result.branchName}
                 </Heading>
               </SlideFade>
+              <Flex justifyContent={"flex-end"}>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    bgColor="#2da042"
+                  >
+                    Review Changes
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem>Raise PR</MenuItem>
+                    <MenuItem>Close Branch</MenuItem>
+                  </MenuList>
+                </Menu>
+              </Flex>
               {loading ? (
                 <SkeletonText
                   mt={4}
@@ -424,16 +437,6 @@ const Branch = () => {
             </Box>
           )}
         </Box>
-
-        {/* <Feedback
-          handleRegenerate={() => {
-            handleSubmit(prompt);
-            setLoading(true);
-          }}
-          handleNew={() => {
-            setLoading(false);
-          }}
-        /> */}
       </Flex>
     </Template>
   );

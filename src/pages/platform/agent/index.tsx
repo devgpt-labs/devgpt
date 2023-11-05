@@ -285,6 +285,21 @@ const Chat = () => {
                 handleSubmit={(prompt: any) => handleSubmit(prompt)}
               />
 
+              <Flex>
+                <Flex alignItems={"center"}>
+                  <FaCodeBranch size="15" />
+                  <Heading size="sm" ml={1.5} fontWeight={"normal"}>
+                    367 Open
+                  </Heading>
+                </Flex>
+                <Flex alignItems={"center"} ml={5}>
+                  <FaCodeBranch size="15" />
+                  <Heading size="sm" ml={1.5} fontWeight={"normal"}>
+                    18,278 Closed
+                  </Heading>
+                </Flex>
+              </Flex>
+
               <TableContainer bgColor={"#2c313a"} borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
                   <TableCaption>
@@ -300,7 +315,7 @@ const Chat = () => {
                   </Tbody>
                   <Tfoot>
                     <Tr>
-                      <Th>To convert</Th>
+                      <Th>Page 1</Th>
                     </Tr>
                   </Tfoot>
                 </Table>
@@ -328,8 +343,8 @@ const Ticket = () => {
     >
       <Td>
         <Flex alignItems={"center"}>
-          <FaCodeBranch />
-          <Heading size="md" ml={1}>
+          <FaCodeBranch color="#3fba50" size="18" />
+          <Heading size="md" ml={1.5}>
             Docs: fix grammatical issue in "Data Fetching Patterns" section
           </Heading>
         </Flex>

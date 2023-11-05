@@ -30,17 +30,11 @@ const ChatHeader = () => {
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
         <Box>
-          <Tag ml={3} bg="blue.500" color="white">
+          <Tag ml={3} bg="blue.500" color="white" size="sm">
             Beta {version}
           </Tag>
         </Box>
-        <Flex gap={2}>
-          {repo.repo && (
-            <Tag bg="blue.500" color="white">
-              {repo.repo}
-            </Tag>
-          )}
-        </Flex>
+        <Flex gap={2}>{repo.repo && <Text>{repo.repo}</Text>}</Flex>
       </Flex>
     </Flex>
   );

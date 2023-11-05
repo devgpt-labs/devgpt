@@ -96,7 +96,7 @@ const PromptAreaAndButton = ({
           ) : hoveringButton ? (
             "Submit task"
           ) : (
-            "New pull request"
+            "Start new task"
           )}
         </Button>
       </Flex>
