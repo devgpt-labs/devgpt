@@ -282,7 +282,7 @@ const Branch = () => {
       <Flex
         direction="column"
         flex={1}
-        w="80%"
+        w="98%"
         maxW="full"
         justifyContent={"center"}
         p={5}
