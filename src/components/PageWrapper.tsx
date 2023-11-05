@@ -16,13 +16,13 @@ const Home = ({ children }: any) => {
     >
       <Flex
         flexDirection="column"
-        bgColor={colorMode === "dark" ? "black" : "whitesmoke"}
+        bgColor={colorMode === "dark" ? "#24292f" : "whitesmoke"}
         width="100vw"
         minH="100vh"
       >
         <AppHeader />
         <Flex
-          minH='78vh'
+          minH="78vh"
           flexDirection="column"
           alignItems="center"
           justifyContent="flex-start"

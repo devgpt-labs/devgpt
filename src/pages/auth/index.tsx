@@ -50,7 +50,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     if (user) {
-      await getModels(setModels, () => { }, user?.email);
+      await getModels(setModels, () => {}, user?.email);
 
       if (models.length > 0) {
         // Navigate user to the prompting page
@@ -122,14 +122,14 @@ const Auth = () => {
           <GitConnectorButton
             color="#0c61db"
             provider="Sign In With BitBucket"
-            handle={() => { }}
+            handle={() => {}}
             Icon={<FaBitbucket />}
             tooltip="Coming soon!"
           />
           <GitConnectorButton
             color="#FC6D27"
             provider="Sign In With GitLab"
-            handle={() => { }}
+            handle={() => {}}
             Icon={<AiFillGitlab />}
             tooltip="Coming soon!"
           />

@@ -25,21 +25,18 @@ const ChatHeader = () => {
       w="full"
       alignItems="center"
       maxH="sm"
+      backgroundColor={colorMode === "light" ? "#F7FAFC" : "black"}
     >
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
         <Box>
-          <Tag
-            ml={3}
-            bg='blue.500'
-            color="white"
-          >
-            Open Beta {version}
+          <Tag ml={3} bg="blue.500" color="white">
+            Beta {version}
           </Tag>
         </Box>
         <Flex gap={2}>
           {repo.repo && (
-            <Tag bg='blue.500' color="white">
+            <Tag bg="blue.500" color="white">
               {repo.repo}
             </Tag>
           )}

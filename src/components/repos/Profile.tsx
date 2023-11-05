@@ -10,8 +10,6 @@ import {
   Tooltip,
   Link,
   useDisclosure,
-  Tag,
-  TagLabel,
 } from "@chakra-ui/react";
 
 // Utils
@@ -24,7 +22,7 @@ import createBranch from "@/utils/github/createBranch";
 import { FiExternalLink } from "react-icons/fi";
 // Components
 import UpgradeModal from "./UpgradeModal";
-import FooterButtons from "@/pages/platform/agent/FooterButtons";
+import FooterButtons from "@/components/FooterButtons";
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
@@ -141,8 +139,6 @@ const Profile = () => {
     }
   };
 
-  // Raise a bra
-
   useEffect(() => {
     fetchData();
   }, [isCreditsOpen]);
@@ -204,7 +200,7 @@ const Profile = () => {
                 alt="Avatar"
                 src={identity?.avatar_url}
                 style={{
-                  borderRadius: 10,
+                  borderRadius: 100,
                   objectFit: "cover",
                 }}
                 maxHeight={40}
@@ -216,9 +212,7 @@ const Profile = () => {
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
                   <Text onClick={onCreditsOpen}>{identity?.name}</Text>
-                  <Text>{identity?.email}</Text>
                 </Flex>
-                <FooterButtons />
               </Flex>
             </Box>
           </Flex>
