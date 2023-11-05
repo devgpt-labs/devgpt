@@ -35,9 +35,9 @@ const PromptCorrectionModal = ({
   const commonWithSpaces = common.map((word: any) => word + " ");
 
   useEffect(() => {
-    setLoading(true);
-    onClose();
-    onSubmit(prompt);
+    // setLoading(true);
+    // onClose();
+    // onSubmit(prompt);
   }, [correctedPrompt]);
 
   return (

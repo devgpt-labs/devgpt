@@ -182,7 +182,7 @@ const Models = ({ onClose }: any) => {
 
   const sections = [
     { name: "Billing", disabled: isPro === "member" ? true : false },
-    { name: "Models", disabled: !isPro ? true : false },
+    { name: "Repos", disabled: !isPro ? true : false },
     {
       name: "Teams",
       disabled: !isPro ? true : isPro === "individual" ? true : false,
@@ -304,7 +304,7 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
 
-          {section.name.toLowerCase() === "models" && (
+          {section.name.toLowerCase() === "repos" && (
             <BillingTable
               modelsInTraining={modelsInTraining}
               budget={budget}

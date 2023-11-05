@@ -89,12 +89,12 @@ const PromptAreaAndButton = ({
           ml={4}
           width="10rem"
           onClick={async (e: any) => {
-            setLoading(true);
-            const checks = await submitChecks(false);
-            if (!checks) {
-              return null;
-            }
-            setHasBeenReset(false);
+            // setLoading(true);
+            // const checks = await submitChecks(false);
+            // if (!checks) {
+            //   return null;
+            // }
+            // setHasBeenReset(false);
             handleSubmit(prompt);
           }}
         >

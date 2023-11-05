@@ -20,8 +20,8 @@ import {
   BiCopy,
 } from "react-icons/bi";
 import { FiExternalLink } from "react-icons/fi";
-import createBranch from "@/utils/github/createBranch";
 import { PlusSquareIcon } from "@chakra-ui/icons";
+import { createBranch } from "git-connectors";
 
 // Icons
 import {
@@ -78,9 +78,61 @@ const Feedback = ({
 
   // if (!model.output) return null;
 
+  const blobs = [
+    {
+      filePath: "app2.js",
+      content: "const a = b",
+      comments: "i did this",
+      examples: ["app.js"],
+    },
+  ];
+
+  const auth = {
+    owner: "tom-lewis-code",
+    repo: "toms-public-sand-pit",
+    editor: "tom",
+  };
+
+  const branch = {
+    branch_name: "test-branch",
+    pr_title: "my title",
+    pr_body: "my body",
+    randomly_generated_4_digit_number: Math.floor(1000 + Math.random() * 9000),
+  };
+
+  const handleRaiseBranch = async (pr: boolean) => {
+    if (!session?.provider_token) return;
+
+    // Pr decides if a PR should be raised or not, if false, it will only raise a branch. If true, it will raise a PR.
+
+    if (pr) {
+      setPullRequestLoading(true);
+    } else {
+      setBranchLoading(true);
+      setPullRequestLoading(true);
+    }
+
+    const data = await createBranch(
+      blobs,
+      auth,
+      branch,
+      session.provider_token,
+      pr
+    );
+
+    if (data?.branch_name) {
+      setBranchName(data.branch_name);
+    }
+
+    if (data?.pull_request) {
+      setPullRequest(data.pull_request);
+    }
+
+    setBranchLoading(false);
+    setPullRequestLoading(false);
+  };
+
   const handleGoodAnswerClick = async () => {
-    // TODO: Readd this
-    // updateModel();
     setFeedbackGiven(true);
   };
 
@@ -103,15 +155,15 @@ const Feedback = ({
         gap={2}
       >
         <Tooltip
-          label={branchName ? "Copy Git Command" : "Raise Branch"}
+          label={branchName ? "Copy Git Command" : "Create Branch"}
           placement="top"
         >
           <IconButton
+            overflow="hidden"
             onClick={() => {
               branchName
-                ? window.open(pullRequest)
-                : null // remake create branch
-
+                ? navigator.clipboard.writeText(branchName)
+                : handleRaiseBranch(false);
             }}
             _hover={{
               transform: "translateY(-4px)",
@@ -121,7 +173,7 @@ const Feedback = ({
             icon={
               <>
                 {branchLoading ? (
-                  <Spinner size='sm' />
+                  <Spinner size="sm" />
                 ) : (
                   <Flex flexDirection="row" px={3}>
                     {branchName ? <BiCopy /> : <BiGitBranch />}
@@ -142,21 +194,19 @@ const Feedback = ({
           placement="top"
         >
           <IconButton
+            overflow="hidden"
             _hover={{
               transform: "translateY(-4px)",
               transition: "all 0.2s ease-in-out",
             }}
             aria-label="Join Discord"
             onClick={() => {
-              // If pull request, window.open, if not, set loading to true and create a branch
-              pullRequest
-                ? window.open(pullRequest)
-                : null //remake create branch
+              pullRequest ? window.open(pullRequest) : handleRaiseBranch(true);
             }}
             icon={
               <>
                 {pullRequestLoading ? (
-                  <Spinner size='sm' />
+                  <Spinner size="sm" />
                 ) : (
                   <Flex flexDirection="row" px={3}>
                     {pullRequest ? <FiExternalLink /> : <BiGitPullRequest />}
@@ -173,6 +223,7 @@ const Feedback = ({
         </Tooltip>
         <Tooltip label="New Prompt" placement="top">
           <IconButton
+            overflow="hidden"
             _hover={{
               transform: "translateY(-4px)",
               transition: "all 0.2s ease-in-out",
@@ -189,6 +240,7 @@ const Feedback = ({
         </Tooltip>
         <Tooltip label="Regenerate" placement="top">
           <IconButton
+            overflow="hidden"
             _hover={{
               transform: "translateY(-4px)",
               transition: "all 0.2s ease-in-out",
@@ -207,9 +259,9 @@ const Feedback = ({
     );
   }
 
-  if (response === "") {
-    return null;
-  }
+  // if (response === "") {
+  //   return null;
+  // }
 
   return (
     <Flex
@@ -241,15 +293,28 @@ const Feedback = ({
       >
         <Tooltip label="Thumbs Up" placement="top">
           <IconButton
+            bg='blue.500'
             aria-label="Thumbs Up"
-            icon={<FaRegThumbsUp />}
+            px={4}
+            icon={
+              <>
+                <FaRegThumbsUp color='white' />
+                <Text color='white' ml={2}>Good</Text>
+              </>
+            }
             onClick={handleGoodAnswerClick}
           />
         </Tooltip>
         <Tooltip label="Thumbs Down" placement="top">
           <IconButton
+            px={4}
             aria-label="Thumbs Down"
-            icon={<FaRegThumbsDown />}
+            icon={
+              <>
+                <FaRegThumbsDown />
+                <Text ml={2}>Bad</Text>
+              </>
+            }
             onClick={handleBadAnswerClick}
           />
         </Tooltip>

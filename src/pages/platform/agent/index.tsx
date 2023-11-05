@@ -20,6 +20,7 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
+  Badge,
 } from "@chakra-ui/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
@@ -27,6 +28,8 @@ import moment from "moment";
 import RepoDrawer from "@/components/repos/RepoDrawer";
 import ModelStat from "@/components/ModelStat";
 import { getLofaf } from "git-connectors";
+import Editor, { DiffEditor } from "@monaco-editor/react";
+import TrainingStatus from "@/pages/platform/agent/TrainingStatus";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -64,8 +67,8 @@ const Chat = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [failMessage, setFailMessage] = useState<string>("");
 
-  // Load state
-  const [initialMessages, setInitialMessages] = useState<any>([]);
+  const [messages, setMessages] = useState<any>([]);
+
   const [response, setResponse] = useState<string>("");
 
   // Active state
@@ -115,11 +118,24 @@ const Chat = () => {
   //     setShowModelAssessment(false);
   //   },
 
-  const handleSubmit = async (prompt: string) => {
-    console.log(prompt);
-  };
-
-  const MAX_MESSAGES = 7; //todo - this should come from training status
+  // const handleSubmit = async (prompt: string) => {
+  //   const response = await fetch(
+  //     "https://devgpt-api-production-f45a.up.railway.app/generate",
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         task: prompt,
+  //         repo: "toms-private-sand-pit",
+  //         owner: "tom-lewis-code",
+  //       }),
+  //     }
+  //   )
+  //     .then((res) => res.json())
+  //     .catch((err) => console.log(err));
+  // };
 
   useEffect(() => {
     // Get all models
@@ -162,34 +178,81 @@ const Chat = () => {
     );
   }, []);
 
+  const result = {
+    success: true,
+    generatedFiles: [
+      {
+        fileName: "src/App.js",
+        originalContent:
+          'import logo from \'./logo.svg\';\nimport \'./App.css\';\n\nfunction App() {\n  return (\n    <div className="App">\n      <header className="App-header">\n        <img src={logo} className="App-logo" alt="logo" />\n        <p>\n          Edit <code>src/App.js</code> and save to reload.\n        </p>\n        <a\n          className="App-link"\n          href="https://reactjs.org"\n          target="_blank"\n          rel="noopener noreferrer"\n        >\n          Learn React\n        </a>\n      </header>\n    </div>\n  );\n}\n\nexport default App;\n',
+        newContent:
+          'import logo from \'./logo.svg\';\nimport \'./App.css\';\n\nfunction App({surname}) {\n  return (\n    <div className="App">\n      <header className="App-header">\n        <img src={logo} className="App-logo" alt="logo" />\n        <p>\n          Edit <code>src/App.js</code> and save to reload.\n        </p>\n        <p>\n          Surname: {surname}\n        </p>\n        <a\n          className="App-link"\n          href="https://reactjs.org"\n          target="_blank"\n          rel="noopener noreferrer"\n        >\n          Learn React\n        </a>\n      </header>\n    </div>\n  );\n}\n\nexport default App;',
+        tasksCompletedPreviously:
+          "Added a 'surname' prop to the App function and displayed it in a new paragraph element in the return statement of the function.",
+        similarFile: {
+          fileName: "src/Mushroom.js",
+          content:
+            "import logo from \"./logo.svg\";\nimport \"./App.css\";\n\nfunction App() {\nreturn (\n<div className='App'>\n<header className='App-header'>\n<img src={logo} className='App-logo' alt='logo' />\n<p>\nEdit <code>src/App.js</code> and save to reload.\n</p>\n<a\nclassName='App-link'\nhref='https://reactjs.org'\ntarget='_blank'\nrel='noopener noreferrer'\n>\nMushroom\n</a>\n</header>\n</div>\n);\n}\n\nexport default App;\n",
+        },
+      },
+      {
+        fileName: "src/App.test.js",
+        originalContent:
+          "import { render, screen } from '@testing-library/react';\nimport App from './App';\n\ntest('renders learn react link', () => {\n  render(<App />);\n  const linkElement = screen.getByText(/learn react/i);\n  expect(linkElement).toBeInTheDocument();\n});\n",
+        newContent:
+          "import { render, screen } from '@testing-library/react';\nimport App from './App';\n\ntest('renders learn react link', () => {\n  render(<App surname='Doe' />);\n  const linkElement = screen.getByText(/learn react/i);\n  const surnameElement = screen.getByText(/Doe/i);\n  expect(linkElement).toBeInTheDocument();\n  expect(surnameElement).toBeInTheDocument();\n});",
+        tasksCompletedPreviously:
+          "Added a 'surname' prop to the App component in the render function of the test. Also added a new line to check if the surname is in the document.",
+        similarFile: {
+          fileName: "src/setupTests.js",
+          content:
+            "// jest-dom adds custom jest matchers for asserting on DOM nodes.\n// allows you to do things like:\n// expect(element).toHaveTextContent(/react/i)\n// learn more: https://github.com/testing-library/jest-dom\nimport '@testing-library/jest-dom';\n",
+        },
+      },
+      {
+        fileName: "src/Profile.js",
+        originalContent: null,
+        newContent:
+          "import React from 'react';\n\nfunction Profile({surname}) {\nreturn (\n<div className='Profile'>\n<p>{surname}</p>\n</div>\n);\n}\n\nexport default Profile;",
+        tasksCompletedPreviously:
+          "Created a new React functional component named 'Profile'. This component accepts a 'surname' prop and displays it in a paragraph element.",
+        similarFile: {
+          fileName: "src/Mushroom.js",
+          content:
+            "import logo from \"./logo.svg\";\nimport \"./App.css\";\n\nfunction App() {\nreturn (\n<div className='App'>\n<header className='App-header'>\n<img src={logo} className='App-logo' alt='logo' />\n<p>\nEdit <code>src/App.js</code> and save to reload.\n</p>\n<a\nclassName='App-link'\nhref='https://reactjs.org'\ntarget='_blank'\nrel='noopener noreferrer'\n>\nMushroom\n</a>\n</header>\n</div>\n);\n}\n\nexport default App;\n",
+        },
+      },
+      {
+        fileName: "src/Profile.test.js",
+        originalContent: null,
+        newContent:
+          "import React from 'react';\n\nfunction Profile({ surname }) {\n  return (\n    <div>\n      <p>{surname}</p>\n    </div>\n  );\n}\n\nexport default Profile;",
+        tasksCompletedPreviously:
+          "Created a new React functional component named 'Profile'. This component accepts a 'surname' prop and displays it in a paragraph element.",
+        similarFile: {
+          fileName: "src/setupTests.js",
+          content:
+            "// jest-dom adds custom jest matchers for asserting on DOM nodes.\n// allows you to do things like:\n// expect(element).toHaveTextContent(/react/i)\n// learn more: https://github.com/testing-library/jest-dom\nimport '@testing-library/jest-dom';\n",
+        },
+      },
+    ],
+  };
+
   const handleGetLofaf = async (repo: any, session: any) => {
-    await getLofaf(
-      repo.owner,
-      repo.repo,
-      session?.provider_token
-    ).then((data: any) => {
-      console.log({ data });
+    await getLofaf(repo.owner, repo.repo, session?.provider_token).then(
+      (data: any) => {
+        if (!data) return;
 
-      if (!data) return;
+        // Convert data from csv to array of strings
+        const files = data.split(",");
 
-      // Convert data from csv to array of strings
-      const files = data.split(",");
-
-      // Set lofaf to the files found
-      setLofaf(files);
-    });
+        // Set lofaf to the files found
+        setLofaf(files);
+      }
+    );
   };
 
   useEffect(() => {
-    // if (initialMessages.length !== 0) return;
-
-    // Update the model to the newest selected one
-
-    // if (model?.output) {
-    //   setInitialMessages(JSON.parse(model?.output).slice(0, MAX_MESSAGES));
-    //   setActiveModelFilesTrained((JSON.parse(model?.output).length - 1) / 2);
-    // }
-
     handleGetLofaf(repo, session);
   }, [repo]);
 
@@ -240,7 +303,6 @@ const Chat = () => {
     setLoading(true);
     setFailMessage("");
     setPreviousPrompt(prompt);
-    setLoading(true);
 
     let promptFeedback;
 
@@ -291,15 +353,6 @@ const Chat = () => {
   };
 
   const model = models?.find((model: any) => model?.repo === repo?.repo);
-  // show code response if any of the messages in the messages array have an id
-
-  // useEffect(() => {
-  //   messages?.some((message: any) => message?.id)
-  //     ? setShowCodeResponse(true)
-  //     : setShowCodeResponse(false);
-
-  //   setLoading(false);
-  // }, [messages]);
 
   if (!isPro) {
     return (
@@ -407,8 +460,6 @@ const Chat = () => {
     );
   }
 
-  // const content = String(messages[messages.length - 1]?.content).split("```");
-
   return (
     <Template>
       <RepoDrawer />
@@ -479,7 +530,8 @@ const Chat = () => {
                 </Flex>
               )}
 
-              {/* <TrainingStatus initialMessages={initialMessages} /> */}
+              <TrainingStatus />
+
               {withAt?.length > 0 && (
                 <Flex alignItems={"center"} my={2}>
                   <Kbd>Tab</Kbd>
@@ -540,42 +592,67 @@ const Chat = () => {
                   skeletonHeight="2"
                 />
               ) : (
-                // <Response
-                //   hasBeenReset={hasBeenReset}
-                //   initialMessages={initialMessages}
-                //   content={String(messages[messages.length - 1]?.content)}
-                // />
                 <Box mt={2}>
-                  {/* {showCodeResponse &&
-                    (String(messages[messages.length - 1]?.content).split("```")
-                      .length > 1 ? (
-                      <>
-                        {content.map((section, index) => {
-                          return (
-                            <>
-                              {index % 2 === 0 ? (
-                                <Box my={4}>{section}</Box>
-                              ) : (
-                                <Box my={4}>
-                                  <Editor
-                                    theme="vs-dark"
-                                    defaultLanguage="javascript"
-                                    value={section}
-                                    height="400px"
-                                    // Fit the editor height to the content
-                                    options={{
-                                      scrollBeyondLastLine: false,
-                                    }}
-                                  />
-                                </Box>
-                              )}
-                            </>
-                          );
-                        })}
-                      </>
-                    ) : (
-                      String(messages[messages.length - 1]?.content)
-                    ))} */}
+                  {result.generatedFiles.map((file: any) => {
+                    return (
+                      <Box>
+                        <Flex flexDirection="row" alignItems="center" gap={2}>
+                          {file.originalContent ? (
+                            <Badge>EDITED</Badge>
+                          ) : (
+                            <Badge>NEW</Badge>
+                          )}
+
+                          <Text fontSize="sm" color="gray.400">
+                            {file.fileName}
+                          </Text>
+                        </Flex>
+
+                        <Text fontSize={14} mt={1}>
+                          {file.tasksCompletedPreviously
+                            ? file.tasksCompletedPreviously
+                            : ""}
+                        </Text>
+
+                        <Box borderRadius={10} mt={2} mb={4} overflow="hidden">
+                          {file.originalContent ? (
+                            <DiffEditor
+                              theme="vs-dark"
+                              language="javascript"
+                              original={file.originalContent}
+                              modified={file.newContent}
+                              options={{
+                                scrollBeyondLastLine: false,
+                                padding: {
+                                  top: 20,
+                                  bottom: 0,
+                                },
+                                renderWhitespace: "none",
+                              }}
+                              height="300px"
+                              className="editor"
+                            />
+                          ) : (
+                            <Editor
+                              value={file.newContent}
+                              theme="vs-dark"
+                              language="javascript"
+                              options={{
+                                scrollBeyondLastLine: false,
+                                padding: {
+                                  top: 20,
+                                  bottom: 0,
+                                },
+                                renderWhitespace: "none",
+                              }}
+                              height="300px"
+                              className="editor"
+                            />
+                          )}
+                        </Box>
+                      </Box>
+                    );
+                  })}
                 </Box>
               )}
 
@@ -653,14 +730,12 @@ const Chat = () => {
           models={models}
           response={response}
           handleRegenerate={() => {
-            // reload();
+            handleSubmit(prompt);
             setLoading(true);
           }}
           handleNew={() => {
-            setShowCodeResponse(false);
             setHasBeenReset(true);
             setLoading(false);
-            setResponse("");
             setFailMessage("");
           }}
         />

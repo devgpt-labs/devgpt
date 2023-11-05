@@ -220,7 +220,7 @@ const RepoDrawer = () => {
                   <Input
                     pr="4rem"
                     mb={2}
-                    placeholder="Search repos"
+                    placeholder="Search your repos"
                     value={filter}
                     onChange={(e) => {
                       setFilter(e.target.value);
