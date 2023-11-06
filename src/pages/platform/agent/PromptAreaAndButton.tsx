@@ -1,13 +1,26 @@
 import React, { useState } from "react";
-import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
+import { Button, Flex, Textarea, Spinner, useToast } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 
 const PromptAreaAndButton = () => {
   const { repo }: any = repoStore();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const handleSubmit = async (prompt: string) => {
+    if (prompt.length < 3) {
+      toast({
+        title: "Task too short",
+        description: "Please enter a longer task.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      setLoading(false);
+      return;
+    }
+
     const response = await fetch(
       "https://devgpt-taskqueue-production.up.railway.app/task-queue",
       {
@@ -21,12 +34,19 @@ const PromptAreaAndButton = () => {
           owner: repo.owner,
         }),
       }
-    )
-      .then((res) => res.json())
-      .catch((err) => console.log(err));
 
-    console.log(response);
+    );
 
+    console.log({ response });
+
+    toast({
+      title: "Task submitted",
+      description: "Your task has been submitted to the queue.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+    setLoading(false);
   };
 
   const [hoveringButton, setHoveringButton] = useState(false);

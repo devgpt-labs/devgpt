@@ -1,5 +1,5 @@
 import React from "react";
-import { ChakraProvider } from "@chakra-ui/provider";
+import { ChakraProvider } from "@chakra-ui/react";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import Head from "next/head";
@@ -11,8 +11,6 @@ import theme from "@/configs/theme";
 import PageWrapper from "@/components/PageWrapper";
 
 const Home = ({ children }: any) => {
-
-
   return (
     <main className={`${inter.className}`}>
       <Head>
