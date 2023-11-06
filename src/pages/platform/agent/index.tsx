@@ -35,6 +35,7 @@ import { useRouter } from "next/router";
 import RepoDrawer from "@/components/repos/RepoDrawer";
 import Editor, { DiffEditor } from "@monaco-editor/react";
 import { FaCodeBranch } from "react-icons/fa";
+import moment from "moment";
 import { supabase } from "@/utils/supabase";
 
 //stores
@@ -55,42 +56,21 @@ import getTokensFromString from "@/utils/getTokensFromString";
 
 // Icons
 import { AiFillCreditCard } from "react-icons/ai";
-import { EmailIcon, InfoIcon } from "@chakra-ui/icons";
+import { EmailIcon, InfoIcon, WarningIcon } from "@chakra-ui/icons";
 import { BiConfused } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
+import { TbGitBranch, TbGitBranchDeleted } from "react-icons/tb";
 
 const Chat = () => {
   // Constants
   const [promptCount, setPromptCount] = useState<number>(0);
-
-  // Sending prompts
-  const [loading, setLoading] = useState<boolean>(false);
-  const [prompt, setPrompt] = useState<string>("");
-  const toast = useToast();
-
   const [tasks, setTasks] = useState<any>([]);
 
   // Active state
   const router = useRouter();
-  const { colorMode } = useColorMode();
-  const {
-    repo,
-    lofaf,
-    setLofaf,
-    setRepo,
-    repoWindowOpen,
-    setRepoWindowOpen,
-  }: any = repoStore();
-  const {
-    user,
-    session,
-    stripe_customer_id,
-    signOut,
-    status,
-    credits,
-    isPro,
-  }: any = authStore();
+  const { repo, setRepo, repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const { user, session, signOut, isPro }: any = authStore();
 
   useEffect(() => {
     // Subscribe to output changes
@@ -104,12 +84,16 @@ const Chat = () => {
           // Merge the results
           const merged = [...tasks, payload?.new];
 
+          console.log({ merged });
+
           // Filter the results (remove nulls)
           const filtered = merged.filter((task: any) => {
             return task.source !== null;
           });
 
           // Set state with the new tasks, reversed.
+          console.log({ filtered });
+
           setTasks(filtered.reverse());
         }
       )
@@ -121,8 +105,6 @@ const Chat = () => {
       if (!supabase) return;
 
       const { data, error } = await supabase.from("prompts").select("*");
-
-      console.log({ data, error });
 
       if (!error) {
         //filter tasks where output is null
@@ -205,7 +187,7 @@ const Chat = () => {
           justifyContent="center"
         >
           {isPro === false && (
-            <Modal isOpen={true} onClose={() => {}} isCentered={true}>
+            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -313,13 +295,13 @@ const Chat = () => {
               <PromptAreaAndButton />
 
               <Flex>
-                <Flex alignItems={"center"} ml={6}>
+                <Flex alignItems={"center"}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
                     {tasks.length} Open
                   </Heading>
                 </Flex>
-                <Flex alignItems={"center"} ml={5}>
+                <Flex alignItems={"center"} ml={4}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
                     0 Closed
@@ -327,7 +309,7 @@ const Chat = () => {
                 </Flex>
               </Flex>
 
-              <TableContainer borderRadius={"sm"} mt={5} >
+              <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
                   <TableCaption>
                     Tip: Help is always available on our Discord server.
@@ -368,12 +350,18 @@ const Ticket = ({ task }: any) => {
   const router = useRouter();
   const toast = useToast();
 
+  // If the task is older than 20 minutes and the tag is still in progress, the task is not closed and the task.output is null, show a warning icon
+  const taskHasErrored =
+    moment(task.created_at).isBefore(moment().subtract(20, "minutes")) &&
+    task.tag === "In-Progress" &&
+    task.output === null;
+
   return (
     <Tr
-      width='100%'
       // On hover, scale up the ticket
       _hover={{
-        transform: "scale(1.01)",
+        // slide slightly to the right
+        transform: "translateX(5px)",
       }}
       // Animate the transform
       transition="transform 0.2s"
@@ -391,27 +379,29 @@ const Ticket = ({ task }: any) => {
           : router.push(`/platform/branch/${task.id}`);
       }}
     >
-      <Td>
-        <Flex alignItems={"center"}>
-          <FaCodeBranch color="#3fba50" size="18" />
-          <Heading size="md" ml={1.5}>
-            {task.prompt || task.branchName}
-          </Heading>
+      <Box py={4}>
+        <Flex alignItems={"center"} gap={2}>
+          {taskHasErrored ? (
+            <TbGitBranchDeleted size="18" />
+          ) : (
+            <TbGitBranch color="#3fba50" size="18" />
+          )}
+
+          <Heading size="md">{task.prompt || task.branchName}</Heading>
+          <Tag
+            size="md"
+            variant="solid"
+            colorScheme={taskHasErrored ? "pink" : task.tag === "IN-PROGRESS" ? "purple" : "green"}
+            borderRadius={"full"}
+          >
+            {taskHasErrored ? 'Error' : task.tag}
+          </Tag>
         </Flex>
-        <Tag
-          mt={2}
-          size="md"
-          variant="solid"
-          colorScheme={task.tag === "IN-PROGRESS" ? "purple" : "green"}
-          borderRadius={"full"}
-        >
-          {task.tag}
-        </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
-          #{task.id} opened 3 minutes ago via{" "}
+          #{task.id} opened {moment(task.created_at).fromNow()} via{" "}
           <Text as="span">{task.source} • Review required</Text>
         </Text>
-      </Td>
+      </Box>
     </Tr>
   );
 };

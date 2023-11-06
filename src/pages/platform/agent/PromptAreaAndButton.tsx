@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Flex, Textarea, Spinner, useToast } from "@chakra-ui/react";
+import { Button, Flex, Textarea, Spinner, useToast, Text } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
@@ -105,20 +105,22 @@ const PromptAreaAndButton = () => {
   const [hoveringButton, setHoveringButton] = useState(false);
 
   return (
-    <Flex flexDirection="column">
-      <Flex flexDirection="column" alignItems={"flex-end"}>
+    <Flex flexDirection="column" mb={4}>
+      <Flex flexDirection="column" alignItems={"flex-start"}>
+        <Text>{repo.owner} / {repo.repo}</Text>
         <Textarea
           mt={3}
+          mb={3}
           maxH="75vh"
           // On focus, add a glow
           _focus={{
-            boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
-            borderColor: "blue.500",
+            boxShadow: "0 0 0 0.4rem rgba(0, 255, 0, .22)",
+            borderColor: "green.500",
           }}
           // On hover, add a glow
           _hover={{
-            boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
-            borderColor: "blue.500",
+            boxShadow: "0 0 0 0.8rem rgba(0, 255, 0, .12)",
+            borderColor: "green.500",
           }}
           // bgColor="#0d1116"
           autoFocus
@@ -142,7 +144,6 @@ const PromptAreaAndButton = () => {
         />
 
         <Button
-          mt={2}
           bg="#2da042"
           onMouseOver={() => setHoveringButton(true)}
           onMouseLeave={() => setHoveringButton(false)}

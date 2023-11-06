@@ -17,14 +17,21 @@ import {
   Tag,
   Spinner,
   Input,
+  InputGroup,
+  InputRightElement,
+  useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Editor, { DiffEditor } from "@monaco-editor/react";
 import { supabase } from "@/utils/supabase";
-import { ChevronDownIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import {
+  ChevronDownIcon,
+  ArrowBackIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+} from "@chakra-ui/icons";
 import { BiGitPullRequest, BiGlasses } from "react-icons/bi";
 import { createBranch } from "git-connectors";
-import moment from "moment";
 
 //stores
 import authStore from "@/store/Auth";
@@ -40,6 +47,8 @@ import { useColorMode } from "@chakra-ui/react";
 import { BiGitBranch } from "react-icons/bi";
 import { TbGitBranchDeleted } from "react-icons/tb";
 import checkCodeLanguage from "@/utils/checkCodeLanguage";
+import { RiOpenSourceLine } from "react-icons/ri";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 const Branch = () => {
   // Sending prompts
@@ -63,6 +72,7 @@ const Branch = () => {
   const router = useRouter();
   const { colorMode } = useColorMode();
   const { user, session, signOut }: any = authStore();
+  const toast = useToast();
 
   const handleRaiseViaGit = async (pr: boolean) => {
     // The prop 'PR' here decides if a pr should be raised or not.
@@ -70,33 +80,34 @@ const Branch = () => {
 
     if (!session?.provider_token) return;
 
-    const blobs = [
-      {
-        filePath: "app2.js",
-        content: "const a = b",
-        comments: "i did this",
-        examples: ["app.js"],
-      },
-    ];
+    const parsedChanges = JSON.parse(task.output);
+
+    // Map parsedChanges (an array of objects) into the blobs schema below
+    const blobs = parsedChanges.map((change: any) => {
+      return {
+        filePath: change.fileName,
+        content: change.newContent,
+        comments: change.taskCompletedPreviously,
+        examples: change.similarFile,
+      };
+    });
 
     const auth = {
-      owner: "tom-lewis-code",
-      repo: "toms-public-sand-pit",
+      owner: task.owner,
+      repo: task.repo,
     };
 
-    const randomly_generated_number = Math.floor(1000 + Math.random() * 9000);
-
     const branchDetails = {
-      branch_name: "newest-branch",
-      pr_title: "title",
-      pr_body: "body",
-      randomly_generated_5_digit_number: randomly_generated_number,
+      branch_name: task.branchDescription.replace(/"/g, ""),
+      pr_title: `Task ${task.id} - ${task.tag} - ${task.prompt} `,
+      pr_body: task.branchDescription,
+      randomly_generated_5_digit_number: task.id,
     };
 
     const commit = {
-      commit_message: "my commit message",
-      author_name: "tom",
-      author_email: "tom@feb.co.uk",
+      commit_message: task.branchDescription,
+      author_name: 'DevGPT-AI',
+      author_email: user?.email,
     };
 
     // Pr decides if a PR should be raised or not, if false, it will only raise a branch. If true, it will raise a PR.
@@ -133,6 +144,32 @@ const Branch = () => {
   const handleAddComment = async () => {
     // Run this through the AI
     // Add comment to the branch in supabase
+  };
+
+  const handleCopyBranch = (branch: any) => {
+    // Copy to clipboard
+    navigator.clipboard.writeText(branch);
+
+    // Tell the user via toast
+    toast({
+      title: "Copied to clipboard",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const handleNavigateToPR = (url: any) => {
+    // Open the URL in a new tab
+    window.open(url, "_blank");
+
+    // Tell the user via toast
+    toast({
+      title: "Opening PR in new tab",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
   };
 
   const loadTask = async () => {
@@ -196,7 +233,7 @@ const Branch = () => {
           className="flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="space-between"
         >
-          <Flex justifyContent={"space-between"} mb={3}>
+          <Flex justifyContent={"space-between"} mb={6}>
             <Flex flexDirection="column">
               <Flex flexDirection="row">
                 {pullRequest.name || branch.name ? (
@@ -282,11 +319,6 @@ const Branch = () => {
                   </Tag>
                 )} */}
               </Flex>
-              <Text fontWeight={"semibold"} fontSize={14} mt={4}>
-                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
-                {task?.created_at ? moment(task?.created_at).fromNow() : ""} via{" "}
-                <Text as="span">DevGPT Web</Text>
-              </Text>
             </Flex>
             <Menu>
               <MenuButton
@@ -373,41 +405,108 @@ const Branch = () => {
             })}
           </Box>
 
-          <Flex mt={2} mb={4} flexDirection="column" gap={2}>
-            <Text fontSize={14} >Git Branch</Text>
-            <Input value={branch?.name} />
-            <Text fontSize={14} >Pull Request URL</Text>
-            <Input value={pullRequest?.name} />
-            {/* {!branch.name ? (
-              <Text>No Branch</Text>
-            ) : branch.loading ? (
-              <Spinner />
-            ) : (
-              <Text>Your Branch: {branch.name}</Text>
-            )}
-            {!pullRequest.name ? (
-              <Text>No PR</Text>
-            ) : pullRequest.loading ? (
-              <Spinner />
-            ) : (
-              <Text>Your PR: {pullRequest.name}</Text>
-            )} */}
-          </Flex>
+          <Flex mt={2} mb={2} flexDirection="column" gap={2}>
+            <Flex
+              border="0.5px solid green"
+              p={4}
+              rounded="lg"
+              justifyContent="space-between"
+              mb={4}
+            >
+              <Box>
+                <Text fontWeight="bold" mb={1}>
+                  Want to work on this in your own code-editor?
+                </Text>
+                <Text mb={1} fontSize={14}>
+                  This will return a git branch ready to be copy-and-pasted.
+                </Text>
 
+                {branch.name && (
+                  <SlideFade in={!!branch.name} offsetY="20px">
+                    <InputGroup mt={2} cursor="pointer" width="100%">
+                      <Input
+                        fontSize={14}
+                        width="100%"
+                        value={`git fetch && git checkout ${branch.name.replace(/"/g, "")} `}
+                        isReadOnly={true}
+                        cursor="pointer"
+                        onClick={() => {
+                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                        }}
+                      />
+                      <InputRightElement
+                        onClick={() => {
+                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                        }}
+                        children={<CopyIcon />}
+                      />
+                    </InputGroup>
+                  </SlideFade>
+                )}
+              </Box>
+              <Button onClick={() => handleRaiseViaGit(false)}>
+                Create Branch
+              </Button>
+            </Flex>
+            <Flex
+              border="0.5px solid green"
+              p={4}
+              rounded="lg"
+              justifyContent="space-between"
+              mb={4}
+            >
+              <Box>
+                <Text fontWeight="bold" mb={1}>
+                  Ready to raise a pull request?
+                </Text>
+                <Text mb={1} fontSize={14}>
+                  This will return a github URL of your pull request.
+                </Text>
+                {pullRequest.name && (
+                  <SlideFade in={!!pullRequest.name} offsetY="20px">
+                    <InputGroup mt={2} cursor="pointer" width="100%">
+                      <Input
+                        fontSize={14}
+                        width="100%"
+                        value={pullRequest.name}
+                        isReadOnly={true}
+                        cursor="pointer"
+                        onClick={() => {
+                          handleNavigateToPR(pullRequest.name);
+                        }}
+                      />
+                      <InputRightElement
+                        onClick={() => {
+                          handleNavigateToPR(pullRequest.name);
+                        }}
+                        children={<ExternalLinkIcon />}
+                      />
+                    </InputGroup>
+                  </SlideFade>
+                )}
+              </Box>
+              <Button onClick={() => handleRaiseViaGit(true)}>
+                Raise Pull Request
+              </Button>
+            </Flex>
+
+          </Flex>
           <Flex flexDirection="column">
-            <Text mb={2} fontSize={14} >Add your comments...</Text>
+            <Text mb={2} fontSize={14}>
+              Add your comments...
+            </Text>
             <Textarea
               maxH="75vh"
               // On focus, add a glow
-              _focus={{
-                boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
-                borderColor: "blue.500",
-              }}
-              // On hover, add a glow
-              _hover={{
-                boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
-                borderColor: "blue.500",
-              }}
+              // _focus={{
+              //   boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
+              //   borderColor: "blue.500",
+              // }}
+              // // On hover, add a glow
+              // _hover={{
+              //   boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
+              //   borderColor: "blue.500",
+              // }}
               className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
               value={comment}
               p={5}
@@ -437,7 +536,6 @@ const Branch = () => {
               Comment
             </Button>
           </Flex>
-
         </Flex>
       </Flex>
     </Template>
