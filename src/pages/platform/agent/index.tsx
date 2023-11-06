@@ -22,6 +22,7 @@ import {
   Table,
   Thead,
   Tbody,
+  useToast,
   Tfoot,
   Tr,
   Th,
@@ -66,6 +67,8 @@ const Chat = () => {
   // Sending prompts
   const [loading, setLoading] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
+  const toast = useToast();
+
   const [tasks, setTasks] = useState<any>([]);
 
   // Active state
@@ -98,13 +101,16 @@ const Chat = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "prompts" },
         (payload: any) => {
-          console.log({ payload });
+          // Merge the results
+          const merged = [...tasks, payload?.new];
 
-          const filteredData = payload?.new?.filter((task: any) => {
+          // Filter the results (remove nulls)
+          const filtered = merged.filter((task: any) => {
             return task.source !== null;
           });
 
-          setTasks(filteredData?.reverse());
+          // Set state with the new tasks, reversed.
+          setTasks(filtered.reverse());
         }
       )
       .subscribe();
@@ -182,9 +188,9 @@ const Chat = () => {
             mb={4}
             borderRadius={10}
           />
-        </Flex >
-      </Template >
-    )
+        </Flex>
+      </Template>
+    );
   }
 
   if (isPro === false) {
@@ -248,7 +254,7 @@ const Chat = () => {
   return (
     <Template>
       <RepoDrawer />
-      <Flex direction="column" flex={1} w="98%" maxW="full" p={5}>
+      <Flex direction="column" flex={1} w="98%" maxW="full" p={4}>
         <Box
           rounded="lg"
           className="p-5 flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
@@ -307,7 +313,7 @@ const Chat = () => {
               <PromptAreaAndButton />
 
               <Flex>
-                <Flex alignItems={"center"}>
+                <Flex alignItems={"center"} ml={6}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
                     {tasks.length} Open
@@ -323,10 +329,7 @@ const Chat = () => {
 
               <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
-                  <TableCaption onClick={() => {
-                    // TODO: Remove
-                    router.push("/platform/branch/1", undefined, { shallow: true });
-                  }}>
+                  <TableCaption>
                     Tip: Help is always available on our Discord server.
                   </TableCaption>
                   <Thead>
@@ -342,9 +345,11 @@ const Chat = () => {
                         </Td>
                       </Tr>
                     )}
-                    {tasks.map((task: any) => {
-                      return <Ticket task={task} />;
-                    })}
+                    <Flex flexDirection="column" gap={2}>
+                      {tasks.map((task: any) => {
+                        return <Ticket task={task} />;
+                      })}
+                    </Flex>
                   </Tbody>
                   <Tfoot>
                     <Tr>
@@ -363,15 +368,30 @@ const Chat = () => {
 
 const Ticket = ({ task }: any) => {
   const router = useRouter();
+  const toast = useToast();
 
   return (
     <Tr
+      // On hover, add a glow and raise the size of the ticekt slighlty
       _hover={{
-        bgColor: "gray.700",
+        // boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
+        // borderColor: "blue.500",
+        transform: "scale(1.01)",
       }}
+      // Animate the transform
+      transition="transform 0.2s"
+      // border="2px solid #e2e8f0"
+      rounded="sm"
       cursor="pointer"
       onClick={() => {
-        router.push(`/platform/branch/${task.id}`);
+        task.tag === "IN-PROGRESS"
+          ? toast({
+            title: "Ticket in progress",
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          })
+          : router.push(`/platform/branch/${task.id}`);
       }}
     >
       <Td>
@@ -385,16 +405,14 @@ const Ticket = ({ task }: any) => {
           mt={2}
           size="md"
           variant="solid"
-          colorScheme="green"
+          colorScheme={task.tag === "IN-PROGRESS" ? "green" : "green"}
           borderRadius={"full"}
         >
           {task.tag}
         </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
-          #{task.id} opened 3 minutes ago by{" "}
-          <Text color="white" as="span">
-            {task.source} • Review required
-          </Text>
+          #{task.id} opened 3 minutes ago via{" "}
+          <Text as="span">{task.source} • Review required</Text>
         </Text>
       </Td>
     </Tr>
