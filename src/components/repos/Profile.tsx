@@ -254,6 +254,9 @@ const Profile = () => {
                       transition: "all 0.2s ease-in-out",
                     }}
                     onClick={() => {
+                      router.push("/platform/agent", undefined, {
+                        shallow: true,
+                      });
                       setRepoWindowOpen(!repoWindowOpen);
                     }}
                     aria-label="Select A Repo"

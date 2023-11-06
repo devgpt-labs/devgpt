@@ -22,7 +22,7 @@ const Home = ({ children }: any) => {
       >
         <AppHeader />
         <Flex
-          minH="78vh"
+          minH='82vh'
           flexDirection="column"
           alignItems="center"
           justifyContent="flex-start"

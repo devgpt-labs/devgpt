@@ -3,7 +3,7 @@ import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 
 const PromptAreaAndButton = () => {
-  const { repo } = repoStore();
+  const { repo }: any = repoStore();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +24,9 @@ const PromptAreaAndButton = () => {
     )
       .then((res) => res.json())
       .catch((err) => console.log(err));
+
+    console.log(response);
+
   };
 
   const [hoveringButton, setHoveringButton] = useState(false);
@@ -32,6 +35,7 @@ const PromptAreaAndButton = () => {
     <Flex flexDirection="column">
       <Flex flexDirection="column" alignItems={"flex-end"}>
         <Textarea
+          maxH='75vh'
           // On focus, add a glow
           _focus={{
             boxShadow: "0 0 0 0.5rem rgba(0, 123, 255, .22)",
@@ -42,7 +46,7 @@ const PromptAreaAndButton = () => {
             boxShadow: "0 0 0 1.0rem rgba(0, 123, 255, .12)",
             borderColor: "blue.500",
           }}
-          bgColor="#0d1116"
+          // bgColor="#0d1116"
           autoFocus
           className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
           value={prompt}
