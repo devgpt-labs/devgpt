@@ -205,7 +205,7 @@ const Chat = () => {
           justifyContent="center"
         >
           {isPro === false && (
-            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <Modal isOpen={true} onClose={() => {}} isCentered={true}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -384,13 +384,13 @@ const Ticket = ({ task }: any) => {
       rounded="sm"
       cursor="pointer"
       onClick={() => {
-        task.tag === "IN-PROGRESS"
+        task.tag === "In-Progress"
           ? toast({
-            title: "Ticket in progress",
-            status: "info",
-            duration: 5000,
-            isClosable: true,
-          })
+              title: "Ticket in progress",
+              status: "info",
+              duration: 5000,
+              isClosable: true,
+            })
           : router.push(`/platform/branch/${task.id}`);
       }}
     >

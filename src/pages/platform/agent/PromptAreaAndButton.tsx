@@ -53,7 +53,7 @@ const PromptAreaAndButton = () => {
       .insert([
         {
           email_address: user.email,
-          tag: "IN-PROGRESS",
+          tag: "In-Progress",
           prompt: prompt,
           repo: repo.repo,
           owner: repo.owner,
