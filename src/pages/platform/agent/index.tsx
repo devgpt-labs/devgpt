@@ -205,7 +205,7 @@ const Chat = () => {
           justifyContent="center"
         >
           {isPro === false && (
-            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <Modal isOpen={true} onClose={() => {}} isCentered={true}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -380,7 +380,7 @@ const Ticket = ({ task }: any) => {
       rounded="sm"
       cursor="pointer"
       onClick={() => {
-        task.tag === "IN-PROGRESS"
+        task.tag === "In-Progress"
           ? toast({
             colorScheme: "green",
             title: "Ticket in progress",
@@ -402,7 +402,7 @@ const Ticket = ({ task }: any) => {
           mt={2}
           size="md"
           variant="solid"
-          colorScheme={task.tag === "IN-PROGRESS" ? "green" : "green"}
+          colorScheme={task.tag === "IN-PROGRESS" ? "purple" : "green"}
           borderRadius={"full"}
         >
           {task.tag}
