@@ -61,9 +61,6 @@ const Branch = () => {
   const { colorMode } = useColorMode();
   const { user, session, signOut }: any = authStore();
 
-  console.log({ branch });
-  console.log({ pullRequest });
-
   const handleRaiseViaGit = async (pr: boolean) => {
     // The prop 'PR' here decides if a pr should be raised or not.
     // If false, it will only raise a branch.If true, it will raise a PR.
@@ -115,8 +112,6 @@ const Branch = () => {
       session.provider_token,
       pr
     );
-
-    console.log({ data });
 
     if (data?.branch_name) {
       setBranch({ loading: false, name: data.branch_name });
