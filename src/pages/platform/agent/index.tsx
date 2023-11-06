@@ -134,7 +134,7 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  if (isPro === null || !user) {
+  if (isPro === null) {
     return (
       <Template>
         <Flex
@@ -345,6 +345,8 @@ const Ticket = ({ task }: any) => {
     task.tag === "In-Progress" &&
     task.output === null;
 
+  // TODO: If longer than a day, don't display
+
   return (
     <Tr
       // On hover, scale up the ticket
@@ -377,24 +379,28 @@ const Ticket = ({ task }: any) => {
           )}
 
           <Heading size="md">{task.prompt || task.branchName}</Heading>
-
         </Flex>
         <Tag
           mt={2}
-
           size="md"
           variant="solid"
-          colorScheme={taskHasErrored ? "red" : task.tag === "IN-PROGRESS" ? "purple" : randomColorString()}
+          colorScheme={
+            taskHasErrored
+              ? "red"
+              : task.tag === "IN-PROGRESS"
+                ? "purple"
+                : randomColorString()
+          }
           borderRadius={"full"}
         >
-          {taskHasErrored ? 'Error' : task.tag}
+          {taskHasErrored ? "Error" : task.tag}
         </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
           #{task.id} opened {moment(task.created_at).fromNow()} via{" "}
           <Text as="span">{task.source} • Review required</Text>
         </Text>
-      </Box >
-    </Tr >
+      </Box>
+    </Tr>
   );
 };
 

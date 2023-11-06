@@ -99,17 +99,21 @@ const Branch = () => {
     };
 
     const branchDetails = {
-      branch_name: task.branchDescription.replace(/"/g, ""),
-      pr_title: `Task ${task.id} - ${task.tag} - ${task.prompt} `,
+      branch_name: task.branchName,
+      pr_title: `Task ${task.id} - ${task.tag}`,
       pr_body: task.branchDescription,
-      randomly_generated_5_digit_number: task.id,
+      randomly_generated_5_digit_number:
+        String(task.id)
     };
 
     const commit = {
       commit_message: task.branchDescription,
-      author_name: 'DevGPT-AI',
+      author_name: "DevGPT-AI",
       author_email: user?.email,
     };
+
+    console.log({ blobs, auth, branchDetails, commit });
+
 
     // Pr decides if a PR should be raised or not, if false, it will only raise a branch. If true, it will raise a PR.
     if (pr) {
@@ -404,16 +408,29 @@ const Branch = () => {
                       <Input
                         fontSize={14}
                         width="100%"
-                        value={`git fetch && git checkout ${branch.name.replace(/"/g, "")} `}
+                        value={`git fetch && git checkout ${branch.name.replace(
+                          /"/g,
+                          ""
+                        )} `}
                         isReadOnly={true}
                         cursor="pointer"
                         onClick={() => {
-                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                          handleCopyBranch(
+                            `git fetch && git checkout ${branch.name.replace(
+                              /"/g,
+                              ""
+                            )} `
+                          );
                         }}
                       />
                       <InputRightElement
                         onClick={() => {
-                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                          handleCopyBranch(
+                            `git fetch && git checkout ${branch.name.replace(
+                              /"/g,
+                              ""
+                            )} `
+                          );
                         }}
                         children={<CopyIcon />}
                       />
@@ -422,7 +439,7 @@ const Branch = () => {
                 )}
               </Box>
               <Button onClick={() => handleRaiseViaGit(false)}>
-                Create Branch
+                {branch.loading ? <Spinner size="sm" /> : "Create Branch"}
               </Button>
             </Flex>
             <Flex
@@ -463,10 +480,13 @@ const Branch = () => {
                 )}
               </Box>
               <Button onClick={() => handleRaiseViaGit(true)}>
-                Raise Pull Request
+                {pullRequest.loading ? (
+                  <Spinner size="sm" />
+                ) : (
+                  "Raise Pull Request"
+                )}
               </Button>
             </Flex>
-
           </Flex>
           <Flex flexDirection="column">
             <Text mb={2} fontSize={14}>
@@ -512,10 +532,10 @@ const Branch = () => {
             >
               Comment
             </Button>
-          </Flex >
-        </Flex >
-      </Flex >
-    </Template >
+          </Flex>
+        </Flex>
+      </Flex>
+    </Template>
   );
 };
 
