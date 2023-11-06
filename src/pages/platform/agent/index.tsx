@@ -157,7 +157,7 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  if (isPro === false) {
+  if (isPro === null) {
     return (
       <Template>
         <Flex
@@ -168,7 +168,7 @@ const Chat = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} onClose={() => {}} isCentered={true}>
+          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -302,13 +302,7 @@ const Chat = () => {
                 </Flex>
               )}
 
-              <PromptAreaAndButton
-                prompt={prompt}
-                loading={loading}
-                setLoading={setLoading}
-                setPrompt={setPrompt}
-                handleSubmit={(prompt: any) => handleSubmit(prompt)}
-              />
+              <PromptAreaAndButton />
 
               <Flex>
                 <Flex alignItems={"center"}>
@@ -325,10 +319,10 @@ const Chat = () => {
                 </Flex>
               </Flex>
 
-              <TableContainer bgColor={"#2c313a"} borderRadius={"sm"} mt={5}>
+              <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
                   <TableCaption>
-                    Pro tip! Help is always available on our Discord server.
+                    Tip: Help is always available on our Discord server.
                   </TableCaption>
                   <Thead>
                     <Tr>
