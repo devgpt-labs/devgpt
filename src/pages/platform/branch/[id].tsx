@@ -16,6 +16,7 @@ import {
   MenuItem,
   Tag,
   Spinner,
+  Input,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Editor, { DiffEditor } from "@monaco-editor/react";
@@ -23,6 +24,7 @@ import { supabase } from "@/utils/supabase";
 import { ChevronDownIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { BiGitPullRequest, BiGlasses } from "react-icons/bi";
 import { createBranch } from "git-connectors";
+import moment from "moment";
 
 //stores
 import authStore from "@/store/Auth";
@@ -37,6 +39,7 @@ import getPromptCount from "@/utils/getPromptCount";
 import { useColorMode } from "@chakra-ui/react";
 import { BiGitBranch } from "react-icons/bi";
 import { TbGitBranchDeleted } from "react-icons/tb";
+import checkCodeLanguage from "@/utils/checkCodeLanguage";
 
 const Branch = () => {
   // Sending prompts
@@ -144,7 +147,7 @@ const Branch = () => {
 
     if (!error) {
       setLoading(false);
-      setTask(data);
+      setTask(data[0]);
     }
   };
 
@@ -193,27 +196,6 @@ const Branch = () => {
           className="flex flex-col border border-blue-800/40 shadow-2xl shadow-blue-900/30"
           justifyContent="space-between"
         >
-          {task.branchName && (
-            <SlideFade in={!!task.branchName}>
-              <Flex alignItems={"center"} mb={1}>
-                <Button
-                  mr={2}
-                  leftIcon={<ArrowBackIcon />}
-                  colorScheme="gray"
-                  borderRadius="lg"
-                  onClick={() =>
-                    router.push("/platform/agent", undefined, { shallow: true })
-                  }
-                >
-                  Back
-                </Button>
-                <Heading mt={2} mb={4} size="lg">
-                  {task.branchName}
-                </Heading>
-              </Flex>
-            </SlideFade>
-          )}
-
           <Flex justifyContent={"space-between"} mb={3}>
             <Flex flexDirection="column">
               <Flex flexDirection="row">
@@ -234,10 +216,22 @@ const Branch = () => {
                   </Tag>
                 ) : (
                   <>
+                    <Button
+                      mr={4}
+                      leftIcon={<ArrowBackIcon />}
+                      colorScheme="gray"
+                      borderRadius="lg"
+                      onClick={() =>
+                        router.push("/platform/agent", undefined, {
+                          shallow: true,
+                        })
+                      }
+                    >
+                      Back
+                    </Button>
                     {open && (
                       <Tag
                         cursor="default"
-                        borderRadius={"full"}
                         bgColor="#2da042"
                         color="white"
                         size="md"
@@ -288,9 +282,9 @@ const Branch = () => {
                   </Tag>
                 )} */}
               </Flex>
-
-              <Text fontWeight={"semibold"} fontSize={14} mt={2}>
-                #{task.id} opened 3 minutes ago via{" "}
+              <Text fontWeight={"semibold"} fontSize={14} mt={4}>
+                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
+                {task?.created_at ? moment(task?.created_at).fromNow() : ""} via{" "}
                 <Text as="span">DevGPT Web</Text>
               </Text>
             </Flex>
@@ -300,7 +294,7 @@ const Branch = () => {
                 rightIcon={<ChevronDownIcon />}
                 bgColor="#2da042"
                 color="white"
-                size="sm"
+                size="md"
               >
                 Review Changes
               </MenuButton>
@@ -315,14 +309,14 @@ const Branch = () => {
               </MenuList>
             </Menu>
           </Flex>
-          <Box mt={2}>
+          <Box>
             {/* generated files */}
-            {task?.output?.map((file: any) => {
+            {JSON.parse(task?.output)?.map((file: any) => {
               return (
                 <Box>
                   <Flex flexDirection="row" alignItems="center" gap={2}>
                     {file.originalContent ? (
-                      <Badge colorScheme="blue">EDITED</Badge>
+                      <Badge colorScheme="green">EDITED</Badge>
                     ) : (
                       <Badge colorScheme="purple">NEW</Badge>
                     )}
@@ -342,7 +336,7 @@ const Branch = () => {
                     {file.originalContent ? (
                       <DiffEditor
                         theme="vs-dark"
-                        language="javascript"
+                        language={checkCodeLanguage(file.fileName)}
                         original={file.originalContent}
                         modified={file.newContent}
                         options={{
@@ -360,7 +354,7 @@ const Branch = () => {
                       <Editor
                         value={file.newContent}
                         theme="vs-dark"
-                        language="javascript"
+                        language={checkCodeLanguage(file.fileName)}
                         options={{
                           scrollBeyondLastLine: false,
                           padding: {
@@ -379,10 +373,29 @@ const Branch = () => {
             })}
           </Box>
 
+          <Flex mt={2} mb={4} flexDirection="column" gap={2}>
+            <Text fontSize={14} >Git Branch</Text>
+            <Input value={branch?.name} />
+            <Text fontSize={14} >Pull Request URL</Text>
+            <Input value={pullRequest?.name} />
+            {/* {!branch.name ? (
+              <Text>No Branch</Text>
+            ) : branch.loading ? (
+              <Spinner />
+            ) : (
+              <Text>Your Branch: {branch.name}</Text>
+            )}
+            {!pullRequest.name ? (
+              <Text>No PR</Text>
+            ) : pullRequest.loading ? (
+              <Spinner />
+            ) : (
+              <Text>Your PR: {pullRequest.name}</Text>
+            )} */}
+          </Flex>
+
           <Flex flexDirection="column">
-            <Heading size="sm" mb={3}>
-              Any comments?
-            </Heading>
+            <Text mb={2} fontSize={14} >Add your comments...</Text>
             <Textarea
               maxH="75vh"
               // On focus, add a glow
@@ -424,22 +437,7 @@ const Branch = () => {
               Comment
             </Button>
           </Flex>
-          <Flex mt={4} flexDirection="column">
-            {!branch.name ? (
-              <Text>No Branch</Text>
-            ) : branch.loading ? (
-              <Spinner />
-            ) : (
-              <Text>Your Branch: {branch.name}</Text>
-            )}
-            {!pullRequest.name ? (
-              <Text>No PR</Text>
-            ) : pullRequest.loading ? (
-              <Spinner />
-            ) : (
-              <Text>Your PR: {pullRequest.name}</Text>
-            )}
-          </Flex>
+
         </Flex>
       </Flex>
     </Template>

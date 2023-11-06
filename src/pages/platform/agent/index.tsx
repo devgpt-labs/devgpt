@@ -55,7 +55,7 @@ import getTokensFromString from "@/utils/getTokensFromString";
 
 // Icons
 import { AiFillCreditCard } from "react-icons/ai";
-import { EmailIcon } from "@chakra-ui/icons";
+import { EmailIcon, InfoIcon } from "@chakra-ui/icons";
 import { BiConfused } from "react-icons/bi";
 import { MdScience } from "react-icons/md";
 import { useColorMode } from "@chakra-ui/react";
@@ -327,7 +327,7 @@ const Chat = () => {
                 </Flex>
               </Flex>
 
-              <TableContainer borderRadius={"sm"} mt={5}>
+              <TableContainer borderRadius={"sm"} mt={5} >
                 <Table variant="simple">
                   <TableCaption>
                     Tip: Help is always available on our Discord server.
@@ -345,11 +345,9 @@ const Chat = () => {
                         </Td>
                       </Tr>
                     )}
-                    <Flex flexDirection="column" gap={2}>
-                      {tasks.map((task: any) => {
-                        return <Ticket task={task} />;
-                      })}
-                    </Flex>
+                    {tasks.map((task: any) => {
+                      return <Ticket task={task} />;
+                    })}
                   </Tbody>
                   <Tfoot>
                     <Tr>
@@ -372,25 +370,24 @@ const Ticket = ({ task }: any) => {
 
   return (
     <Tr
-      // On hover, add a glow and raise the size of the ticekt slighlty
+      width='100%'
+      // On hover, scale up the ticket
       _hover={{
-        // boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
-        // borderColor: "blue.500",
         transform: "scale(1.01)",
       }}
       // Animate the transform
       transition="transform 0.2s"
-      // border="2px solid #e2e8f0"
       rounded="sm"
       cursor="pointer"
       onClick={() => {
         task.tag === "In-Progress"
           ? toast({
-              title: "Ticket in progress",
-              status: "info",
-              duration: 5000,
-              isClosable: true,
-            })
+            colorScheme: "green",
+            title: "Ticket in progress",
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          })
           : router.push(`/platform/branch/${task.id}`);
       }}
     >
