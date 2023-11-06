@@ -157,7 +157,7 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  if (isPro === null) {
+  if (isPro === null || !user) {
     return (
       <Template>
         <Flex
@@ -168,32 +168,6 @@ const Chat = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
-              <ModalBody>
-                <Text>
-                  To use DevGPT, you need a plan that unlocks its full
-                  potential. This allows you to train models and run prompts.
-                </Text>
-              </ModalBody>
-
-              <ModalFooter>
-                <Button
-                  width="100%"
-                  bgGradient="linear(to-r, blue.500, teal.500)"
-                  color="white"
-                  onClick={() => {
-                    router.push("/platform/billing");
-                  }}
-                >
-                  <Text mr={2}>Billing</Text>
-                  <AiFillCreditCard />
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
           <Skeleton
             bg="gray.700"
             height="40px"
@@ -210,20 +184,48 @@ const Chat = () => {
           />
         </Flex>
       </Template>
-    );
+    )
   }
 
-  if (!user) {
+  if (isPro === false) {
     return (
       <Template>
         <Flex
           flexDirection="row"
-          width="80%"
+          width="98%"
           height="70vh"
           gap={2}
           alignItems="center"
           justifyContent="center"
         >
+          {isPro === false && (
+            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
+                <ModalBody>
+                  <Text>
+                    To use DevGPT, you need a plan that unlocks its full
+                    potential. This allows you to train models and run prompts.
+                  </Text>
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button
+                    width="100%"
+                    bgGradient="linear(to-r, blue.500, teal.500)"
+                    color="white"
+                    onClick={() => {
+                      router.push("/platform/billing");
+                    }}
+                  >
+                    <Text mr={2}>Billing</Text>
+                    <AiFillCreditCard />
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          )}
           <Skeleton
             bg="gray.700"
             height="40px"
@@ -242,6 +244,8 @@ const Chat = () => {
       </Template>
     );
   }
+
+
 
   return (
     <Template>
@@ -321,7 +325,10 @@ const Chat = () => {
 
               <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
-                  <TableCaption>
+                  <TableCaption onClick={() => {
+                    // TODO: Remove
+                    router.push("/platform/branch/1", undefined, { shallow: true });
+                  }}>
                     Tip: Help is always available on our Discord server.
                   </TableCaption>
                   <Thead>

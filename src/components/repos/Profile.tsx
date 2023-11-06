@@ -18,7 +18,6 @@ import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
 import { MdScience } from "react-icons/md";
 import { TbPrompt } from "react-icons/tb";
-import createBranch from "@/utils/github/createBranch";
 import { FiExternalLink } from "react-icons/fi";
 // Components
 import UpgradeModal from "./UpgradeModal";
@@ -210,6 +209,7 @@ const Profile = () => {
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
                   <Text onClick={onCreditsOpen}>{identity?.name}</Text>
+                  <Text onClick={onCreditsOpen}>{identity?.email}</Text>
                 </Flex>
               </Flex>
             </Box>

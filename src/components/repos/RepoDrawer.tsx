@@ -44,7 +44,9 @@ const RepoDrawer = () => {
     isOpen: isRepoSetupOpen,
     onOpen: onRepoSetupOpen,
     onClose: onRepoSetupClose,
-  } = useDisclosure();
+  } = useDisclosure({
+    defaultIsOpen: false
+  });
 
   const { repoWindowOpen, setRepo, setLofaf }: any = repoStore();
   const { session, user, signOut, stripe_customer_id }: any = authStore();

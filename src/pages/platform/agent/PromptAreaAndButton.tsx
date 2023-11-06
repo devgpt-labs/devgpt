@@ -9,6 +9,7 @@ const PromptAreaAndButton = () => {
   const toast = useToast();
 
   const handleSubmit = async (prompt: string) => {
+
     if (prompt.length < 3) {
       toast({
         title: "Task too short",
@@ -34,10 +35,7 @@ const PromptAreaAndButton = () => {
           owner: repo.owner,
         }),
       }
-
     );
-
-    console.log({ response });
 
     toast({
       title: "Task submitted",
@@ -58,12 +56,12 @@ const PromptAreaAndButton = () => {
           maxH='75vh'
           // On focus, add a glow
           _focus={{
-            boxShadow: "0 0 0 0.5rem rgba(0, 123, 255, .22)",
+            boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
             borderColor: "blue.500",
           }}
           // On hover, add a glow
           _hover={{
-            boxShadow: "0 0 0 1.0rem rgba(0, 123, 255, .12)",
+            boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
             borderColor: "blue.500",
           }}
           // bgColor="#0d1116"
