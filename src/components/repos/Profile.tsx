@@ -209,7 +209,6 @@ const Profile = () => {
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
                   <Text onClick={onCreditsOpen}>{identity?.name}</Text>
-                  <Text onClick={onCreditsOpen}>{identity?.email}</Text>
                 </Flex>
               </Flex>
             </Box>
