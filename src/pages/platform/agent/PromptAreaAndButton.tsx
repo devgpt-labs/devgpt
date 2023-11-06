@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Button, Flex, Textarea, Spinner, useToast } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
+import authStore from "@/store/Auth";
+import { supabase } from "@/utils/supabase";
 
 const PromptAreaAndButton = () => {
   const { repo }: any = repoStore();
+  const { user }: any = authStore();
   const [prompt, setPrompt] = useState("");
-  const [loading, setLoading] = useState(false);
   const toast = useToast();
 
   const handleSubmit = async (prompt: string) => {
@@ -18,24 +20,41 @@ const PromptAreaAndButton = () => {
         duration: 5000,
         isClosable: true,
       });
-      setLoading(false);
       return;
     }
 
-    const response = await fetch(
-      "https://devgpt-taskqueue-production.up.railway.app/task-queue",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          task: prompt,
+    if (!supabase) {
+      console.warn("No supabase");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("prompts")
+      .insert([
+        {
+          email_address: user.email,
+          tag: "IN-PROGRESS",
+          prompt: prompt,
           repo: repo.repo,
           owner: repo.owner,
-        }),
-      }
-    );
+          source: "DevGPT Web",
+        },
+      ])
+      .select("*");
+
+    setPrompt("");
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "There was an error submitting your task.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      return;
+    }
 
     toast({
       title: "Task submitted",
@@ -44,7 +63,16 @@ const PromptAreaAndButton = () => {
       duration: 5000,
       isClosable: true,
     });
-    setLoading(false);
+
+    fetch("http://localhost:4000/task-queue", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: data[0].id,
+      }),
+    });
   };
 
   const [hoveringButton, setHoveringButton] = useState(false);
@@ -53,7 +81,7 @@ const PromptAreaAndButton = () => {
     <Flex flexDirection="column">
       <Flex flexDirection="column" alignItems={"flex-end"}>
         <Textarea
-          maxH='75vh'
+          maxH="75vh"
           // On focus, add a glow
           _focus={{
             boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
@@ -77,12 +105,9 @@ const PromptAreaAndButton = () => {
               return;
             }
 
-            if (loading) return;
-
             // If key equals enter, submit
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              setLoading(true);
               handleSubmit(prompt);
             }
           }}
@@ -91,23 +116,15 @@ const PromptAreaAndButton = () => {
         <Button
           mt={2}
           bg="#2da042"
-          isDisabled={loading}
           onMouseOver={() => setHoveringButton(true)}
           onMouseLeave={() => setHoveringButton(false)}
           color="white"
           width="10rem"
           onClick={async (e: any) => {
-            setLoading(true);
             handleSubmit(prompt);
           }}
         >
-          {loading ? (
-            <Spinner size="sm" />
-          ) : hoveringButton ? (
-            "Submit task"
-          ) : (
-            "Start new task"
-          )}
+          {hoveringButton ? "Submit task" : "Start new task"}
         </Button>
       </Flex>
     </Flex>
