@@ -53,6 +53,7 @@ import getPromptCount from "@/utils/getPromptCount";
 import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
+import randomColorString from "@/utils/randomColorString";
 
 // Icons
 import { AiFillCreditCard } from "react-icons/ai";
@@ -125,18 +126,6 @@ const Chat = () => {
     if (lastUsedRepo) {
       const lastUsedRepoObject = JSON.parse(lastUsedRepo);
       setRepo(lastUsedRepoObject);
-    }
-
-    if (!session?.provider_token) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no session found, returning to home");
-    }
-
-    if (!user) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no user found, returning to home");
     }
   }, []);
 
@@ -388,21 +377,24 @@ const Ticket = ({ task }: any) => {
           )}
 
           <Heading size="md">{task.prompt || task.branchName}</Heading>
-          <Tag
-            size="md"
-            variant="solid"
-            colorScheme={taskHasErrored ? "pink" : task.tag === "IN-PROGRESS" ? "purple" : "green"}
-            borderRadius={"full"}
-          >
-            {taskHasErrored ? 'Error' : task.tag}
-          </Tag>
+
         </Flex>
+        <Tag
+          mt={2}
+
+          size="md"
+          variant="solid"
+          colorScheme={taskHasErrored ? "red" : task.tag === "IN-PROGRESS" ? "purple" : randomColorString()}
+          borderRadius={"full"}
+        >
+          {taskHasErrored ? 'Error' : task.tag}
+        </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
           #{task.id} opened {moment(task.created_at).fromNow()} via{" "}
           <Text as="span">{task.source} • Review required</Text>
         </Text>
-      </Box>
-    </Tr>
+      </Box >
+    </Tr >
   );
 };
 

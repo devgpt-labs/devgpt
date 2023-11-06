@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
 import Profile from "@/components/repos/Profile";
 import AppHeader from "@/components/AppHeader";
+import authStore from "@/store/Auth";
+import { useRouter } from "next/router";
 
 const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();
+  const router = useRouter();
+
+  const { session, user }: any = authStore();
+
+  useEffect(() => {
+    if (!session) {
+      console.log("no session found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+
+    if (!user) {
+      console.log("no user found, returning to home");
+      router.push("/", undefined, { shallow: true });
+    }
+  }, [session, user]);
 
   return (
     <Flex
@@ -22,7 +39,7 @@ const Home = ({ children }: any) => {
       >
         <AppHeader />
         <Flex
-          minH='82vh'
+          minH="82vh"
           flexDirection="column"
           alignItems="center"
           justifyContent="flex-start"

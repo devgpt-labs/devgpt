@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Flex, Textarea, Spinner, useToast, Text } from "@chakra-ui/react";
+import { Button, Flex, Textarea, Spinner, useToast, Text, Link } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
@@ -143,20 +143,28 @@ const PromptAreaAndButton = () => {
           }}
         />
 
-        <Button
-          bg="#2da042"
-          onMouseOver={() => setHoveringButton(true)}
-          onMouseLeave={() => setHoveringButton(false)}
-          color="white"
-          width="10rem"
-          onClick={async (e: any) => {
-            handleSubmit(prompt);
-          }}
-        >
-          {hoveringButton ? "Submit task" : "Start new task"}
-        </Button>
-      </Flex>
-    </Flex>
+        <Flex w="full" justifyContent="space-between" mt="2">
+          <Link href="https://docs.devgpt.com/february-labs/product-guides/prompting">
+            <Text textDecoration={"underline"} color="gray" fontSize={"sm"}>
+              Best practices for prompting
+            </Text>
+          </Link>
+
+          <Button
+            bg="#2da042"
+            onMouseOver={() => setHoveringButton(true)}
+            onMouseLeave={() => setHoveringButton(false)}
+            color="white"
+            width="10rem"
+            onClick={async (e: any) => {
+              handleSubmit(prompt);
+            }}
+          >
+            {hoveringButton ? "Submit task" : "Start new task"}
+          </Button>
+        </Flex>
+      </Flex >
+    </Flex >
   );
 };
 

@@ -32,6 +32,7 @@ import {
 } from "@chakra-ui/icons";
 import { BiGitPullRequest, BiGlasses } from "react-icons/bi";
 import { createBranch } from "git-connectors";
+import moment from "moment";
 
 //stores
 import authStore from "@/store/Auth";
@@ -190,18 +191,6 @@ const Branch = () => {
 
   useEffect(() => {
     loadTask();
-
-    if (!session?.provider_token) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no session found, returning to home");
-    }
-
-    if (!user) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no user found, returning to home");
-    }
   }, []);
 
   if (loading) {
@@ -300,25 +289,13 @@ const Branch = () => {
                     )}
                   </>
                 )}
-
-                {/* {open && (
-                  <Tag
-                    cursor="default"
-                    borderRadius={"full"}
-                    bgColor="#2da042"
-                    color="white"
-                    size="md"
-                    mr={2}
-                    px={4}
-                    py={2}
-                    gap={1}
-                    colorScheme="white"
-                  >
-                    <BiGlasses size={20} />
-                    Review Required
-                  </Tag>
-                )} */}
               </Flex>
+              <Heading mt={3}>{task.prompt}</Heading>
+              <Text fontWeight={"semibold"} fontSize={14} mt={4}>
+                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
+                {task?.created_at ? moment(task?.created_at).fromNow() : ""} via{" "}
+                <Text as="span">DevGPT Web</Text>
+              </Text>
             </Flex>
             <Menu>
               <MenuButton
@@ -493,7 +470,7 @@ const Branch = () => {
           </Flex>
           <Flex flexDirection="column">
             <Text mb={2} fontSize={14}>
-              Add your comments...
+              Add a comment
             </Text>
             <Textarea
               maxH="75vh"
@@ -535,10 +512,10 @@ const Branch = () => {
             >
               Comment
             </Button>
-          </Flex>
-        </Flex>
-      </Flex>
-    </Template>
+          </Flex >
+        </Flex >
+      </Flex >
+    </Template >
   );
 };
 
