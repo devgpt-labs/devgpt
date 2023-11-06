@@ -270,7 +270,7 @@ const Branch = () => {
                   </>
                 )}
 
-                {open && (
+                {/* {open && (
                   <Tag
                     cursor="default"
                     borderRadius={"full"}
@@ -286,7 +286,7 @@ const Branch = () => {
                     <BiGlasses size={20} />
                     Review Required
                   </Tag>
-                )}
+                )} */}
               </Flex>
 
               <Text fontWeight={"semibold"} fontSize={14} mt={2}>

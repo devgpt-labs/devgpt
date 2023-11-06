@@ -10,8 +10,28 @@ const PromptAreaAndButton = () => {
   const [prompt, setPrompt] = useState("");
   const toast = useToast();
 
-  const handleSubmit = async (prompt: string) => {
+  const handleTaskFailed = async (id: any) => {
+    if (!supabase) {
+      console.warn("No supabase");
+      return;
+    }
 
+    const { data, error } = await supabase
+      .from("prompts")
+      .update({ tag: "FAILED" })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (data) {
+      console.log(data);
+    }
+  };
+
+  const handleSubmit = async (prompt: string) => {
     if (prompt.length < 3) {
       toast({
         title: "Task too short",
@@ -72,7 +92,14 @@ const PromptAreaAndButton = () => {
       body: JSON.stringify({
         id: data[0].id,
       }),
-    });
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        // Set the tasks tag to 'failed' in prompts
+        handleTaskFailed(data[0].id);
+      });
   };
 
   const [hoveringButton, setHoveringButton] = useState(false);
@@ -81,6 +108,7 @@ const PromptAreaAndButton = () => {
     <Flex flexDirection="column">
       <Flex flexDirection="column" alignItems={"flex-end"}>
         <Textarea
+          mt={3}
           maxH="75vh"
           // On focus, add a glow
           _focus={{
