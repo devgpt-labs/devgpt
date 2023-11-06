@@ -405,7 +405,7 @@ const Ticket = ({ task }: any) => {
           mt={2}
           size="md"
           variant="solid"
-          colorScheme={task.tag === "IN-PROGRESS" ? "green" : "green"}
+          colorScheme={task.tag === "IN-PROGRESS" ? "purple" : "green"}
           borderRadius={"full"}
         >
           {task.tag}

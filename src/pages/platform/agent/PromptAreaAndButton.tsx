@@ -84,7 +84,7 @@ const PromptAreaAndButton = () => {
       isClosable: true,
     });
 
-    fetch("http://localhost:4000/task-queue", {
+    fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
