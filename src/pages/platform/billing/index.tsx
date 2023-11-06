@@ -95,18 +95,6 @@ const Models = ({ onClose }: any) => {
     setMonthlySpend();
   }, [stripe_customer_id]);
 
-  useEffect(() => {
-    if (!session) {
-      console.log("no session found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-
-    if (!user) {
-      console.log("no user found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-  }, [session, user]);
-
   // Used to show how much the user will have available for prompting
   const balanceCalculation =
     Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));

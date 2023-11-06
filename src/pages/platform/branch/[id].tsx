@@ -153,18 +153,6 @@ const Branch = () => {
 
   useEffect(() => {
     loadTask();
-
-    if (!session?.provider_token) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no session found, returning to home");
-    }
-
-    if (!user) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no user found, returning to home");
-    }
   }, []);
 
   if (loading) {
@@ -263,25 +251,9 @@ const Branch = () => {
                     )}
                   </>
                 )}
-
-                {/* {open && (
-                  <Tag
-                    cursor="default"
-                    borderRadius={"full"}
-                    bgColor="#2da042"
-                    color="white"
-                    size="md"
-                    mr={2}
-                    px={4}
-                    py={2}
-                    gap={1}
-                    colorScheme="white"
-                  >
-                    <BiGlasses size={20} />
-                    Review Required
-                  </Tag>
-                )} */}
               </Flex>
+              <Heading mt={3}>{task.prompt}</Heading>
+
               <Text fontWeight={"semibold"} fontSize={14} mt={4}>
                 #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
                 {task?.created_at ? moment(task?.created_at).fromNow() : ""} via{" "}
@@ -374,9 +346,9 @@ const Branch = () => {
           </Box>
 
           <Flex mt={2} mb={4} flexDirection="column" gap={2}>
-            <Text fontSize={14} >Git Branch</Text>
+            <Text fontSize={14}>Git Branch</Text>
             <Input value={branch?.name} />
-            <Text fontSize={14} >Pull Request URL</Text>
+            <Text fontSize={14}>Pull Request URL</Text>
             <Input value={pullRequest?.name} />
             {/* {!branch.name ? (
               <Text>No Branch</Text>
@@ -395,7 +367,9 @@ const Branch = () => {
           </Flex>
 
           <Flex flexDirection="column">
-            <Text mb={2} fontSize={14} >Add your comments...</Text>
+            <Text mb={2} fontSize={14}>
+              Add a comment
+            </Text>
             <Textarea
               maxH="75vh"
               // On focus, add a glow
@@ -437,7 +411,6 @@ const Branch = () => {
               Comment
             </Button>
           </Flex>
-
         </Flex>
       </Flex>
     </Template>

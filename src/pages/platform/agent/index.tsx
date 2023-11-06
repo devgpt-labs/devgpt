@@ -52,6 +52,7 @@ import getPromptCount from "@/utils/getPromptCount";
 import promptCorrection from "@/utils/promptCorrection";
 import getModels from "@/utils/getModels";
 import getTokensFromString from "@/utils/getTokensFromString";
+import randomColorString from "@/utils/randomColorString";
 
 // Icons
 import { AiFillCreditCard } from "react-icons/ai";
@@ -102,15 +103,8 @@ const Chat = () => {
         { event: "*", schema: "public", table: "prompts" },
         (payload: any) => {
           // Merge the results
-          const merged = [...tasks, payload?.new];
-
-          // Filter the results (remove nulls)
-          const filtered = merged.filter((task: any) => {
-            return task.source !== null;
-          });
-
           // Set state with the new tasks, reversed.
-          setTasks(filtered.reverse());
+          setTasks([...tasks, payload?.new]);
         }
       )
       .subscribe();
@@ -143,18 +137,6 @@ const Chat = () => {
     if (lastUsedRepo) {
       const lastUsedRepoObject = JSON.parse(lastUsedRepo);
       setRepo(lastUsedRepoObject);
-    }
-
-    if (!session?.provider_token) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no session found, returning to home");
-    }
-
-    if (!user) {
-      signOut();
-      router.push("/", undefined, { shallow: true });
-      console.log("no user found, returning to home");
     }
   }, []);
 
@@ -327,7 +309,7 @@ const Chat = () => {
                 </Flex>
               </Flex>
 
-              <TableContainer borderRadius={"sm"} mt={5} >
+              <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
                   <TableCaption>
                     Tip: Help is always available on our Discord server.
@@ -370,7 +352,7 @@ const Ticket = ({ task }: any) => {
 
   return (
     <Tr
-      width='100%'
+      width="100%"
       // On hover, scale up the ticket
       _hover={{
         transform: "scale(1.01)",
@@ -382,12 +364,12 @@ const Ticket = ({ task }: any) => {
       onClick={() => {
         task.tag === "In-Progress"
           ? toast({
-            colorScheme: "green",
-            title: "Ticket in progress",
-            status: "info",
-            duration: 5000,
-            isClosable: true,
-          })
+              colorScheme: "green",
+              title: "Ticket in progress",
+              status: "info",
+              duration: 5000,
+              isClosable: true,
+            })
           : router.push(`/platform/branch/${task.id}`);
       }}
     >
@@ -402,7 +384,9 @@ const Ticket = ({ task }: any) => {
           mt={2}
           size="md"
           variant="solid"
-          colorScheme={task.tag === "IN-PROGRESS" ? "purple" : "green"}
+          colorScheme={
+            task.tag === "In-Progress" ? "purple" : randomColorString()
+          }
           borderRadius={"full"}
         >
           {task.tag}
