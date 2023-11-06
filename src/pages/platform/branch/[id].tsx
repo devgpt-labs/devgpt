@@ -107,7 +107,7 @@ const Branch = () => {
 
     const commit = {
       commit_message: task.branchDescription,
-      author_name: 'DevGPT-AI',
+      author_name: "DevGPT-AI",
       author_email: user?.email,
     };
 
@@ -183,7 +183,10 @@ const Branch = () => {
       .select("*")
       .eq("id", router.query.id);
 
-    if (!error) {
+    if (error) {
+      console.error(error);
+      return;
+    } else {
       setLoading(false);
       setTask(data[0]);
     }
@@ -191,7 +194,7 @@ const Branch = () => {
 
   useEffect(() => {
     loadTask();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -404,16 +407,29 @@ const Branch = () => {
                       <Input
                         fontSize={14}
                         width="100%"
-                        value={`git fetch && git checkout ${branch.name.replace(/"/g, "")} `}
+                        value={`git fetch && git checkout ${branch.name.replace(
+                          /"/g,
+                          ""
+                        )} `}
                         isReadOnly={true}
                         cursor="pointer"
                         onClick={() => {
-                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                          handleCopyBranch(
+                            `git fetch && git checkout ${branch.name.replace(
+                              /"/g,
+                              ""
+                            )} `
+                          );
                         }}
                       />
                       <InputRightElement
                         onClick={() => {
-                          handleCopyBranch(`git fetch && git checkout ${branch.name.replace(/"/g, "")} `);
+                          handleCopyBranch(
+                            `git fetch && git checkout ${branch.name.replace(
+                              /"/g,
+                              ""
+                            )} `
+                          );
                         }}
                         children={<CopyIcon />}
                       />
@@ -466,7 +482,6 @@ const Branch = () => {
                 Raise Pull Request
               </Button>
             </Flex>
-
           </Flex>
           <Flex flexDirection="column">
             <Text mb={2} fontSize={14}>
@@ -512,10 +527,10 @@ const Branch = () => {
             >
               Comment
             </Button>
-          </Flex >
-        </Flex >
-      </Flex >
-    </Template >
+          </Flex>
+        </Flex>
+      </Flex>
+    </Template>
   );
 };
 
