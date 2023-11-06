@@ -1,33 +1,32 @@
 import React, { useState } from "react";
 import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
-import authStore from "@/store/Auth";
+import repoStore from "@/store/Repos";
 
-interface PromptAreaAndButtonProps {
-  prompt: string;
-  selectedFile: any;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-  handleUseTabSuggestion: (file: any) => void;
-  setPrompt: (prompt: string) => void;
-  setHasBeenReset: (hasBeenReset: boolean) => void;
-  handleSubmit: (prompt: any) => void;
-}
+const PromptAreaAndButton = () => {
+  const { repo } = repoStore();
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
 
-const PromptAreaAndButton = ({
-  prompt,
-  selectedFile,
-  loading,
-  setLoading,
-  handleUseTabSuggestion,
-  setPrompt,
-  setHasBeenReset,
-  handleSubmit,
-}: PromptAreaAndButtonProps) => {
-  const { isPro }: any = authStore();
-  const [show, setShow] = useState(false);
+  const handleSubmit = async (prompt: string) => {
+    const response = await fetch(
+      "https://devgpt-taskqueue-production.up.railway.app/task-queue",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          task: prompt,
+          repo: repo.repo,
+          owner: repo.owner,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .catch((err) => console.log(err));
+  };
+
   const [hoveringButton, setHoveringButton] = useState(false);
-
-  if (!isPro) return null;
 
   return (
     <Flex flexDirection="column">
@@ -58,18 +57,10 @@ const PromptAreaAndButton = ({
 
             if (loading) return;
 
-            // If key equals tab, autocomplete
-            if (e.key === "Tab") {
-              e.preventDefault();
-              handleUseTabSuggestion(selectedFile[0]);
-              return;
-            }
-
             // If key equals enter, submit
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-
-              setHasBeenReset(false);
+              setLoading(true);
               handleSubmit(prompt);
             }
           }}
@@ -78,16 +69,13 @@ const PromptAreaAndButton = ({
         <Button
           mt={2}
           bg="#2da042"
-          // On hover, animate the width to 0
-          // bgGradient="linear(to-r, blue.500, teal.500)"
           isDisabled={loading}
           onMouseOver={() => setHoveringButton(true)}
           onMouseLeave={() => setHoveringButton(false)}
           color="white"
           width="10rem"
           onClick={async (e: any) => {
-            // setLoading(true);
-            // setHasBeenReset(false);
+            setLoading(true);
             handleSubmit(prompt);
           }}
         >

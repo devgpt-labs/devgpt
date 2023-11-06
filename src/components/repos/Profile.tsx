@@ -159,13 +159,12 @@ const Profile = () => {
     <>
       <Flex
         w="full"
-        mt={3}
         flexDirection="column"
         rounded="lg"
         borderTop={
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
-        p={4}
+        p={3}
       >
         {/* <CreditsModal
           isCreditsOpen={isCreditsOpen}
@@ -187,7 +186,6 @@ const Profile = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
-          px={4}
         >
           <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
@@ -233,7 +231,7 @@ const Profile = () => {
                     />
                   </Tooltip>
                 )}
-
+                {/* 
                 <Tooltip label={"Write Prompts"} placement="top">
                   <IconButton
                     _hover={{
@@ -248,7 +246,7 @@ const Profile = () => {
                     aria-label="Write Prompts"
                     icon={<TbPrompt size={18} />}
                   />
-                </Tooltip>
+                </Tooltip> */}
                 <Tooltip label={"Select A Repo"} placement="top">
                   <IconButton
                     _hover={{
@@ -259,21 +257,9 @@ const Profile = () => {
                       setRepoWindowOpen(!repoWindowOpen);
                     }}
                     aria-label="Select A Repo"
-                    icon={<MdScience size={18} />}
+                    icon={<TbPrompt size={18} />}
                   />
                 </Tooltip>
-                {/* <Tooltip label="Read The Docs" placement="top">
-                  <Link isExternal href="https://docs.devgpt.com">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Read The Docs"
-                      icon={<BiSolidBookBookmark />}
-                    />
-                  </Link>
-                </Tooltip> */}
               </Flex>
               <Flex gap={2} ml={2}>
                 <Tooltip label={"View Billing"} placement="top">
@@ -301,7 +287,7 @@ const Profile = () => {
                   Icon={MoonIcon}
                   OtherIcon={SunIcon}
                 />
-                <Tooltip label="Report An Issue" placement="top">
+                <Tooltip label="Report A Bug" placement="top">
                   <Link
                     isExternal
                     href="https://github.com/devgpt-labs/devgpt-releases/issues"
@@ -311,7 +297,7 @@ const Profile = () => {
                         transform: "translateY(-4px)",
                         transition: "all 0.2s ease-in-out",
                       }}
-                      aria-label="Report An Issue"
+                      aria-label="Report A Bug"
                       icon={<FaBug />}
                     />
                   </Link>
@@ -340,49 +326,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// Now unused profile options
-{
-  /* <>
-  <Tooltip label="Enter Open AI key" placement="top">
-    <IconButton
-      _hover={{
-        transform: "translateY(-4px)",
-        transition: "all 0.2s ease-in-out",
-      }}
-      onClick={onKeyOpen}
-      aria-label="Enter Open AI key"
-      icon={<BiKey size={18} />}
-    />
-  </Tooltip>
-  <ProfileOptionIconButton
-    tooltip={"Train Repo"}
-    comparison={repoWindowOpen}
-    onClick={() => {
-      setRepoWindowOpen(!repoWindowOpen);
-    }}
-    ariaLabel="Train Repo"
-    label="Close"
-    otherLabel="Open"
-    Icon={AiFillFolderOpen}
-    OtherIcon={AiFillFolderOpen}
-  />
-  <Tooltip
-    label={isSettingsOpen ? "Close Settings" : "Open Settings"}
-    placement="top"
-  >
-    <IconButton
-      _hover={{
-        transform: "translateY(-4px)",
-        transition: "all 0.2s ease-in-out",
-      }}
-      onClick={() => {
-        onSettingsToggle();
-        onModelsClose();
-      }}
-      aria-label="Open Settings"
-      icon={<IoMdSettings size={18} />}
-    />
-  </Tooltip>
-</>; */
-}

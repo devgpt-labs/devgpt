@@ -34,6 +34,7 @@ import { useRouter } from "next/router";
 import RepoDrawer from "@/components/repos/RepoDrawer";
 import Editor, { DiffEditor } from "@monaco-editor/react";
 import { FaCodeBranch } from "react-icons/fa";
+import { supabase } from "@/utils/supabase";
 
 //stores
 import repoStore from "@/store/Repos";
@@ -65,6 +66,7 @@ const Chat = () => {
   // Sending prompts
   const [loading, setLoading] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>("");
+  const [tasks, setTasks] = useState<any>([]);
 
   // Active state
   const router = useRouter();
@@ -87,24 +89,47 @@ const Chat = () => {
     isPro,
   }: any = authStore();
 
-  const handleSubmit = async (prompt: string) => {
-    const response = await fetch(
-      "https://devgpt-api-production-f45a.up.railway.app/generate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          task: prompt,
-          repo: "toms-private-sand-pit",
-          owner: "tom-lewis-code",
-        }),
+  useEffect(() => {
+    // Subscribe to output changes
+    if (!supabase) return;
+    const reponse = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "prompts" },
+        (payload: any) => {
+          const filteredData = payload?.new?.filter((task: any) => {
+            return task.output !== null;
+          });
+
+          setTasks(filteredData);
+        }
+      )
+      .subscribe();
+  }, []);
+
+  useEffect(() => {
+    const getTasks = async () => {
+      if (!supabase) return;
+
+      const { data, error } = await supabase
+        .from("prompts")
+        .select("*")
+        .eq("repo", repo.repo)
+        .eq("owner", repo.owner);
+
+      if (!error) {
+        //filter tasks where output is null
+        const filteredData = data.filter((task: any) => {
+          return task.output !== null;
+        });
+
+        setTasks(filteredData);
       }
-    )
-      .then((res) => res.json())
-      .catch((err) => console.log(err));
-  };
+    };
+
+    getTasks();
+  }, []);
 
   useEffect(() => {
     // Get the users last used repo
@@ -289,13 +314,13 @@ const Chat = () => {
                 <Flex alignItems={"center"}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
-                    367 Open
+                    {tasks.length} Open
                   </Heading>
                 </Flex>
                 <Flex alignItems={"center"} ml={5}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
-                    18,278 Closed
+                    {tasks.length} Closed
                   </Heading>
                 </Flex>
               </Flex>
@@ -311,7 +336,16 @@ const Chat = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    <Ticket />
+                    {tasks.length === 0 && (
+                      <Tr>
+                        <Td>
+                          <Text>No tasks completed yet.</Text>
+                        </Td>
+                      </Tr>
+                    )}
+                    {tasks.map((task: any) => {
+                      <Ticket task={task} />;
+                    })}
                   </Tbody>
                   <Tfoot>
                     <Tr>
@@ -328,7 +362,7 @@ const Chat = () => {
   );
 };
 
-const Ticket = () => {
+const Ticket = ({ task }: any) => {
   const router = useRouter();
 
   return (
@@ -338,14 +372,14 @@ const Ticket = () => {
       }}
       cursor="pointer"
       onClick={() => {
-        router.push("/platform/branch");
+        router.push(`/platform/branch/${task.id}`);
       }}
     >
       <Td>
         <Flex alignItems={"center"}>
           <FaCodeBranch color="#3fba50" size="18" />
           <Heading size="md" ml={1.5}>
-            Docs: fix grammatical issue in "Data Fetching Patterns" section
+            {task.branchName}
           </Heading>
         </Flex>
         <Tag
@@ -355,12 +389,12 @@ const Ticket = () => {
           colorScheme="green"
           borderRadius={"full"}
         >
-          area: documentation
+          {task.tag}
         </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
-          #57937 opened 3 minutes ago by{" "}
+          #{task.id} opened 3 minutes ago by{" "}
           <Text color="white" as="span">
-            DevGPT Web • Review required
+            {task.source} • Review required
           </Text>
         </Text>
       </Td>

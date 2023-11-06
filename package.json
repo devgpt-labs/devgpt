@@ -1,6 +1,6 @@
 {
-  "name": "devgpt",
-  "version": "2.0.5",
+  "name": "DevGPT Frontend",
+  "version": "2.0.6",
   "private": true,
   "scripts": {
     "dev": "next dev",
