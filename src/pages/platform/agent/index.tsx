@@ -98,11 +98,13 @@ const Chat = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "prompts" },
         (payload: any) => {
+          console.log({ payload });
+
           const filteredData = payload?.new?.filter((task: any) => {
-            return task.output !== null;
+            return task.source !== null;
           });
 
-          setTasks(filteredData);
+          setTasks(filteredData?.reverse());
         }
       )
       .subscribe();
@@ -112,19 +114,17 @@ const Chat = () => {
     const getTasks = async () => {
       if (!supabase) return;
 
-      const { data, error } = await supabase
-        .from("prompts")
-        .select("*")
-        .eq("repo", repo.repo)
-        .eq("owner", repo.owner);
+      const { data, error } = await supabase.from("prompts").select("*");
+
+      console.log({ data, error });
 
       if (!error) {
         //filter tasks where output is null
         const filteredData = data.filter((task: any) => {
-          return task.output !== null;
+          return task.source !== null;
         });
 
-        setTasks(filteredData);
+        setTasks(filteredData?.reverse());
       }
     };
 
@@ -157,6 +157,8 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
+  console.log({ tasks });
+
   if (isPro === null) {
     return (
       <Template>
@@ -168,7 +170,7 @@ const Chat = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+          <Modal isOpen={true} onClose={() => {}} isCentered={true}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -314,7 +316,7 @@ const Chat = () => {
                 <Flex alignItems={"center"} ml={5}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
-                    {tasks.length} Closed
+                    0 Closed
                   </Heading>
                 </Flex>
               </Flex>
@@ -338,7 +340,7 @@ const Chat = () => {
                       </Tr>
                     )}
                     {tasks.map((task: any) => {
-                      <Ticket task={task} />;
+                      return <Ticket task={task} />;
                     })}
                   </Tbody>
                   <Tfoot>
@@ -373,7 +375,7 @@ const Ticket = ({ task }: any) => {
         <Flex alignItems={"center"}>
           <FaCodeBranch color="#3fba50" size="18" />
           <Heading size="md" ml={1.5}>
-            {task.branchName}
+            {task.prompt || task.branchName}
           </Heading>
         </Flex>
         <Tag
