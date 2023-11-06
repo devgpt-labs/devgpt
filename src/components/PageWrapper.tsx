@@ -9,7 +9,11 @@ const Home = ({ children }: any) => {
   const { colorMode } = useColorMode();
   const router = useRouter();
 
-  const { session, user }: any = authStore();
+  const { session, user, fetch }: any = authStore();
+
+  useEffect(() => {
+    fetch();
+  }, []);
 
   useEffect(() => {
     if (!session) {

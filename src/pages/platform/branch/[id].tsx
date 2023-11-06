@@ -187,7 +187,10 @@ const Branch = () => {
       .select("*")
       .eq("id", router.query.id);
 
-    if (!error) {
+    if (error) {
+      console.error(error);
+      return;
+    } else {
       setLoading(false);
       setTask(data[0]);
     }
@@ -195,7 +198,7 @@ const Branch = () => {
 
   useEffect(() => {
     loadTask();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (

@@ -19,6 +19,8 @@ const useStore = create((set) => ({
     set({ user: null, session: null });
   },
   fetch: async (state: any) => {
+    console.log("here6");
+
     if (!supabase) {
       set({
         user: false,
@@ -32,6 +34,8 @@ const useStore = create((set) => ({
       error,
     }: any = await supabase.auth.getSession();
 
+    console.log("here5");
+
     if (error) throw error;
     if (!session) {
       set({
@@ -40,6 +44,9 @@ const useStore = create((set) => ({
       });
       return null;
     }
+
+    console.log("here4");
+
     if (!session?.user?.email) {
       set({
         user: false,
@@ -52,6 +59,8 @@ const useStore = create((set) => ({
       .from("customers")
       .select("*")
       .eq("email_address", session?.user?.email);
+
+    console.log("here3");
 
     if (customerError || customerData?.length === 0) {
       const { error: insertCustomerError } = await supabase
@@ -71,6 +80,8 @@ const useStore = create((set) => ({
       (identity: any) => identity?.provider === "github"
     )?.identity_data;
 
+    console.log("here2");
+
     if (!customerData) {
       console.log("Failed to retrieve customer data");
       set({
@@ -81,6 +92,8 @@ const useStore = create((set) => ({
     }
 
     const pro = await checkIfPro(githubIdentity?.email);
+
+    console.log("here1");
 
     set({
       user: session?.user,
