@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Button, Flex, Textarea, Spinner, useToast, Text, Link } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Textarea,
+  Spinner,
+  useToast,
+  Text,
+  Link,
+} from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import { supabase } from "@/utils/supabase";
@@ -84,7 +92,8 @@ const PromptAreaAndButton = () => {
       isClosable: true,
     });
 
-    fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
+    //fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
+    fetch("http://localhost:4000/task-queue", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +116,9 @@ const PromptAreaAndButton = () => {
   return (
     <Flex flexDirection="column" mb={4}>
       <Flex flexDirection="column" alignItems={"flex-start"}>
-        <Text>{repo.owner} / {repo.repo}</Text>
+        <Text>
+          {repo.owner} / {repo.repo}
+        </Text>
         <Textarea
           mt={3}
           mb={3}
@@ -163,8 +174,8 @@ const PromptAreaAndButton = () => {
             {hoveringButton ? "Submit task" : "Start new task"}
           </Button>
         </Flex>
-      </Flex >
-    </Flex >
+      </Flex>
+    </Flex>
   );
 };
 

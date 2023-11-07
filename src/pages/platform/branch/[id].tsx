@@ -102,8 +102,7 @@ const Branch = () => {
       branch_name: task.branchName,
       pr_title: `Task ${task.id} - ${task.tag}`,
       pr_body: task.branchDescription,
-      randomly_generated_5_digit_number:
-        String(task.id)
+      randomly_generated_5_digit_number: String(task.id),
     };
 
     const commit = {
@@ -113,7 +112,6 @@ const Branch = () => {
     };
 
     console.log({ blobs, auth, branchDetails, commit });
-
 
     // Pr decides if a PR should be raised or not, if false, it will only raise a branch. If true, it will raise a PR.
     if (pr) {
@@ -352,7 +350,7 @@ const Branch = () => {
                     {file.originalContent ? (
                       <DiffEditor
                         theme="vs-dark"
-                        language={checkCodeLanguage(file.fileName)}
+                        language={"javascript"}
                         original={file.originalContent}
                         modified={file.newContent}
                         options={{
