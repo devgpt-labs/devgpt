@@ -10,6 +10,7 @@ const Logo = () => {
 
   return (
     <Image
+      ml={2}
       cursor="pointer"
       onClick={() => {
         router.push("/platform/agent", undefined, {
