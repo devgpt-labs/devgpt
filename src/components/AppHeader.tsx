@@ -19,13 +19,13 @@ const ChatHeader = () => {
     <Flex
       justifyContent="space-between"
       borderBottom={
-        colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
+        colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #2d2d2d"
       }
       p={5}
       w="full"
       alignItems="center"
       maxH="sm"
-      backgroundColor={colorMode === "light" ? "#F7FAFC" : "black"}
+      backgroundColor={colorMode === "light" ? "#F7FAFC" : "#1c1c1c"}
     >
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">

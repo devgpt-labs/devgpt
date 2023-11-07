@@ -5,13 +5,13 @@ const checkCodeLanguage = (file: string) => {
     case "javascript":
     case "js":
       return "javascript";
-    case "typescript":
+    case "javascript":
     case "ts":
-      return "typescript";
+      return "javascript";
     case "jsx":
       return "javascript";
     case "tsx":
-      return "typescript";
+      return "javascript";
     case "python":
     case "py":
       return "python";

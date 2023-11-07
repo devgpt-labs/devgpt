@@ -50,6 +50,7 @@ import { TbGitBranchDeleted } from "react-icons/tb";
 import checkCodeLanguage from "@/utils/checkCodeLanguage";
 import { RiOpenSourceLine } from "react-icons/ri";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { TiTickOutline } from "react-icons/ti";
 
 const Branch = () => {
   // Sending prompts
@@ -102,7 +103,8 @@ const Branch = () => {
       branch_name: task.branchName,
       pr_title: `Task ${task.id} - ${task.tag}`,
       pr_body: task.branchDescription,
-      randomly_generated_5_digit_number: String(task.id),
+      randomly_generated_5_digit_number:
+        String(task.id) + String(Math.floor(100 + Math.random() * 900)),
     };
 
     const commit = {
@@ -279,9 +281,7 @@ const Branch = () => {
                     {!open && (
                       <Tag
                         cursor="default"
-                        borderRadius={"full"}
-                        bgColor="#2da042"
-                        color="white"
+                        colorScheme="red"
                         size="md"
                         mr={2}
                         px={4}
@@ -297,20 +297,22 @@ const Branch = () => {
               </Flex>
               <Heading mt={3}>{task.prompt}</Heading>
               <Text fontWeight={"semibold"} fontSize={14} mt={4}>
-                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
-                {task?.created_at ? moment(task?.created_at).fromNow() : ""} via{" "}
+                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened 3 minutes ago via{" "}
                 <Text as="span">DevGPT Web</Text>
               </Text>
             </Flex>
             <Menu>
               <MenuButton
                 as={Button}
-                rightIcon={<ChevronDownIcon />}
                 bgColor="#2da042"
                 color="white"
-                size="md"
+                gap={3}
+                pr={4}
               >
-                Review Changes
+                <Flex flexDirection="row" gap={2} alignItems="center">
+                  <Text>Review Changes</Text>
+                  <ChevronDownIcon />
+                </Flex>
               </MenuButton>
               <MenuList>
                 <MenuItem onClick={() => handleRaiseViaGit(true)}>
@@ -350,7 +352,7 @@ const Branch = () => {
                     {file.originalContent ? (
                       <DiffEditor
                         theme="vs-dark"
-                        language={"javascript"}
+                        language={checkCodeLanguage(file.fileName)}
                         original={file.originalContent}
                         modified={file.newContent}
                         options={{
@@ -389,7 +391,7 @@ const Branch = () => {
 
           <Flex mt={2} mb={2} flexDirection="column" gap={2}>
             <Flex
-              border="0.5px solid green"
+              border="0.5px solid #2da042"
               p={4}
               rounded="lg"
               justifyContent="space-between"
@@ -444,7 +446,7 @@ const Branch = () => {
               </Button>
             </Flex>
             <Flex
-              border="0.5px solid green"
+              border="0.5px solid #2da042"
               p={4}
               rounded="lg"
               justifyContent="space-between"
@@ -496,15 +498,13 @@ const Branch = () => {
             <Textarea
               maxH="75vh"
               // On focus, add a glow
-              // _focus={{
-              //   boxShadow: "0 0 0 0.4rem rgba(0, 123, 255, .22)",
-              //   borderColor: "blue.500",
-              // }}
-              // // On hover, add a glow
-              // _hover={{
-              //   boxShadow: "0 0 0 0.8rem rgba(0, 123, 255, .12)",
-              //   borderColor: "blue.500",
-              // }}
+              _focus={{
+                borderColor: "green.500",
+              }}
+              // On hover, add a glow
+              _hover={{
+                borderColor: "green.500",
+              }}
               className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
               value={comment}
               p={5}

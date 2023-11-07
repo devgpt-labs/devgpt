@@ -22,6 +22,7 @@ import { FiExternalLink } from "react-icons/fi";
 // Components
 import UpgradeModal from "./UpgradeModal";
 import FooterButtons from "@/components/FooterButtons";
+const { getAccessToken } = require("git-connectors");
 
 // Icons
 import { PiSignOutBold } from "react-icons/pi";
@@ -39,8 +40,9 @@ import { FaBug } from "react-icons/fa";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
+import { BsEye, BsEyeSlashFill } from "react-icons/bs";
 
-interface ProfileOptionIconButtonProps {
+interface FooterOptionIconButtonProps {
   tooltip?: any;
   comparison?: any;
   onClick?: any;
@@ -60,7 +62,7 @@ interface Identity {
 }
 
 // TODO: Convert all of the buttons on this menu to use this component
-const ProfileOptionIconButton = ({
+const FooterOptionIconButton = ({
   tooltip,
   comparison,
   onClick,
@@ -69,7 +71,7 @@ const ProfileOptionIconButton = ({
   otherLabel,
   Icon,
   OtherIcon,
-}: ProfileOptionIconButtonProps) => {
+}: FooterOptionIconButtonProps) => {
   return (
     <Tooltip
       label={tooltip ? tooltip : comparison ? label : otherLabel}
@@ -88,13 +90,14 @@ const ProfileOptionIconButton = ({
   );
 };
 
-const Profile = () => {
+const Footer = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const [credits, setCredits] = useState<number>(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
   const { user, isPro, signOut, session }: any = authStore();
-  const { repoWindowOpen, setRepoWindowOpen }: any = repoStore();
+  const { repoWindowOpen, setRepoWindowOpen, repo }: any = repoStore();
   const { colorMode, toggleColorMode } = useColorMode();
+  const [hasAccess, setHasAccess] = useState<any>(null);
   const router = useRouter();
 
   const {
@@ -130,6 +133,29 @@ const Profile = () => {
     }
   };
 
+  const checkAccess = async () => {
+    // Get the identity in user.identities that has 'provider' github, and then get the identity_data from it
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    // Send a POST request to https://devgpt-api-production-f45a.up.railway.app/validation with the JSON of { repo: "x" }
+    const response = await fetch(
+      "https://devgpt-api-production-f45a.up.railway.app/validation",
+      {
+        method: "POST",
+        body: JSON.stringify({ login: identity?.user_name + 2, repo: repo?.repo }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    response.json().then((data) => {
+      data.success ? setHasAccess(true) : setHasAccess(false);
+    });
+  };
+
   const fetchData = async () => {
     const credits: any = await getCredits(user?.email);
 
@@ -137,6 +163,10 @@ const Profile = () => {
       setCredits(credits);
     }
   };
+
+  useEffect(() => {
+    checkAccess();
+  }, [repo]);
 
   useEffect(() => {
     fetchData();
@@ -246,6 +276,31 @@ const Profile = () => {
                     icon={<TbPrompt size={18} />}
                   />
                 </Tooltip> */}
+                {!hasAccess && (
+                  <Tooltip label='Enable git access via GitHub for DevGPT' placement="top">
+                    <IconButton
+                      colorScheme='orange'
+                      onClick={() => {
+                        window.open('https://github.com/apps/devgpt-labs', '_blank');
+                      }}
+                      isDisabled={hasAccess}
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Access"
+                      icon={
+                        <Flex flexDirection="row" px={3}>
+                          {hasAccess ? <BsEye /> : <BsEyeSlashFill />}
+                          <Text ml={2} fontSize={14}>
+                            No connection to {repo?.repo}
+                          </Text>
+                        </Flex>
+                      }
+                    />
+                  </Tooltip>
+                )}
+
                 <Tooltip label={"Select A Repo"} placement="top">
                   <IconButton
                     _hover={{
@@ -280,7 +335,7 @@ const Profile = () => {
                   />
                 </Tooltip>
 
-                <ProfileOptionIconButton
+                <FooterOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
                   ariaLabel="Turn the lights on"
@@ -304,7 +359,7 @@ const Profile = () => {
                     />
                   </Link>
                 </Tooltip>
-                <Tooltip label="Signout" placement="top">
+                {/* <Tooltip label="Signout" placement="top">
                   <IconButton
                     _hover={{
                       transform: "translateY(-4px)",
@@ -317,7 +372,7 @@ const Profile = () => {
                     aria-label="Signout"
                     icon={<PiSignOutBold size={14} />}
                   />
-                </Tooltip>
+                </Tooltip> */}
               </Flex>
             </Flex>
           )}
@@ -327,4 +382,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Footer;

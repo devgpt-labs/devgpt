@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Tag, Text, Flex, useColorMode, Box } from "@chakra-ui/react";
-import Profile from "@/components/repos/Profile";
+import Footer from "@/components/repos/Footer";
 import AppHeader from "@/components/AppHeader";
 import authStore from "@/store/Auth";
 import { useRouter } from "next/router";
@@ -37,7 +37,7 @@ const Home = ({ children }: any) => {
     >
       <Flex
         flexDirection="column"
-        bgColor={colorMode === "dark" ? "#24292f" : "whitesmoke"}
+        bgColor={colorMode === "dark" ? "#1c1c1c" : "whitesmoke"}
         width="100vw"
         minH="100vh"
       >
@@ -50,7 +50,7 @@ const Home = ({ children }: any) => {
         >
           {children}
         </Flex>
-        <Profile />
+        <Footer />
       </Flex>
     </Flex>
   );

@@ -7,6 +7,11 @@ import {
   useToast,
   Text,
   Link,
+  InputGroup,
+  InputRightElement,
+  Kbd,
+  SlideFade,
+  useColorMode,
 } from "@chakra-ui/react";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
@@ -15,6 +20,7 @@ import { supabase } from "@/utils/supabase";
 const PromptAreaAndButton = () => {
   const { repo }: any = repoStore();
   const { user }: any = authStore();
+  const { colorMode } = useColorMode();
   const [prompt, setPrompt] = useState("");
   const toast = useToast();
 
@@ -61,7 +67,8 @@ const PromptAreaAndButton = () => {
       .insert([
         {
           email_address: user.email,
-          tag: "In-Progress",
+          tag: "In Progress",
+          login: user.username,
           prompt: prompt,
           repo: repo.repo,
           owner: repo.owner,
@@ -111,8 +118,6 @@ const PromptAreaAndButton = () => {
       });
   };
 
-  const [hoveringButton, setHoveringButton] = useState(false);
-
   return (
     <Flex flexDirection="column" mb={4}>
       <Flex flexDirection="column" alignItems={"flex-start"}>
@@ -121,8 +126,7 @@ const PromptAreaAndButton = () => {
         </Text>
         <Textarea
           mt={3}
-          mb={3}
-          maxH="75vh"
+          pr="8rem"
           // On focus, add a glow
           _focus={{
             boxShadow: "0 0 0 0.4rem rgba(0, 255, 0, .22)",
@@ -133,11 +137,10 @@ const PromptAreaAndButton = () => {
             boxShadow: "0 0 0 0.8rem rgba(0, 255, 0, .12)",
             borderColor: "green.500",
           }}
-          // bgColor="#0d1116"
+          maxH="75vh"
           autoFocus
-          className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
           value={prompt}
-          placeholder="Copy and paste your software task here."
+          placeholder="Copy and paste your software task here..."
           onChange={(e: any) => {
             setPrompt(e.target.value);
           }}
@@ -153,26 +156,53 @@ const PromptAreaAndButton = () => {
             }
           }}
         />
+        {/* <Button
+          bg="#2da042"
+          onMouseOver={() => setHoveringButton(true)}
+          onMouseLeave={() => setHoveringButton(false)}
+          color="white"
+          onClick={async (e: any) => {
+            handleSubmit(prompt);
+          }}
+          >
+          {hoveringButton ? "Start new task" : "Start new task"}
+        </Button> */}
 
-        <Flex w="full" justifyContent="space-between" mt="2">
+        <Flex
+          flexDirection="row"
+          justifyContent="space-between"
+          width="100%"
+          mt={3}
+        >
+          {prompt.length > 3 && (
+            <SlideFade in={prompt.length > 3}>
+              <Button>
+                Hit
+                <Kbd
+                  mx={2}
+                  cursor="pointer"
+                  onClick={() => {
+                    handleSubmit(prompt);
+                  }}
+                >
+                  Enter
+                </Kbd>{" "}
+                to start your new task
+              </Button>
+            </SlideFade>
+          )}
+
+          {prompt.length <= 3 && (
+            <SlideFade in={prompt.length <= 3}>
+              <Button isDisabled={true}>Enter your task above</Button>
+            </SlideFade>
+          )}
+
           <Link href="https://docs.devgpt.com/february-labs/product-guides/prompting">
             <Text textDecoration={"underline"} color="gray" fontSize={"sm"}>
               Best practices for prompting
             </Text>
           </Link>
-
-          <Button
-            bg="#2da042"
-            onMouseOver={() => setHoveringButton(true)}
-            onMouseLeave={() => setHoveringButton(false)}
-            color="white"
-            width="10rem"
-            onClick={async (e: any) => {
-              handleSubmit(prompt);
-            }}
-          >
-            {hoveringButton ? "Submit task" : "Start new task"}
-          </Button>
         </Flex>
       </Flex>
     </Flex>

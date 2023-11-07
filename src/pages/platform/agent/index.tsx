@@ -89,6 +89,7 @@ const Chat = () => {
 
           // Filter the results (remove nulls)
           const filtered = merged.filter((task: any) => {
+            console.log('removed')
             return task.source !== null;
           });
 
@@ -283,7 +284,7 @@ const Chat = () => {
 
               <PromptAreaAndButton />
 
-              <Flex>
+              {/* <Flex>
                 <Flex alignItems={"center"}>
                   <FaCodeBranch size="15" />
                   <Heading size="sm" ml={1.5} fontWeight={"normal"}>
@@ -296,13 +297,13 @@ const Chat = () => {
                     0 Closed
                   </Heading>
                 </Flex>
-              </Flex>
+              </Flex> */}
 
               <TableContainer borderRadius={"sm"} mt={5}>
                 <Table variant="simple">
-                  <TableCaption>
+                  {/* <TableCaption>
                     Tip: Help is always available on our Discord server.
-                  </TableCaption>
+                  </TableCaption> */}
                   <Thead>
                     <Tr>
                       <Th>Recent Tickets</Th>
@@ -320,11 +321,11 @@ const Chat = () => {
                       return <Ticket task={task} />;
                     })}
                   </Tbody>
-                  <Tfoot>
+                  {/* <Tfoot>
                     <Tr>
                       <Th>Page 1</Th>
                     </Tr>
-                  </Tfoot>
+                  </Tfoot> */}
                 </Table>
               </TableContainer>
             </Box>
@@ -339,13 +340,19 @@ const Ticket = ({ task }: any) => {
   const router = useRouter();
   const toast = useToast();
 
-  // If the task is older than 20 minutes and the tag is still in progress, the task is not closed and the task.output is null, show a warning icon
-  const taskHasErrored =
-    moment(task.created_at).isBefore(moment().subtract(20, "minutes")) &&
-    task.tag === "In-Progress" &&
-    task.output === null;
+  const isIncomplete = task.tag.toLowerCase().replace('-', ' ') === "in progress" && task.output === null;
 
-  // TODO: If longer than a day, don't display
+  const isOlderThan20Minutes = moment(task.created_at).isBefore(
+    moment().subtract(20, "minutes")
+  );
+
+  const isOlderThan8Hours = moment(task.created_at).isBefore(
+    moment().subtract(8, "hours")
+  );
+
+  if (isIncomplete && isOlderThan8Hours) return null;
+
+  if (task.prompt === 'Write') return null
 
   return (
     <Tr
@@ -359,7 +366,7 @@ const Ticket = ({ task }: any) => {
       rounded="sm"
       cursor="pointer"
       onClick={() => {
-        task.tag === "In-Progress"
+        task.tag.toLowerCase().replace('-', ' ') === "in progress"
           ? toast({
             colorScheme: "green",
             title: "Ticket in progress",
@@ -372,8 +379,8 @@ const Ticket = ({ task }: any) => {
     >
       <Box py={4}>
         <Flex alignItems={"center"} gap={2}>
-          {taskHasErrored ? (
-            <TbGitBranchDeleted size="18" />
+          {isIncomplete && isOlderThan20Minutes ? (
+            <TbGitBranchDeleted color="#993739" size="18" />
           ) : (
             <TbGitBranch color="#3fba50" size="18" />
           )}
@@ -385,15 +392,15 @@ const Ticket = ({ task }: any) => {
           size="md"
           variant="solid"
           colorScheme={
-            taskHasErrored
+            isIncomplete && isOlderThan20Minutes
               ? "red"
-              : task.tag === "IN-PROGRESS"
+              : task.tag.toLowerCase().replace('-', ' ') === "in progress"
                 ? "purple"
                 : randomColorString()
           }
           borderRadius={"full"}
         >
-          {taskHasErrored ? "Error" : task.tag}
+          {isIncomplete && isOlderThan20Minutes ? "Error" : task.tag}
         </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
           #{task.id} opened {moment(task.created_at).fromNow()} via{" "}
