@@ -34,7 +34,7 @@ const ChatHeader = () => {
             bgGradient="linear(to-r, blue.500, teal.500)"
             color="white"
           >
-            Open Beta {version}
+            Open Alpha {version}
           </Tag>
         </Box>
 
