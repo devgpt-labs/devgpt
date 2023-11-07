@@ -21,7 +21,7 @@ import { useRouter } from "next/router";
 import { AiFillGitlab } from "react-icons/ai";
 import { FaBitbucket } from "react-icons/fa";
 import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
-import { BsDiscord, BsGithub } from "react-icons/bs";
+import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
 
 //components
 import GitConnectorButton from "./GitConnectorButton";
@@ -36,6 +36,7 @@ import useStore from "@/store/Auth";
 //assets
 import astro from "@/assets/astro.png";
 import getModels from "@/utils/getModels";
+import { RiStarSFill } from "react-icons/ri";
 
 const Auth = () => {
   const router = useRouter();
@@ -43,6 +44,16 @@ const Auth = () => {
   const [models, setModels] = useState<any[]>([]);
 
   const { fetch, user, session }: any = useStore();
+
+  useEffect(() => {
+    handleLogin();
+  }, [user]);
+
+  useEffect(() => {
+    if (loading || user || session || router.asPath.includes("access_token")) {
+      setLoading(true);
+    }
+  }, [loading, user, session, router.asPath]);
 
   useEffect(() => {
     fetch();
@@ -64,16 +75,6 @@ const Auth = () => {
     }
   };
 
-  useEffect(() => {
-    handleLogin();
-  }, [user]);
-
-  useEffect(() => {
-    if (loading || user || session || router.asPath.includes("access_token")) {
-      setLoading(true);
-    }
-  }, [loading, user, session, router.asPath]);
-
   // If the user is on mobile, show them a message saying that this is a desktop app
   // if (typeof window !== "undefined" && window.innerWidth < 768) {
   //   return (
@@ -87,7 +88,7 @@ const Auth = () => {
   //   console.log("Not mobile");
   // }
 
-  if (loading)
+  if (loading) {
     return (
       <Template>
         <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
@@ -96,9 +97,7 @@ const Auth = () => {
         </Flex>
       </Template>
     );
-
-
-  console.log({ user });
+  }
 
   return (
     <Template>
@@ -122,7 +121,7 @@ const Auth = () => {
             Icon={<BsGithub />}
             tooltip=""
           />
-          <GitConnectorButton
+          {/* <GitConnectorButton
             color="#0c61db"
             provider="Sign In With BitBucket"
             handle={() => { }}
@@ -135,23 +134,28 @@ const Auth = () => {
             handle={() => { }}
             Icon={<AiFillGitlab />}
             tooltip="Coming soon!"
-          />
+          /> */}
           <Heading size="xs" my={2}>
             Just getting started?
           </Heading>
-          <WhatIsDevGPT />
-          <AuthOption
+          {/* <WhatIsDevGPT /> */}
+          {/* <AuthOption
             label="Read Our Docs"
             Icon={<BiSolidBookBookmark />}
             url="https://docs.devgpt.com"
+          /> */}
+          <AuthOption
+            label="Authenticate With Github"
+            Icon={<BsGithub />}
+            url="https://github.com/apps/devgpt-labs"
           />
           <AuthOption
             label="Star Project On GitHub"
-            Icon={<BiSolidStar />}
+            Icon={<BsStars />}
             url="https://github.com/devgpt-labs/devgpt-releases/"
           />
           <AuthOption
-            label="Join Discord Community"
+            label="Join Our Discord Community"
             Icon={<BsDiscord />}
             url="https://discord.com/invite/6GFtwzuvtw"
           />

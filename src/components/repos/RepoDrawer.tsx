@@ -45,7 +45,7 @@ const RepoDrawer = () => {
     onOpen: onRepoSetupOpen,
     onClose: onRepoSetupClose,
   } = useDisclosure({
-    defaultIsOpen: false
+    defaultIsOpen: false,
   });
 
   const { repoWindowOpen, setRepo, setLofaf }: any = repoStore();
@@ -59,10 +59,6 @@ const RepoDrawer = () => {
   const [trainedModels, setTrainedModels] = useState<any[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
   const btnRef = useRef<any>();
-
-  if (!user) {
-    return null;
-  }
 
   useEffect(() => {
     if (repoWindowOpen === null) return;
@@ -152,7 +148,6 @@ const RepoDrawer = () => {
     });
 
     // Create a new row in the models table in Supabase
-    if (!supabase) return;
 
     // const newModel = {
     //   created_at: new Date().toISOString(),
@@ -189,6 +184,10 @@ const RepoDrawer = () => {
 
   if (!session?.provider_token) {
     signOut();
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
