@@ -30,7 +30,7 @@ const ChatHeader = () => {
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
         <Box>
-          <Tag ml={3} bg="#2da042" color="white" size="sm">
+          <Tag ml={3} colorScheme="cyan" size="sm">
             Beta {version}
           </Tag>
         </Box>

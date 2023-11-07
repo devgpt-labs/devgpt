@@ -104,9 +104,7 @@ const Branch = () => {
       pr_title: `Task ${task.id} - ${task.tag}`,
       pr_body: task.branchDescription,
       randomly_generated_5_digit_number:
-        String(task.id) +
-        // a number between 00 and 99 (2 digits)
-        +String(Math.floor(100 + Math.random() * 900)),
+        String(task.id) + String(Math.floor(100 + Math.random() * 900)),
     };
 
     const commit = {
@@ -354,7 +352,7 @@ const Branch = () => {
                     {file.originalContent ? (
                       <DiffEditor
                         theme="vs-dark"
-                        language="javascript"
+                        language={checkCodeLanguage(file.fileName)}
                         original={file.originalContent}
                         modified={file.newContent}
                         options={{
