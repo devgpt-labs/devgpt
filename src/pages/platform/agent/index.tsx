@@ -118,7 +118,7 @@ const Chat = () => {
     getPromptCount(user?.email, setPromptCount);
   }, [user?.email]);
 
-  if (isPro === null) {
+  if (isPro === "loading") {
     return (
       <Template>
         <Flex

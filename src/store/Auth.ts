@@ -10,7 +10,7 @@ const useStore = create((set) => ({
   stripe_customer_id: null,
   monthly_budget: null,
   credits: null,
-  isPro: false,
+  isPro: "loading",
   status: null,
   setCredits: (credits: number) => set({ credits }),
   setInvites: (invites: any) => set({ invites }),
