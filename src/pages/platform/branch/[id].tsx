@@ -31,7 +31,7 @@ import {
   ExternalLinkIcon,
 } from "@chakra-ui/icons";
 import { BiGitPullRequest, BiGlasses } from "react-icons/bi";
-import { createBranch } from "git-connectors";
+const { createBranch } = require("git-connectors")
 import moment from "moment";
 
 //stores

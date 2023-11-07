@@ -11,7 +11,7 @@ const openai = new OpenAI({
 export default async function handler(req: Request, res: Response) {
   let { messages } = await req.json();
 
-  const response = await openai.chat.completions.create({
+  const response: any = await openai.chat.completions.create({
     model: "gpt-4",
     stream: true,
     messages: messages,
