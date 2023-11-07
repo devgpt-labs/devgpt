@@ -21,7 +21,7 @@ import {
 } from "react-icons/bi";
 import { FiExternalLink } from "react-icons/fi";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { createBranch } from "git-connectors";
+const { createBranch } = require("git-connectors")
 
 // Icons
 import {
