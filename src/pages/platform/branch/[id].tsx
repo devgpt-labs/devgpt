@@ -31,7 +31,7 @@ import {
   ExternalLinkIcon,
 } from "@chakra-ui/icons";
 import { BiGitPullRequest, BiGlasses } from "react-icons/bi";
-const { createBranch } = require("git-connectors")
+const { createBranch } = require("git-connectors");
 import moment from "moment";
 
 //stores
@@ -232,36 +232,38 @@ const Branch = () => {
           <Flex justifyContent={"space-between"} mb={6}>
             <Flex flexDirection="column">
               <Flex flexDirection="row">
+                <Button
+                  mr={4}
+                  leftIcon={<ArrowBackIcon />}
+                  colorScheme="gray"
+                  borderRadius="lg"
+                  onClick={() =>
+                    router.push("/platform/agent", undefined, {
+                      shallow: true,
+                    })
+                  }
+                >
+                  Back
+                </Button>
                 {pullRequest.name || branch.name ? (
-                  <Tag
-                    cursor="default"
-                    borderRadius={"full"}
-                    bgColor="#2da042"
-                    color="white"
-                    size="md"
-                    mr={2}
-                    px={4}
-                    py={2}
-                    gap={1}
-                  >
-                    <BiGitPullRequest size={18} />
-                    Raised
-                  </Tag>
+                  <>
+                    <Tag
+                      cursor="default"
+                      borderRadius={"full"}
+                      bgColor="#2da042"
+                      color="white"
+                      size="md"
+                      mr={2}
+                      px={4}
+                      py={2}
+                      gap={1}
+                    >
+                      <BiGitPullRequest size={18} />
+                      Raised
+                    </Tag>
+                  </>
                 ) : (
                   <>
-                    <Button
-                      mr={4}
-                      leftIcon={<ArrowBackIcon />}
-                      colorScheme="gray"
-                      borderRadius="lg"
-                      onClick={() =>
-                        router.push("/platform/agent", undefined, {
-                          shallow: true,
-                        })
-                      }
-                    >
-                      Back
-                    </Button>
                     {open && (
                       <Tag
                         cursor="default"
@@ -297,22 +299,26 @@ const Branch = () => {
               </Flex>
               <Heading mt={3}>{task.prompt}</Heading>
               <Text fontWeight={"semibold"} fontSize={14} mt={4}>
-                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened 3 minutes ago via{" "}
+                #{task?.id}/{task?.branchName?.replace(/"/g, "")} opened{" "}
+                {moment(task?.created_at).fromNow()} via{" "}
                 <Text as="span">DevGPT Web</Text>
               </Text>
             </Flex>
             <Menu>
               <MenuButton
+                px={4}
+                py={2}
+                bg="#2da042"
+                transition="all 0.2s"
+                borderRadius="md"
+                borderWidth="1px"
+                // _hover={{ bg: "gray.500" }}
+                // _expanded={{ bg: "green.500" }}
+                // _focus={{ boxShadow: "outline" }}
                 as={Button}
-                bgColor="#2da042"
-                color="white"
-                gap={3}
-                pr={4}
+                rightIcon={<ChevronDownIcon ml={20} />}
               >
-                <Flex flexDirection="row" gap={2} alignItems="center">
-                  <Text>Review Changes</Text>
-                  <ChevronDownIcon />
-                </Flex>
+                Review Changes
               </MenuButton>
               <MenuList>
                 <MenuItem onClick={() => handleRaiseViaGit(true)}>
@@ -491,7 +497,7 @@ const Branch = () => {
               </Button>
             </Flex>
           </Flex>
-          <Flex flexDirection="column">
+          {/* <Flex flexDirection="column">
             <Text mb={2} fontSize={14}>
               Add a comment
             </Text>
@@ -532,8 +538,8 @@ const Branch = () => {
               size="sm"
             >
               Comment
-            </Button>
-          </Flex>
+            </Button> */}
+          {/* </Flex> */}
         </Flex>
       </Flex>
     </Template>

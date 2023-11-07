@@ -34,7 +34,7 @@ const ChatHeader = () => {
             Beta {version}
           </Tag>
         </Box>
-        <Flex gap={2}>{repo.repo && <Text>{repo.repo}</Text>}</Flex>
+        <Flex mr={2} gap={2}>{repo.repo && <Text>{repo.repo}</Text>}</Flex>
       </Flex>
     </Flex>
   );

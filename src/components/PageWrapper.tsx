@@ -36,6 +36,7 @@ const Home = ({ children }: any) => {
       className={`min-h-screen flex bg-slate-950 overflow-hidden`}
     >
       <Flex
+        justifyContent='space-between'
         flexDirection="column"
         bgColor={colorMode === "dark" ? "#1c1c1c" : "whitesmoke"}
         width="100vw"

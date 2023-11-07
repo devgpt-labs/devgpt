@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -22,6 +22,7 @@ const PromptAreaAndButton = () => {
   const { user }: any = authStore();
   const { colorMode } = useColorMode();
   const [prompt, setPrompt] = useState("");
+  const [gitValid, setGitValid] = useState<any>(null);
   const toast = useToast();
 
   const handleTaskFailed = async (id: any) => {
@@ -43,6 +44,29 @@ const PromptAreaAndButton = () => {
     if (data) {
       console.log(data);
     }
+  };
+
+  const checkAccess = async () => {
+    // Get the identity in user.identities that has 'provider' github, and then get the identity_data from it
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    // Send a POST request to https://devgpt-api-production-f45a.up.railway.app/validation with the JSON of { repo: "x" }
+    const response = await fetch(
+      "https://devgpt-api-production-f45a.up.railway.app/validation",
+      {
+        method: "POST",
+        body: JSON.stringify({ login: identity?.user_name, repo: repo?.repo }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    response.json().then((data) => {
+      data.success ? setGitValid(true) : setGitValid(false);
+    });
   };
 
   const handleSubmit = async (prompt: string) => {
@@ -124,6 +148,10 @@ const PromptAreaAndButton = () => {
       });
   };
 
+  useEffect(() => {
+    checkAccess();
+  }, [repo]);
+
   return (
     <Flex flexDirection="column" mb={4}>
       <Flex flexDirection="column" alignItems={"flex-start"}>
@@ -182,7 +210,7 @@ const PromptAreaAndButton = () => {
         >
           {prompt.length > 3 && (
             <SlideFade in={prompt.length > 3}>
-              <Button>
+              <Button mt={1}>
                 Hit
                 <Kbd
                   mx={2}
@@ -200,12 +228,37 @@ const PromptAreaAndButton = () => {
 
           {prompt.length <= 3 && (
             <SlideFade in={prompt.length <= 3}>
-              <Button isDisabled={true}>Enter your task above</Button>
+              {gitValid !== null && !gitValid ? (
+                <Button
+                  colorScheme="orange"
+                  onClick={() => {
+                    window.open(
+                      "https://github.com/apps/devgpt-labs",
+                      "_blank"
+                    );
+                  }}
+                  mt={1}
+                >
+                  You must connect Git before prompting
+                </Button>
+              ) : (
+                <Button mt={1} isDisabled={true}>
+                  Enter your task above
+                </Button>
+              )}
             </SlideFade>
           )}
 
-          <Link href="https://docs.devgpt.com/february-labs/product-guides/prompting">
-            <Text textDecoration={"underline"} color="gray" fontSize={"sm"}>
+          <Link
+            href="https://docs.devgpt.com/february-labs/product-guides/prompting"
+            isExternal={true}
+          >
+            <Text
+              mt={1}
+              textDecoration={"underline"}
+              color="gray"
+              fontSize={"sm"}
+            >
               Best practices for prompting
             </Text>
           </Link>
