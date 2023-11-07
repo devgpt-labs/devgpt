@@ -61,7 +61,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     if (user) {
-      await getModels(setModels, () => { }, user?.email);
+      await getModels(setModels, () => {}, user?.email);
 
       if (models.length > 0) {
         // Navigate user to the prompting page
@@ -144,11 +144,6 @@ const Auth = () => {
             Icon={<BiSolidBookBookmark />}
             url="https://docs.devgpt.com"
           /> */}
-          <AuthOption
-            label="Authenticate With Github"
-            Icon={<BsGithub />}
-            url="https://github.com/apps/devgpt-labs"
-          />
           <AuthOption
             label="Star Project On GitHub"
             Icon={<BsStars />}

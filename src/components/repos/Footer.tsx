@@ -144,7 +144,7 @@ const Footer = () => {
       "https://devgpt-api-production-f45a.up.railway.app/validation",
       {
         method: "POST",
-        body: JSON.stringify({ login: identity?.user_name + 2, repo: repo?.repo }),
+        body: JSON.stringify({ login: identity?.user_name, repo: repo?.repo }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -277,11 +277,17 @@ const Footer = () => {
                   />
                 </Tooltip> */}
                 {!hasAccess && (
-                  <Tooltip label='Enable git access via GitHub for DevGPT' placement="top">
+                  <Tooltip
+                    label="Enable git access via GitHub for DevGPT"
+                    placement="top"
+                  >
                     <IconButton
-                      colorScheme='orange'
+                      colorScheme="orange"
                       onClick={() => {
-                        window.open('https://github.com/apps/devgpt-labs', '_blank');
+                        window.open(
+                          "https://github.com/apps/devgpt-labs",
+                          "_blank"
+                        );
                       }}
                       isDisabled={hasAccess}
                       _hover={{

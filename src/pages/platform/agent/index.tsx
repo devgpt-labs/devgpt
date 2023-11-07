@@ -82,21 +82,9 @@ const Chat = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "prompts" },
         (payload: any) => {
-          // Merge the results
-          const merged = [...tasks, payload?.new];
-
-          console.log({ merged });
-
-          // Filter the results (remove nulls)
-          const filtered = merged.filter((task: any) => {
-            console.log('removed')
-            return task.source !== null;
-          });
-
-          // Set state with the new tasks, reversed.
-          console.log({ filtered });
-
-          setTasks(filtered.reverse());
+          //add the new task to tasks
+          const merged = tasks.concat(payload.new);
+          setTasks(formatTasks(merged));
         }
       )
       .subscribe();
@@ -109,12 +97,7 @@ const Chat = () => {
       const { data, error } = await supabase.from("prompts").select("*");
 
       if (!error) {
-        //filter tasks where output is null
-        const filteredData = data.filter((task: any) => {
-          return task.source !== null;
-        });
-
-        setTasks(filteredData?.reverse());
+        setTasks(formatTasks(data));
       }
     };
 
@@ -177,7 +160,7 @@ const Chat = () => {
           justifyContent="center"
         >
           {isPro === false && (
-            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+            <Modal isOpen={true} onClose={() => {}} isCentered={true}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -340,7 +323,9 @@ const Ticket = ({ task }: any) => {
   const router = useRouter();
   const toast = useToast();
 
-  const isIncomplete = task.tag.toLowerCase().replace('-', ' ') === "in progress" && task.output === null;
+  const isIncomplete =
+    task.tag.toLowerCase().replace("-", " ") === "in progress" &&
+    task.output === null;
 
   const isOlderThan20Minutes = moment(task.created_at).isBefore(
     moment().subtract(20, "minutes")
@@ -352,7 +337,7 @@ const Ticket = ({ task }: any) => {
 
   if (isIncomplete && isOlderThan8Hours) return null;
 
-  if (task.prompt === 'Write') return null
+  if (task.prompt === "Write") return null;
 
   return (
     <Tr
@@ -366,14 +351,14 @@ const Ticket = ({ task }: any) => {
       rounded="sm"
       cursor="pointer"
       onClick={() => {
-        task.tag.toLowerCase().replace('-', ' ') === "in progress"
+        task.tag.toLowerCase().replace("-", " ") === "in progress"
           ? toast({
-            colorScheme: "green",
-            title: "Ticket in progress",
-            status: "info",
-            duration: 5000,
-            isClosable: true,
-          })
+              colorScheme: "green",
+              title: "Ticket in progress",
+              status: "info",
+              duration: 5000,
+              isClosable: true,
+            })
           : router.push(`/platform/branch/${task.id}`);
       }}
     >
@@ -394,9 +379,9 @@ const Ticket = ({ task }: any) => {
           colorScheme={
             isIncomplete && isOlderThan20Minutes
               ? "red"
-              : task.tag.toLowerCase().replace('-', ' ') === "in progress"
-                ? "purple"
-                : randomColorString()
+              : task.tag.toLowerCase().replace("-", " ") === "in progress"
+              ? "purple"
+              : randomColorString()
           }
           borderRadius={"full"}
         >
@@ -412,3 +397,17 @@ const Ticket = ({ task }: any) => {
 };
 
 export default Chat;
+
+const formatTasks = (tasks: any[]) => {
+  // Filter the results (remove nulls)
+  let filtered = tasks.filter((task: any) => {
+    return task.source !== null;
+  });
+
+  //order tasks by date created
+  filtered = filtered.sort((a: any, b: any) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  return filtered;
+};

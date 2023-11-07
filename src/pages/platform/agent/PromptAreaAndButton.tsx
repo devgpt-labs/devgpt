@@ -62,13 +62,19 @@ const PromptAreaAndButton = () => {
       return;
     }
 
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    const login = identity?.user_name;
+
     const { data, error } = await supabase
       .from("prompts")
       .insert([
         {
           email_address: user.email,
           tag: "In Progress",
-          login: user.username,
+          login: login,
           prompt: prompt,
           repo: repo.repo,
           owner: repo.owner,
@@ -99,8 +105,8 @@ const PromptAreaAndButton = () => {
       isClosable: true,
     });
 
-    //fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
-    fetch("http://localhost:4000/task-queue", {
+    // fetch("http://localhost:4000/task-queue", {
+    fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
