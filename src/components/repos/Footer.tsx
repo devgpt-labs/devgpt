@@ -16,22 +16,12 @@ import {
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { MdScience } from "react-icons/md";
 import { TbPrompt } from "react-icons/tb";
-import { FiExternalLink } from "react-icons/fi";
 // Components
 import UpgradeModal from "./UpgradeModal";
-import FooterButtons from "@/components/FooterButtons";
 const { getAccessToken } = require("git-connectors");
 
 // Icons
-import { PiSignOutBold } from "react-icons/pi";
-import {
-  BiCopy,
-  BiGitBranch,
-  BiGitPullRequest,
-  BiSolidBookBookmark,
-} from "react-icons/bi";
 import { AiFillCreditCard } from "react-icons/ai";
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
@@ -55,6 +45,7 @@ interface FooterOptionIconButtonProps {
 
 interface Identity {
   provider: "github" | "gitlab" | "bitbucket" | "mock";
+  full_name?: string;
   avatar_url?: string;
   name?: string;
   email?: string;
@@ -97,7 +88,7 @@ const Footer = () => {
   const { user, isPro, signOut, session }: any = authStore();
   const { repoWindowOpen, setRepoWindowOpen, repo }: any = repoStore();
   const { colorMode, toggleColorMode } = useColorMode();
-  const [hasAccess, setHasAccess] = useState<any>(null);
+  const [gitValid, setGitValid] = useState<any>(null);
   const router = useRouter();
 
   const {
@@ -152,7 +143,7 @@ const Footer = () => {
     );
 
     response.json().then((data) => {
-      data.success ? setHasAccess(true) : setHasAccess(false);
+      data.success ? setGitValid(true) : setGitValid(false);
     });
   };
 
@@ -219,6 +210,7 @@ const Footer = () => {
           <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
               <Image
+                ml={2}
                 _hover={{
                   boxShadow: "0px 0px 10px 0px gold",
                   transform: "translateY(-2px)",
@@ -238,7 +230,7 @@ const Footer = () => {
             <Box ml={15} flexDirection="column">
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
-                  <Text onClick={onCreditsOpen}>{identity?.name}</Text>
+                  <Text onClick={onCreditsOpen}>{identity?.full_name}</Text>
                 </Flex>
               </Flex>
             </Box>
@@ -276,7 +268,7 @@ const Footer = () => {
                     icon={<TbPrompt size={18} />}
                   />
                 </Tooltip> */}
-                {!hasAccess && (
+                {gitValid !== null && !gitValid && (
                   <Tooltip
                     label="Enable git access via GitHub for DevGPT"
                     placement="top"
@@ -289,7 +281,7 @@ const Footer = () => {
                           "_blank"
                         );
                       }}
-                      isDisabled={hasAccess}
+                      isDisabled={gitValid}
                       _hover={{
                         transform: "translateY(-4px)",
                         transition: "all 0.2s ease-in-out",
@@ -297,9 +289,9 @@ const Footer = () => {
                       aria-label="Access"
                       icon={
                         <Flex flexDirection="row" px={3}>
-                          {hasAccess ? <BsEye /> : <BsEyeSlashFill />}
+                          {gitValid ? <BsEye /> : <BsEyeSlashFill />}
                           <Text ml={2} fontSize={14}>
-                            No connection to {repo?.repo}
+                            No connection to Git
                           </Text>
                         </Flex>
                       }
@@ -324,7 +316,7 @@ const Footer = () => {
                   />
                 </Tooltip>
               </Flex>
-              <Flex gap={2} ml={2}>
+              <Flex gap={2} mx={2}>
                 <Tooltip label={"View Billing"} placement="top">
                   <IconButton
                     _hover={{

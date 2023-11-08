@@ -160,7 +160,7 @@ const Chat = () => {
           justifyContent="center"
         >
           {isPro === false && (
-            <Modal isOpen={true} onClose={() => {}} isCentered={true}>
+            <Modal isOpen={true} onClose={() => { }} isCentered={true}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Start Your 7-day Free Trial</ModalHeader>
@@ -341,24 +341,21 @@ const Ticket = ({ task }: any) => {
 
   return (
     <Tr
-      // On hover, scale up the ticket
       _hover={{
-        // slide slightly to the right
         transform: "translateX(5px)",
       }}
-      // Animate the transform
       transition="transform 0.2s"
       rounded="sm"
       cursor="pointer"
       onClick={() => {
         task.tag.toLowerCase().replace("-", " ") === "in progress"
           ? toast({
-              colorScheme: "green",
-              title: "Ticket in progress",
-              status: "info",
-              duration: 5000,
-              isClosable: true,
-            })
+            colorScheme: "green",
+            title: "Ticket in progress",
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          })
           : router.push(`/platform/branch/${task.id}`);
       }}
     >
@@ -380,8 +377,8 @@ const Ticket = ({ task }: any) => {
             isIncomplete && isOlderThan20Minutes
               ? "red"
               : task.tag.toLowerCase().replace("-", " ") === "in progress"
-              ? "purple"
-              : randomColorString()
+                ? "purple"
+                : randomColorString()
           }
           borderRadius={"full"}
         >
@@ -389,7 +386,15 @@ const Ticket = ({ task }: any) => {
         </Tag>
         <Text fontWeight={"semibold"} fontSize="14" color="#7d8590" mt={2}>
           #{task.id} opened {moment(task.created_at).fromNow()} via{" "}
-          <Text as="span">{task.source} • Review required</Text>
+          <Text
+
+            _hover={{
+              textDecoration: "underline",
+              cursor: "pointer",
+              color: "blue.500"
+            }}
+
+            as="span">{task.source} • Review required</Text>
         </Text>
       </Box>
     </Tr>
