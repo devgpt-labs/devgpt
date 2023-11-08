@@ -1,52 +1,25 @@
 {
-  "name": "DevGPT Frontend",
+  "name": "devgpt-api",
   "version": "2.1.0",
-  "private": true,
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/provider": "^2.4.1",
-    "@chakra-ui/react": "^2.8.1",
-    "@monaco-editor/react": "^4.6.0",
-    "@octokit/auth-app": "^6.0.1",
-    "@octokit/core": "^5.0.1",
-    "@octokit/rest": "^20.0.2",
-    "@supabase/auth-ui-react": "^0.4.5",
-    "@supabase/auth-ui-shared": "^0.1.7",
-    "@supabase/supabase-js": "^2.33.2",
-    "@types/js-cookie": "^3.0.4",
-    "@types/react-spinner": "^0.2.1",
-    "ai": "^2.2.13",
     "axios": "^1.6.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "fs": "^0.0.1-security",
-    "git-connectors": "^2.2.8",
-    "gpt-tokenizer": "^2.1.1",
-    "js-cookie": "^3.0.5",
-    "jsonwebtoken": "^9.0.2",
-    "moment": "^2.29.4",
-    "monaco-editor": "^0.44.0",
-    "next": "latest",
-    "octokit": "^3.1.1",
-    "openai": "^4.10.0",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-icons": "^4.11.0",
-    "react-markdown": "^8.0.7",
-    "react-syntax-highlighter": "^15.5.0",
-    "stripe": "^13.6.0",
-    "supabase": "^1.93.0",
-    "zustand": "^4.4.1"
+    "express": "^4.18.1",
+    "git-connectors": "^2.3.4",
+    "openai": "^4.16.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "typescript": "latest"
+    "nodemon": "^3.0.1"
   }
 }
