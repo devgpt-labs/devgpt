@@ -30,22 +30,6 @@ app.get("/", (req, res) => {
   res.send("API is operational 🤖");
 });
 
-app.post("/validation", get_access_token, (req, res) => {
-  const { accessToken } = req.body;
-
-  console.log({ accessToken });
-
-  if (accessToken) {
-    res.json({
-      success: true,
-    });
-  } else {
-    res.json({
-      success: false,
-    });
-  }
-});
-
 app.post(
   "/generate",
   get_access_token,
@@ -73,6 +57,19 @@ app.post(
     });
   }
 );
+
+app.post("/validation", get_access_token, (req, res) => {
+  const { accessToken } = req.body;
+  if (accessToken) {
+    res.json({
+      success: true,
+    });
+  } else {
+    res.json({
+      success: false,
+    });
+  }
+});
 
 // Export the Express API
 module.exports = app;
