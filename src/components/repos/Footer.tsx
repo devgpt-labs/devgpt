@@ -45,6 +45,7 @@ interface FooterOptionIconButtonProps {
 
 interface Identity {
   provider: "github" | "gitlab" | "bitbucket" | "mock";
+  full_name?: string;
   avatar_url?: string;
   name?: string;
   email?: string;
