@@ -7,9 +7,7 @@ import {
   Image,
   Text,
   useColorMode,
-  SlideFade,
   Tooltip,
-  Tag,
   Link,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -18,25 +16,13 @@ import {
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabase";
 import getPromptCount from "@/utils/getPromptCount";
-import { MdMoney, MdScience, MdWork } from "react-icons/md";
 import { TbPrompt } from "react-icons/tb";
-
 // Components
-import Repos from "./Settings";
 import UpgradeModal from "./UpgradeModal";
-import FooterButtons from "@/pages/platform/agent/FooterButtons";
+const { getAccessToken } = require("git-connectors");
 
 // Icons
-import { PiSignOutBold } from "react-icons/pi";
-import { BiSolidBookBookmark } from "react-icons/bi";
 import { AiFillCreditCard } from "react-icons/ai";
-import {
-  GiBattery100,
-  GiBattery75,
-  GiBattery50,
-  GiBattery0,
-  GiIsland,
-} from "react-icons/gi";
 import { MoonIcon, SunIcon, StarIcon } from "@chakra-ui/icons";
 import { FaBug } from "react-icons/fa";
 
@@ -44,10 +30,9 @@ import { FaBug } from "react-icons/fa";
 import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
 import KeyModal from "./KeyModal";
-import CreditsModal from "./CreditsModal";
-import Models from "@/pages/platform/models";
+import { BsEye, BsEyeSlashFill } from "react-icons/bs";
 
-interface ProfileOptionIconButtonProps {
+interface FooterOptionIconButtonProps {
   tooltip?: any;
   comparison?: any;
   onClick?: any;
@@ -60,6 +45,7 @@ interface ProfileOptionIconButtonProps {
 
 interface Identity {
   provider: "github" | "gitlab" | "bitbucket" | "mock";
+  full_name?: string;
   avatar_url?: string;
   name?: string;
   email?: string;
@@ -67,7 +53,7 @@ interface Identity {
 }
 
 // TODO: Convert all of the buttons on this menu to use this component
-const ProfileOptionIconButton = ({
+const FooterOptionIconButton = ({
   tooltip,
   comparison,
   onClick,
@@ -76,7 +62,7 @@ const ProfileOptionIconButton = ({
   otherLabel,
   Icon,
   OtherIcon,
-}: ProfileOptionIconButtonProps) => {
+}: FooterOptionIconButtonProps) => {
   return (
     <Tooltip
       label={tooltip ? tooltip : comparison ? label : otherLabel}
@@ -95,12 +81,14 @@ const ProfileOptionIconButton = ({
   );
 };
 
-const Profile = () => {
+const Footer = () => {
   const [promptCount, setPromptCount] = useState<number>(0);
   const [credits, setCredits] = useState<number>(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
-  const { user, isPro, signOut }: any = authStore();
+  const { user, isPro, signOut, session }: any = authStore();
+  const { repoWindowOpen, setRepoWindowOpen, repo }: any = repoStore();
   const { colorMode, toggleColorMode } = useColorMode();
+  const [gitValid, setGitValid] = useState<any>(null);
   const router = useRouter();
 
   const {
@@ -136,6 +124,29 @@ const Profile = () => {
     }
   };
 
+  const checkAccess = async () => {
+    // Get the identity in user.identities that has 'provider' github, and then get the identity_data from it
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    // Send a POST request to https://devgpt-api-production-f45a.up.railway.app/validation with the JSON of { repo: "x" }
+    const response = await fetch(
+      "https://devgpt-api-production-f45a.up.railway.app/validation",
+      {
+        method: "POST",
+        body: JSON.stringify({ login: identity?.user_name, repo: repo?.repo }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    response.json().then((data) => {
+      data.success ? setGitValid(true) : setGitValid(false);
+    });
+  };
+
   const fetchData = async () => {
     const credits: any = await getCredits(user?.email);
 
@@ -143,6 +154,10 @@ const Profile = () => {
       setCredits(credits);
     }
   };
+
+  useEffect(() => {
+    checkAccess();
+  }, [repo]);
 
   useEffect(() => {
     fetchData();
@@ -164,13 +179,12 @@ const Profile = () => {
     <>
       <Flex
         w="full"
-        mt={3}
         flexDirection="column"
         rounded="lg"
         borderTop={
           colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
         }
-        p={4}
+        p={3}
       >
         {/* <CreditsModal
           isCreditsOpen={isCreditsOpen}
@@ -192,11 +206,11 @@ const Profile = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
-          px={4}
         >
           <Flex flexDirection="row" alignItems="center">
             {identity?.avatar_url && (
               <Image
+                ml={2}
                 _hover={{
                   boxShadow: "0px 0px 10px 0px gold",
                   transform: "translateY(-2px)",
@@ -205,7 +219,7 @@ const Profile = () => {
                 alt="Avatar"
                 src={identity?.avatar_url}
                 style={{
-                  borderRadius: 10,
+                  borderRadius: 100,
                   objectFit: "cover",
                 }}
                 maxHeight={40}
@@ -216,10 +230,8 @@ const Profile = () => {
             <Box ml={15} flexDirection="column">
               <Flex flexDirection={"row"} alignItems={"center"}>
                 <Flex flexDirection="column" mr={3}>
-                  <Text onClick={onCreditsOpen}>{identity?.name}</Text>
-                  <Text>{identity?.email}</Text>
+                  <Text onClick={onCreditsOpen}>{identity?.full_name}</Text>
                 </Flex>
-                <FooterButtons />
               </Flex>
             </Box>
           </Flex>
@@ -240,7 +252,7 @@ const Profile = () => {
                     />
                   </Tooltip>
                 )}
-
+                {/* 
                 <Tooltip label={"Write Prompts"} placement="top">
                   <IconButton
                     _hover={{
@@ -255,37 +267,56 @@ const Profile = () => {
                     aria-label="Write Prompts"
                     icon={<TbPrompt size={18} />}
                   />
-                </Tooltip>
-                <Tooltip label={"View Models"} placement="top">
+                </Tooltip> */}
+                {gitValid !== null && !gitValid && (
+                  <Tooltip
+                    label="Enable git access via GitHub for DevGPT"
+                    placement="top"
+                  >
+                    <IconButton
+                      colorScheme="orange"
+                      onClick={() => {
+                        window.open(
+                          "https://github.com/apps/devgpt-labs",
+                          "_blank"
+                        );
+                      }}
+                      isDisabled={gitValid}
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                      aria-label="Access"
+                      icon={
+                        <Flex flexDirection="row" px={3}>
+                          {gitValid ? <BsEye /> : <BsEyeSlashFill />}
+                          <Text ml={2} fontSize={14}>
+                            No connection to Git
+                          </Text>
+                        </Flex>
+                      }
+                    />
+                  </Tooltip>
+                )}
+
+                <Tooltip label={"Select A Repo"} placement="top">
                   <IconButton
                     _hover={{
                       transform: "translateY(-4px)",
                       transition: "all 0.2s ease-in-out",
                     }}
                     onClick={() => {
-                      router.push("/platform/models", undefined, {
+                      router.push("/platform/agent", undefined, {
                         shallow: true,
                       });
+                      setRepoWindowOpen(!repoWindowOpen);
                     }}
-                    aria-label="View Models"
-                    icon={<MdScience size={18} />}
+                    aria-label="Select A Repo"
+                    icon={<TbPrompt size={18} />}
                   />
                 </Tooltip>
-
-                <Tooltip label="Read The Docs" placement="top">
-                  <Link isExternal href="https://docs.devgpt.com">
-                    <IconButton
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        transition: "all 0.2s ease-in-out",
-                      }}
-                      aria-label="Read The Docs"
-                      icon={<BiSolidBookBookmark />}
-                    />
-                  </Link>
-                </Tooltip>
               </Flex>
-              <Flex gap={2} ml={2}>
+              <Flex gap={2} mx={2}>
                 <Tooltip label={"View Billing"} placement="top">
                   <IconButton
                     _hover={{
@@ -302,7 +333,7 @@ const Profile = () => {
                   />
                 </Tooltip>
 
-                <ProfileOptionIconButton
+                <FooterOptionIconButton
                   comparison={colorMode === "light"}
                   onClick={toggleColorMode}
                   ariaLabel="Turn the lights on"
@@ -311,7 +342,7 @@ const Profile = () => {
                   Icon={MoonIcon}
                   OtherIcon={SunIcon}
                 />
-                <Tooltip label="Report An Issue" placement="top">
+                <Tooltip label="Report A Bug" placement="top">
                   <Link
                     isExternal
                     href="https://github.com/devgpt-labs/devgpt-releases/issues"
@@ -321,12 +352,12 @@ const Profile = () => {
                         transform: "translateY(-4px)",
                         transition: "all 0.2s ease-in-out",
                       }}
-                      aria-label="Report An Issue"
+                      aria-label="Report A Bug"
                       icon={<FaBug />}
                     />
                   </Link>
                 </Tooltip>
-                <Tooltip label="Signout" placement="top">
+                {/* <Tooltip label="Signout" placement="top">
                   <IconButton
                     _hover={{
                       transform: "translateY(-4px)",
@@ -339,7 +370,7 @@ const Profile = () => {
                     aria-label="Signout"
                     icon={<PiSignOutBold size={14} />}
                   />
-                </Tooltip>
+                </Tooltip> */}
               </Flex>
             </Flex>
           )}
@@ -349,50 +380,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
-
-// Now unused profile options
-{
-  /* <>
-  <Tooltip label="Enter Open AI key" placement="top">
-    <IconButton
-      _hover={{
-        transform: "translateY(-4px)",
-        transition: "all 0.2s ease-in-out",
-      }}
-      onClick={onKeyOpen}
-      aria-label="Enter Open AI key"
-      icon={<BiKey size={18} />}
-    />
-  </Tooltip>
-  <ProfileOptionIconButton
-    tooltip={"Train Repo"}
-    comparison={repoWindowOpen}
-    onClick={() => {
-      setRepoWindowOpen(!repoWindowOpen);
-    }}
-    ariaLabel="Train Repo"
-    label="Close"
-    otherLabel="Open"
-    Icon={AiFillFolderOpen}
-    OtherIcon={AiFillFolderOpen}
-  />
-  <Tooltip
-    label={isSettingsOpen ? "Close Settings" : "Open Settings"}
-    placement="top"
-  >
-    <IconButton
-      _hover={{
-        transform: "translateY(-4px)",
-        transition: "all 0.2s ease-in-out",
-      }}
-      onClick={() => {
-        onSettingsToggle();
-        onModelsClose();
-      }}
-      aria-label="Open Settings"
-      icon={<IoMdSettings size={18} />}
-    />
-  </Tooltip>
-</>; */
-}
+export default Footer;

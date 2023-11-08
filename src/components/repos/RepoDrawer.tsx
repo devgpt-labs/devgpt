@@ -37,14 +37,16 @@ type PageInfo = {
   endCursor: string;
 };
 
-const RepoDrawer = ({ setRefresh, refresh }: any) => {
+const RepoDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     isOpen: isRepoSetupOpen,
     onOpen: onRepoSetupOpen,
     onClose: onRepoSetupClose,
-  } = useDisclosure();
+  } = useDisclosure({
+    defaultIsOpen: false,
+  });
 
   const { repoWindowOpen, setRepo, setLofaf }: any = repoStore();
   const { session, user, signOut, stripe_customer_id }: any = authStore();
@@ -58,12 +60,8 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
   const btnRef = useRef<any>();
 
-  if (!user) {
-    return null;
-  }
-
   useEffect(() => {
-    if (repoWindowOpen === null || !repoWindowOpen) return;
+    if (repoWindowOpen === null) return;
     onOpen();
   }, [repoWindowOpen]);
 
@@ -150,35 +148,34 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
     });
 
     // Create a new row in the models table in Supabase
-    if (!supabase) return;
 
-    const newModel = {
-      created_at: new Date().toISOString(),
-      stripe_customer_id: stripe_customer_id,
-      repo: repo.name,
-      owner: repo.owner.login,
-      branch: "main",
-      epochs: repo.epochs,
-      training_method: "ENCODING",
-      frequency: repo.frequency,
-      sample_size: repo.sampleSize,
-      output: null,
-      deleted: false,
-      email_address: user?.email,
-    };
+    // const newModel = {
+    //   created_at: new Date().toISOString(),
+    //   stripe_customer_id: stripe_customer_id,
+    //   repo: repo.name,
+    //   owner: repo.owner.login,
+    //   branch: "main",
+    //   epochs: repo.epochs,
+    //   training_method: "ENCODING",
+    //   frequency: repo.frequency,
+    //   sample_size: repo.sampleSize,
+    //   output: null,
+    //   deleted: false,
+    //   email_address: user?.email,
+    // };
 
     // charge
-    handleChargeCustomer(newModel);
+    // handleChargeCustomer(newModel);
 
-    const { data, error } = await supabase
-      .from("models")
-      .insert([{ ...newModel }]);
+    // const { data, error } = await supabase
+    //   .from("models")
+    //   .insert([{ ...newModel }]);
 
-    setRefresh(!refresh);
+    // setRefresh(!refresh);
 
-    if (error) {
-      console.log(error);
-    }
+    // if (error) {
+    // console.log(error);
+    // }
   };
 
   useEffect(() => {
@@ -187,6 +184,10 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
 
   if (!session?.provider_token) {
     signOut();
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
@@ -210,7 +211,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
           <DrawerCloseButton mt={2} />
           <DrawerHeader>
             <Flex justifyContent="space-between" alignItems="center">
-              Train A New Model {reposCount ? ` (${reposCount} repos) ` : ""}
+              Select A Repo {reposCount ? ` (${reposCount} repos) ` : ""}
             </Flex>
           </DrawerHeader>
           <DrawerBody>
@@ -220,7 +221,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
                   <Input
                     pr="4rem"
                     mb={2}
-                    placeholder="Search repos"
+                    placeholder="Search your repos"
                     value={filter}
                     onChange={(e) => {
                       setFilter(e.target.value);
@@ -251,7 +252,7 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
                   ?.map((repoOption) => {
                     return (
                       <Flex
-                        key={repoOption.name + repoOption.owner.login}
+                        key={repoOption.name + Math.random()}
                         mb={2}
                         flexDirection="row"
                         justifyContent={"space-between"}
@@ -270,11 +271,15 @@ const RepoDrawer = ({ setRefresh, refresh }: any) => {
                         <Button
                           size="sm"
                           onClick={() => {
+                            onClose();
                             setSelectedRepo(repoOption);
-                            onRepoSetupOpen();
+                            setRepo({
+                              owner: repoOption.owner.login,
+                              repo: repoOption.name,
+                            });
                           }}
                         >
-                          Train
+                          Select
                         </Button>
                       </Flex>
                     );

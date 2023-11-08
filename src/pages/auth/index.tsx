@@ -21,7 +21,7 @@ import { useRouter } from "next/router";
 import { AiFillGitlab } from "react-icons/ai";
 import { FaBitbucket } from "react-icons/fa";
 import { BiSolidBookBookmark, BiSolidStar } from "react-icons/bi";
-import { BsDiscord, BsGithub } from "react-icons/bs";
+import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
 
 //components
 import GitConnectorButton from "./GitConnectorButton";
@@ -36,6 +36,7 @@ import useStore from "@/store/Auth";
 //assets
 import astro from "@/assets/astro.png";
 import getModels from "@/utils/getModels";
+import { RiStarSFill } from "react-icons/ri";
 
 const Auth = () => {
   const router = useRouter();
@@ -43,26 +44,6 @@ const Auth = () => {
   const [models, setModels] = useState<any[]>([]);
 
   const { fetch, user, session }: any = useStore();
-
-  useEffect(() => {
-    fetch();
-  }, []);
-
-  const handleLogin = async () => {
-    if (user) {
-      await getModels(setModels, () => { }, user?.email);
-
-      if (models.length > 0) {
-        // Navigate user to the prompting page
-        router.push("/platform/agent", undefined, { shallow: true });
-      } else {
-        // If the user has no models, navigate them to the add a model page
-        router.push("/platform/models", undefined, { shallow: true });
-      }
-    } else {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     handleLogin();
@@ -74,7 +55,40 @@ const Auth = () => {
     }
   }, [loading, user, session, router.asPath]);
 
-  if (loading)
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  const handleLogin = async () => {
+    if (user) {
+      await getModels(setModels, () => {}, user?.email);
+
+      if (models.length > 0) {
+        // Navigate user to the prompting page
+        router.push("/platform/agent", undefined, { shallow: true });
+      } else {
+        // If the user has no models, navigate them to the add a model page
+        router.push("/platform/agent", undefined, { shallow: true });
+      }
+    } else {
+      setLoading(false);
+    }
+  };
+
+  // If the user is on mobile, show them a message saying that this is a desktop app
+  // if (typeof window !== "undefined" && window.innerWidth < 768) {
+  //   return (
+  //     <Template>
+  //       <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
+  //         <Text ml={3}>Sorry, DevGPT is not available on mobile devices.</Text>
+  //       </Flex>
+  //     </Template>
+  //   );
+  // } else {
+  //   console.log("Not mobile");
+  // }
+
+  if (loading) {
     return (
       <Template>
         <Flex height="70vh" alignItems="center" justifyContent="center" mt={5}>
@@ -83,6 +97,7 @@ const Auth = () => {
         </Flex>
       </Template>
     );
+  }
 
   return (
     <Template>
@@ -106,7 +121,7 @@ const Auth = () => {
             Icon={<BsGithub />}
             tooltip=""
           />
-          <GitConnectorButton
+          {/* <GitConnectorButton
             color="#0c61db"
             provider="Sign In With BitBucket"
             handle={() => { }}
@@ -119,23 +134,23 @@ const Auth = () => {
             handle={() => { }}
             Icon={<AiFillGitlab />}
             tooltip="Coming soon!"
-          />
+          /> */}
           <Heading size="xs" my={2}>
             Just getting started?
           </Heading>
-          <WhatIsDevGPT />
-          <AuthOption
+          {/* <WhatIsDevGPT /> */}
+          {/* <AuthOption
             label="Read Our Docs"
             Icon={<BiSolidBookBookmark />}
             url="https://docs.devgpt.com"
-          />
+          /> */}
           <AuthOption
             label="Star Project On GitHub"
-            Icon={<BiSolidStar />}
+            Icon={<BsStars />}
             url="https://github.com/devgpt-labs/devgpt-releases/"
           />
           <AuthOption
-            label="Join Discord Community"
+            label="Join Our Discord Community"
             Icon={<BsDiscord />}
             url="https://discord.com/invite/6GFtwzuvtw"
           />

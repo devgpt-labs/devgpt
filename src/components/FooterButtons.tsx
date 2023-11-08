@@ -5,6 +5,8 @@ import { Flex, Text, Tooltip, IconButton, Link } from "@chakra-ui/react";
 // Icons
 import { BsDiscord, BsGithub, BsStars } from "react-icons/bs";
 import authStore from "@/store/Auth";
+import { BiLogIn } from "react-icons/bi";
+import { useEffect } from "react";
 
 // TODO: The discord icon would ideally show people online in discord
 // TODO: The github icon would ideally show the number of stars on the repo
@@ -26,7 +28,7 @@ const FooterButtons = () => {
               <Flex flexDirection="row" px={3}>
                 <StarIcon />
                 <Text ml={2} fontSize={14}>
-                  {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                  {/* {activeOnDiscord && `Online: ${ activeOnDiscord } `} */}
                   Pro Plan
                 </Text>
               </Flex>
@@ -34,7 +36,6 @@ const FooterButtons = () => {
           />
         </Tooltip>
       )}
-
       <Tooltip label="Join Discord" placement="top">
         <Link href="https://discord.com/invite/6GFtwzuvtw">
           <IconButton
@@ -47,7 +48,7 @@ const FooterButtons = () => {
               <Flex flexDirection="row" px={3}>
                 <BsDiscord />
                 <Text ml={2} fontSize={14}>
-                  {/* {activeOnDiscord && `Online: ${activeOnDiscord}`} */}
+                  {/* {activeOnDiscord && `Online: ${ activeOnDiscord } `} */}
                   Join
                 </Text>
               </Flex>

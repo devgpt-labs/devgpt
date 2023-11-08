@@ -109,9 +109,9 @@ const checkIfPro = async (emailAddress: string) => {
 	// If none of the above apply, check on their individual subscription to ensure it's active
 	if (
 		customer?.subscriptions?.data?.[0]?.status === "active" ||
-		customer?.subscriptions?.data?.[0]?.status === "trialing"
+		customer?.subscriptions?.data?.[0]?.status === "trialing" 
 	) {
-		return activePlan;
+		return activePlan 
 	} else {
 		return false;
 	}

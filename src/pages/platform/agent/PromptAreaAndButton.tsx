@@ -1,119 +1,270 @@
-import React, { useState } from "react";
-import { Button, Flex, Input, Spinner, Text, Code } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Flex,
+  Textarea,
+  Spinner,
+  useToast,
+  Text,
+  Link,
+  InputGroup,
+  InputRightElement,
+  Kbd,
+  SlideFade,
+  useColorMode,
+} from "@chakra-ui/react";
+import repoStore from "@/store/Repos";
 import authStore from "@/store/Auth";
+import { supabase } from "@/utils/supabase";
 
-interface PromptAreaAndButtonProps {
-  prompt: string;
-  selectedFile: any;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-  handleUseTabSuggestion: (file: any) => void;
-  setPrompt: (prompt: string) => void;
-  handleInputChange: (e: any) => void;
-  submitChecks: (isReset: boolean) => Promise<boolean>;
-  setHasBeenReset: (hasBeenReset: boolean) => void;
-  handleSubmit: (e: any) => void;
-}
+const PromptAreaAndButton = () => {
+  const { repo }: any = repoStore();
+  const { user }: any = authStore();
+  const { colorMode } = useColorMode();
+  const [prompt, setPrompt] = useState("");
+  const [gitValid, setGitValid] = useState<any>(null);
+  const toast = useToast();
 
-const PromptAreaAndButton = ({
-  prompt,
-  selectedFile,
-  loading,
-  setLoading,
-  handleUseTabSuggestion,
-  setPrompt,
-  handleInputChange,
-  submitChecks,
-  setHasBeenReset,
-  handleSubmit,
-}: PromptAreaAndButtonProps) => {
-  const { isPro }: any = authStore();
-  const [show, setShow] = useState(false);
+  const handleTaskFailed = async (id: any) => {
+    if (!supabase) {
+      console.warn("No supabase");
+      return;
+    }
 
-  if (!isPro) return null;
+    const { data, error } = await supabase
+      .from("prompts")
+      .update({ tag: "FAILED" })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (data) {
+      console.log(data);
+    }
+  };
+
+  const checkAccess = async () => {
+    // Get the identity in user.identities that has 'provider' github, and then get the identity_data from it
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    // Send a POST request to https://devgpt-api-production-f45a.up.railway.app/validation with the JSON of { repo: "x" }
+    const response = await fetch(
+      "https://devgpt-api-production-f45a.up.railway.app/validation",
+      {
+        method: "POST",
+        body: JSON.stringify({ login: identity?.user_name, repo: repo?.repo }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    response.json().then((data) => {
+      data.success ? setGitValid(true) : setGitValid(false);
+    });
+  };
+
+  const handleSubmit = async (prompt: string) => {
+    if (prompt.length < 3) {
+      toast({
+        title: "Task too short",
+        description: "Please enter a longer task.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (!supabase) {
+      console.warn("No supabase");
+      return;
+    }
+
+    const identity = user?.identities?.find((identity: { provider: string }) =>
+      ["github"].includes(identity?.provider)
+    )?.identity_data;
+
+    const login = identity?.user_name;
+
+    const { data, error } = await supabase
+      .from("prompts")
+      .insert([
+        {
+          email_address: user.email,
+          tag: "In Progress",
+          login: login,
+          prompt: prompt,
+          repo: repo.repo,
+          owner: repo.owner,
+          source: "DevGPT Web",
+        },
+      ])
+      .select("*");
+
+    setPrompt("");
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "There was an error submitting your task.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      return;
+    }
+
+    toast({
+      title: "Task submitted",
+      description: "Your task has been submitted to the queue.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+
+    // fetch("http://localhost:4000/task-queue", {
+    fetch("https://devgpt-taskqueue-production.up.railway.app/task-queue", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: data[0].id,
+      }),
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        // Set the tasks tag to 'failed' in prompts
+        handleTaskFailed(data[0].id);
+      });
+  };
+
+  useEffect(() => {
+    checkAccess();
+  }, [repo]);
 
   return (
-    <Flex flexDirection='column'>
-      <Flex flexDirection="row" my={2}>
-        <Input
-          // border="solid 1px #3e68ff"
-          // borderColor='#3e68ff'
-          // shadow="0px 0px 5px 5px #3e68ff"
+    <Flex flexDirection="column" mb={4}>
+      <Flex flexDirection="column" alignItems={"flex-start"}>
+        <Text>
+          {repo.owner} / {repo.repo}
+        </Text>
+        <Textarea
+          mt={3}
+          pr="8rem"
+          // On focus, add a glow
+          _focus={{
+            boxShadow: "0 0 0 0.4rem rgba(0, 255, 0, .22)",
+            borderColor: "green.500",
+          }}
+          // On hover, add a glow
+          _hover={{
+            boxShadow: "0 0 0 0.8rem rgba(0, 255, 0, .12)",
+            borderColor: "green.500",
+          }}
+          maxH="75vh"
           autoFocus
-          className="fixed w-full max-w-md bottom-0 rounded shadow-xl p-2 dark:text-black"
           value={prompt}
-          placeholder="Enter your task, e.g. Create a login page, or use @ to reference a file from your repo."
+          placeholder="Copy and paste your software task here..."
           onChange={(e: any) => {
             setPrompt(e.target.value);
-            handleInputChange(e);
           }}
           onKeyDown={async (e: any) => {
             if (prompt.length < 3) {
               return;
             }
 
-            if (loading) return;
-
-            // If key equals tab, autocomplete
-            if (e.key === "Tab") {
-              e.preventDefault();
-              handleUseTabSuggestion(selectedFile[0]);
-              return;
-            }
-
             // If key equals enter, submit
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              const checks = await submitChecks(false);
-              if (!checks) return null;
-              setHasBeenReset(false);
-              handleSubmit(e);
+              handleSubmit(prompt);
             }
           }}
         />
-
-        <Button
-          bg="blue.500"
-          // bgGradient="linear(to-r, blue.500, teal.500)"
-          isDisabled={loading}
+        {/* <Button
+          bg="#2da042"
+          onMouseOver={() => setHoveringButton(true)}
+          onMouseLeave={() => setHoveringButton(false)}
           color="white"
-          ml={4}
-          width="10rem"
           onClick={async (e: any) => {
-            setLoading(true);
-            const checks = await submitChecks(false);
-            if (!checks) {
-              return null;
-            }
-            setHasBeenReset(false);
-            handleSubmit(e);
+            handleSubmit(prompt);
           }}
+          >
+          {hoveringButton ? "Start new task" : "Start new task"}
+        </Button> */}
+
+        <Flex
+          flexDirection="row"
+          justifyContent="space-between"
+          width="100%"
+          mt={3}
         >
-          {loading ? <Spinner size="sm" /> : "Generate Code"}
-        </Button>
+          {prompt.length > 3 && (
+            <SlideFade in={prompt.length > 3}>
+              <Button mt={1}>
+                Hit
+                <Kbd
+                  mx={2}
+                  cursor="pointer"
+                  onClick={() => {
+                    handleSubmit(prompt);
+                  }}
+                >
+                  Enter
+                </Kbd>{" "}
+                to start your new task
+              </Button>
+            </SlideFade>
+          )}
+
+          {prompt.length <= 3 && (
+            <SlideFade in={prompt.length <= 3}>
+              {gitValid !== null && !gitValid ? (
+                <Button
+                  colorScheme="orange"
+                  onClick={() => {
+                    window.open(
+                      "https://github.com/apps/devgpt-labs",
+                      "_blank"
+                    );
+                  }}
+                  mt={1}
+                >
+                  You must connect Git before prompting
+                </Button>
+              ) : (
+                <Button mt={1} isDisabled={true}>
+                  Enter your task above
+                </Button>
+              )}
+            </SlideFade>
+          )}
+
+          <Link
+            href="https://docs.devgpt.com/february-labs/product-guides/prompting"
+            isExternal={true}
+          >
+            <Text
+              mt={1}
+              textDecoration={"underline"}
+              color="gray"
+              fontSize={"sm"}
+            >
+              Best practices for prompting
+            </Text>
+          </Link>
+        </Flex>
       </Flex>
-      {/* <Text
-        color="gray.400"
-        cursor="pointer"
-        textDecoration={"underline"}
-        onClick={() => {
-          setShow(!show);
-        }}
-      >
-        View how to improve prompts
-      </Text>
-      {show && (
-        <>
-          <Text>
-            Use the <Code>@</Code> command to target files
-          </Text>
-          <Text>Provide specific detail about your task only</Text>
-          <Text>You can disable this feature in the settings</Text>
-        </>
-      )} */}
     </Flex>
-
-
   );
 };
 

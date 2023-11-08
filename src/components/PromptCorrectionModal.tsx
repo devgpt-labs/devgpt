@@ -19,16 +19,13 @@ const PromptCorrectionModal = ({
   isOpen,
   onClose,
   correctedPrompt,
-  setCorrectedPrompt,
   prompt,
   setPrompt,
-  onReject,
   onSubmit,
   setLoading,
 }: any) => {
   const promptArray = prompt.split(" ");
   const correctedPromptArray = correctedPrompt.split(" ");
-  const [show, setShow] = useState(false);
 
   const common = correctedPromptArray.filter(
     (word: any) => !promptArray.includes(word)
@@ -38,18 +35,14 @@ const PromptCorrectionModal = ({
   const commonWithSpaces = common.map((word: any) => word + " ");
 
   useEffect(() => {
-    setPrompt(correctedPrompt);
-    setLoading(true);
-    onClose();
-    onSubmit({
-      preventDefault: () => { },
-      value: correctedPrompt,
-    });
+    // setLoading(true);
+    // onClose();
+    // onSubmit(prompt);
   }, [correctedPrompt]);
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      {/* <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalCloseButton />
@@ -57,7 +50,7 @@ const PromptCorrectionModal = ({
             <Text>Correcting your prompt</Text>
           </Box>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

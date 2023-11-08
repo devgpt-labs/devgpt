@@ -92,18 +92,6 @@ const Models = () => {
     getModels(setModelsInTraining, setLoading, user?.email);
   }, [repos, refresh]);
 
-  useEffect(() => {
-    if (!session) {
-      console.log("no session found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-
-    if (!user) {
-      console.log("no user found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-  }, [session, user]);
-
   if (loading || !user) return <ModelLoadingScreen />;
   if (modelsInTraining.length === 0 && isPro)
     return <AddAModel setRefresh={setRefresh} refresh={refresh} />;
@@ -119,7 +107,7 @@ const Models = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Modal isOpen={true} onClose={() => { }} isCentered={true}>
+          <Modal isOpen={true} onClose={() => {}} isCentered={true}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>It's time to upgrade</ModalHeader>
@@ -204,16 +192,7 @@ const Models = () => {
       >
         <Flex alignItems="center" justifyContent="space-between" gap={3} mb={3}>
           <Flex flexDirection="row" alignItems="center">
-            {/* <Link href="/platform/agent">
-              <IconButton
-                onClick={() => {
-                  router.back();
-                }}
-                aria-label="Close"
-                icon={<ArrowBackIcon />}
-              />
-            </Link> */}
-            <Heading size="md">Trained Models</Heading>
+            <Heading size="md">Repos</Heading>
           </Flex>
           <Flex gap={2}>
             <Button
@@ -255,7 +234,6 @@ const Models = () => {
           </Grid>
         )}
       </Flex>
-      <RepoDrawer setRefresh={setRefresh} refresh={refresh} />
     </Template>
   );
 };

@@ -95,18 +95,6 @@ const Models = ({ onClose }: any) => {
     setMonthlySpend();
   }, [stripe_customer_id]);
 
-  useEffect(() => {
-    if (!session) {
-      console.log("no session found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-
-    if (!user) {
-      console.log("no user found, returning to home");
-      router.push("/", undefined, { shallow: true });
-    }
-  }, [session, user]);
-
   // Used to show how much the user will have available for prompting
   const balanceCalculation =
     Number(budget) - Number(calculateTotalCost(modelsInTraining, 0));
@@ -182,7 +170,7 @@ const Models = ({ onClose }: any) => {
 
   const sections = [
     { name: "Billing", disabled: isPro === "member" ? true : false },
-    { name: "Models", disabled: !isPro ? true : false },
+    { name: "Repos", disabled: !isPro ? true : false },
     {
       name: "Teams",
       disabled: !isPro ? true : isPro === "individual" ? true : false,
@@ -304,7 +292,7 @@ const Models = ({ onClose }: any) => {
             </Flex>
           </Flex>
 
-          {section.name.toLowerCase() === "models" && (
+          {section.name.toLowerCase() === "repos" && (
             <BillingTable
               modelsInTraining={modelsInTraining}
               budget={budget}

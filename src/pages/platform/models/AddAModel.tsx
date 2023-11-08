@@ -54,7 +54,7 @@ const AddAModel = ({ setRefresh, refresh }: any) => {
             <Text ml={2}>Refresh</Text>
           </Button>
         </Flex>
-        <RepoDrawer setRefresh={setRefresh} refresh={refresh} />
+        <RepoDrawer />
         <Flex
           width="100%"
           height="50vh"
@@ -69,7 +69,7 @@ const AddAModel = ({ setRefresh, refresh }: any) => {
             }}
             rightIcon={<SmallAddIcon />}
           >
-            Train A New Model
+            Select Model
           </Button>
         </Flex>
       </Flex>

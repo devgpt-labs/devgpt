@@ -5,7 +5,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-  organization: process?.env?.NEXT_PUBLIC_OPEN_AI_ORG_2,
 });
 
 type ResponseData = {

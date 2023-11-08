@@ -19,60 +19,22 @@ const ChatHeader = () => {
     <Flex
       justifyContent="space-between"
       borderBottom={
-        colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #1a202c"
+        colorMode === "light" ? "1px solid #CBD5E0" : "1px solid #2d2d2d"
       }
       p={5}
       w="full"
       alignItems="center"
       maxH="sm"
+      backgroundColor={colorMode === "light" ? "#F7FAFC" : "#1c1c1c"}
     >
       <Logo />
       <Flex flexDirection={"row"} width="100%" justifyContent="space-between">
         <Box>
-          <Tag
-            ml={3}
-            bgGradient="linear(to-r, blue.500, teal.500)"
-            color="white"
-          >
-            Open Beta {version}
+          <Tag ml={3} colorScheme="cyan" size="sm">
+            Beta {version}
           </Tag>
         </Box>
-
-        <Flex gap={2}>
-          {/* <Tag
-            color='white'
-            colorScheme="blue"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="row"
-            ml={2}
-            gap={2}
-          >
-            <Text>Desktop app returning soon</Text>
-            <Text>🎉</Text>
-          </Tag> */}
-          <Tag
-            ml={3}
-            bgGradient="linear(to-r, blue.500, teal.500)"
-            color="white"
-          >
-            We're currently investigating issues with training, join our discord
-            to stay updated.
-          </Tag>
-          {repo.repo && (
-            <Tag bgGradient={"linear(to-r, blue.500, teal.500)"} color="white">
-              {repo.repo}
-            </Tag>
-          )}
-          {/* {isPro && (
-            <Tag colorScheme="blue"
-              color='white'
-
-            >
-              {repo.repo}
-            </Tag>
-          )} */}
-        </Flex>
+        <Flex mr={2} gap={2}>{repo.repo && <Text>{repo.repo}</Text>}</Flex>
       </Flex>
     </Flex>
   );

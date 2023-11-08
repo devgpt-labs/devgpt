@@ -259,7 +259,7 @@ const ModelCard = ({
                       }
                     />
                   </Tooltip>
-                  <Tooltip label="Edit Model">
+                  {/* <Tooltip label="Edit Model">
                     <IconButton
                       size="sm"
                       onClick={() => setShow(!show)}
@@ -281,7 +281,7 @@ const ModelCard = ({
                       aria-label="Train Model"
                       icon={isTraining ? <Spinner size="sm" /> : <FaBrain />}
                     />
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip label="Select Model">
                     <IconButton
                       size="sm"
@@ -315,31 +315,10 @@ const ModelCard = ({
               </Flex>
               <Flex flexDirection="column" gap={1} mb={1}>
                 <Badge
-                  colorScheme={
-                    model.deleted
-                      ? "red"
-                      : isTraining
-                        ? "blue"
-                        : isErrored
-                          ? "orange"
-                          : !JSON.parse(model.output) ||
-                            JSON.parse(model.output)?.length < 2
-                            ? "orange"
-                            : "teal"
-                  }
+                  colorScheme={repo.repo === model.repo ? "teal" : "orange"}
                   alignSelf="flex-start"
                 >
-                  Status:{" "}
-                  {model.deleted
-                    ? "Deleted"
-                    : isTraining
-                      ? "Training"
-                      : isErrored
-                        ? "Training Failed"
-                        : !JSON.parse(model.output) ||
-                          JSON.parse(model.output)?.length < 2
-                          ? "Untrained"
-                          : "Trained"}
+                  Status: {repo.repo === model.repo ? "In use" : "Not in use"}
                 </Badge>
                 {isErrored && (
                   <Text fontSize={14}>
@@ -360,24 +339,6 @@ const ModelCard = ({
               <Text fontSize={14}>
                 {moment(model.created_at).format("MMMM Do YYYY, h:mm:ss a")}
               </Text>
-            </Box>
-            <Box>
-              <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                <GridItem>
-                  <Stat>
-                    <StatLabel>Frequency</StatLabel>
-                    <StatNumber>{model.frequency}</StatNumber>
-                    <Text fontSize={10}>Train X times a month</Text>
-                  </Stat>
-                </GridItem>
-                <GridItem>
-                  <Stat>
-                    <StatLabel>Sample Size</StatLabel>
-                    <StatNumber>{model.sample_size}</StatNumber>
-                    <Text fontSize={10}>Train on X amount of files</Text>
-                  </Stat>
-                </GridItem>
-              </Grid>
             </Box>
           </Stack>
           <Box mt={5}>{isTraining && <ModelInTraining model={model} />}</Box>
@@ -414,14 +375,6 @@ const ModelCard = ({
                     },
                   });
                 }}
-              // setBranch={(e: any) => {
-              //   handleModelInTrainingChange({
-              //     target: {
-              //       name: "branch",
-              //       value: e,
-              //     },
-              //   });
-              // }}
               />
               <Flex gap={2} mt={4}>
                 <Button onClick={() => setShow(false)}>Cancel</Button>
@@ -441,7 +394,7 @@ const ModelCard = ({
           )}
         </CardBody>
       </Card>
-    </Box >
+    </Box>
   );
 };
 
