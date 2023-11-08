@@ -16,6 +16,15 @@ const Home = ({ children }: any) => {
   }, []);
 
   useEffect(() => {
+    //make sure that the user isn't already on the / page
+    const isOnHomePage = router.asPath === "/";
+
+    console.log("here", router.asPath);
+
+    if (isOnHomePage) {
+      return;
+    }
+
     if (!session) {
       console.log("no session found, returning to home");
       router.push("/", undefined, { shallow: true });
