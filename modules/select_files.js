@@ -30,7 +30,6 @@ const select_files = async (req, res, next) => {
 							Pick as few files as possible to complete the task.
 							If new files are needed, please add their paths to the JSON ARRAY of generatedFiles,
 							for each file also return a similar file that will be used for reference.
-							IMPORTANT: The developer will often quote relevant file names in the task, if so, ONLY return those.
 							Response in valid JSON ARRAY of objects containing the following properties:
 							
 							property name: selectedFiles
