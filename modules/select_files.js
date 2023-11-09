@@ -48,7 +48,7 @@ const select_files = async (req, res, next) => {
         },
         {
           role: "user",
-          content: `Task: "${prompt}" ProjectFiles: "${prunedLofaf}"`,
+          content: `${prompt} ProjectFiles: "${prunedLofaf}"`,
         },
       ],
     });
