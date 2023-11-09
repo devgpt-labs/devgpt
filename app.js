@@ -8,9 +8,7 @@ const PORT = process.env.PORT || 3999;
 
 //routes
 const get_access_token = require("./modules/get_access_token.js");
-const generate_branch_name = require("./modules/generate_branch_name.js");
-const generate_branch_description = require("./modules/generate_branch_description.js");
-const generate_tag = require("./modules/generate_tag.js");
+const generate_branch_details = require("./modules/generate_branch_details.js");
 const prune_lofaf = require("./modules/prune_lofaf.js");
 const select_files = require("./modules/select_files.js");
 const prepare_files = require("./modules/prepare_files.js");
@@ -33,9 +31,7 @@ app.get("/", (req, res) => {
 app.post(
   "/generate",
   get_access_token,
-  generate_branch_name,
-  generate_branch_description,
-  generate_tag,
+  generate_branch_details,
   prune_lofaf,
   select_files,
   prepare_files,
