@@ -19,16 +19,16 @@ const select_files = async (req, res, next) => {
     console.log("select_files started:", prunedLofaf);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo-1106",
+      model: "gpt-4-1106-preview",
       response_format: { type: "json_object" },
       temperature: 0,
       stream: false,
       messages: [
         {
           role: "system",
-          content: `Your task is to process a list of files given to you by a software developer,
+          content: `Your task is to pick files from a list that are relevant to the developer's task,
 							Pick as few files as possible to complete the task.
-							If new files are needed, please add their paths to the CSV,
+							If new files are needed, please add their paths to the JSON ARRAY of generatedFiles,
 							for each file also return a similar file that will be used for reference.
 							IMPORTANT: The developer will often quote relevant file names in the task, if so, ONLY return those.
 							Response in valid JSON ARRAY of objects containing the following properties:
