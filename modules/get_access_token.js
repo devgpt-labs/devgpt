@@ -11,6 +11,8 @@ const get_access_token = async (req, res, next) => {
       process.env.APP_ID,
       JSON.parse(process.env.PEM).pem
     ).then((token) => {
+      console.log("get_access_token finished:", token);
+
       req.body.accessToken = token;
       next();
     });
