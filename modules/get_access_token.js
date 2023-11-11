@@ -3,11 +3,11 @@ require("dotenv").config();
 
 const get_access_token = async (req, res, next) => {
   try {
-    const { login, repo } = req.body;
+    const { owner, repo } = req.body;
 
     getAccessToken(
       repo,
-      login,
+      owner,
       process.env.APP_ID,
       JSON.parse(process.env.PEM).pem
     ).then((token) => {
