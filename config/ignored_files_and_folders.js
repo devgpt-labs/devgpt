@@ -20,18 +20,17 @@ const IGNORED_FILES_AND_FOLDERS = [
     ".so", // Shared Object files (Linux)
     ".o", // Object files (compiled code)
     ".a", // Archive files
-    ".class", // Java class files
     ".jar", // Java Archive files
     ".pdb", // Program Database files (debug info)
     ".swp", // Vim swap files
     ".gitignore",
     ".yaml",
+    ".yml",
     ".json",
     ".env",
-    ".lock", //lock files should be ommited
+    ".lock", //lock files should be omitted
     ".sll",
     "node_modules",
-    "node-modules",
     ".git", // Git metadata folder
     ".vscode", // Visual Studio Code settings folder
     ".idea", // JetBrains IntelliJ IDEA settings folder
@@ -43,7 +42,35 @@ const IGNORED_FILES_AND_FOLDERS = [
     "target", // Java/Maven target folder
     "bin", // Binary folder
     "obj", // Object folder (C#/.NET)
-    "vendor" // PhP Eqv of node_modules
+    "vendor", // PHP Eqv of node_modules
+    ".gem", // Gem files
+    ".rbc", // Ruby compiled files
+    ".rbo", // Ruby compiled files
+    ".gemfile.lock", // Gemfile lock file
+    ".ruby-version", // Ruby version file
+    ".ruby-gemset", // Ruby gemset file
+    ".rbenv-version", // rbenv version file
+    ".rvmrc", // RVM version file
+    "Gemfile.lock", // Gemfile lock file
+    "vendor/bundle/", // Bundler's bundle directory
+    "log/", // Log files
+    "tmp/", // Temporary files
+    "coverage/", // Code coverage reports
+    "Rakefile", // Rake build script
+    "Capfile", // Capistrano configuration file
+    "config.ru", // Rackup configuration file
+    ".rspec", // RSpec configuration file
+    "spec/", // RSpec test directory
+    "test/", // Test directory
+    "Guardfile", // Guard configuration file
+    ".yardoc/", // YARD documentation directory
+    ".yardopts", // YARD documentation configuration file
+    "fonts/",
+    "images/",
+    "img/",
+    "assets/",
+    "node-modules", // Missing in the second list
+    ".class", // Missing in the second list
 ];
 
 module.exports = IGNORED_FILES_AND_FOLDERS;
