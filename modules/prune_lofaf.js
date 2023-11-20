@@ -1,4 +1,5 @@
 const { getLofaf } = require("git-connectors");
+const ignored_files_and_folders = require("../config/ignored_files_and_folders");
 
 const prune_lofaf = async (req, res, next) => {
   try {
@@ -11,7 +12,20 @@ const prune_lofaf = async (req, res, next) => {
     const lofaf = await getLofaf(owner, repo, accessToken);
 
     // Filter out the unnecessary files
-    let prunedLofaf = lofaf.split(",");
+    let unprunedLofaf = lofaf.split(",");
+
+    // Filter the prunedLofaf, if the file string includes something from the ignored_files_and_folders array, remove it
+    prunedLofaf = unprunedLofaf.filter((file) => {
+      let keepFile = true;
+
+      ignored_files_and_folders.forEach((ignoredFileOrFolder) => {
+        if (file.includes(ignoredFileOrFolder)) {
+          keepFile = false;
+        }
+      });
+
+      return keepFile;
+    });
 
     // Update the request object with the pruned lofaf
     req.body.prunedLofaf = prunedLofaf;
