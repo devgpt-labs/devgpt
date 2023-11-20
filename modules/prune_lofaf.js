@@ -15,7 +15,7 @@ const prune_lofaf = async (req, res, next) => {
     let unprunedLofaf = lofaf.split(",");
 
     // Filter the prunedLofaf, if the file string includes something from the ignored_files_and_folders array, remove it
-    prunedLofaf = unprunedLofaf.filter((file) => {
+    const prunedLofaf = unprunedLofaf.filter((file) => {
       let keepFile = true;
 
       ignored_files_and_folders.forEach((ignoredFileOrFolder) => {
