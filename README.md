@@ -1,4 +1,4 @@
-# DevGPT: Autonomous AI that writes code like you; for human review.
+# DevGPT: Transform Jira tickets straight into code.
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@
 
 ## Introduction
 
-Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4-32k and other models.
+Welcome to **DevGPT**, the AI-driven development tool designed to transform the way you code. Created to assist developers in achieving their maximum potential, DevGPT is not just an auto-completion tool; it's your AI-powered dev-agent powered by gpt-4-turbo and other models.
 
 ## Features
 
